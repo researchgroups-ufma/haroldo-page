@@ -746,9 +746,9 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Projeto Astro + TypeScript + Tailwind inicializado; versões fixadas em `package.json` e `.nvmrc` — plano 002 (`astro@5.18.2`, `tailwindcss@4.3.3`, `typescript@5.9.3`, Node 24)
 - [x] Estrutura de diretórios criada conforme §7.5 — plano 003 (14 `.gitkeep` versionados)
 - [ ] Conta/projeto TinaCloud criado e vinculado ao repositório
-- [ ] Conta Cloudflare com Worker criado
+- [ ] Conta Cloudflare com Worker criado — *configuração de hospedagem versionada em `wrangler.toml` (plano 007); falta criar conta/Worker e fazer o primeiro deploy (plano 012)*
 - [x] Convenção de link de material definida — URL livre (D-07); Drive recomendado no manual, sem dependência de conta
-- [ ] `.env.example` criado e documentado
+- [x] `.env.example` criado e documentado — plano 006 (`TINA_CLIENT_ID`, `TINA_TOKEN`, `TINA_BRANCH`, `PUBLIC_SITE_URL`)
 - [ ] `README.md` inicial (instalação + como rodar)
 - [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — *Prettier, ESLint (plano 004) e Vitest (plano 005) prontos; falta o CI (plano 008)*
 - [x] Q-03 respondida (limite de minutos de build do plano gratuito) e registrada — 3.000 min/mês, verificado 2026-09-01
