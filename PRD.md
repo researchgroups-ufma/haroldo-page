@@ -28,6 +28,7 @@
 | v0.1 | 2026-09-01 | Desenvolvedor | Versão inicial, derivada do briefing + sessão de brainstorming (decisões D-01 a D-06 da §7.2) |
 | v0.1.1 | 2026-09-01 | Desenvolvedor | Q-03 resolvida (cota do Workers Builds); A-03 confirmada; R-06 rebaixado; R-12 acrescentado |
 | v0.1.2 | 2026-09-01 | Desenvolvedor | Q-01 resolvida via `lattes.pdf` (Apêndice C); Q-08 dissolvida pela decisão D-07 (link agnóstico ao hospedeiro); NG-02, RN-05, A-04, R-08 e §7.4 ajustados |
+| v0.1.3 | 2026-09-01 | Desenvolvedor | §12 atualizada com o progresso real da fase 0 (planos 001–004 DONE); mapa de execução dos planos em `plans/README.md` |
 
 ---
 
@@ -731,7 +732,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 
 | Fase | Itens concluídos | Status |
 |---|---|---|
-| Fase 0 — Setup e provisionamento | 2/10 | 🟡 Em andamento |
+| Fase 0 — Setup e provisionamento | 4/10 | 🟡 Em andamento |
 | Fase 1 — Modelo de conteúdo | 0/9 | ⬜ Não iniciada |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
 | Fase 3 — Site público (PT) | 0/11 | ⬜ Não iniciada |
@@ -741,15 +742,15 @@ Todo módulo `.ts` e componente `.astro` começa com:
 Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqueada
 
 ### Fase 0 — Setup e Provisionamento
-- [ ] Repositório GitHub criado (privado) com `.gitignore` adequado
-- [ ] Projeto Astro + TypeScript + Tailwind inicializado; versões fixadas em `package.json` e `.nvmrc`
-- [ ] Estrutura de diretórios criada conforme §7.5
+- [ ] Repositório GitHub criado (privado) com `.gitignore` adequado — *`.gitignore` e repositório local prontos (plano 001); falta o repositório remoto (plano 010)*
+- [x] Projeto Astro + TypeScript + Tailwind inicializado; versões fixadas em `package.json` e `.nvmrc` — plano 002 (`astro@5.18.2`, `tailwindcss@4.3.3`, `typescript@5.9.3`, Node 24)
+- [x] Estrutura de diretórios criada conforme §7.5 — plano 003 (14 `.gitkeep` versionados)
 - [ ] Conta/projeto TinaCloud criado e vinculado ao repositório
 - [ ] Conta Cloudflare com Worker criado
 - [x] Convenção de link de material definida — URL livre (D-07); Drive recomendado no manual, sem dependência de conta
 - [ ] `.env.example` criado e documentado
 - [ ] `README.md` inicial (instalação + como rodar)
-- [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando
+- [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — *Prettier e ESLint prontos (plano 004); faltam Vitest (plano 005) e CI (plano 008)*
 - [x] Q-03 respondida (limite de minutos de build do plano gratuito) e registrada — 3.000 min/mês, verificado 2026-09-01
 
 ### Fase 1 — Modelo de Conteúdo
