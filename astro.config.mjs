@@ -1,6 +1,17 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { loadEnv } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
+
+// astro.config.mjs roda em Node antes de o Astro/Vite aplicar `.env` ao
+// processo — `process.env.PUBLIC_SITE_URL` ficaria sempre `undefined` quando
+// a variável só existe no `.env` local (verificado empiricamente na revisão
+// da pendência P-2 do plano 006). `loadEnv` lê os arquivos `.env*` na raiz do
+// projeto sem sobrescrever variáveis já definidas no ambiente real (CI,
+// Cloudflare Workers Builds), que continuam tendo prioridade. Prefixo
+// `'PUBLIC_'` limita a leitura a essas variáveis — não carrega `TINA_TOKEN`
+// nem as demais, que este arquivo não usa.
+const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), 'PUBLIC_');
 
 /**
  * ============================================================================
@@ -11,10 +22,11 @@ import tailwindcss from '@tailwindcss/vite';
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
  *  Atualizado em: 2026-09-01
- *  Versão       : 0.1.0
+ *  Versão       : 0.1.1
  *
- *  Dependências : astro, @tailwindcss/vite
- *  Entradas     : variável de ambiente PUBLIC_SITE_URL (opcional)
+ *  Dependências : astro, @tailwindcss/vite, vite (loadEnv)
+ *  Entradas     : variável de ambiente PUBLIC_SITE_URL (opcional), lida via
+ *                 `loadEnv` do `.env`/ambiente real — ver nota acima
  *  Saídas       : configuração consumida pelo CLI do Astro (`astro build`/`astro dev`)
  *  Uso          : lido automaticamente pelo Astro na raiz do projeto
  *
@@ -25,7 +37,7 @@ import tailwindcss from '@tailwindcss/vite';
  */
 export default defineConfig({
   output: 'static',
-  site: process.env.PUBLIC_SITE_URL ?? 'https://haroldo-page.workers.dev',
+  site: PUBLIC_SITE_URL ?? 'https://haroldo-page.workers.dev',
   vite: {
     plugins: [tailwindcss()],
   },
