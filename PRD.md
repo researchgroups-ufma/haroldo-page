@@ -750,7 +750,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Convenção de link de material definida — URL livre (D-07); Drive recomendado no manual, sem dependência de conta
 - [ ] `.env.example` criado e documentado
 - [ ] `README.md` inicial (instalação + como rodar)
-- [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — *Prettier e ESLint prontos (plano 004); faltam Vitest (plano 005) e CI (plano 008)*
+- [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — *Prettier, ESLint (plano 004) e Vitest (plano 005) prontos; falta o CI (plano 008)*
 - [x] Q-03 respondida (limite de minutos de build do plano gratuito) e registrada — 3.000 min/mês, verificado 2026-09-01
 
 ### Fase 1 — Modelo de Conteúdo
