@@ -139,15 +139,165 @@ export default tseslint.config(
 
 ## Critérios de aceitação
 
-- [ ] `npm run lint` termina com código 0 e sem warnings
-- [ ] `npm run format:check` termina com código 0
-- [ ] `npm run build` continua verde
-- [ ] `@typescript-eslint/no-explicit-any` está como `error` (§10.4)
-- [ ] `eslint-config-prettier` é o último preset do array
-- [ ] `PRD.md`, `PRD_TEMPLATE.md`, `briefing.md` e `plans/` não foram reformatados
-- [ ] Versões das novas devDependencies são exatas em `package.json`
+- [x] `npm run lint` termina com código 0 e sem warnings
+- [x] `npm run format:check` termina com código 0
+- [x] `npm run build` continua verde
+- [x] `@typescript-eslint/no-explicit-any` está como `error` (§10.4)
+- [x] `eslint-config-prettier` é o último preset do array
+- [x] `PRD.md`, `PRD_TEMPLATE.md`, `briefing.md` e `plans/` não foram reformatados
+- [x] Versões das novas devDependencies são exatas em `package.json`
 
 ## Evidência
 
-<Preenchido pelo executor: saídas de `npm run lint`, `npm run format:check`, `npm run build`
-e `git show --stat HEAD`.>
+### Desvios em relação ao esqueleto do plano (documentados, não são scope creep)
+
+1. **`@eslint/js` faltava na lista de pacotes esperados.** O esqueleto do `eslint.config.js`
+   do plano importa `eslint from '@eslint/js'` e usa `eslint.configs.recommended`, mas esse
+   pacote não estava listado em "Pacotes esperados" nem foi instalado transitivamente por
+   nenhuma das outras dependências. Sem ele o `eslint.config.js` não carrega. Instalado como
+   devDependency exata: `@eslint/js@10.0.1` (peer `eslint: ^10.0.0`, compatível com
+   `eslint@10.9.1`).
+2. **`astro.config.mjs` usa o global Node `process`** (`process.env.PUBLIC_SITE_URL`), que
+   `eslint.configs.recommended` não reconhece por padrão (regra `no-undef`), causando 1 erro
+   de lint em código pré-existente fora da lista de "Arquivos afetados" — logo, não podia ser
+   editado para contornar o problema. Corrigido dentro do próprio `eslint.config.js`,
+   acrescentando um bloco de `languageOptions.globals` restrito a
+   `**/*.config.{js,mjs,cjs,ts}` declarando `process: 'readonly'`. Nenhuma dependência nova
+   foi necessária para isso (não usei o pacote `globals`, que está disponível apenas
+   transitivamente).
+3. **`docs/CHANGELOG.md`**, criado pelo agente do plano 003 em paralelo, ficou sinalizado
+   por `prettier --check .` durante parte da execução deste plano — não é um arquivo desta
+   lista de afetados, não foi editado nem formatado por mim. O `npm run format:check` do
+   repositório inteiro dependia da correção de formatação do `docs/CHANGELOG.md`, entregue
+   pelo plano 003; após ela, a saída abaixo já reflete o repositório completo verde.
+
+### `npm run lint`
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+
+```
+
+Sem saída adicional; código de saída 0.
+
+### `npm run format:check`
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+Código de saída 0 no repositório inteiro.
+
+### `npm run build`
+
+```
+> haroldo-page@0.1.0 build
+> astro check && astro build
+
+[content] Syncing content
+[content] Synced content
+[types] Generated 53ms
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+eslint.config.js:16:25 - warning ts(6387): The signature '(...configs: InfiniteDepthConfigWithExtends[]): ConfigArray' of 'tseslint.config' is deprecated.
+
+16 export default tseslint.config(
+                           ~~~~~~
+
+Result (5 files):
+- 0 errors
+- 0 warnings
+- 1 hint
+
+[content] Syncing content
+[content] Synced content
+[types] Generated 41ms
+[build] output: "static"
+[build] mode: "static"
+[build] directory: S:\Projetos\academic_page\haroldo\dist\
+[build] Collecting build info...
+[build] ✓ Completed in 58ms.
+[build] Building static entrypoints...
+[vite] ✓ built in 500ms
+[build] ✓ Completed in 527ms.
+
+ generating static routes 
+▶ src/pages/index.astro
+  └─ /index.html (+5ms)
+✓ Completed in 12ms.
+[build] 1 page(s) built in 609ms
+[build] Complete!
+```
+
+Build verde (0 erros); o único item reportado é um `hint` do `astro check` sobre uma
+assinatura depreciada do `tseslint.config` (não bloqueante, informativo do próprio
+typescript-eslint sobre seu overload de API).
+
+### `npm ls` das devDependencies de lint instaladas
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
++-- @eslint/js@10.0.1
++-- astro-eslint-parser@3.1.0
++-- eslint-config-prettier@10.1.8
++-- eslint-plugin-astro@3.1.0
++-- eslint@10.9.1
++-- prettier-plugin-astro@0.14.1
++-- prettier-plugin-tailwindcss@0.8.1
++-- prettier@3.9.6
+`-- typescript-eslint@8.69.0
+```
+
+Todas as versões são exatas em `package.json` (sem `^`/`~`), e o campo `overrides.vite`
+permanece `6.4.3`, confirmado com `npm ls vite`:
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
++-- @tailwindcss/vite@4.3.3
+| `-- vite@6.4.3 overridden
+`-- astro@5.18.2
+  +-- vite@6.4.3 deduped
+  `-- vitefu@1.1.3
+    `-- vite@6.4.3 deduped
+```
+
+### `git show --stat HEAD`
+
+```
+commit d42af3955db49d66bd1deace4615b4745d584ab4
+Author: André Ferreira <and.near@hotmail.com>
+Date:   Tue Sep 1 12:55:40 2026 -0300
+
+    chore: configura Prettier e ESLint para Astro e TypeScript
+
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+ .prettierignore       |   10 +
+ .prettierrc.json      |    7 +
+ eslint.config.js      |   37 ++
+ package-lock.json     | 1599 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ package.json          |   19 +-
+ src/pages/index.astro |   16 +-
+ src/styles/global.css |    2 +-
+ 7 files changed, 1677 insertions(+), 13 deletions(-)
+```
+
+Nenhum arquivo do plano 003 (`content/`, `public/`, `src/components/`, `src/i18n/`,
+`src/layouts/`, `src/pages/en/`, `docs/`, `tests/`, `scripts/`) e nenhum documento do PRD
+(`PRD.md`, `PRD_TEMPLATE.md`, `briefing.md`, `plans/`) entrou no commit — confirmado pelo
+`git show --stat` acima e pelo `git status --short` verificado antes do `git add`.
+
+### Reformatação de arquivos existentes
+
+`npm run format` (restrito aos arquivos do escopo) reformatou:
+
+- `src/pages/index.astro` — indentação convertida de tabs para 2 espaços (default do
+  Prettier).
+- `src/styles/global.css` — aspas duplas trocadas por aspas simples em
+  `@import "tailwindcss";` → `@import 'tailwindcss';` (regra `singleQuote: true`).
+
+Nenhuma mudança semântica; confirmado pelo `npm run build` verde após a reformatação.
