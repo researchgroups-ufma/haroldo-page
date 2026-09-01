@@ -1,6 +1,6 @@
 # Plano 010 — Roteiro humano: repositório privado no GitHub e push inicial
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 1 do checklist §12; RNF-16, M-08)
 **Depende de:** plano 009
 **Modelo recomendado:** — (execução humana; um agente sonnet pode assistir nos passos 1 e 6)
@@ -88,17 +88,128 @@ comando; caso contrário, pelo navegador. Verifique com `gh auth status`.
 
 ## Critérios de aceitação
 
-- [ ] Repositório `haroldo-page` existe no GitHub e está marcado **Private**
-- [ ] `git remote -v` aponta para ele e `git push` funciona sem erro
-- [ ] Branch padrão é `main`
-- [ ] `git ls-files` não contém `.env`, `lattes.pdf` nem qualquer arquivo de `.firecrawl/`
-- [ ] **Verificação objetiva final:** a execução do workflow "CI" na aba Actions está
+- [x] Repositório `haroldo-page` existe no GitHub e está marcado **Private**
+- [x] `git remote -v` aponta para ele e `git push` funciona sem erro
+- [x] Branch padrão é `main`
+- [x] `git ls-files` não contém `.env`, `lattes.pdf` nem qualquer arquivo de `.firecrawl/`
+- [x] **Verificação objetiva final:** a execução do workflow "CI" na aba Actions está
       **verde**, e a URL dessa execução está registrada na Evidência
-- [ ] O professor **não** foi adicionado como colaborador
-- [ ] Workers Builds **não** foi conectado (é fase 2)
+- [x] O professor **não** foi adicionado como colaborador
+- [x] Workers Builds **não** foi conectado (é fase 2)
 
 ## Evidência
 
-<Preenchido por quem executou: URL do repositório, saída de `git remote -v` e
-`git status -sb`, URL e resultado da execução do workflow CI, e a lista de arquivos
-versionados (`git ls-files | Measure-Object -Line`) confirmando ausência de segredos.>
+Executado em 2026-09-01. Os passos automatizáveis (1, 3, 4) foram feitos pelo agente
+orquestrador; a criação do repositório (passo 2) e a conferência da aba Actions (passo 6)
+foram feitas pelo usuário, dono da organização.
+
+**Repositório:** <https://github.com/researchgroups-ufma/haroldo-page>
+
+Divergência registrada em relação ao plano: o plano previa o repositório na conta pessoal
+do desenvolvedor (§4.2 do PRD). O usuário optou pela organização `researchgroups-ufma`, que
+lhe pertence, e reafirmou a escolha depois de alertado sobre o dado pessoal do `PRD.md` e
+sobre a matriz da §9 (professor sem acesso ao repositório). Decisão do stakeholder.
+
+### Passo 1 — auditoria local antes de publicar
+
+```
+$ git ls-files | grep -iE '(^|/)\.env$|lattes\.pdf|^\.firecrawl/|^\.wrangler/|^dist/|^coverage/|^node_modules/'
+(nenhum resultado)
+
+$ git ls-files | wc -l
+57
+
+$ grep -nE '^(TINA_CLIENT_ID|TINA_TOKEN)=.+' .env.example
+(nenhum resultado — os dois estão vazios)
+
+$ git grep -nIE '(ghp_|github_pat_|gho_|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY)'
+(nenhum resultado)
+```
+
+`.env.example` é o único arquivo `.env` versionado, como manda a §7.6.
+
+### Visibilidade — prova de que o repositório é privado
+
+Sem `gh` CLI na máquina, a confirmação foi feita por contraste entre acesso autenticado e
+anônimo:
+
+```
+$ git ls-remote origin          # autenticado
+git exit=0   (repositório existe e responde)
+
+$ curl -s -o /dev/null -w "%{http_code}" https://github.com/researchgroups-ufma/haroldo-page
+404
+
+$ curl -s -o /dev/null -w "%{http_code}" https://api.github.com/repos/researchgroups-ufma/haroldo-page
+404
+```
+
+Existe para quem tem credencial, 404 para quem não tem: **Private** confirmado.
+
+### Passos 3 e 4 — remote e push
+
+```
+$ git remote -v
+origin	https://github.com/researchgroups-ufma/haroldo-page.git (fetch)
+origin	https://github.com/researchgroups-ufma/haroldo-page.git (push)
+
+$ git push -u origin main
+To https://github.com/researchgroups-ufma/haroldo-page.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.
+
+$ git status -sb
+## main...origin/main
+```
+
+Sem divergência entre local e remoto.
+
+### Passo 5 — branch padrão
+
+```
+$ git ls-remote --symref origin HEAD
+ref: refs/heads/main	HEAD
+9dc42c7a9ed9c8310fe19f354666ddf2a7344057	HEAD
+```
+
+### Conteúdo efetivamente publicado (verificado no remoto, não só no local)
+
+```
+$ git ls-tree -r origin/main --name-only | wc -l
+57
+$ git rev-list --count origin/main
+22
+$ git ls-tree origin/main .github/workflows/
+100644 blob de6c17b61cfe3b69560cd3fe2fba8fa8fb038124	.github/workflows/ci.yml
+$ git ls-tree -r origin/main --name-only | grep -iE '(^|/)\.env$|lattes\.pdf|^\.firecrawl/'
+(nenhum resultado)
+```
+
+### Passo 6 — primeira execução do workflow CI
+
+Conferida pelo usuário na aba Actions, em 2026-09-01, e reportada assim:
+
+```
+Triggered via push 2 minutes ago
+@abbadravaabbadrava pushed 9dc42c7 main
+Status:         Success
+Total duration: 48s
+Artifacts:      –
+```
+
+Aba: <https://github.com/researchgroups-ufma/haroldo-page/actions>
+
+O commit `9dc42c7` é o `HEAD` da `main`, ou seja, o workflow validou a árvore inteira —
+`npm ci`, `lint`, `format:check`, `test` e `build` — em Linux, com o Node resolvido a
+partir do `.nvmrc`. O passo 7 (diagnóstico de falha) não foi necessário.
+
+**Procedência desta evidência:** ao contrário do restante deste plano, o resultado do CI
+não foi capturado por comando desta sessão — não há `gh` CLI na máquina e o agente não
+acessou as credenciais do usuário para consultar a API. É observação direta do usuário na
+interface do GitHub, que é a fonte autoritativa do fato. Registrado como relato atribuído,
+não como saída de comando.
+
+### Fora de escopo, confirmado
+
+- O professor **não** foi adicionado como colaborador.
+- O Cloudflare Workers Builds **não** foi conectado (é fase 2, §6.2).

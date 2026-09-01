@@ -135,9 +135,12 @@ mas as chaves do YAML e os nomes de action são do GitHub e ficam como estão.
 - [x] Roda, nesta ordem: `lint`, `format:check`, `test`, `build`
 - [x] Nenhum job de deploy e nenhum secret referenciado
 - [x] A sequência completa do CI reproduzida localmente com sucesso (evidência colada)
-- [ ] **Verificação final adiada:** a primeira execução real do workflow só pode ser
+- [x] **Verificação final adiada:** a primeira execução real do workflow só pode ser
       conferida depois do plano 010 (repositório no GitHub). Registre isso como pendência
       no campo Evidência e feche-a no plano 013.
+      **FECHADA em 2026-09-01**, antes do plano 013: o push do plano 010 disparou a
+      primeira execução, que concluiu **Success** em 48s sobre o commit `9dc42c7`
+      (`HEAD` da `main`). Ver a subseção "Primeira execução real do workflow" na Evidência.
 
 ## Evidência
 
@@ -266,3 +269,37 @@ Consequências, ambas boas — não "corrija" o script:
   porque `format:check` é Prettier. Não há duplicação a eliminar.
 
 Atualize a tabela para refletir o script real antes de executar.
+
+---
+
+## Fechamento da pendência de verificação — 2026-09-01
+
+### Primeira execução real do workflow
+
+A pendência registrada nos critérios de aceitação ("a primeira execução real do workflow só
+pode ser conferida depois do plano 010") foi **fechada no próprio plano 010**, sem precisar
+esperar o 013.
+
+O push inicial para `https://github.com/researchgroups-ufma/haroldo-page` disparou o
+workflow, com o seguinte resultado, conferido pelo usuário na aba Actions:
+
+```
+Triggered via push
+@abbadravaabbadrava pushed 9dc42c7 main
+Status:         Success
+Total duration: 48s
+Artifacts:      –
+```
+
+Aba: <https://github.com/researchgroups-ufma/haroldo-page/actions>
+
+O commit `9dc42c7` é o `HEAD` da `main`, então o job validou a árvore inteira — `npm ci`,
+`lint`, `format:check`, `test` e `build` — rodando em `ubuntu-latest`, com o Node resolvido
+a partir do `.nvmrc`. Nenhuma das três armadilhas previstas no passo 7 se materializou: não
+houve falha de CRLF no `format:check`, o `npm ci` não reclamou de lock dessincronizado e a
+versão de Node resolveu sem divergência.
+
+**Procedência:** este resultado não veio de comando desta sessão — não há `gh` CLI na
+máquina e o agente não acessou as credenciais do usuário para consultar a API do GitHub. É
+observação direta do usuário na interface, que é a fonte autoritativa do fato, registrada
+como relato atribuído.

@@ -742,15 +742,15 @@ Todo módulo `.ts` e componente `.astro` começa com:
 Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqueada
 
 ### Fase 0 — Setup e Provisionamento
-- [ ] Repositório GitHub criado (privado) com `.gitignore` adequado — *`.gitignore` e repositório local prontos (plano 001); falta o repositório remoto (plano 010)*
+- [x] Repositório GitHub criado (privado) com `.gitignore` adequado — plano 010 (`researchgroups-ufma/haroldo-page`, visibilidade Private confirmada por 404 anônimo; 57 arquivos, sem `.env` nem `lattes.pdf`)
 - [x] Projeto Astro + TypeScript + Tailwind inicializado; versões fixadas em `package.json` e `.nvmrc` — plano 002 (`astro@5.18.2`, `tailwindcss@4.3.3`, `typescript@5.9.3`, Node 24)
 - [x] Estrutura de diretórios criada conforme §7.5 — plano 003 (14 `.gitkeep` versionados)
 - [ ] Conta/projeto TinaCloud criado e vinculado ao repositório
 - [ ] Conta Cloudflare com Worker criado — *configuração de hospedagem versionada em `wrangler.toml` (plano 007); falta criar conta/Worker e fazer o primeiro deploy (plano 012)*
 - [x] Convenção de link de material definida — URL livre (D-07); Drive recomendado no manual, sem dependência de conta
 - [x] `.env.example` criado e documentado — plano 006 (`TINA_CLIENT_ID`, `TINA_TOKEN`, `TINA_BRANCH`, `PUBLIC_SITE_URL`)
-- [ ] `README.md` inicial (instalação + como rodar)
-- [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — *Prettier, ESLint (plano 004), Vitest (plano 005) e workflow de CI (plano 008) prontos; falta a primeira execução real do CI, que depende do repositório no GitHub (plano 010)*
+- [ ] `README.md` inicial (instalação + como rodar) — *arquivo escrito e commitado (`9dc42c7`), verificado sem afirmação falsa; o plano 009 segue TODO porque o ciclo de revisão foi interrompido antes da aprovação final*
+- [x] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — Prettier e ESLint (plano 004), Vitest (plano 005), workflow (plano 008); primeira execução verde em 2026-09-01, `Success` em 48s sobre `9dc42c7` (plano 010)
 - [x] Q-03 respondida (limite de minutos de build do plano gratuito) e registrada — 3.000 min/mês, verificado 2026-09-01
 
 ### Fase 1 — Modelo de Conteúdo
