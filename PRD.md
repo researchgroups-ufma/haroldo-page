@@ -732,7 +732,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 
 | Fase | Itens concluídos | Status |
 |---|---|---|
-| Fase 0 — Setup e provisionamento | 4/10 | 🟡 Em andamento |
+| Fase 0 — Setup e provisionamento | 8/10 | 🟡 Em andamento |
 | Fase 1 — Modelo de conteúdo | 0/9 | ⬜ Não iniciada |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
 | Fase 3 — Site público (PT) | 0/11 | ⬜ Não iniciada |
@@ -749,7 +749,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [ ] Conta Cloudflare com Worker criado — *configuração de hospedagem versionada em `wrangler.toml` (plano 007); falta criar conta/Worker e fazer o primeiro deploy (plano 012)*
 - [x] Convenção de link de material definida — URL livre (D-07); Drive recomendado no manual, sem dependência de conta
 - [x] `.env.example` criado e documentado — plano 006 (`TINA_CLIENT_ID`, `TINA_TOKEN`, `TINA_BRANCH`, `PUBLIC_SITE_URL`)
-- [ ] `README.md` inicial (instalação + como rodar) — *arquivo escrito e commitado (`9dc42c7`), verificado sem afirmação falsa; o plano 009 segue TODO porque o ciclo de revisão foi interrompido antes da aprovação final*
+- [x] `README.md` inicial (instalação + como rodar) — plano 009 (`9dc42c7`, 205 linhas; 17 pontos verificados sem afirmação falsa; revisão final do usuário)
 - [x] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — Prettier e ESLint (plano 004), Vitest (plano 005), workflow (plano 008); primeira execução verde em 2026-09-01, `Success` em 48s sobre `9dc42c7` (plano 010)
 - [x] Q-03 respondida (limite de minutos de build do plano gratuito) e registrada — 3.000 min/mês, verificado 2026-09-01
 
