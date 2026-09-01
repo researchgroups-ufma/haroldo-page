@@ -137,3 +137,20 @@ e acrescente a linha se faltar.
 
 <Preenchido pelo executor: saída de `npx wrangler --version`, de
 `npx wrangler deploy --dry-run`, e `git show --stat HEAD`.>
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendência vinda da revisão do plano 003)
+
+**Acrescente `public/_headers` com `X-Robots-Tag: noindex` enquanto o site viver em `*.workers.dev`.**
+
+O plano 003 entregou um `robots.txt` com `Disallow: /` para desencorajar indexação do domínio
+provisório (A-07, Q-05 em aberto). Mas `Disallow` bloqueia **rastreamento**, não garante
+**não indexação**: uma URL descoberta por link externo pode ser indexada mesmo assim. A garantia
+de fato é o header `X-Robots-Tag: noindex`, que em Workers Static Assets se declara em
+`public/_headers`.
+
+Acrescente o arquivo à lista de "Arquivos afetados" deste plano, com comentário explicando que
+é provisório e que a **fase 5 (RF-30) é quem remove** — junto com a reativação da linha do
+`Sitemap` no `robots.txt`. A verificação empírica (`curl -I` conferindo o header na resposta)
+pertence ao plano 012, que faz o primeiro deploy.

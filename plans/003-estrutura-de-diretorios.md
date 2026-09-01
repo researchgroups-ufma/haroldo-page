@@ -1,6 +1,6 @@
 # Plano 003 — Estrutura de diretórios conforme §7.5 do PRD
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 3 do checklist §12)
 **Depende de:** plano 002
 **Modelo recomendado:** haiku

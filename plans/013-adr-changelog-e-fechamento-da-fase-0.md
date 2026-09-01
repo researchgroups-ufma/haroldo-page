@@ -222,3 +222,24 @@ usa) e afrouxar o `astro check` (regressão).
 > Validar com `npm ls vite --all` mostrando uma única cópia.
 
 A justificativa completa está na seção `## Evidência` de `plans/002-scaffolding-astro-typescript-tailwind.md`.
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendências P-2 e P-3, vindas da revisão dos planos 003 e 004)
+
+**P-2 — API depreciada do `tseslint.config`.** Todo `npm run build` emite um hint do `astro check`
+sobre uso de API depreciada em `eslint.config.js`. Não é erro nem warning (o `astro check` só
+falha com erros), mas a fase 0 fecha com "build verde" como critério e o hint aparece em toda
+execução daqui em diante. A migração é de uma linha: trocar `tseslint.config(...)` por
+`defineConfig([...])` importado de `eslint/config`. Faça a troca e confirme que `npm run lint`,
+`npm run format:check` e `npm run build` seguem verdes.
+
+**P-3 — reconciliação da URL e do `robots.txt`.** O passo 3 e o critério "URL do site coerente
+entre `astro.config.mjs`, `src/lib/config.ts` e `public/robots.txt`" precisam ser reescritos:
+a linha do `Sitemap` no `robots.txt` está **comentada** desde a revisão do plano 003, e assim
+deve permanecer até a fase 5. O `Select-String` por `workers.dev` continua funcionando (a linha
+comentada preserva a string), mas o critério não pode exigir um `Sitemap` ativo.
+
+A fase 5 (RF-30) herda a obrigação de reativar a linha do `Sitemap`, remover o `Disallow: /`
+e remover o `X-Robots-Tag: noindex` do `public/_headers` (plano 007) — registre isso no
+fechamento da fase 0 para não se perder.

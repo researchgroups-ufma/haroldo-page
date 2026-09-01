@@ -1,6 +1,6 @@
 # Plano 004 — Prettier e ESLint configurados para Astro + TypeScript
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 9 parcial do checklist §12; §10.4 do PRD)
 **Depende de:** plano 002
 **Modelo recomendado:** sonnet

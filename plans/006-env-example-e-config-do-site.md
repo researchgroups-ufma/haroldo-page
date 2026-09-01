@@ -160,3 +160,17 @@ canonical/`site` no `dist/`. Conforme o resultado:
   "Arquivos afetados" ao fazê-lo).
 
 Cole a evidência da verificação na seção `## Evidência` deste plano, seja qual for o resultado.
+
+### Acréscimo — 2026-09-01 (vindo da revisão do plano 004)
+
+**Fixe por escrito, e por teste, que código sob `src/` lê ambiente por `import.meta.env`, nunca
+por `process.env`.**
+
+O revisor do plano 004 encontrou um buraco de detecção: um `process.env` escrito em
+`src/lib/*.ts` **não seria pego por ninguém** — o ESLint desliga `no-undef` em arquivos `.ts`
+(via `typescript-eslint/eslint-recommended`) e o TypeScript aceita, porque `@types/node` está
+instalado desde o plano 002. O erro só apareceria no navegador, em produção.
+
+Como este plano é o dono de `src/lib/config.ts`, é aqui que a regra se estabelece. `astro.config.mjs`
+segue sendo exceção legítima (roda em Node, no build) — o que reforça a pendência P-2 acima
+sobre verificar de onde aquele arquivo realmente lê `PUBLIC_SITE_URL`.
