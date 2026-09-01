@@ -31,3 +31,6 @@ Thumbs.db
 
 # Relatório de cobertura do Vitest
 coverage/
+
+# Instruções locais para o Claude Code — não fazem parte do produto
+CLAUDE.md
