@@ -1,0 +1,14 @@
+# Normaliza fim de linha para LF no repositório, independente do SO de checkout.
+# Desenvolvimento é no Windows; build roda em Linux (Workers Builds / GitHub Actions).
+* text=auto eol=lf
+
+# Arquivos binários — não normalizar fim de linha, não gerar diff textual
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary

@@ -1,0 +1,33 @@
+# Dependências — geradas pelo npm ci / npm install, não precisam ir para o repositório
+node_modules/
+
+# Build do Astro — gerado pelo astro build
+dist/
+
+# Cache e tipos gerados pelo Astro
+.astro/
+
+# Variáveis de ambiente — TINA_TOKEN e outros segredos vivem aqui, NUNCA commitar (RNF-07)
+# .env.example é a exceção: é template sem segredos, deve ser versionado
+.env
+.env.*
+!.env.example
+
+# Extração bruta do Lattes — insumo local, já processado no Apêndice C do PRD
+.firecrawl/
+
+# Documento pessoal bruto (endereço residencial-institucional e telefone).
+# O Apêndice C do PRD já extraiu dele tudo o que o projeto precisa.
+# O arquivo permanece no disco, apenas não é versionado.
+# Se o stakeholder quiser versioná-lo, basta remover esta linha.
+lattes.pdf
+
+# Estado local do Wrangler
+.wrangler/
+
+# Lixo de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Relatório de cobertura do Vitest
+coverage/

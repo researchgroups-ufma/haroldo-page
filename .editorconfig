@@ -1,0 +1,15 @@
+# EditorConfig — https://editorconfig.org
+# Mantém convenções de formatação consistentes entre editores e contribuidores.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+
+# Markdown: espaços finais podem ser significativos (quebra de linha forçada)
+[*.md]
+trim_trailing_whitespace = false
