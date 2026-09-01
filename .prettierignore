@@ -1,0 +1,10 @@
+dist/
+.astro/
+node_modules/
+coverage/
+package-lock.json
+PRD.md
+PRD_TEMPLATE.md
+briefing.md
+plans/
+.firecrawl/

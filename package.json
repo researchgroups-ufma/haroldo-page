@@ -8,17 +8,30 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
-    "astro": "5.18.2",
     "@tailwindcss/vite": "4.3.3",
+    "astro": "5.18.2",
     "tailwindcss": "4.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@eslint/js": "10.0.1",
     "@types/node": "24.13.3",
-    "typescript": "5.9.3"
+    "astro-eslint-parser": "3.1.0",
+    "eslint": "10.9.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-astro": "3.1.0",
+    "prettier": "3.9.6",
+    "prettier-plugin-astro": "0.14.1",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.69.0"
   },
   "overrides": {
     "vite": "6.4.3"
