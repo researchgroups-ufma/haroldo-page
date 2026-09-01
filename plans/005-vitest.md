@@ -1,6 +1,6 @@
 # Plano 005 — Vitest configurado com o primeiro teste real
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 9 parcial do checklist §12; §11 do PRD, RNF-10)
 **Depende de:** planos 003 e 004
 **Modelo recomendado:** sonnet
@@ -147,15 +147,180 @@ job. Versões exatas no `package.json`, sem `^`/`~` (convenção do plano 002).
 
 ## Critérios de aceitação
 
-- [ ] `npm run test` verde, com os 7 casos de `slugify` nomeados individualmente
-- [ ] O caso `"Mecânica Clássica"` → `mecanica-classica` passa (prova o tratamento de acento)
-- [ ] `npm run test:coverage` gera relatório sem erro
-- [ ] `npm run lint` e `npm run format:check` continuam verdes
-- [ ] `npm run build` continua verde
-- [ ] `src/lib/slug.ts` tem cabeçalho §10.1 e TSDoc na função exportada
-- [ ] Nenhum teste depende de data corrente, rede ou ordem de execução
+- [x] `npm run test` verde, com os 7 casos de `slugify` nomeados individualmente
+- [x] O caso `"Mecânica Clássica"` → `mecanica-classica` passa (prova o tratamento de acento)
+- [x] `npm run test:coverage` gera relatório sem erro
+- [x] `npm run lint` e `npm run format:check` continuam verdes
+- [x] `npm run build` continua verde
+- [x] `src/lib/slug.ts` tem cabeçalho §10.1 e TSDoc na função exportada
+- [x] Nenhum teste depende de data corrente, rede ou ordem de execução
 
 ## Evidência
 
-<Preenchido pelo executor: saída de `npm run test` com os números reais de arquivos/testes,
-saída de `npm run test:coverage` e `git show --stat HEAD`.>
+Saída autoritativa do triage-runner (verificação independente desta sessão).
+
+### 1. `npm run test` — exit 0
+
+```
+> haroldo-page@0.1.0 test
+> vitest run
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  15:21:30
+   Duration  203ms (transform 42ms, setup 0ms, import 56ms, tests 3ms, environment 0ms)
+```
+
+### 2. `npm run test:coverage` — exit 0
+
+```
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  15:21:37
+   Duration  225ms (transform 34ms, setup 0ms, import 49ms, tests 4ms, environment 0ms)
+
+ % Coverage report from v8
+-----------|---------|----------|---------|---------|-------------------
+File       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-----------|---------|----------|---------|---------|-------------------
+-----------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 1/1 )
+Branches     : 100% ( 0/0 )
+Functions    : 100% ( 1/1 )
+Lines        : 100% ( 1/1 )
+================================================================================
+```
+
+Nota do triage-runner: a tabela de arquivos individual sai vazia (nenhum arquivo listado por
+nome), apenas o sumário agregado "1/1". `src/lib/slug.ts` não aparece nominalmente no
+relatório de texto apesar do 100% agregado — confirmado pelo `coverage/lib/slug.ts.html`
+(100% em statements/branches/functions/lines; `1/1` está correto porque a função é um único
+`return` encadeado). É um defeito cosmético do reporter de texto do v8 no Windows, não
+bloqueante.
+
+### 3. `npm run lint` — exit 0
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+(sem nenhum warning/erro impresso)
+
+### 4. `npm run format:check` — exit 1
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+[warn] CLAUDE.md
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.
+```
+
+Único arquivo listado: `CLAUDE.md` — pré-existente, não rastreado pelo git, fora do escopo
+do plano 005. Nenhum arquivo do plano aparece.
+
+Verificação isolada dos arquivos do plano 005 — exit 0:
+
+```
+> npx prettier --check vitest.config.ts src/lib/slug.ts tests/lib/slug.test.ts package.json
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+### 5. `npm run build` — exit 0
+
+```
+> haroldo-page@0.1.0 build
+> astro check && astro build
+
+[content] Syncing content
+[content] Synced content
+[types] Generated 48ms
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+eslint.config.js:16:25 - warning ts(6387): The signature '(...configs: InfiniteDepthConfigWithExtends[]): ConfigArray' of 'tseslint.config' is deprecated.
+16 export default tseslint.config(
+                          ~~~~~~
+
+coverage/prettify.js:2:14757 - warning ts(6133): 'ae' is declared but its value is never read.
+[... corpo minificado de terceiros omitido pelo triage-runner ...]
+
+Result (11 files):
+- 0 errors
+- 0 warnings
+- 5 hints
+
+[content] Syncing content
+[content] Synced content
+[types] Generated 38ms
+[build] output: "static"
+[build] mode: "static"
+[build] directory: S:\Projetos\academic_page\haroldo\dist\
+[build] Collecting build info...
+[build] ✓ Completed in 51ms.
+[build] Building static entrypoints...
+[vite] ✓ built in 527ms
+[build] ✓ Completed in 556ms.
+
+ generating static routes
+▶ src/pages/index.astro
+  └─ /index.html (+6ms)
+✓ Completed in 12ms.
+[build] 1 page(s) built in 628ms
+[build] Complete!
+```
+
+### 6/7. Estado da árvore de trabalho pré-commit (`git status --short` / `git diff --stat`) — exit 0
+
+O commit ainda não existe neste momento (é feito pelo orquestrador depois do fechamento do
+plano); o critério `git show --stat HEAD` do plano é substituído pelo estado real da árvore
+de trabalho no momento da verificação:
+
+```
+ M package-lock.json
+ M package.json
+?? CLAUDE.md
+?? src/lib/slug.ts
+?? tests/lib/
+?? vitest.config.ts
+
+ package-lock.json | 497 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ package.json      |   9 +-
+ 2 files changed, 503 insertions(+), 3 deletions(-)
+```
+
+`CLAUDE.md` não rastreado é pré-existente e fora do escopo deste plano — não foi criado nem
+modificado por esta execução.
+
+### Resumo
+
+| Comando | Resultado | Exit |
+|---|---|---|
+| `npm run test` | PASSOU — 1 arquivo, 7 testes, 7 passaram | 0 |
+| `npm run test:coverage` | PASSOU — 100% agregado (1/1), tabela por-arquivo vazia (cosmético) | 0 |
+| `npm run lint` | PASSOU | 0 |
+| `npm run format:check` | FALHOU — só `CLAUDE.md` (pré-existente, fora de escopo) | 1 |
+| `npx prettier --check` (arquivos do plano) | PASSOU | 0 |
+| `npm run build` | PASSOU — 0 errors, 0 warnings, 5 hints; 1 página | 0 |
+
+### Notas de execução
+
+- Desvio do plano: `vitest.config.ts` recebeu `/// <reference types="vitest/config" />` no
+  topo, além do bloco literal do plano, porque `getViteConfig({ test: {...} })` sem essa
+  referência falha em `tsc --noEmit` com `TS2353: Object literal may only specify known
+  properties, and 'test' does not exist in type 'UserConfig'` — é a solução oficial
+  documentada pela Astro para esse erro; revisado e aprovado pelo code-reviewer.
+- Achado para plano futuro: `coverage/` não está em `exclude` no `tsconfig.json`, então
+  `astro check` varre `coverage/prettify.js` (minificado, de terceiros) e emite um warning
+  ts(6133); não bloqueia o build e está fora do escopo do plano 005.
