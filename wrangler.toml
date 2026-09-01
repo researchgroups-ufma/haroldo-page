@@ -1,0 +1,17 @@
+# Configuração do Cloudflare Workers — Static Assets.
+# D-01 do PRD: site 100% estático, sem `main`, sem adapter, sem SSR.
+# Nenhum código executa por requisição (§7.1).
+
+# codinome do projeto (§0 do PRD); define o subdomínio `haroldo-page.workers.dev`,
+# já usado como `PUBLIC_SITE_URL` provisório nos planos 002 e 006
+name = "haroldo-page"
+
+# data de criação do projeto; congela o comportamento da plataforma
+compatibility_date = "2026-09-01"
+
+[assets]
+# saída padrão do `astro build`
+directory = "./dist"
+# serve `/404.html` com status 404 — é o que faz RF-27 funcionar num site
+# estático. O default (`none`) devolveria um 404 sem corpo, sem navegação de volta
+not_found_handling = "404-page"

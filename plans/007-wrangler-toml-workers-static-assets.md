@@ -1,6 +1,6 @@
 # Plano 007 — `wrangler.toml` para Cloudflare Workers Static Assets
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-27 (parcial: `not_found_handling`); Fase 0, item 5 parcial do checklist §12
 **Depende de:** plano 002
 **Modelo recomendado:** sonnet
@@ -20,6 +20,9 @@ primeira vez.
 - `wrangler.toml` — criar
 - `package.json` — devDependency `wrangler` e script `deploy`
 - `.gitignore` — acrescentar `.wrangler/`, se o plano 001 não tiver incluído
+- `public/_headers` — criar; `X-Robots-Tag: noindex` provisório enquanto o site vive em
+  `*.workers.dev` (nota do orquestrador, pendência da revisão do plano 003). A fase 5
+  (RF-30) remove este arquivo junto com a reativação da linha `Sitemap` no `robots.txt`
 
 > O executor não toca em arquivo fora desta lista. Se precisar, para e reporta.
 > **Não** instale `@astrojs/cloudflare` e **não** altere `astro.config.mjs`.
@@ -125,18 +128,119 @@ e acrescente a linha se faltar.
 
 ## Critérios de aceitação
 
-- [ ] `wrangler.toml` existe, com `[assets].directory = "./dist"` e
+- [x] `wrangler.toml` existe, com `[assets].directory = "./dist"` e
       `not_found_handling = "404-page"`
-- [ ] `wrangler.toml` **não** declara `main` (D-01: nenhum código roda por requisição)
-- [ ] `@astrojs/cloudflare` continua ausente do `package.json`
-- [ ] `npx wrangler deploy --dry-run` sem erro de configuração (ou justificativa registrada)
-- [ ] `.wrangler/` ignorado pelo Git
-- [ ] `npm run build`, `npm run lint` e `npm run test` continuam verdes
+- [x] `wrangler.toml` **não** declara `main` (D-01: nenhum código roda por requisição)
+- [x] `@astrojs/cloudflare` continua ausente do `package.json`
+- [x] `npx wrangler deploy --dry-run` sem erro de configuração (ou justificativa registrada)
+- [x] `.wrangler/` ignorado pelo Git
+- [x] `npm run build`, `npm run lint` e `npm run test` continuam verdes
 
 ## Evidência
 
-<Preenchido pelo executor: saída de `npx wrangler --version`, de
-`npx wrangler deploy --dry-run`, e `git show --stat HEAD`.>
+Saídas reais copiadas do arquivo de triagem autoritativa (verificação independente do
+`triage-runner`, nesta sessão). O `wrangler deploy --dry-run` **não exigiu autenticação** —
+rodou inteiramente offline, ao contrário do cenário de contingência previsto no plano
+(passo 5 / nota da seção "Contexto necessário"), então a verificação alternativa
+(`wrangler --version` + inspeção manual) não precisou ser usada.
+
+### `npx wrangler --version` — exit 0
+
+```
+4.128.0
+```
+
+### `npx wrangler deploy --dry-run` — exit 0, SEM prompt de login
+
+```
+ ⛅️ wrangler 4.128.0
+────────────────────
+✨ Read 7 files from the assets directory S:\Projetos\academic_page\haroldo\dist
+Total Upload: 0.31 KiB / gzip: 0.22 KiB
+No bindings found.
+--dry-run: exiting now.
+```
+
+### `npm run test` — exit 0
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+ Test Files  2 passed (2)
+      Tests  12 passed (12)
+   Start at  15:59:43
+   Duration  270ms
+```
+
+### `npm run lint` — exit 0
+
+```
+> eslint .
+(sem saída)
+```
+
+### `npm run format:check` — exit 0
+
+```
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+### `npm run build` — exit 0
+
+```
+astro check: 0 errors, 0 warnings, 1 hint (depreciação em eslint.config.js:16,
+pré-existente, não relacionado). astro build: 1 page built em 735ms, saída em dist/.
+```
+
+### Estado da árvore de trabalho — pré-commit
+
+O passo 7 do plano pede `git show --stat HEAD`, mas o commit ainda não existe (é do
+orquestrador, fora do escopo deste executor). O que segue é o estado da working tree no
+momento da verificação:
+
+`git status --short`:
+
+```
+ M package-lock.json
+ M package.json
+ M plans/007-wrangler-toml-workers-static-assets.md
+?? public/_headers
+?? wrangler.toml
+```
+
+`git diff --stat`:
+
+```
+ package-lock.json                                | 5677 ++++++++++++++--------
+ package.json                                     |    6 +-
+ plans/007-...md                                  |    3 +
+ 3 files changed, 3588 insertions(+), 2098 deletions(-)
+```
+
+### Verificações estruturais (sustentam D-01)
+
+- `grep '^main\|^ *main *=' wrangler.toml` → nenhum match (exit 1). Confirma a ausência da
+  chave `main` exigida por D-01.
+- `grep 'astrojs/cloudflare' package.json` → nenhum match (exit 1). Adapter proibido
+  ausente.
+- `.wrangler/` ignorado pelo Git: `git check-ignore -v .wrangler/foo` → exit 0,
+  `.gitignore:26:.wrangler/	.wrangler/foo`.
+- `ls dist/_headers && cat dist/_headers` → arquivo presente, conteúdo idêntico a
+  `public/_headers`. O build copia o `_headers` corretamente para `dist/`.
+
+### Verificação do lockfile (feita pelo orquestrador)
+
+O churn de 5677 linhas em `package-lock.json` é só a árvore de dependências própria do
+wrangler (workerd, esbuild, miniflare e afins) — nenhuma versão fixada mudou: `astro`
+5.18.2, `typescript` 5.9.3, `tailwindcss` 4.3.3, `vite` 6.4.3, `vitest` 4.1.11, todas
+idênticas antes/depois; `overrides.vite = 6.4.3` foi preservado. Benigno.
+
+### Lacuna empurrada corretamente para o plano 012
+
+O header `X-Robots-Tag: noindex` de `public/_headers` só pode ser confirmado numa resposta
+HTTP real (`curl -I`), o que exige um deploy publicado — isso pertence ao plano 012 (primeiro
+deploy). Aqui a única verificação possível — o arquivo ser copiado para `dist/_headers` no
+build — foi feita e está registrada acima.
 
 ---
 

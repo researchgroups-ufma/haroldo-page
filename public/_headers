@@ -1,0 +1,7 @@
+# Provisório: enquanto o site vive no subdomínio *.workers.dev (A-07, Q-05 em aberto),
+# `Disallow: /` no robots.txt bloqueia rastreamento, mas não garante não indexação — uma
+# URL descoberta por link externo pode ser indexada mesmo assim. Este header garante a
+# não indexação de fato. A fase 5 (RF-30) remove este arquivo junto com a reativação da
+# linha `Sitemap` no robots.txt, quando o domínio próprio (Q-05) estiver definido.
+/*
+  X-Robots-Tag: noindex
