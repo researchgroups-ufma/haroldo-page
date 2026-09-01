@@ -1,6 +1,6 @@
 # Plano 003 — Estrutura de diretórios conforme §7.5 do PRD
 
-**Status:** DONE
+**Status:** TODO
 **RFs cobertos:** — (Fase 0, item 3 do checklist §12)
 **Depende de:** plano 002
 **Modelo recomendado:** haiku
@@ -280,3 +280,32 @@ Result (4 files):
 12:52:45 [build] 1 page(s) built in 681ms
 12:52:45 [build] Complete!
 ```
+
+### Correção pós-revisão
+
+**Item 1:** `public/robots.txt` desencoraja indexação do domínio provisório
+
+Novo conteúdo (Disallow em vez de Allow, Sitemap comentado):
+
+```
+# Provisório: enquanto o site vive no subdomínio *.workers.dev (A-07, Q-05 em aberto),
+# a indexação é desencorajada. A fase 5 (RF-30) publica o robots definitivo com o sitemap.
+User-agent: *
+Disallow: /
+
+# Sitemap: https://haroldo-page.workers.dev/sitemap-index.xml  (fase 5, RF-30)
+```
+
+**Item 2:** Formatação do CHANGELOG.md corrigida
+
+Prettier --check: ✓ All matched files use Prettier code style!
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+**Item 3:** Status revertido para TODO (conforme instrução — promoção é pós-revisão)

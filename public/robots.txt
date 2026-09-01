@@ -1,4 +1,6 @@
+# Provisório: enquanto o site vive no subdomínio *.workers.dev (A-07, Q-05 em aberto),
+# a indexação é desencorajada. A fase 5 (RF-30) publica o robots definitivo com o sitemap.
 User-agent: *
-Allow: /
+Disallow: /
 
-Sitemap: https://haroldo-page.workers.dev/sitemap-index.xml
+# Sitemap: https://haroldo-page.workers.dev/sitemap-index.xml  (fase 5, RF-30)

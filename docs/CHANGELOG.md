@@ -7,4 +7,5 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 ## [Não publicado]
 
 ### Adicionado
+
 - Fase 0: repositório, projeto Astro 5 estático, TypeScript e Tailwind 4.
