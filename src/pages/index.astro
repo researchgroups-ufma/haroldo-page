@@ -1,0 +1,38 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : index.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página inicial. Placeholder temporário do scaffolding —
+ *                 confirma que Astro, TypeScript strict e Tailwind 4 estão
+ *                 ativos (plano 002); conteúdo real chega na fase 3.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-01
+ *  Atualizado em: 2026-09-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/styles/global.css
+ *  Entradas     : nenhuma
+ *  Saídas       : HTML estático da rota `/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/index.astro`
+ *
+ *  Notas        : conteúdo hardcoded é temporário — TODO(fase 3) abaixo.
+ * ============================================================================
+ */
+import '../styles/global.css';
+
+// TODO(fase 3): substituir pelo conteúdo real da Home (RF-20), vindo de
+// content/perfil/index.md via o schema Zod (D-06), não hardcoded.
+const professorName = 'Prof. Haroldo C. D. Lima Junior';
+---
+
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{professorName}</title>
+	</head>
+	<body>
+		<h1 class="text-3xl font-semibold">{professorName}</h1>
+	</body>
+</html>
