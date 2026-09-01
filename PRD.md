@@ -750,7 +750,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Convenção de link de material definida — URL livre (D-07); Drive recomendado no manual, sem dependência de conta
 - [x] `.env.example` criado e documentado — plano 006 (`TINA_CLIENT_ID`, `TINA_TOKEN`, `TINA_BRANCH`, `PUBLIC_SITE_URL`)
 - [ ] `README.md` inicial (instalação + como rodar)
-- [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — *Prettier, ESLint (plano 004) e Vitest (plano 005) prontos; falta o CI (plano 008)*
+- [ ] Prettier, ESLint e Vitest configurados; CI do GitHub Actions rodando — *Prettier, ESLint (plano 004), Vitest (plano 005) e workflow de CI (plano 008) prontos; falta a primeira execução real do CI, que depende do repositório no GitHub (plano 010)*
 - [x] Q-03 respondida (limite de minutos de build do plano gratuito) e registrada — 3.000 min/mês, verificado 2026-09-01
 
 ### Fase 1 — Modelo de Conteúdo
