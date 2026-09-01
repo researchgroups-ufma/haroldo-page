@@ -1,6 +1,6 @@
 # Plano 001 — Repositório Git local, `.gitignore`, `.nvmrc` e configuração de editor
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, itens 1 e 2 parciais do checklist §12; RNF-12, RNF-16)
 **Depende de:** nenhum
 **Modelo recomendado:** sonnet
@@ -126,14 +126,60 @@ para evitar que arquivos cheguem ao CI com CRLF.
 
 ## Critérios de aceitação
 
-- [ ] `git branch --show-current` retorna `main`
-- [ ] `git status --short` limpo (nenhum arquivo não rastreado inesperado)
-- [ ] `git check-ignore -v lattes.pdf .firecrawl/lattes.txt` confirma que ambos estão ignorados
-- [ ] `.nvmrc` contém um major LTS (22 ou 24), coerente com a regra do plano
-- [ ] `package-lock.json` **não** está no `.gitignore`
-- [ ] Primeiro commit criado com mensagem em Conventional Commits
+- [x] `git branch --show-current` retorna `main`
+- [x] `git status --short` limpo (nenhum arquivo não rastreado inesperado)
+- [x] `git check-ignore -v lattes.pdf .firecrawl/lattes.txt` confirma que ambos estão ignorados
+- [x] `.nvmrc` contém um major LTS (22 ou 24), coerente com a regra do plano
+- [x] `package-lock.json` **não** está no `.gitignore`
+- [x] Primeiro commit criado com mensagem em Conventional Commits
 
 ## Evidência
 
-<Preenchido pelo executor: saída de `node -v`, `git branch --show-current`,
-`git status --short`, `git show --stat HEAD` e `git check-ignore -v lattes.pdf`.>
+Executado em 2026-09-01, Windows 11, PowerShell/Git Bash.
+
+**Regra determinística do Node:** `node -v` retornou `v24.16.0` — major **24**, uma das
+duas linhas LTS aceitas (22 ou 24). Gravado `24` no `.nvmrc`. Sem divergência a reportar.
+
+```
+$ node -v
+v24.16.0
+
+$ git branch --show-current
+main
+
+$ git status --short
+(saída vazia — working tree limpo)
+
+$ git show --stat HEAD
+commit 78759a96f6c8de79e3da07fd078ecf8080e1e08f
+Author: André Ferreira <and.near@hotmail.com>
+Date:   Tue Sep 1 12:30:34 2026 -0300
+
+    chore: inicializa repositório com documentos do projeto e configuração base
+
+ .editorconfig                                      |  15 +
+ .gitattributes                                     |  14 +
+ .gitignore                                         |  33 +
+ .nvmrc                                             |   1 +
+ PRD.md                                             | 992 +++++++++++++++++++++
+ PRD_TEMPLATE.md                                    | 485 ++++++++++
+ briefing.md                                        | 706 +++++++++++++++
+ plans/001-repositorio-git-local-e-gitignore.md     | 139 +++
+ plans/002-scaffolding-astro-typescript-tailwind.md | 174 ++++
+ plans/003-estrutura-de-diretorios.md               | 152 ++++
+ plans/004-prettier-e-eslint.md                     | 153 ++++
+ plans/005-vitest.md                                | 161 ++++
+ plans/006-env-example-e-config-do-site.md          | 141 +++
+ plans/007-wrangler-toml-workers-static-assets.md   | 139 +++
+ plans/008-ci-github-actions.md                     | 146 +++
+ plans/009-readme-inicial.md                        | 141 +++
+ plans/010-roteiro-repositorio-github-privado.md    | 104 +++
+ plans/011-roteiro-projeto-tinacloud.md             | 129 +++
+ plans/012-roteiro-cloudflare-worker-e-primeiro-deploy.md | 146 +++
+ plans/013-adr-changelog-e-fechamento-da-fase-0.md  | 199 +++++
+ 20 files changed, 4170 insertions(+)
+
+$ git check-ignore -v lattes.pdf .firecrawl/lattes.txt
+.gitignore:23:lattes.pdf	lattes.pdf
+.gitignore:17:.firecrawl/	.firecrawl/lattes.txt
+```
