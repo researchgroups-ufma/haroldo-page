@@ -159,16 +159,226 @@ português**; `any` proibido; sem string de interface hardcoded em componente de
 
 ## Critérios de aceitação
 
-- [ ] `npm run build` termina com sucesso e gera `dist/index.html`
-- [ ] `npx astro check` sem erros de tipo
-- [ ] `astro.config.mjs` declara `output: 'static'` e **não** declara `adapter` (D-01)
-- [ ] `@astrojs/cloudflare` e `@astrojs/tailwind` ausentes do `package.json`
-- [ ] Todas as versões em `package.json` são exatas (sem `^`/`~`)
-- [ ] `package-lock.json` commitado
-- [ ] `src/pages/index.astro` tem o cabeçalho obrigatório da §10.1
-- [ ] `PRD.md`, `briefing.md`, `.gitignore` e `.nvmrc` inalterados
+- [x] `npm run build` termina com sucesso e gera `dist/index.html`
+- [x] `npx astro check` sem erros de tipo
+- [x] `astro.config.mjs` declara `output: 'static'` e **não** declara `adapter` (D-01)
+- [x] `@astrojs/cloudflare` e `@astrojs/tailwind` ausentes do `package.json`
+- [x] Todas as versões em `package.json` são exatas (sem `^`/`~`)
+- [x] `package-lock.json` commitado
+- [x] `src/pages/index.astro` tem o cabeçalho obrigatório da §10.1
+- [x] `PRD.md`, `briefing.md`, `.gitignore` e `.nvmrc` inalterados
 
 ## Evidência
 
-<Preenchido pelo executor: saída de `npm run build`, de `npx astro check`, versões
-instaladas (`npm ls astro tailwindcss @tailwindcss/vite --depth=0`) e `git show --stat HEAD`.>
+### Divergência registrada em relação ao plano
+
+O scaffold `npm create astro@latest . -- --template minimal --install --no-git
+--typescript strict --skip-houston` **não funcionou de forma não interativa**: como o
+diretório não está vazio (`PRD.md`, `plans/`, `.git` etc.), o wizard do `create-astro`
+ignora os flags de destino e pergunta interativamente "Where should we create your new
+project?" (sugerindo um diretório novo, ex. `./stale-spiral78`). Sem stdin disponível no
+ambiente de execução, o comando trava. Conforme a opção B prevista no próprio plano
+("montar `package.json` à mão e rodar `npm install astro@<versão> typescript
+@tailwindcss/vite tailwindcss`"), abandonei o wizard e configurei os arquivos manualmente:
+`package.json`, `astro.config.mjs`, `tsconfig.json`, `src/pages/index.astro`,
+`src/styles/global.css`, `src/env.d.ts`. Nenhum arquivo de scaffold indesejado
+(`README.md`, `.gitignore` de template, `public/favicon.svg`) chegou a ser criado, então
+não houve necessidade de restaurar nada do plano 001.
+
+Duas dependências adicionais, não listadas em "Arquivos afetados" mas necessárias para os
+critérios de aceitação, foram adicionadas a `package.json` (versões exatas):
+
+- `@astrojs/check@0.9.10` (`devDependencies`) — exigida pelo próprio `astro check`
+  (chamado pelo script `build`); sem ela, `astro check`/`npm run build` também caem num
+  prompt interativo pedindo para instalá-la.
+- `@types/node@24.13.3` (`devDependencies`) — sem ela, `astro.config.mjs` falhava em
+  `astro check` com `ts(2580): Cannot find name 'process'` na linha `process.env.PUBLIC_SITE_URL`
+  (snippet exigido pelo próprio plano). Versão alinhada ao Node 24 do `.nvmrc`.
+
+Também foi necessário um campo `"overrides": { "vite": "6.4.3" }` em `package.json`:
+instalando `astro@5.18.2` e `@tailwindcss/vite@4.3.3` (ambos as versões `5.x`/`4.x` mais
+recentes disponíveis, conforme pedido) o npm resolvia dois `vite` diferentes na árvore —
+`vite@8.2.2` hoisted na raiz (satisfazendo o range amplo do `@tailwindcss/vite`) e
+`vite@6.4.3` aninhado dentro de `astro` (que exige `^6.4.1`) — e o tipo `Plugin<any>` de
+um não era atribuível ao do outro, quebrando `astro check` (`ts(2322)`). O override fixa
+um único `vite@6.4.3` (compatível com o range `^5.2.0 || ^6 || ^7 || ^8` do
+`@tailwindcss/vite`) em toda a árvore, sem contornar nem enfraquecer a checagem de tipos.
+
+Nenhuma outra divergência: `output: 'static'` sem `adapter`, plugin Vite do Tailwind (não
+a integração `@astrojs/tailwind`), sem `tailwind.config.js`, sem TinaCMS.
+
+### `npm run build`
+
+```
+> haroldo-page@0.1.0 build
+> astro check && astro build
+
+12:38:42 [vite] Re-optimizing dependencies because vite config has changed
+12:38:42 [content] Syncing content
+12:38:42 [content] Synced content
+12:38:42 [types] Generated 141ms
+12:38:42 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (4 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+12:38:46 [content] Syncing content
+12:38:46 [content] Synced content
+12:38:46 [types] Generated 37ms
+12:38:46 [build] output: "static"
+12:38:46 [build] mode: "static"
+12:38:46 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+12:38:46 [build] Collecting build info...
+12:38:46 [build] ✓ Completed in 47ms.
+12:38:46 [build] Building static entrypoints...
+12:38:46 [vite] ✓ built in 497ms
+12:38:46 [build] ✓ Completed in 526ms.
+
+ generating static routes
+12:38:46 ▶ src/pages/index.astro
+12:38:46   └─ /index.html (+5ms)
+12:38:46 ✓ Completed in 12ms.
+
+12:38:46 [build] 1 page(s) built in 594ms
+12:38:46 [build] Complete!
+```
+
+`dist/index.html` gerado contém:
+`<h1 class="text-3xl font-semibold">Prof. Haroldo C. D. Lima Junior</h1>` — confirmado por
+leitura direta do arquivo.
+
+### `npx astro check`
+
+```
+12:38:53 [content] Syncing content
+12:38:53 [content] Synced content
+12:38:53 [types] Generated 49ms
+12:38:53 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (4 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+```
+
+### `npm ls astro tailwindcss @tailwindcss/vite --depth=0`
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
++-- @tailwindcss/vite@4.3.3
++-- astro@5.18.2
+`-- tailwindcss@4.3.3
+```
+
+TypeScript instalado: `typescript@5.9.3` (confirmado via
+`npm ls astro typescript tailwindcss @tailwindcss/vite --depth=0`).
+
+### Verificação adicional — pacotes proibidos ausentes
+
+```
+> npm ls @astrojs/tailwind
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
+`-- (empty)
+
+> npm ls @astrojs/cloudflare
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
+`-- (empty)
+
+> Test-Path tailwind.config.js
+False
+```
+
+### `npm run dev` (verificação não bloqueante do passo 5)
+
+Servidor subido em background, checado com `curl http://localhost:4321/` e derrubado em
+seguida (processo na porta 4321 finalizado, porta confirmada livre). Resposta HTML
+recebida continha `<h1 class="text-3xl font-semibold">Prof. Haroldo C. D. Lima Junior</h1>`
+e o CSS do Tailwind (`tailwindcss v4.3.3`) injetado inline pelo Vite dev server — a
+renderização estilizada foi confirmada sem deixar o servidor em execução.
+
+### `git show --stat HEAD`
+
+```
+commit 35edfeacd04e690022378692d9f563b0edd3ac1c
+Author: André Ferreira <and.near@hotmail.com>
+Date:   Tue Sep 1 12:38:28 2026 -0300
+
+    chore: inicializa projeto Astro 5 estático com TypeScript e Tailwind 4
+
+ astro.config.mjs      |   32 +
+ package-lock.json     | 7095 +++++++++++++++++++++++++++++++++++++++++++++++++
+ package.json          |   26 +
+ src/env.d.ts          |    1 +
+ src/pages/index.astro |   38 +
+ src/styles/global.css |    1 +
+ tsconfig.json         |    5 +
+ 7 files changed, 7198 insertions(+)
+```
+
+`plans/001-repositorio-git-local-e-gitignore.md` foi deixado **fora** deste commit
+(modificação pendente pré-existente, não tocada por este plano).
+
+---
+
+## Correção pós-revisão (code-reviewer, item único)
+
+**Item apontado:** `src/env.d.ts` continha apenas a diretiva
+`/// <reference types="astro/client" />`, sem o cabeçalho obrigatório da §10.1 do PRD.
+Corrigido: cabeçalho completo (12 campos) inserido **acima** da diretiva triple-slash —
+única posição válida em TypeScript, já que a diretiva só é reconhecida quando precedida
+apenas por comentários.
+
+**Confirmação empírica de que a diretiva continua em efeito** (cache `.astro/` e `dist/`
+apagados antes, para forçar regeneração):
+
+### `npx astro check` (pós-correção)
+
+```
+12:45:35 [content] Syncing content
+12:45:36 [content] Synced content
+12:45:36 [types] Generated 55ms
+12:45:36 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (4 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+```
+
+### `npm run build` (pós-correção)
+
+```
+> haroldo-page@0.1.0 build
+> astro check && astro build
+
+12:45:40 [content] Syncing content
+12:45:40 [content] Synced content
+12:45:40 [types] Generated 47ms
+12:45:40 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (4 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+12:45:43 [content] Syncing content
+12:45:43 [content] Synced content
+12:45:43 [types] Generated 43ms
+12:45:43 [build] output: "static"
+12:45:43 [build] mode: "static"
+12:45:43 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+12:45:43 [build] Collecting build info...
+12:45:43 [build] ✓ Completed in 62ms.
+12:45:43 [build] Building static entrypoints...
+12:45:44 [vite] ✓ built in 609ms
+12:45:44 [build] ✓ Completed in 648ms.
+
+ generating static routes
+12:45:44 ▶ src/pages/index.astro
+12:45:44   └─ /index.html (+6ms)
+12:45:44 ✓ Completed in 12ms.
+
+12:45:44 [build] 1 page(s) built in 733ms
+12:45:44 [build] Complete!
+```
+
+0 erros em ambos, cache regenerado do zero — a diretiva `/// <reference types="astro/client" />`
+segue efetiva com o cabeçalho acima dela.
