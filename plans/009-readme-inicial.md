@@ -139,3 +139,18 @@ convenções da casa proíbe declarar pronto por relato.
 <Preenchido pelo executor: saídas de `npm ci`, `npm run lint`, `npm run format:check`,
 `npm run test`, `npm run build`, `npm run preview`, versões reais de Node e Astro, e
 `git show --stat HEAD`.>
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendência P-1, vinda da revisão do plano 002)
+
+Acrescente ao README, na seção de **Troubleshooting**, duas linhas sobre o campo `overrides`
+do `package.json`, remetendo ao ADR `docs/adr/0002-pin-do-vite-via-overrides.md` (criado pelo
+plano 013).
+
+Contexto para escrever: `astro@5.18.2` depende de `vite@^6.4.1` (dependência dura), enquanto
+`@tailwindcss/vite@4.3.3` declara vite como *peer* `^5.2.0 || ^6 || ^7 || ^8`. Sem o override,
+o npm resolve vite 8 na raiz e aninha o 6 sob `astro` — duas cópias, e o plugin do Tailwind
+tipado contra a versão errada quebra o `astro check` com `ts(2322)`.
+
+É lá que alguém vai olhar depois de estranhar um `npm ls vite` marcando "overridden".

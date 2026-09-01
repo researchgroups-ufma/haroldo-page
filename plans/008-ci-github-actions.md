@@ -144,3 +144,19 @@ mas as chaves do YAML e os nomes de action são do GitHub e ficam como estão.
 <Preenchido pelo executor: saída dos cinco comandos rodados em sequência local, e
 `git show --stat HEAD`. Depois do plano 010, acrescentar o link/resultado da primeira
 execução do workflow no GitHub.>
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendência P-3, vinda da revisão do plano 002)
+
+**A tabela de "Scripts npm que já existem" deste plano está desatualizada.** O plano 002
+entregou `build` como `astro check && astro build`, não `astro build`.
+
+Consequências, ambas boas — não "corrija" o script:
+
+- O nome do script (`build`) é o que este plano verifica, então nada quebra.
+- A checagem de tipos passa a rodar dentro do `build` do CI. Sem ela, o workflow da fase 0
+  (`npm ci → lint → format:check → test → build`) **não teria checagem de tipos nenhuma**,
+  porque `format:check` é Prettier. Não há duplicação a eliminar.
+
+Atualize a tabela para refletir o script real antes de executar.

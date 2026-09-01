@@ -197,3 +197,28 @@ inteiro; use edição pontual).
 <Preenchido pelo executor: lista dos planos 001–012 com Evidência conferida, saída dos cinco
 comandos de qualidade, `git show --stat HEAD`, URL e resultado da execução final do CI, e a
 decisão tomada quanto à URL do Worker (divergiu ou não).>
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendência P-1, vinda da revisão do plano 002)
+
+**O critério de aceitação "apenas o ADR da D-01" deste plano fica ampliado: escreva também um
+segundo ADR.**
+
+`docs/adr/0002-pin-do-vite-via-overrides.md` — registra o campo `overrides: { vite: "6.4.3" }`
+introduzido pelo plano 002. A §10.5 do PRD define `docs/adr/` como "Decisões D-01..D-06 **e
+futuras**", o que autoriza um ADR fora da tabela de decisões D.
+
+Contexto técnico já apurado (não precisa reinvestigar): `astro@5.18.2` depende de `vite@^6.4.1`
+como dependência dura; `@tailwindcss/vite@4.3.3` declara vite como *peer* `^5.2.0 || ^6 || ^7 || ^8`.
+Sem o override o npm iça vite 8 para a raiz e aninha o 6 sob `astro` — duas cópias, e o `Plugin`
+de uma não é atribuível ao da outra, quebrando `astro check` com `ts(2322)`. Alternativas
+descartadas: declarar `vite` como devDependency direta (acrescenta dependência que o projeto não
+usa) e afrouxar o `astro check` (regressão).
+
+**O ADR precisa conter o gatilho de revisão** — é a parte que hoje não existe em lugar nenhum:
+
+> Remover este override quando o `astro` passar a exigir vite ≥ 7.
+> Validar com `npm ls vite --all` mostrando uma única cópia.
+
+A justificativa completa está na seção `## Evidência` de `plans/002-scaffolding-astro-typescript-tailwind.md`.

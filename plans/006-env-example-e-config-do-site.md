@@ -139,3 +139,24 @@ dicionários futuros bebam da mesma fonte:
 ## Evidência
 
 <Preenchido pelo executor: saída de `npm run test`, `npm run build` e `git show --stat HEAD`.>
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendência P-2, vinda da revisão do plano 002)
+
+**Verifique empiricamente antes de documentar `PUBLIC_SITE_URL` como variável de `.env`.**
+
+O `astro.config.mjs` criado pelo plano 002 lê `process.env.PUBLIC_SITE_URL`. O arquivo de
+configuração do Astro é carregado **antes** de o `.env` ser aplicado ao processo — o caminho
+suportado para ler `.env` ali é o `loadEnv` do Vite. Ou seja, há risco concreto de alguém pôr
+`PUBLIC_SITE_URL` no `.env` local, buildar, e o `site` continuar no default sem nenhum aviso.
+
+**O que fazer:** defina `PUBLIC_SITE_URL` no `.env`, rode `npm run build` e inspecione o
+canonical/`site` no `dist/`. Conforme o resultado:
+
+- se **não** for lido do `.env`: documente isso explicitamente no `.env.example`
+  ("esta variável vem do ambiente real — shell, GitHub Actions, Cloudflare — não do `.env`"); **ou**
+- troque `process.env` por `loadEnv` no `astro.config.mjs` (acrescente o arquivo à lista de
+  "Arquivos afetados" ao fazê-lo).
+
+Cole a evidência da verificação na seção `## Evidência` deste plano, seja qual for o resultado.

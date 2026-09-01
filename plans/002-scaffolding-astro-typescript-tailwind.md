@@ -1,6 +1,6 @@
 # Plano 002 — Scaffolding Astro 5 estático + TypeScript strict + Tailwind 4
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 2 do checklist §12; D-01, RNF-02, RNF-12)
 **Depende de:** plano 001
 **Modelo recomendado:** sonnet
