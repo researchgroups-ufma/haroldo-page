@@ -1,6 +1,6 @@
 # Plano 003 — Estrutura de diretórios conforme §7.5 do PRD
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 3 do checklist §12)
 **Depende de:** plano 002
 **Modelo recomendado:** haiku
@@ -141,12 +141,142 @@ de arquivo por template dentro dessas pastas (RN-08).
 
 ## Critérios de aceitação
 
-- [ ] Toda pasta da §7.5 marcada "← CRIAR" existe e é rastreada pelo Git
-- [ ] Nenhuma pasta marcada ⏳ foi criada
-- [ ] `content/` está na raiz do repositório, **não** dentro de `src/`
-- [ ] `npm run build` continua verde
-- [ ] `PRD.md`, `briefing.md` e os arquivos dos planos 001/002 inalterados
+- [x] Toda pasta da §7.5 marcada "← CRIAR" existe e é rastreada pelo Git
+- [x] Nenhuma pasta marcada ⏳ foi criada
+- [x] `content/` está na raiz do repositório, **não** dentro de `src/`
+- [x] `npm run build` continua verde
+- [x] `PRD.md`, `briefing.md` e os arquivos dos planos 001/002 inalterados
 
 ## Evidência
 
-<Preenchido pelo executor: saída de `git show --stat HEAD` e de `npm run build`.>
+### git ls-files (arquivos criados)
+
+```
+content/disciplinas/.gitkeep
+content/linhas-pesquisa/.gitkeep
+content/perfil/.gitkeep
+content/projetos/.gitkeep
+content/publicacoes/.gitkeep
+docs/CHANGELOG.md
+docs/adr/.gitkeep
+public/robots.txt
+public/uploads/.gitkeep
+scripts/.gitkeep
+src/components/.gitkeep
+src/i18n/.gitkeep
+src/layouts/.gitkeep
+src/lib/.gitkeep
+src/pages/en/.gitkeep
+tests/.gitkeep
+```
+
+### Árvore de diretórios
+
+```
+haroldo/
+├── content/
+│   ├── disciplinas/.gitkeep
+│   ├── linhas-pesquisa/.gitkeep
+│   ├── perfil/.gitkeep
+│   ├── projetos/.gitkeep
+│   └── publicacoes/.gitkeep
+├── public/
+│   ├── robots.txt
+│   └── uploads/.gitkeep
+├── src/
+│   ├── components/.gitkeep
+│   ├── i18n/.gitkeep
+│   ├── layouts/.gitkeep
+│   ├── lib/.gitkeep
+│   ├── pages/
+│   │   ├── en/.gitkeep
+│   │   └── index.astro (já existe)
+│   ├── styles/ (já existe)
+│   └── env.d.ts (já existe)
+├── docs/
+│   ├── adr/.gitkeep
+│   └── CHANGELOG.md
+├── tests/.gitkeep
+├── scripts/.gitkeep
+└── [arquivos dos planos 001/002 — inalterados]
+```
+
+### git show --stat HEAD
+
+```
+commit caeee458b42a05e5056627aca5b6d26b71e1b9dd
+Author: André Ferreira <and.near@hotmail.com>
+Date:   Tue Sep 1 12:52:14 2026 -0300
+
+    chore: cria estrutura de diretórios conforme §7.5 do PRD
+    
+    - content/: perfil, linhas-pesquisa, projetos, disciplinas, publicacoes
+    - public/uploads/: para uploads do painel
+    - public/robots.txt: versão provisória para subdomínio workers.dev
+    - src/components/, src/layouts/, src/i18n/, src/lib/: estrutura de código
+    - src/pages/en/: rotas em inglês
+    - tests/: suíte Vitest
+    - scripts/: utilitários
+    - docs/adr/: Architecture Decision Records
+    - docs/CHANGELOG.md: esqueleto Keep a Changelog (português)
+    
+    Todos os diretórios rastreados pelo Git via .gitkeep.
+    
+    Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01NY5BpzMocrirtxZ4rjPP3Y
+
+ content/disciplinas/.gitkeep     |  0
+ content/linhas-pesquisa/.gitkeep |  0
+ content/perfil/.gitkeep          |  0
+ content/projetos/.gitkeep        |  0
+ content/publicacoes/.gitkeep     |  0
+ docs/CHANGELOG.md                | 10 ++++++++++
+ docs/adr/.gitkeep                |  0
+ public/robots.txt                |  4 ++++
+ public/uploads/.gitkeep          |  0
+ scripts/.gitkeep                 |  0
+ src/components/.gitkeep          |  0
+ src/i18n/.gitkeep                |  0
+ src/layouts/.gitkeep             |  0
+ src/lib/.gitkeep                 |  0
+ src/pages/en/.gitkeep            |  0
+ tests/.gitkeep                   |  0
+ 16 files changed, 14 insertions(+)
+```
+
+### npm run build (verde)
+
+```
+> haroldo-page@0.1.0 build
+> astro check && astro build
+
+12:52:40 [vite] Re-optimizing dependencies because lockfile has changed
+12:52:40 [content] Syncing content
+12:52:40 [content] Synced content
+12:52:40 [types] Generated 224ms
+12:52:40 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (4 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+12:52:44 [content] Syncing content
+12:52:44 [content] Synced content
+12:52:44 [types] Generated 44ms
+12:52:44 [build] output: "static"
+12:52:44 [build] mode: "static"
+12:52:44 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+12:52:44 [build] Collecting build info...
+12:52:44 [build] ✓ Completed in 56ms.
+12:52:44 [build] Building static entrypoints...
+12:52:45 [vite] ✓ built in 568ms
+12:52:45 [build] ✓ Completed in 604ms.
+
+ generating static routes 
+12:52:45 ▶ src/pages/index.astro
+12:52:45   └─ /index.html (+6ms) 
+12:52:45 ✓ Completed in 11ms.
+
+12:52:45 [build] 1 page(s) built in 681ms
+12:52:45 [build] Complete!
+```
