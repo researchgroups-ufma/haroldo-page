@@ -122,7 +122,7 @@ Verificação autoritativa hoje:
 npm ci                →  não reescreve o lock (conferido por hash)
 npm run lint          →  exit 0
 npm run format:check  →  All matched files use Prettier code style!
-npm run test          →  Test Files 2 passed (2) | Tests 12 passed (12)
+npm run test:coverage →  testes verdes E cobertura ≥ 80% (threshold imposto)
 npm run build         →  0 errors, 0 warnings, 0 hints; Complete!
 ```
 
@@ -180,5 +180,5 @@ do arquivo antes de despachar qualquer um destes**:
   obsoleto~~ — **resolvidos em 2026-09-01**. Nenhum arquivo de código ou configuração menciona
   mais `haroldo-page.workers.dev`; as ocorrências restantes estão só em Evidências de planos,
   que registram o que era verdade na execução e não se reescrevem.
-- O campo `Versão do PRD` em `PRD.md` §0 continua `v0.1`, enquanto o histórico §0.1 já vai em
-  `v0.1.5`. Inconsistência preexistente, fora do escopo do 013.
+- ~~O campo `Versão do PRD` em `PRD.md` §0 continua `v0.1`~~ — **corrigido em 2026-09-01** para
+  `v0.1.7`, junto com a linha de histórico que registra a correção.

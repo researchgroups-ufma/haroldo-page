@@ -70,11 +70,13 @@ trabalho.
   promove; Evidência é saída literal colada; **teste novo tem de ser provado falsificável**.
 - **Portão de qualidade** — um plano só vira `DONE` com verificação independente com saída real
   **e** revisão de código aprovada.
-- **Dívidas ativas** — `Versão do PRD` em §0 ainda `v0.1` enquanto o histórico já vai em
-  `v0.1.6`; cobertura sem `thresholds`, então a meta de ≥ 80% da §11 é relatada e nunca imposta;
-  **o teste da regra `process.env` varre só `.ts` sob `src/`** — e esta fase traz `.astro`,
-  então a lacuna passa a morder agora. As dívidas de URL provisória
-  (`.env.example`, `wrangler.toml`) foram resolvidas em 2026-09-01.
+- **Dívidas herdadas: nenhuma.** As cinco que a fase 0 deixou foram resolvidas em 2026-09-01 —
+  URL provisória em `.env.example` e no comentário do `wrangler.toml`, campo `Versão do PRD`,
+  cobertura sem `thresholds` e a varredura de `process.env` que ignorava `.astro`. **Esta fase
+  começa com a lista limpa; mantenha assim.**
+- **A cobertura agora reprova.** O `vitest.config.ts` tem `thresholds` em 80% e o CI roda
+  `npm run test:coverage`. Módulo novo em `src/lib/` ou `src/i18n/` sem teste **quebra o CI** —
+  o que é o ponto, mas é bom saber antes de abrir o PR.
 
 ## Verificação autoritativa
 
@@ -82,6 +84,6 @@ trabalho.
 npm ci                →  não reescreve o lock
 npm run lint          →  exit 0
 npm run format:check  →  All matched files use Prettier code style!
-npm run test          →  (a contagem cresce a cada plano desta fase)
+npm run test:coverage →  testes verdes E cobertura ≥ 80% (threshold imposto)
 npm run build         →  0 errors, 0 warnings, 0 hints; Complete!
 ```

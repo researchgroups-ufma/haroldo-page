@@ -18,5 +18,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
-      - run: npm run test
+      # test:coverage em vez de test: roda os mesmos testes e ainda impoe o
+      # threshold de 80% da §11 do PRD, que ate 2026-09-01 era so relatado
+      - run: npm run test:coverage
       - run: npm run build

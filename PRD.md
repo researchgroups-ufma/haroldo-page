@@ -12,7 +12,7 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1 |
+| **Versão do PRD** | v0.1.7 |
 | **Status** | 🟡 Rascunho |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
@@ -32,6 +32,7 @@
 | v0.1.4 | 2026-09-01 | Desenvolvedor | **Fase 0 concluída:** checklist §12 fechado (10/10) com TinaCloud (plano 011) e Cloudflare (plano 012); ADR-0001 e ADR-0002 registrados; URL real do Worker reconciliada no código; §16 corrigida (Q-07 bloqueia a fase 3, não a 5) |
 | v0.1.5 | 2026-09-01 | Desenvolvedor | Repositório passa de **privado a público**, por necessidade do projeto: §0, §7.4 e §12 atualizadas. Consequência registrada em D-04 e RN-01 — `publicado: false` esconde do site, não do GitHub |
 | v0.1.6 | 2026-09-01 | Desenvolvedor | **Q-02 resolvida:** painel do TinaCMS em inglês é aceitável; A-08 confirmada e o TinaCMS fica. Decap deixa de ser gatilho de decisão e segue só como plano B de R-03. Nada mais bloqueia a fase 1 |
+| v0.1.7 | 2026-09-01 | Desenvolvedor | Campo **Versão do PRD** em §0 corrigido — dizia `v0.1` desde a v0.1.1, divergindo do próprio histórico. A meta de cobertura da §11 passou de relatada a **imposta** (`thresholds` no Vitest, rodando no CI) |
 
 ---
 
