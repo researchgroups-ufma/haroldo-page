@@ -32,5 +32,15 @@ Thumbs.db
 # Relatório de cobertura do Vitest
 coverage/
 
+# Artefatos gerados pelo TinaCMS — 100% derivados de `tina/config.ts` e de
+# `content/`. Regenerados por `tinacms build` (rodado antes de `astro build`,
+# ver `package.json`) ou por `tinacms dev`. `public/admin/index.html` em
+# especial difere completamente entre dev (aponta para o servidor local do
+# Tina em `localhost:4001`) e produção (bundle estático) — versionar
+# produziria o arquivo errado dependendo de quem rodou por último.
+tina/__generated__/
+tina/tina-lock.json
+public/admin/
+
 # Instruções locais para o Claude Code — não fazem parte do produto
 CLAUDE.md

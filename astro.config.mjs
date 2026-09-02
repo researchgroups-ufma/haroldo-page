@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
+import { tinaAdminDevRedirect } from '@tinacms/astro/vite';
 
 // astro.config.mjs roda em Node antes de o Astro/Vite aplicar `.env` ao
 // processo — `process.env.PUBLIC_SITE_URL` ficaria sempre `undefined` quando
@@ -18,13 +19,15 @@ const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '
  *  Arquivo      : astro.config.mjs
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Configuração do Astro em modo estático (D-01), sem adapter
- *                 e sem SSR, com o plugin Vite do Tailwind 4 (RNF-02, RNF-12).
+ *                 e sem SSR, com o plugin Vite do Tailwind 4 (RNF-02, RNF-12)
+ *                 e o plugin de dev do TinaCMS que resolve `/admin` sem sufixo
+ *                 durante `astro dev`.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
- *  Atualizado em: 2026-09-01
- *  Versão       : 0.1.1
+ *  Atualizado em: 2026-09-02
+ *  Versão       : 0.2.0
  *
- *  Dependências : astro, @tailwindcss/vite, vite (loadEnv)
+ *  Dependências : astro, @tailwindcss/vite, @tinacms/astro (tinaAdminDevRedirect), vite (loadEnv)
  *  Entradas     : variável de ambiente PUBLIC_SITE_URL (opcional), lida via
  *                 `loadEnv` do `.env`/ambiente real — ver nota acima
  *  Saídas       : configuração consumida pelo CLI do Astro (`astro build`/`astro dev`)
@@ -32,13 +35,16 @@ const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '
  *
  *  Notas        : `site` usa o subdomínio padrão do Worker (A-07) até a fase 5
  *                 confirmar domínio próprio (Q-05). Nunca adicionar `adapter`
- *                 aqui — o site é 100% estático (D-01).
+ *                 aqui — o site é 100% estático (D-01). `tinaAdminDevRedirect`
+ *                 só age em dev (`apply: 'serve'`); o build de produção serve
+ *                 `public/admin/index.html` diretamente — sem SSR, sem visual
+ *                 editing (D-02).
  * ============================================================================
  */
 export default defineConfig({
   output: 'static',
   site: PUBLIC_SITE_URL ?? 'https://haroldo-page.and-near.workers.dev',
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), tinaAdminDevRedirect()],
   },
 });

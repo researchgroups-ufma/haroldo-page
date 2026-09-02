@@ -9,3 +9,7 @@ briefing.md
 plans/
 .firecrawl/
 CLAUDE.md
+
+# Dono do formato é o TinaCMS (RF-01/RF-02), não o Prettier — sem esta linha,
+# cada salvamento pelo painel deixaria o CI vermelho para o professor.
+content/
