@@ -10,7 +10,7 @@ A fonte de verdade sobre requisitos, arquitetura e decisões é o `PRD.md`.
 
 ## Stack
 
-- **Astro 5** — site 100% estático (`output: 'static'`), sem servidor por requisição.
+- **Astro 7** — site 100% estático (`output: 'static'`), sem servidor por requisição.
 - **TypeScript** — em modo estrito, para os schemas de conteúdo e o código de `src/`.
 - **Tailwind CSS 4** — via plugin Vite (`@tailwindcss/vite`).
 - **TinaCMS** — painel de edição em `/admin`. **Ainda não existe neste repositório** —
@@ -187,19 +187,15 @@ commite o resultado.
 projeto normaliza os finais de linha; se ainda assim divergir, rode `npm run format`
 localmente antes de commitar em vez de editar o Prettier.
 
-**`overrides` do `package.json` marcando pacotes como "overridden" (`vite`, `sharp`,
-`esbuild`).** Não remova esses overrides sem entender o motivo de cada um:
+**Tutorial de Astro 4 ou 5 não serve para este projeto.** O upgrade para o Astro 7
+(2026-09-01) trouxe mudanças que quebram exemplos antigos, e elas atingem exatamente o
+código de conteúdo: as coleções legadas foram removidas — usa-se a **Content Layer API** com
+o loader `glob()` —, o Zod subiu para a **versão 4** (`z.string().email()` virou `z.email()`)
+e o `z` agora vem de **`astro/zod`**; `astro:schema` e o `z` exportado por `astro:content`
+não existem mais. O arquivo de schemas é `src/content.config.ts`.
 
-- `vite: 6.4.3` — `astro@5.18.2` depende de `vite@^6.4.1` (dependência dura), enquanto
-  `@tailwindcss/vite@4.3.3` declara `vite` como peer `^5.2.0 || ^6 || ^7 || ^8`. Sem o
-  override, o npm resolve `vite@8` na raiz e deixa o `6` aninhado sob `astro` — duas cópias
-  — e o plugin do Tailwind, tipado contra a versão errada, quebra o `astro check` com
-  `ts(2322)`. Decisão registrada em `docs/adr/0002-pin-do-vite-via-overrides.md` (criado
-  pelo plano 013 do projeto — se este arquivo ainda não existir, a decisão segue documentada
-  aqui e nesta seção).
-- `sharp: 0.35.4` e `esbuild: 0.28.2` — fixados para corrigir vulnerabilidades que vinham
-  aninhadas sob `astro` (sharp/libvips severidade alta; esbuild permitia leitura arbitrária
-  de arquivo pelo dev server em rede local no Windows). Reduziram o `npm audit` de 3
-  vulnerabilidades para 1. A que resta é do núcleo do `astro` e só se resolve subindo para o
-  Astro 7 (dois majors acima), o que está adiado para um plano próprio — não rode
-  `npm audit fix --force` sem essa decisão deliberada.
+**O `package.json` não tem `overrides` — e não deve voltar a ter sem motivo escrito.** Houve
+três (`vite`, `sharp`, `esbuild`), removidos no upgrade do Astro: o 7 exige `vite ^8.0.13` e
+já pede nativamente as versões corrigidas de `sharp` e `esbuild`. `npm audit` está em **zero
+vulnerabilidades**. A história completa, com o que motivou cada pin e por que cada um caiu,
+está em `docs/adr/0002-pin-do-vite-via-overrides.md`.

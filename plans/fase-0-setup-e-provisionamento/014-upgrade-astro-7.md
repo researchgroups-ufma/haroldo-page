@@ -114,7 +114,7 @@ motivo atualizado no ADR-0002.
 - [x] ADR-0002 atualizado registrando que o gatilho de revisão disparou e o que foi feito
 - [x] `docs/CHANGELOG.md` com entrada em "Alterado"
 - [x] `plans/README.md` sem a dívida do upgrade do Astro
-- [ ] CI verde após o push
+- [x] CI verde após o push
 
 ## Evidência
 
@@ -269,7 +269,8 @@ x-robots-tag: noindex
 - **A otimização de imagem usou imagem sintética**, como na validação original do `07521cd`. A
   pendência de reconferir com imagem real segue aberta para a fase 1, quando houver a foto do
   perfil.
-- **CI verde após o push** — depende do push e de leitura da aba Actions; `gh` não está
-  instalado nesta máquina.
+- ~~CI verde após o push~~ — **confirmado pelo usuário** em 2026-09-01 na aba Actions, sobre o
+  commit `68b5daa`. É a primeira execução do CI com Astro 7. A procedência é o relato do
+  usuário: `gh` não está instalado nesta máquina e não houve como ler o run daqui.
 - Nenhum ADR próprio foi escrito para o upgrade. A pendência do `plans/README.md` admitia "ADR
   do upgrade do Astro **ou plano próprio**"; este plano é o registro.

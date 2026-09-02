@@ -70,10 +70,11 @@ trabalho.
   promove; Evidência é saída literal colada; **teste novo tem de ser provado falsificável**.
 - **Portão de qualidade** — um plano só vira `DONE` com verificação independente com saída real
   **e** revisão de código aprovada.
-- **Dívidas ativas** — `.env.example:23` com o subdomínio provisório (sabota quem seguir o
-  README); `wrangler.toml:5-6` com comentário obsoleto; `Versão do PRD` em §0 ainda `v0.1`;
-  cobertura sem `thresholds`; **o teste da regra `process.env` varre só `.ts` sob `src/`** — e
-  esta fase traz `.astro`, então a lacuna passa a morder agora.
+- **Dívidas ativas** — `Versão do PRD` em §0 ainda `v0.1` enquanto o histórico já vai em
+  `v0.1.6`; cobertura sem `thresholds`, então a meta de ≥ 80% da §11 é relatada e nunca imposta;
+  **o teste da regra `process.env` varre só `.ts` sob `src/`** — e esta fase traz `.astro`,
+  então a lacuna passa a morder agora. As dívidas de URL provisória
+  (`.env.example`, `wrangler.toml`) foram resolvidas em 2026-09-01.
 
 ## Verificação autoritativa
 

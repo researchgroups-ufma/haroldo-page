@@ -176,13 +176,9 @@ do arquivo antes de despachar qualquer um destes**:
   decidir se entra no `.gitignore`.
 - A tabela de cobertura por arquivo sai vazia no Windows (defeito cosmético do reporter de
   texto do v8). O relatório HTML em `coverage/` mostra os arquivos corretamente.
-- **`.env.example:23` ainda traz `PUBLIC_SITE_URL=https://haroldo-page.workers.dev`**, o
-  provisório. O README manda copiar esse arquivo para criar o `.env`, e o valor copiado
-  sobrescreve o default correto do código — quem instalar hoje aponta para um subdomínio que
-  não existe. Ficou fora do plano 013 por não estar em "Arquivos afetados". **É a mais urgente
-  desta lista.**
-- `wrangler.toml:5-6` — o comentário ainda afirma que `name` define o subdomínio
-  `haroldo-page.workers.dev` e que ele é o `PUBLIC_SITE_URL` provisório. As duas metades
-  ficaram falsas com a reconciliação da URL.
+- ~~`.env.example:23` com o subdomínio provisório~~ e ~~`wrangler.toml:5-6` com o comentário
+  obsoleto~~ — **resolvidos em 2026-09-01**. Nenhum arquivo de código ou configuração menciona
+  mais `haroldo-page.workers.dev`; as ocorrências restantes estão só em Evidências de planos,
+  que registram o que era verdade na execução e não se reescrevem.
 - O campo `Versão do PRD` em `PRD.md` §0 continua `v0.1`, enquanto o histórico §0.1 já vai em
   `v0.1.5`. Inconsistência preexistente, fora do escopo do 013.

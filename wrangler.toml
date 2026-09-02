@@ -2,8 +2,9 @@
 # D-01 do PRD: site 100% estático, sem `main`, sem adapter, sem SSR.
 # Nenhum código executa por requisição (§7.1).
 
-# codinome do projeto (§0 do PRD); define o subdomínio `haroldo-page.workers.dev`,
-# já usado como `PUBLIC_SITE_URL` provisório nos planos 002 e 006
+# codinome do projeto (§0 do PRD); combinado ao subdomínio da conta, define a
+# URL do Worker — `haroldo-page.and-near.workers.dev`, publicada no plano 012 e
+# provisória até a fase 5 confirmar domínio próprio (A-07, Q-05)
 name = "haroldo-page"
 
 # data de criação do projeto; congela o comportamento da plataforma
