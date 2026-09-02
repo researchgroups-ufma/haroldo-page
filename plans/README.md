@@ -21,12 +21,11 @@
 | 008 | CI no GitHub Actions (lint, testes, build) | 🟢 DONE | implementer | `8b71999`, `af72c49`, `ac6e52d` |
 | 009 | `README.md` inicial | 🟢 DONE | implementer | `9dc42c7`, `ac6e52d` |
 | 010 | 🧑 Repositório privado no GitHub e push inicial | 🟢 DONE | **humano** | `ac6e52d` |
-| 011 | 🧑 Projeto no TinaCloud vinculado ao repositório | 🟢 DONE | **humano** | — |
-| 012 | 🧑 Conta Cloudflare, Worker e primeiro deploy | ⬜ TODO | **humano** | — |
+| 011 | 🧑 Projeto no TinaCloud vinculado ao repositório | 🟢 DONE | **humano** | `219d61c` |
+| 012 | 🧑 Conta Cloudflare, Worker e primeiro deploy | 🟢 DONE | **humano** | — |
 | 013 | ADR-0001, ADR-0002, CHANGELOG e fechamento da fase 0 | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 012 (Cloudflare) — o deploy já foi feito; faltam só as conferências de
-painel. Depois o 013 fecha a fase.
+**Próximo:** plano 013 — único restante. Fecha a fase 0.
 
 **Commits fora do fluxo de planos:** `c1d23bb` (tira `CLAUDE.md` do versionamento, exclui
 `coverage` do `astro check`) e `07521cd` (overrides de `sharp` e `esbuild` — ver "Segurança").
@@ -38,12 +37,13 @@ painel. Depois o 013 fecha a fase.
   previa; foi decisão do stakeholder, registrada na Evidência do plano 010.
 - **CI:** verde. Primeira execução real em 2026-09-01, `Success` em 48s sobre `9dc42c7`.
 - **Suíte:** 2 arquivos, 12 testes. `lint`, `format:check` e `build` verdes.
-- **Site:** **no ar** em <https://haroldo-page.and-near.workers.dev> — deploy manual feito
-  pelo usuário em 2026-09-01. Raiz responde 200 com a página placeholder; rota inexistente
-  responde 404. O plano 012 segue aberto por falta das conferências de painel (assets sem
-  runtime, custo US$ 0,00, cotas de build).
+- **Site:** **no ar** em <https://haroldo-page.and-near.workers.dev> — deploy manual em
+  2026-09-01, versão `85adc91c`. Raiz responde 200 com a página placeholder estilizada; rota
+  inexistente responde 404; `x-robots-tag: noindex` presente. Custo US$ 0,00. **A URL
+  divergiu do provisório** `https://haroldo-page.workers.dev` — o subdomínio da conta é
+  `and-near`, e reconciliar isso no código é tarefa do plano 013.
 - **Conteúdo:** `content/` vazio (só `.gitkeep`). Uma única página, `src/pages/index.astro`.
-- **Checklist §12 da fase 0:** 9 de 10. Falta Cloudflare (012).
+- **Checklist §12 da fase 0:** 10 de 10 na prática — falta o plano 013 marcá-lo no PRD.
 
 ## Grafo de dependências
 
@@ -54,7 +54,7 @@ painel. Depois o 013 fecha a fase.
             └─ 007
 ```
 
-Os planos 001–011 estão fechados. Resta o 012 — humano — e o 013, que depende dele.
+Os planos 001–012 estão fechados. Resta apenas o 013, que fecha a fase.
 
 ## Restrição que limita o paralelismo
 

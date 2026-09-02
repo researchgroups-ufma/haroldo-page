@@ -1,6 +1,6 @@
 # Plano 012 — Roteiro humano: conta Cloudflare, Worker criado e primeiro deploy
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 5 do checklist §12; valida D-01, RNF-03, RNF-14)
 **Depende de:** planos 007 e 009
 **Modelo recomendado:** — (execução humana; um agente sonnet pode assistir nos passos 1 e 7)
@@ -126,21 +126,173 @@ de `PUBLIC_SITE_URL` e do `site` do Astro até que exista domínio próprio.
 
 ## Critérios de aceitação
 
-- [ ] Conta Cloudflare gratuita ativa e `npx wrangler whoami` identificando-a
-- [ ] Worker `haroldo-page` criado pelo primeiro `wrangler deploy`
-- [ ] **Verificação objetiva:** a URL `https://haroldo-page.<subdominio>.workers.dev`
+- [x] Conta Cloudflare gratuita ativa e `npx wrangler whoami` identificando-a
+- [x] Worker `haroldo-page` criado pelo primeiro `wrangler deploy`
+- [x] **Verificação objetiva:** a URL `https://haroldo-page.<subdominio>.workers.dev`
       responde **200** com a página placeholder estilizada, e uma rota inexistente responde
       **404**
-- [ ] O Worker serve assets estáticos, sem código de runtime (D-01 validada na prática)
-- [ ] URL exata do Worker registrada na Evidência
-- [ ] Workers Builds **não** foi conectado ao GitHub (é fase 2)
-- [ ] Nenhuma variável de ambiente nem segredo configurado no painel da Cloudflare
-- [ ] Custo permanece US$ 0,00 (RNF-14)
-- [ ] Cotas do plano gratuito conferem com Q-03/A-03 (3.000 min/mês, 1 build simultâneo,
+- [x] O Worker serve assets estáticos, sem código de runtime (D-01 validada na prática)
+- [x] URL exata do Worker registrada na Evidência
+- [x] Workers Builds **não** foi conectado ao GitHub (é fase 2)
+- [x] Nenhuma variável de ambiente nem segredo configurado no painel da Cloudflare
+- [x] Custo permanece US$ 0,00 (RNF-14)
+- [x] Cotas do plano gratuito conferem com Q-03/A-03 (3.000 min/mês, 1 build simultâneo,
       20 min por build) — ou divergência reportada
 
 ## Evidência
 
-<Preenchido por quem executou: saída completa de `npm run deploy`, `npx wrangler whoami`,
-URL exata do Worker, código HTTP da raiz e de uma rota inexistente, descrição do que o
-painel Workers & Pages mostra sobre o Worker, e confirmação do plano gratuito.>
+Executado por: usuário (conta, `wrangler login` e `npm run deploy`), em 2026-09-01.
+Verificação independente por CLI e HTTP: sessão de orquestração, 2026-09-01.
+
+### URL real do Worker
+
+```
+https://haroldo-page.and-near.workers.dev
+```
+
+**Divergiu** do provisório `https://haroldo-page.workers.dev` usado nos planos 002 e 006 — o
+subdomínio da conta é `and-near`. Conforme a instrução deste plano, **nenhum arquivo
+versionado foi alterado aqui**; o ajuste de `astro.config.mjs`, `src/lib/config.ts` e da linha
+comentada do `Sitemap` em `public/robots.txt` é do **plano 013**. O `.env` local já recebeu
+`PUBLIC_SITE_URL=https://haroldo-page.and-near.workers.dev` (sem barra final, como exige
+`tests/lib/config.test.ts`).
+
+### Conta autenticada
+
+```
+$ npx wrangler whoami
+ ⛅️ wrangler 4.128.0
+👋 You are logged in with an OAuth Token, associated with the email and.near@hotmail.com.
+┌────────────────────────────────┬──────────────────────────────────┐
+│ Account Name                   │ Account ID                       │
+├────────────────────────────────┼──────────────────────────────────┤
+│ And.near@hotmail.com's Account │ 98e35087677f329c2adbf68711ecebbf │
+└────────────────────────────────┴──────────────────────────────────┘
+```
+
+### `npm run deploy`
+
+```
+> haroldo-page@0.1.0 deploy
+> npm run build && wrangler deploy
+
+> haroldo-page@0.1.0 build
+> astro check && astro build
+
+22:26:51 [content] Syncing content
+22:26:51 [types] Generated 40ms
+22:26:51 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+eslint.config.js:16:25 - warning ts(6387): The signature '(...configs: InfiniteDepthConfigWithExtends[]): ConfigArray' of 'tseslint.config' is deprecated.
+
+Result (10 files):
+- 0 errors
+- 0 warnings
+- 1 hint
+
+22:26:54 [build] output: "static"
+22:26:54 [build] mode: "static"
+22:26:54 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+22:26:54 [build] Building static entrypoints...
+22:26:54 [vite] ✓ built in 417ms
+ generating static routes
+22:26:54 ▶ src/pages/index.astro
+22:26:54   └─ /index.html (+12ms)
+22:26:54 [build] 1 page(s) built in 527ms
+22:26:54 [build] Complete!
+
+ ⛅️ wrangler 4.128.0
+🌀 Building list of assets...
+✨ Read 7 files from the assets directory S:\Projetos\academic_page\haroldo\dist
+🌀 Starting asset upload...
+No updated asset files to upload. Proceeding with deployment...
+Total Upload: 0.31 KiB / gzip: 0.22 KiB
+Uploaded haroldo-page (9.90 sec)
+Deployed haroldo-page triggers (5.15 sec)
+  https://haroldo-page.and-near.workers.dev
+Current Version ID: 85adc91c-8c40-4414-8e9c-d6daff99e4d7
+```
+
+`No updated asset files to upload` porque esta execução é a segunda — o Worker já havia sido
+criado. O `1 hint` do `tseslint.config` é a pendência **P-2**, que o plano 013 resolve.
+
+### Implantações e versão no ar
+
+```
+$ npx wrangler deployments list
+Created:     2026-09-02T00:57:11.312Z
+Author:      and.near@hotmail.com
+Source:      Upload
+Message:     Automatic deployment on upload.
+Version(s):  (100%) 5689b7e5-b24d-4d4e-88ee-21115168b4a1
+
+Created:     2026-09-02T01:27:05.690Z
+Author:      and.near@hotmail.com
+Source:      Unknown (deployment)
+Version(s):  (100%) 85adc91c-8c40-4414-8e9c-d6daff99e4d7
+
+$ npx wrangler versions view 85adc91c-8c40-4414-8e9c-d6daff99e4d7
+Version ID:  85adc91c-8c40-4414-8e9c-d6daff99e4d7
+Created:     2026-09-02T01:27:03.983Z
+Author:      and.near@hotmail.com
+Source:      Unknown (version_upload)
+Compatibility Date:  2026-09-01
+```
+
+Horários em UTC; `00:57Z` e `01:27Z` correspondem a 21:57 e 22:27 de 2026-09-01 no horário
+local. A primeira implantação é a que criou o Worker. Ambas têm `Source: Upload` — nenhuma
+veio de build disparado por push.
+
+### Verificação objetiva HTTP
+
+```
+$ curl.exe -s -o /dev/null -w 'raiz: %{http_code}\n' https://haroldo-page.and-near.workers.dev/
+raiz: 200
+$ curl.exe -s -o /dev/null -w '404:  %{http_code}\n' https://haroldo-page.and-near.workers.dev/nao-existe
+404:  404
+
+$ curl.exe -s https://haroldo-page.and-near.workers.dev/ | grep -o "<h1[^>]*>[^<]*</h1>"
+<h1 class="text-3xl font-semibold">Prof. Haroldo C. D. Lima Junior</h1>
+
+$ curl.exe -sI https://haroldo-page.and-near.workers.dev/
+HTTP/1.1 200 OK
+Content-Type: text/html
+CF-Cache-Status: HIT
+Cache-Control: public, max-age=0, must-revalidate
+x-robots-tag: noindex
+Server: cloudflare
+```
+
+O `<h1>` prova que a página servida é a placeholder do projeto, com Tailwind aplicado
+(`text-3xl font-semibold`). O `x-robots-tag: noindex` fecha a pendência que o
+`plans/README.md` havia registrado para este plano: o `public/_headers` chega mesmo à
+resposta HTTP.
+
+### D-01 validada na prática
+
+Base da afirmação, em ordem de força:
+
+1. `wrangler.toml` **não tem `main`** (arquivo versionado, plano 007)
+2. `astro build` reporta `output: "static"` e `mode: "static"`
+3. o wrangler leu **7 arquivos do diretório de assets** e não empacotou módulo de entrada
+4. não existe código de runtime no repositório para ser executado
+5. `wrangler versions view` não lista bindings nem entrypoint — **corroboração, não prova**:
+   ausência de campo na saída não é o mesmo que ausência de código
+
+### Confirmações de painel (reportadas pelo usuário)
+
+- Custo **US$ 0,00**, conta no plano **gratuito** (RNF-14, M-06).
+- Cotas do Workers Builds conferem com Q-03/A-03: **3.000 min/mês**, **1 build simultâneo**,
+  **20 min por build**. Nenhuma divergência a reportar ao PRD.
+- **Workers Builds não conectado ao repositório** — o deploy automático a cada push é fase 2.
+- **Nenhuma variável de ambiente nem segredo** configurado no Worker.
+
+### O que NÃO foi verificado
+
+- **`not_found_handling = "404-page"` não é distinguível de `none` hoje.** Não existe
+  `src/pages/404.astro`, então o build não gera `dist/404.html` e a Cloudflare devolve um 404
+  de corpo vazio — exatamente o que o default `none` devolveria. O **status 404 está
+  confirmado** e o critério de aceitação se satisfaz; o que não se pode afirmar é a inferência
+  do passo 6 de que a chave está ativa. A página 404 própria é RF-27, de fase posterior, e é
+  ela que tornará a chave verificável.
+- Descrição textual do painel *Workers & Pages* sobre o Worker: substituída pela evidência de
+  CLI acima, mais forte e reproduzível.
