@@ -18,7 +18,7 @@
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
 | **Última atualização** | 2026-09-01 |
-| **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — privado, na organização `researchgroups-ufma` (plano 010) |
+| **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav` |
 
 ### 0.1 Histórico de Versões (Changelog)
@@ -30,6 +30,7 @@
 | v0.1.2 | 2026-09-01 | Desenvolvedor | Q-01 resolvida via `lattes.pdf` (Apêndice C); Q-08 dissolvida pela decisão D-07 (link agnóstico ao hospedeiro); NG-02, RN-05, A-04, R-08 e §7.4 ajustados |
 | v0.1.3 | 2026-09-01 | Desenvolvedor | §12 atualizada com o progresso real da fase 0 (planos 001–004 DONE); mapa de execução dos planos em `plans/README.md` |
 | v0.1.4 | 2026-09-01 | Desenvolvedor | **Fase 0 concluída:** checklist §12 fechado (10/10) com TinaCloud (plano 011) e Cloudflare (plano 012); ADR-0001 e ADR-0002 registrados; URL real do Worker reconciliada no código; §16 corrigida (Q-07 bloqueia a fase 3, não a 5) |
+| v0.1.5 | 2026-09-01 | Desenvolvedor | Repositório passa de **privado a público**, por necessidade do projeto: §0, §7.4 e §12 atualizadas. Consequência registrada em D-04 e RN-01 — `publicado: false` esconde do site, não do GitHub |
 
 ---
 
@@ -229,7 +230,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 
 | ID | Regra | Origem/Justificativa |
 |---|---|---|
-| RN-01 | Conteúdo com `publicado = false` não aparece em nenhuma página pública, sitemap ou feed | Substitui o Editorial Workflow ausente no plano gratuito (D-04) |
+| RN-01 | Conteúdo com `publicado = false` não aparece em nenhuma página pública, sitemap ou feed | Substitui o Editorial Workflow ausente no plano gratuito (D-04). A regra vale para o site — **não** para o repositório, que é público (ver D-04) |
 | RN-02 | Publicações são ordenadas por ano decrescente; dentro do mesmo ano, pela ordem de cadastro invertida (mais recente primeiro) | `briefing.md` §10 |
 | RN-03 | Uma disciplina é "atual" ou "anterior"; a transição é manual, feita pelo professor no campo `status` | Evita lógica de data que erraria a cada calendário acadêmico atípico |
 | RN-04 | Aulas, listas e materiais são ordenados pela posição definida pelo professor na lista, não por data | Aula 12 pode ser reagendada sem virar a ordem do curso |
@@ -369,7 +370,7 @@ Três propriedades desta arquitetura merecem registro explícito:
 | D-01 | Astro estático (`output: 'static'`), sem adapter e sem SSR | Astro em modo servidor no Workers | Assets estáticos são ilimitados no plano gratuito e não executam código por requisição; SSR só se justificaria pelo visual editing (D-02) |
 | D-02 | Painel por formulários; **sem** visual editing | Visual editing do Tina | O visual editing exige `output: 'server'`, adapter, ilhas Tina por página e consumo de cota do Worker. O ganho — clicar no texto — não paga a complexidade e o risco. O fluxo do briefing (login → formulário → publicar) é atendido integralmente |
 | D-03 | i18n por grupo "Versão em inglês" recolhível **dentro do mesmo arquivo**, com fallback por campo | Pastas `pt/` e `en/` espelhadas (padrão do LaFiM com Decap) | Um único editor: um arquivo por item elimina o risco de par órfão e mantém um formulário só. O fallback vira "campo vazio ⇒ usa PT", mais simples que merge por nome de arquivo |
-| D-04 | Rascunho como campo `publicado` no schema | Editorial Workflow do TinaCloud | Indisponível no plano gratuito (apenas Team Plus, US$ 41/mês). O campo entrega o essencial: conteúdo pela metade não vaza para o site |
+| D-04 | Rascunho como campo `publicado` no schema | Editorial Workflow do TinaCloud | Indisponível no plano gratuito (apenas Team Plus, US$ 41/mês). O campo entrega o essencial: conteúdo pela metade não vaza para o site. **Consequência desde 2026-09-01:** com o repositório público, `publicado: false` esconde do *site*, não do *GitHub* — o arquivo e todo o histórico de edição ficam legíveis por qualquer pessoa |
 | D-05 | Aulas, listas e materiais como listas embutidas no arquivo da disciplina | Coleção `aulas` separada com referência à disciplina | O professor abre a disciplina e vê tudo num lugar só, sem escolher a disciplina a cada aula. Consequência aceita: aula não tem página própria — se um dia precisar (texto longo, fórmulas, vídeo), migra-se para coleção separada |
 | D-06 | Zod (Astro) é o portão de validação; Tina é a interface de entrada; paridade garantida por teste | Confiar apenas no schema do Tina | Dois schemas descrevem o mesmo conteúdo; divergência silenciosa produz build quebrado que o professor não sabe diagnosticar (F-09, RNF-09) |
 | D-07 | Campo de material é uma **URL livre**, agnóstica ao hospedeiro | Campo acoplado ao Google Drive (validação de domínio, seletor de arquivos do Drive) | Decisão do stakeholder em 2026-09-01: o que importa é o professor ter um link, não onde ele hospedou. O Drive vira recomendação do manual, não dependência de arquitetura — o que também elimina o acoplamento a uma conta Google específica |
@@ -454,7 +455,7 @@ Nome de arquivo: `{ano}-{slug(titulo)}.md`.
 | Serviço | Finalidade | Autenticação | Limites/custos | Plano B se falhar |
 |---|---|---|---|---|
 | TinaCloud | Autenticação dos editores e API de conteúdo do painel | OAuth do TinaCloud; `clientId` público + token de leitura em variável de ambiente | Free: 2 usuários, 2 papéis, assets ≤ 100 MB, sem Editorial Workflow | Migrar para Decap CMS (gratuito, sem limite de usuários) mantendo o mesmo conteúdo em arquivos — o modelo de dados é agnóstico ao CMS (R-03) |
-| GitHub | Repositório e histórico do conteúdo | App do TinaCloud com acesso ao repositório | Gratuito para repositório privado | Nenhum — é a fonte de verdade |
+| GitHub | Repositório e histórico do conteúdo | App do TinaCloud com acesso ao repositório | Gratuito — o repositório é público desde 2026-09-01 | Nenhum — é a fonte de verdade |
 | Cloudflare Workers Builds | Build e deploy automático | Integração GitHub ↔ Cloudflare | Free: 3.000 min de build/mês, 1 build simultâneo, teto de 20 min por build (verificado 2026-09-01) | Trocar por GitHub Actions + `wrangler deploy` (mesma conta, sem custo) |
 | Hospedeiro de arquivos (Google Drive recomendado) | Armazenamento de PDFs, slides e listas | Do próprio hospedeiro; exige link público | Cota da conta usada pelo professor | Nenhum acoplamento a mitigar: o campo é uma URL livre (D-07), qualquer hospedeiro serve |
 
@@ -743,7 +744,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqueada
 
 ### Fase 0 — Setup e Provisionamento
-- [x] Repositório GitHub criado (privado) com `.gitignore` adequado — plano 010 (`researchgroups-ufma/haroldo-page`, visibilidade Private confirmada por 404 anônimo; 57 arquivos, sem `.env` nem `lattes.pdf`)
+- [x] Repositório GitHub criado com `.gitignore` adequado — plano 010 (`researchgroups-ufma/haroldo-page`; criado privado, **tornado público em 2026-09-01** por necessidade do projeto). Varredura de exposição na virada: nenhum `.env`, `lattes.pdf`, chave ou token em qualquer commit da história; `.env.example` versionado com os campos vazios
 - [x] Projeto Astro + TypeScript + Tailwind inicializado; versões fixadas em `package.json` e `.nvmrc` — plano 002 (`astro@5.18.2`, `tailwindcss@4.3.3`, `typescript@5.9.3`, Node 24)
 - [x] Estrutura de diretórios criada conforme §7.5 — plano 003 (14 `.gitkeep` versionados)
 - [x] Conta/projeto TinaCloud criado e vinculado ao repositório — plano 011 (plano Free, vinculado a `researchgroups-ufma/haroldo-page` na `main`, GitHub App restrito a esse repositório; credenciais validadas contra o content API com canários de falsificabilidade; 1 de 2 usuários ocupados)

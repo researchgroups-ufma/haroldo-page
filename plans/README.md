@@ -22,17 +22,21 @@
 | 009 | `README.md` inicial | 🟢 DONE | implementer | `9dc42c7`, `ac6e52d` |
 | 010 | 🧑 Repositório privado no GitHub e push inicial | 🟢 DONE | **humano** | `ac6e52d` |
 | 011 | 🧑 Projeto no TinaCloud vinculado ao repositório | 🟢 DONE | **humano** | `219d61c` |
-| 012 | 🧑 Conta Cloudflare, Worker e primeiro deploy | 🟢 DONE | **humano** | — |
-| 013 | ADR-0001, ADR-0002, CHANGELOG e fechamento da fase 0 | ⬜ TODO | implementer | — |
+| 012 | 🧑 Conta Cloudflare, Worker e primeiro deploy | 🟢 DONE | **humano** | `b2f0234` |
+| 013 | ADR-0001, ADR-0002, CHANGELOG e fechamento da fase 0 | 🟢 DONE | orquestrador | `9150233` |
 
-**Próximo:** plano 013 — único restante. Fecha a fase 0.
+**Próximo:** nenhum. **A fase 0 está fechada** — 13 de 13 planos DONE. A fase 1 começa pelo
+modelo de conteúdo (§6.1 do PRD), e antes dela cabe o plano de upgrade do Astro (ver
+"Segurança").
 
 **Commits fora do fluxo de planos:** `c1d23bb` (tira `CLAUDE.md` do versionamento, exclui
 `coverage` do `astro check`) e `07521cd` (overrides de `sharp` e `esbuild` — ver "Segurança").
 
 ## Onde o projeto está — 2026-09-01
 
-- **Repositório:** <https://github.com/researchgroups-ufma/haroldo-page> — privado, na
+- **Repositório:** <https://github.com/researchgroups-ufma/haroldo-page> — **público** desde
+  2026-09-01, por necessidade do projeto (antes privado; ver PRD v0.1.5 e as notas ao fim dos
+  planos 010 e 011). Varredura na virada não achou segredo em commit algum. Na
   organização `researchgroups-ufma`. Não é a conta pessoal do desenvolvedor, como o PRD §4.2
   previa; foi decisão do stakeholder, registrada na Evidência do plano 010.
 - **CI:** verde. Primeira execução real em 2026-09-01, `Success` em 48s sobre `9dc42c7`.
@@ -41,9 +45,9 @@
   2026-09-01, versão `85adc91c`. Raiz responde 200 com a página placeholder estilizada; rota
   inexistente responde 404; `x-robots-tag: noindex` presente. Custo US$ 0,00. **A URL
   divergiu do provisório** `https://haroldo-page.workers.dev` — o subdomínio da conta é
-  `and-near`, e reconciliar isso no código é tarefa do plano 013.
+  `and-near`. Reconciliado no código pelo plano 013.
 - **Conteúdo:** `content/` vazio (só `.gitkeep`). Uma única página, `src/pages/index.astro`.
-- **Checklist §12 da fase 0:** 10 de 10 na prática — falta o plano 013 marcá-lo no PRD.
+- **Checklist §12 da fase 0:** **10/10 🟢 Concluída**, marcado no PRD pelo plano 013.
 
 ## Grafo de dependências
 
@@ -54,7 +58,7 @@
             └─ 007
 ```
 
-Os planos 001–012 estão fechados. Resta apenas o 013, que fecha a fase.
+Todos os 13 planos estão fechados.
 
 ## Restrição que limita o paralelismo
 
@@ -113,10 +117,11 @@ npm ci                →  não reescreve o lock (conferido por hash)
 npm run lint          →  exit 0
 npm run format:check  →  All matched files use Prettier code style!
 npm run test          →  Test Files 2 passed (2) | Tests 12 passed (12)
-npm run build         →  0 errors, 0 warnings, 1 hint; Complete!
+npm run build         →  0 errors, 0 warnings, 0 hints; Complete!
 ```
 
-O `1 hint` é a depreciação de `tseslint.config` em `eslint.config.js` — pendência do 013.
+O `1 hint` da depreciação de `tseslint.config` **acabou**: o plano 013 migrou
+`eslint.config.js` para `defineConfig` de `eslint/config`. O build está limpo.
 
 **Exceções registradas.** O plano 009 foi fechado com aprovação direta do usuário, que revisou
 o README por conta própria; o ciclo automatizado foi interrompido antes do veredito. A
@@ -148,10 +153,10 @@ do arquivo antes de despachar qualquer um destes**:
 | Plano | Pendência |
 |---|---|
 | ~~012~~ | ~~Conferir que o header `X-Robots-Tag: noindex` do `public/_headers` chega na resposta HTTP~~ — **resolvida em 2026-09-01**: `curl.exe -sI` na raiz do Worker devolve `x-robots-tag: noindex` |
-| 013 | ADR-0002 do pin do vite — **com os três overrides** (`vite`, `sharp`, `esbuild`), não só o vite; incluir gatilho de revisão |
-| 013 | Migrar o `tseslint.config` depreciado — é o único `hint` que o `astro check` ainda emite |
-| 013 | Reconciliar a linha comentada do `Sitemap` no `robots.txt` |
-| 013 | ADR do upgrade do Astro (ver "Segurança"), ou plano próprio antes da fase 1 |
+| ~~013~~ | ~~ADR-0002 do pin do vite, com os três overrides e gatilho de revisão~~ — feito |
+| ~~013~~ | ~~Migrar o `tseslint.config` depreciado~~ — feito; o build não emite mais hints |
+| ~~013~~ | ~~Reconciliar a linha comentada do `Sitemap` no `robots.txt`~~ — feito; segue comentada até a fase 5 |
+| Fase 1 | ADR do upgrade do Astro (ver "Segurança"), ou plano próprio **antes** de a fase 1 entregar conteúdo |
 | Fase 1 | Cobertura cobre só `src/lib/` e `src/i18n/`, e o `vitest.config.ts` **não tem `thresholds`** — a meta de ≥80% da §11 é relatada, nunca imposta |
 | Fase 1 | O teste da regra `process.env` varre só `.ts` sob `src/`; um `process.env` em `<script>` de arquivo `.astro` passaria batido |
 | Fase 1 | Reconferir o override do `sharp` com imagens reais — a validação usou imagem sintética |
@@ -165,3 +170,13 @@ do arquivo antes de despachar qualquer um destes**:
   decidir se entra no `.gitignore`.
 - A tabela de cobertura por arquivo sai vazia no Windows (defeito cosmético do reporter de
   texto do v8). O relatório HTML em `coverage/` mostra os arquivos corretamente.
+- **`.env.example:23` ainda traz `PUBLIC_SITE_URL=https://haroldo-page.workers.dev`**, o
+  provisório. O README manda copiar esse arquivo para criar o `.env`, e o valor copiado
+  sobrescreve o default correto do código — quem instalar hoje aponta para um subdomínio que
+  não existe. Ficou fora do plano 013 por não estar em "Arquivos afetados". **É a mais urgente
+  desta lista.**
+- `wrangler.toml:5-6` — o comentário ainda afirma que `name` define o subdomínio
+  `haroldo-page.workers.dev` e que ele é o `PUBLIC_SITE_URL` provisório. As duas metades
+  ficaram falsas com a reconciliação da URL.
+- O campo `Versão do PRD` em `PRD.md` §0 continua `v0.1`, enquanto o histórico §0.1 já vai em
+  `v0.1.5`. Inconsistência preexistente, fora do escopo do 013.

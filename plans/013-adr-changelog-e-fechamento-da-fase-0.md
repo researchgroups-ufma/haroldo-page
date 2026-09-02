@@ -1,6 +1,6 @@
 # Plano 013 — ADR-0001 (D-01), CHANGELOG e fechamento do checklist da fase 0
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, fechamento; §7.2 "cada decisão vira um ADR", §10.5, Definition of Done §12)
 **Depende de:** planos 010, 011 e 012 (todos os anteriores, por transitividade)
 **Modelo recomendado:** sonnet
@@ -189,7 +189,7 @@ inteiro; use edição pontual).
 - [x] A frase "Restam bloqueando a fase 0: Q-01 (…) e Q-08 (…)" não existe mais no PRD
 - [x] Linha v0.1.3 acrescentada ao histórico §0.1; §0 com data e repositório reais
 - [x] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
-- [ ] CI verde no GitHub após o push (fecha a pendência registrada no plano 008)
+- [x] CI verde no GitHub após o push (fecha a pendência registrada no plano 008)
 - [x] Nenhum item do checklist marcado sem Evidência correspondente no plano de origem
 
 ## Evidência
@@ -324,10 +324,89 @@ site estático publicado, estrutura de diretórios, ferramentas de qualidade, CI
 de ambiente, provisionamento e os dois ADRs. **Nenhuma tag criada** — `v1.0.0` é entregável
 da fase 5.
 
-### 9. O que NÃO foi verificado
+### 9. CI no GitHub Actions
+
+Commit `9150233` empurrado para `origin/main` em 2026-09-01:
+
+```
+$ git push origin main
+To https://github.com/researchgroups-ufma/haroldo-page.git
+   b2dcf2b..9150233  main -> main
+```
+
+**Execução verde confirmada pelo usuário** na aba Actions do repositório. A procedência é essa
+— o `gh` não está instalado nesta máquina (`gh: command not found`) e a API anônima não servia
+para consultar o run enquanto o repositório era privado. Isso fecha também a pendência de
+verificação herdada do plano 008.
+
+### 10. O que NÃO foi verificado
 
 - **`Versão do PRD` em §0 continua `v0.1`**, enquanto o histórico §0.1 já vai em `v0.1.4`. É
   inconsistência preexistente e o campo **não está na lista de "Arquivos afetados"** deste
   plano, que manda parar e reportar em vez de estender o escopo. **Reportado, não corrigido.**
 - `plans/.idea/` segue untracked, sem decisão sobre entrar no `.gitignore` (dívida registrada
   em `plans/README.md`).
+
+**Divergências doc/código criadas por este próprio plano.** A reconciliação da URL deixou dois
+arquivos versionados afirmando o valor provisório. Nenhum dos dois está em "Arquivos afetados",
+então **foram reportados, não corrigidos** — mas ambos precisam de correção:
+
+- **`wrangler.toml:5-6`** — o comentário diz que `name` "define o subdomínio
+  `haroldo-page.workers.dev`, já usado como `PUBLIC_SITE_URL` provisório nos planos 002 e
+  006". As duas metades ficaram falsas: o subdomínio real é `haroldo-page.and-near.workers.dev`
+  e nenhum arquivo de código usa mais o provisório.
+- **`.env.example:23`** — ainda traz `PUBLIC_SITE_URL=https://haroldo-page.workers.dev`. É o
+  mais consequente dos dois: o README manda copiar este arquivo para criar o `.env`, e o valor
+  copiado **sobrescreve** o default correto de `astro.config.mjs` e `src/lib/config.ts`. Quem
+  seguir a instalação hoje gera um `.env` que aponta para um subdomínio que não existe.
+
+As demais ocorrências de `haroldo-page.workers.dev` estão em Evidências e textos dos planos
+002, 003, 006, 007, 012 e neste — são registro histórico do que era verdade na execução e
+**não devem ser reescritas**.
+
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendência P-1, vinda da revisão do plano 002)
+
+**O critério de aceitação "apenas o ADR da D-01" deste plano fica ampliado: escreva também um
+segundo ADR.**
+
+`docs/adr/0002-pin-do-vite-via-overrides.md` — registra o campo `overrides: { vite: "6.4.3" }`
+introduzido pelo plano 002. A §10.5 do PRD define `docs/adr/` como "Decisões D-01..D-06 **e
+futuras**", o que autoriza um ADR fora da tabela de decisões D.
+
+Contexto técnico já apurado (não precisa reinvestigar): `astro@5.18.2` depende de `vite@^6.4.1`
+como dependência dura; `@tailwindcss/vite@4.3.3` declara vite como *peer* `^5.2.0 || ^6 || ^7 || ^8`.
+Sem o override o npm iça vite 8 para a raiz e aninha o 6 sob `astro` — duas cópias, e o `Plugin`
+de uma não é atribuível ao da outra, quebrando `astro check` com `ts(2322)`. Alternativas
+descartadas: declarar `vite` como devDependency direta (acrescenta dependência que o projeto não
+usa) e afrouxar o `astro check` (regressão).
+
+**O ADR precisa conter o gatilho de revisão** — é a parte que hoje não existe em lugar nenhum:
+
+> Remover este override quando o `astro` passar a exigir vite ≥ 7.
+> Validar com `npm ls vite --all` mostrando uma única cópia.
+
+A justificativa completa está na seção `## Evidência` de `plans/002-scaffolding-astro-typescript-tailwind.md`.
+
+---
+
+## Nota do orquestrador — 2026-09-01 (pendências P-2 e P-3, vindas da revisão dos planos 003 e 004)
+
+**P-2 — API depreciada do `tseslint.config`.** Todo `npm run build` emite um hint do `astro check`
+sobre uso de API depreciada em `eslint.config.js`. Não é erro nem warning (o `astro check` só
+falha com erros), mas a fase 0 fecha com "build verde" como critério e o hint aparece em toda
+execução daqui em diante. A migração é de uma linha: trocar `tseslint.config(...)` por
+`defineConfig([...])` importado de `eslint/config`. Faça a troca e confirme que `npm run lint`,
+`npm run format:check` e `npm run build` seguem verdes.
+
+**P-3 — reconciliação da URL e do `robots.txt`.** O passo 3 e o critério "URL do site coerente
+entre `astro.config.mjs`, `src/lib/config.ts` e `public/robots.txt`" precisam ser reescritos:
+a linha do `Sitemap` no `robots.txt` está **comentada** desde a revisão do plano 003, e assim
+deve permanecer até a fase 5. O `Select-String` por `workers.dev` continua funcionando (a linha
+comentada preserva a string), mas o critério não pode exigir um `Sitemap` ativo.
+
+A fase 5 (RF-30) herda a obrigação de reativar a linha do `Sitemap`, remover o `Disallow: /`
+e remover o `X-Robots-Tag: noindex` do `public/_headers` (plano 007) — registre isso no
+fechamento da fase 0 para não se perder.

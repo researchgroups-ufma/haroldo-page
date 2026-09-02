@@ -229,3 +229,22 @@ no push. Não há ação a tomar na fase 0.
 
 - Escopo exato das permissões concedidas ao GitHub App (leitura/escrita por recurso). Foi
   confirmado o alcance por repositório, não a lista de permissões.
+
+---
+
+## Nota posterior — 2026-09-01: o repositório passou a ser público
+
+A Evidência acima registra o repositório como **privado**, e era: a visibilidade Private foi
+comprovada na execução. Ainda em 2026-09-01, **por necessidade do projeto, o repositório foi
+tornado público** (`"visibility": "public"` pela API anônima, que passou a responder 200).
+
+A Evidência não é reescrita — ela registra o que se observou quando o plano rodou. Esta nota
+existe para que ninguém a leia como descrição do estado atual.
+
+Varredura feita na virada, sem achados: o token do TinaCloud não aparece em nenhum commit da
+história, `.env` nunca foi rastreado, `.env.example` está versionado com os campos vazios e não
+há `lattes.pdf`, chave ou credencial em commit algum. Ficaram públicos o e-mail pessoal do
+desenvolvedor, o `clientId` do TinaCloud (público por definição) e o Account ID da Cloudflare —
+identificadores, não credenciais.
+
+O estado atual do repositório está em `PRD.md` §0 (versão v0.1.5).
