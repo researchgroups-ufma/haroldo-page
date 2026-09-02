@@ -1,6 +1,6 @@
 # Plano 011 — Roteiro humano: projeto no TinaCloud vinculado ao repositório
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (Fase 0, item 4 do checklist §12; base de RF-01, RF-02, RF-11)
 **Depende de:** plano 010
 **Modelo recomendado:** — (execução humana; um agente sonnet pode assistir na verificação final)
@@ -108,22 +108,124 @@ do projeto; o token de leitura é gerado em *Tokens* (rótulo costuma ser "Read 
 
 ## Critérios de aceitação
 
-- [ ] Projeto criado no TinaCloud, plano **Free**, na conta do desenvolvedor
-- [ ] Vinculado ao repositório **privado** `haroldo-page`, branch `main`
-- [ ] GitHub App instalado **apenas** em `haroldo-page` (verificado em
+- [x] Projeto criado no TinaCloud, plano **Free**, na conta do desenvolvedor
+- [x] Vinculado ao repositório **privado** `haroldo-page`, branch `main`
+- [x] GitHub App instalado **apenas** em `haroldo-page` (verificado em
       `github.com/settings/installations`)
-- [ ] `TINA_CLIENT_ID` e `TINA_TOKEN` gravados **somente** no `.env` local
-- [ ] `git status --short` limpo — nenhum `.env` rastreado; nenhum token em commit,
+- [x] `TINA_CLIENT_ID` e `TINA_TOKEN` gravados **somente** no `.env` local
+- [x] `git status --short` limpo — nenhum `.env` rastreado; nenhum token em commit,
       README, `.env.example` ou mensagem de commit
-- [ ] **Apenas 1 dos 2 usuários** do plano Free ocupado (o professor **não** foi convidado —
+- [x] **Apenas 1 dos 2 usuários** do plano Free ocupado (o professor **não** foi convidado —
       é fase 2, e a Q-06 está aberta)
-- [ ] Editorial Workflow **não** ativado (NG-07)
-- [ ] TinaCMS **não** instalado no projeto (é fase 1)
-- [ ] Nota registrada: se a Q-02 for respondida com "não", este provisionamento é descartável
+- [x] Editorial Workflow **não** ativado (NG-07)
+- [x] TinaCMS **não** instalado no projeto (é fase 1)
+- [x] Nota registrada: se a Q-02 for respondida com "não", este provisionamento é descartável
 
 ## Evidência
 
-<Preenchido por quem executou: nome/URL do projeto no TinaCloud, plano, repositório e branch
-vinculados, captura ou descrição da tela de instalação do GitHub App mostrando o repositório
-único, e a saída de `git status --short` + `git check-ignore -v .env`.
-**Não cole o token em lugar nenhum.**>
+Executado por: usuário (passos de navegador), em 2026-09-01.
+Verificação automática das credenciais: sessão de orquestração, 2026-09-01.
+
+### Projeto e vínculo
+
+O painel do TinaCloud, com o projeto criado e o `clientId` emitido, exibe:
+
+```
+Project setup did not complete. No Tina config was found on main of researchgroups-ufma/haroldo-page.
+
+Checked tina/meta.json, tina/config.*, tina/schema.*, .tina/config.*, and .tina/schema.*.
+
+Commit your Tina config to main and push again. Indexing will start automatically.
+```
+
+Essa mensagem é a evidência do vínculo: o TinaCloud nomeia o repositório
+(`researchgroups-ufma/haroldo-page`, o privado criado no plano 010) e a branch (`main`) que
+foi procurar. O estado "setup did not complete" **é o esperado nesta fase** — o plano proíbe
+instalar o TinaCMS (⛔ "isso é fase 1"), e sem `tina/config.ts` commitado não há schema para
+indexar.
+
+### Credenciais no `.env` local
+
+`clientId` (público): `8be98053-68c3-4262-b7bd-dd1286e1c7ad`.
+Token: gravado apenas no `.env`, **não reproduzido aqui** (§7.6, RNF-07).
+
+```
+$ awk -F= '/^TINA_/ {print $1 " -> " length($2) " chars"}' .env
+TINA_CLIENT_ID -> 36 chars
+TINA_TOKEN -> 40 chars
+TINA_BRANCH -> 4 chars
+```
+
+### Validação das credenciais contra a API do TinaCloud
+
+Sem instalar nada, por POST em `https://content.tinajs.io/1.5/content/<clientId>/github/<branch>`
+com o token no header `X-API-KEY`. Quatro chamadas, três delas canários de falsificabilidade:
+
+```
+real cid + real token + main    : {"message":"Branch 'main' not found"} [http 404]
+cid FALSO + real token + main   : {"message":"missing or invalid auth credentials"} [http 401]
+real cid + token FALSO + main   : {"message":"missing or invalid auth credentials"} [http 401]
+real cid + real token + branch X: {"message":"Branch 'branch-que-nao-existe-xyz' not found"} [http 404]
+```
+
+Adulterar qualquer um dos dois valores derruba para 401; o par real passa da autenticação e
+chega à busca de branch. Logo, `TINA_CLIENT_ID` e `TINA_TOKEN` são válidos e resolvem para um
+projeto TinaCloud existente. O 404 da primeira linha é ausência de índice, não vínculo errado
+— a mensagem do painel, acima, é o que separa as duas hipóteses.
+
+Antes de o token ser gravado, a mesma chamada devolvia `{"message":"No authorization header
+set"} [http 401]`, que rejeita antes de olhar o `clientId` e por isso não discrimina nada.
+
+### Segredos fora do versionamento
+
+```
+$ git status --short
+(vazio)
+
+$ git check-ignore -v .env
+.gitignore:12:.env	.env
+
+$ git log --all --diff-filter=A --name-only --pretty=format: | grep -x ".env"
+(vazio — nunca commitado)
+
+$ git grep -nIE "TINA_(CLIENT_ID|TOKEN)[[:space:]]*=[[:space:]]*[^[:space:]]" $(git rev-list --all)
+(vazio, descontado o .env.example — nenhum valor preenchido em nenhum commit)
+```
+
+### TinaCMS não instalado (é fase 1)
+
+```
+$ grep -nE "tinacms|@tinacms" package.json
+nenhum pacote tina declarado
+$ ls -d tina 2>/dev/null || echo "sem tina/"
+sem tina/
+$ ls -d src/pages/admin public/admin 2>/dev/null || echo "sem rota /admin"
+sem rota /admin
+```
+
+### Confirmações de painel (reportadas pelo usuário)
+
+- `github.com/settings/installations`: a instalação do TinaCloud lista **apenas**
+  `haroldo-page` — não "All repositories".
+- Usuários do projeto: **1 de 2** ocupados, só o desenvolvedor (ADMIN). O professor **não**
+  foi convidado — é fase 2, e a Q-06 (e-mail do professor) segue aberta.
+- Editorial Workflow **não** ativado (NG-07).
+- Plano da conta: **Free** (§7.2, RNF-14) — 2 usuários, 2 papéis, sem Editorial Workflow.
+
+### Nota de reversibilidade — Q-02
+
+A **Q-02** ("o professor aceita um painel cuja interface estrutural está em inglês?") continua
+**aberta** e bloqueia a fase 2. Se for respondida com "não", a migração para o Decap CMS (R-03)
+descarta este provisionamento sem custo: nenhum arquivo versionado depende do TinaCloud, e o
+`.env` é local. **A fase 2 não deve tratar este plano como decisão consolidada.**
+
+### Pendência herdada pela fase 1
+
+A indexação do TinaCloud está parada em "setup did not complete" e **só destrava quando a fase
+1 commitar `tina/config.ts` na `main`** — o próprio painel diz que a indexação começa sozinha
+no push. Não há ação a tomar na fase 0.
+
+### O que NÃO foi verificado
+
+- Escopo exato das permissões concedidas ao GitHub App (leitura/escrita por recurso). Foi
+  confirmado o alcance por repositório, não a lista de permissões.

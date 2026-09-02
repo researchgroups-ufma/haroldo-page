@@ -21,11 +21,12 @@
 | 008 | CI no GitHub Actions (lint, testes, build) | 🟢 DONE | implementer | `8b71999`, `af72c49`, `ac6e52d` |
 | 009 | `README.md` inicial | 🟢 DONE | implementer | `9dc42c7`, `ac6e52d` |
 | 010 | 🧑 Repositório privado no GitHub e push inicial | 🟢 DONE | **humano** | `ac6e52d` |
-| 011 | 🧑 Projeto no TinaCloud vinculado ao repositório | ⬜ TODO | **humano** | — |
+| 011 | 🧑 Projeto no TinaCloud vinculado ao repositório | 🟢 DONE | **humano** | — |
 | 012 | 🧑 Conta Cloudflare, Worker e primeiro deploy | ⬜ TODO | **humano** | — |
 | 013 | ADR-0001, ADR-0002, CHANGELOG e fechamento da fase 0 | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 011 (TinaCloud). Depois o 012, e o 013 fecha a fase.
+**Próximo:** plano 012 (Cloudflare) — o deploy já foi feito; faltam só as conferências de
+painel. Depois o 013 fecha a fase.
 
 **Commits fora do fluxo de planos:** `c1d23bb` (tira `CLAUDE.md` do versionamento, exclui
 `coverage` do `astro check`) e `07521cd` (overrides de `sharp` e `esbuild` — ver "Segurança").
@@ -37,9 +38,12 @@
   previa; foi decisão do stakeholder, registrada na Evidência do plano 010.
 - **CI:** verde. Primeira execução real em 2026-09-01, `Success` em 48s sobre `9dc42c7`.
 - **Suíte:** 2 arquivos, 12 testes. `lint`, `format:check` e `build` verdes.
-- **Site:** ainda **não publicado**. Nenhum deploy foi feito — é o plano 012.
+- **Site:** **no ar** em <https://haroldo-page.and-near.workers.dev> — deploy manual feito
+  pelo usuário em 2026-09-01. Raiz responde 200 com a página placeholder; rota inexistente
+  responde 404. O plano 012 segue aberto por falta das conferências de painel (assets sem
+  runtime, custo US$ 0,00, cotas de build).
 - **Conteúdo:** `content/` vazio (só `.gitkeep`). Uma única página, `src/pages/index.astro`.
-- **Checklist §12 da fase 0:** 8 de 10. Faltam TinaCloud (011) e Cloudflare (012).
+- **Checklist §12 da fase 0:** 9 de 10. Falta Cloudflare (012).
 
 ## Grafo de dependências
 
@@ -50,8 +54,7 @@
             └─ 007
 ```
 
-Os planos 001–010 estão fechados. Restam 011 e 012 — ambos humanos e independentes entre si
-— e o 013, que depende dos dois.
+Os planos 001–011 estão fechados. Resta o 012 — humano — e o 013, que depende dele.
 
 ## Restrição que limita o paralelismo
 
@@ -144,7 +147,7 @@ do arquivo antes de despachar qualquer um destes**:
 
 | Plano | Pendência |
 |---|---|
-| 012 | Conferir com `curl -I` que o header `X-Robots-Tag: noindex` do `public/_headers` chega mesmo na resposta HTTP. Só verificável com o site no ar |
+| ~~012~~ | ~~Conferir que o header `X-Robots-Tag: noindex` do `public/_headers` chega na resposta HTTP~~ — **resolvida em 2026-09-01**: `curl.exe -sI` na raiz do Worker devolve `x-robots-tag: noindex` |
 | 013 | ADR-0002 do pin do vite — **com os três overrides** (`vite`, `sharp`, `esbuild`), não só o vite; incluir gatilho de revisão |
 | 013 | Migrar o `tseslint.config` depreciado — é o único `hint` que o `astro check` ainda emite |
 | 013 | Reconciliar a linha comentada do `Sitemap` no `robots.txt` |
