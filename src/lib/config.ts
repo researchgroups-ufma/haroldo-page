@@ -28,7 +28,7 @@
  */
 
 /** Valor provisório de `PUBLIC_SITE_URL`, usado até a fase 5 confirmar domínio próprio (A-07, Q-05). */
-const DEFAULT_SITE_URL = 'https://haroldo-page.workers.dev';
+const DEFAULT_SITE_URL = 'https://haroldo-page.and-near.workers.dev';
 
 /**
  * Configuração central do site: título, URL canônica, idiomas suportados e

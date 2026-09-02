@@ -178,68 +178,156 @@ inteiro; use edição pontual).
 
 ## Critérios de aceitação
 
-- [ ] `docs/adr/0001-astro-estatico-sem-adapter.md` existe, curto, em português, com Status
+- [x] `docs/adr/0001-astro-estatico-sem-adapter.md` existe, curto, em português, com Status
       "Aceita" e data absoluta
-- [ ] Apenas o ADR da D-01 foi escrito (D-02..D-07 são de fases posteriores)
-- [ ] URL do site coerente entre `astro.config.mjs`, `src/lib/config.ts`, `public/robots.txt`
+- [x] Apenas o ADR da D-01 foi escrito (D-02..D-07 são de fases posteriores)
+- [x] URL do site coerente entre `astro.config.mjs`, `src/lib/config.ts`, `public/robots.txt`
       e a Evidência do plano 012
-- [ ] `docs/CHANGELOG.md` descreve a fase 0; nenhuma tag `v1.0.0` criada
-- [ ] §12 do PRD: os 10 itens da fase 0 marcados e a tabela de progresso em `10/10 🟢`,
+- [x] `docs/CHANGELOG.md` descreve a fase 0; nenhuma tag `v1.0.0` criada
+- [x] §12 do PRD: os 10 itens da fase 0 marcados e a tabela de progresso em `10/10 🟢`,
       **com as caixas batendo com o contador**
-- [ ] A frase "Restam bloqueando a fase 0: Q-01 (…) e Q-08 (…)" não existe mais no PRD
-- [ ] Linha v0.1.3 acrescentada ao histórico §0.1; §0 com data e repositório reais
-- [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
+- [x] A frase "Restam bloqueando a fase 0: Q-01 (…) e Q-08 (…)" não existe mais no PRD
+- [x] Linha v0.1.3 acrescentada ao histórico §0.1; §0 com data e repositório reais
+- [x] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
 - [ ] CI verde no GitHub após o push (fecha a pendência registrada no plano 008)
-- [ ] Nenhum item do checklist marcado sem Evidência correspondente no plano de origem
+- [x] Nenhum item do checklist marcado sem Evidência correspondente no plano de origem
 
 ## Evidência
 
-<Preenchido pelo executor: lista dos planos 001–012 com Evidência conferida, saída dos cinco
-comandos de qualidade, `git show --stat HEAD`, URL e resultado da execução final do CI, e a
-decisão tomada quanto à URL do Worker (divergiu ou não).>
+Executado na sessão de orquestração em 2026-09-01, sem subagente executor, por decisão do
+usuário. Revisão independente por `code-reviewer` sobre o diff.
 
----
+### 1. Planos 001–012 — Evidência conferida
 
-## Nota do orquestrador — 2026-09-01 (pendência P-1, vinda da revisão do plano 002)
+Auditoria automática de `Status:` e do conteúdo da seção `## Evidência` de cada arquivo:
 
-**O critério de aceitação "apenas o ADR da D-01" deste plano fica ampliado: escreva também um
-segundo ADR.**
+```
+001 | DONE | linhas de evidencia: 40  | placeholder: 0
+002 | DONE | linhas de evidencia: 171 | placeholder: 0
+003 | DONE | linhas de evidencia: 134 | placeholder: 0
+004 | DONE | linhas de evidencia: 121 | placeholder: 0
+005 | DONE | linhas de evidencia: 131 | placeholder: 0
+006 | DONE | linhas de evidencia: 145 | placeholder: 0
+007 | DONE | linhas de evidencia: 91  | placeholder: 0
+008 | DONE | linhas de evidencia: 124 | placeholder: 0
+009 | DONE | linhas de evidencia: 87  | placeholder: 0
+010 | DONE | linhas de evidencia: 83  | placeholder: 0
+011 | DONE | linhas de evidencia: 77  | placeholder: 0
+012 | DONE | linhas de evidencia: 125 | placeholder: 0
+```
 
-`docs/adr/0002-pin-do-vite-via-overrides.md` — registra o campo `overrides: { vite: "6.4.3" }`
-introduzido pelo plano 002. A §10.5 do PRD define `docs/adr/` como "Decisões D-01..D-06 **e
-futuras**", o que autoriza um ADR fora da tabela de decisões D.
+Os 12 estão `DONE` e nenhum manteve o placeholder `<Preenchido por quem executou…>`. Nenhum
+item do checklist §12 foi marcado sem Evidência no plano de origem.
 
-Contexto técnico já apurado (não precisa reinvestigar): `astro@5.18.2` depende de `vite@^6.4.1`
-como dependência dura; `@tailwindcss/vite@4.3.3` declara vite como *peer* `^5.2.0 || ^6 || ^7 || ^8`.
-Sem o override o npm iça vite 8 para a raiz e aninha o 6 sob `astro` — duas cópias, e o `Plugin`
-de uma não é atribuível ao da outra, quebrando `astro check` com `ts(2322)`. Alternativas
-descartadas: declarar `vite` como devDependency direta (acrescenta dependência que o projeto não
-usa) e afrouxar o `astro check` (regressão).
+### 2. ADRs
 
-**O ADR precisa conter o gatilho de revisão** — é a parte que hoje não existe em lugar nenhum:
+- `docs/adr/0001-astro-estatico-sem-adapter.md` (59 linhas). Cita `output: 'static'`, a
+  ausência de `main` no `wrangler.toml`, RNF-03 e a rejeição de `@astrojs/cloudflare`, com a
+  evidência empírica do deploy do plano 012.
+- `docs/adr/0002-pin-do-vite-via-overrides.md` (70 linhas), conforme a pendência **P-1**:
+  cobre os **três** overrides (`vite` 6.4.3, `sharp` 0.35.4, `esbuild` 0.28.2), com as
+  alternativas descartadas e **gatilhos de revisão** por override, incluindo
+  `npm ls vite --all` mostrando uma única cópia.
 
-> Remover este override quando o `astro` passar a exigir vite ≥ 7.
-> Validar com `npm ls vite --all` mostrando uma única cópia.
+Nenhum ADR foi escrito para D-02..D-07 — são de fases posteriores.
 
-A justificativa completa está na seção `## Evidência` de `plans/002-scaffolding-astro-typescript-tailwind.md`.
+### 3. Pendência P-2 — `tseslint.config` depreciado
 
----
+`eslint.config.js` migrou de `tseslint.config(...)` para `defineConfig([...])` importado de
+`eslint/config` (disponível no `eslint@10.9.1` do projeto). O hint sumiu:
 
-## Nota do orquestrador — 2026-09-01 (pendências P-2 e P-3, vindas da revisão dos planos 003 e 004)
+```
+antes:  eslint.config.js:16:25 - warning ts(6387): The signature '(...configs:
+        InfiniteDepthConfigWithExtends[]): ConfigArray' of 'tseslint.config' is deprecated.
+        Result (10 files): 0 errors, 0 warnings, 1 hint
 
-**P-2 — API depreciada do `tseslint.config`.** Todo `npm run build` emite um hint do `astro check`
-sobre uso de API depreciada em `eslint.config.js`. Não é erro nem warning (o `astro check` só
-falha com erros), mas a fase 0 fecha com "build verde" como critério e o hint aparece em toda
-execução daqui em diante. A migração é de uma linha: trocar `tseslint.config(...)` por
-`defineConfig([...])` importado de `eslint/config`. Faça a troca e confirme que `npm run lint`,
-`npm run format:check` e `npm run build` seguem verdes.
+depois: Result (10 files):
+        - 0 errors
+        - 0 warnings
+        - 0 hints
+```
 
-**P-3 — reconciliação da URL e do `robots.txt`.** O passo 3 e o critério "URL do site coerente
-entre `astro.config.mjs`, `src/lib/config.ts` e `public/robots.txt`" precisam ser reescritos:
-a linha do `Sitemap` no `robots.txt` está **comentada** desde a revisão do plano 003, e assim
-deve permanecer até a fase 5. O `Select-String` por `workers.dev` continua funcionando (a linha
-comentada preserva a string), mas o critério não pode exigir um `Sitemap` ativo.
+### 4. Reconciliação da URL — divergiu
 
-A fase 5 (RF-30) herda a obrigação de reativar a linha do `Sitemap`, remover o `Disallow: /`
-e remover o `X-Robots-Tag: noindex` do `public/_headers` (plano 007) — registre isso no
-fechamento da fase 0 para não se perder.
+A URL real do Worker (`https://haroldo-page.and-near.workers.dev`, Evidência do plano 012)
+**divergiu** do provisório `https://haroldo-page.workers.dev`. Substituída nos três arquivos:
+
+```
+astro.config.mjs:40:  site: PUBLIC_SITE_URL ?? 'https://haroldo-page.and-near.workers.dev',
+src/lib/config.ts:31:const DEFAULT_SITE_URL = 'https://haroldo-page.and-near.workers.dev';
+public/robots.txt:6:# Sitemap: https://haroldo-page.and-near.workers.dev/sitemap-index.xml  (fase 5, RF-30)
+```
+
+Conforme a pendência **P-3**, a linha do `Sitemap` **permanece comentada** — reativá-la é da
+fase 5 (RF-30). A leitura de `PUBLIC_SITE_URL` como sobrescrita foi preservada nos dois
+primeiros. `tests/lib/config.test.ts` segue verde.
+
+### 5. Sequência de qualidade
+
+```
+$ npm ci
+(sem reescrita do lock — `git status --short package-lock.json` vazio depois)
+
+$ npm run lint
+> eslint .
+(exit 0, sem saída)
+
+$ npm run format:check
+Checking formatting...
+All matched files use Prettier code style!
+
+$ npm run test
+ Test Files  2 passed (2)
+      Tests  12 passed (12)
+   Duration  661ms
+
+$ npm run build
+Result (10 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+[build] 1 page(s) built in 558ms
+[build] Complete!
+```
+
+### 6. Desvios do plano, registrados
+
+**A linha `v0.1.3` já existia.** O plano manda acrescentar `v0.1.3` ao histórico §0.1, mas
+essa versão foi consumida antes, para "§12 atualizada com o progresso real da fase 0 (planos
+001–004 DONE)". Acrescentada **`v0.1.4`** no lugar, com o conteúdo que o plano descreve. O
+critério de aceitação correspondente foi marcado por equivalência de intenção — a intenção era
+registrar o fechamento da fase no histórico, e ela foi cumprida.
+
+**A nota residual da §16 já estava corrigida.** A frase "Restam bloqueando a fase 0: Q-01
+(identificação do professor) e Q-08 (conta do Google Drive)" **não existia mais** no PRD; o
+texto atual já dizia que nenhuma questão bloqueia a fase 0. Nenhuma substituição foi
+necessária. Mas a nota trazia um erro próprio: listava **Q-07 na fase 5**, enquanto a tabela
+logo acima diz **fase 3**. Corrigido para "Q-04 e Q-07 (fase 3), Q-05 (fase 5)" — edição
+dentro do escopo que o plano autoriza para essa nota.
+
+### 7. Checklist §12
+
+```
+marcados: 10 | abertos: 0
+| Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
+```
+
+As caixas batem com o contador. Os dois itens que faltavam receberam texto de evidência:
+TinaCloud remete ao plano 011 e Cloudflare ao 012, com a URL e a versão do Worker.
+
+`Select-String -Path PRD.md -Pattern "Restam bloqueando a fase 0"` não retorna nada.
+
+### 8. CHANGELOG
+
+`docs/CHANGELOG.md`, seção "Não publicado → Adicionado", reescrita em linguagem de mudança:
+site estático publicado, estrutura de diretórios, ferramentas de qualidade, CI, configuração
+de ambiente, provisionamento e os dois ADRs. **Nenhuma tag criada** — `v1.0.0` é entregável
+da fase 5.
+
+### 9. O que NÃO foi verificado
+
+- **`Versão do PRD` em §0 continua `v0.1`**, enquanto o histórico §0.1 já vai em `v0.1.4`. É
+  inconsistência preexistente e o campo **não está na lista de "Arquivos afetados"** deste
+  plano, que manda parar e reportar em vez de estender o escopo. **Reportado, não corrigido.**
+- `plans/.idea/` segue untracked, sem decisão sobre entrar no `.gitignore` (dívida registrada
+  em `plans/README.md`).

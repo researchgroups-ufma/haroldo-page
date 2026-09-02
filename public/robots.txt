@@ -3,4 +3,4 @@
 User-agent: *
 Disallow: /
 
-# Sitemap: https://haroldo-page.workers.dev/sitemap-index.xml  (fase 5, RF-30)
+# Sitemap: https://haroldo-page.and-near.workers.dev/sitemap-index.xml  (fase 5, RF-30)

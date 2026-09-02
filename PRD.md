@@ -18,7 +18,7 @@
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
 | **Última atualização** | 2026-09-01 |
-| **Repositório** | A criar na fase 0 (GitHub, conta do desenvolvedor) |
+| **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — privado, na organização `researchgroups-ufma` (plano 010) |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav` |
 
 ### 0.1 Histórico de Versões (Changelog)
@@ -29,6 +29,7 @@
 | v0.1.1 | 2026-09-01 | Desenvolvedor | Q-03 resolvida (cota do Workers Builds); A-03 confirmada; R-06 rebaixado; R-12 acrescentado |
 | v0.1.2 | 2026-09-01 | Desenvolvedor | Q-01 resolvida via `lattes.pdf` (Apêndice C); Q-08 dissolvida pela decisão D-07 (link agnóstico ao hospedeiro); NG-02, RN-05, A-04, R-08 e §7.4 ajustados |
 | v0.1.3 | 2026-09-01 | Desenvolvedor | §12 atualizada com o progresso real da fase 0 (planos 001–004 DONE); mapa de execução dos planos em `plans/README.md` |
+| v0.1.4 | 2026-09-01 | Desenvolvedor | **Fase 0 concluída:** checklist §12 fechado (10/10) com TinaCloud (plano 011) e Cloudflare (plano 012); ADR-0001 e ADR-0002 registrados; URL real do Worker reconciliada no código; §16 corrigida (Q-07 bloqueia a fase 3, não a 5) |
 
 ---
 
@@ -732,7 +733,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 
 | Fase | Itens concluídos | Status |
 |---|---|---|
-| Fase 0 — Setup e provisionamento | 8/10 | 🟡 Em andamento |
+| Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
 | Fase 1 — Modelo de conteúdo | 0/9 | ⬜ Não iniciada |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
 | Fase 3 — Site público (PT) | 0/11 | ⬜ Não iniciada |
@@ -745,8 +746,8 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Repositório GitHub criado (privado) com `.gitignore` adequado — plano 010 (`researchgroups-ufma/haroldo-page`, visibilidade Private confirmada por 404 anônimo; 57 arquivos, sem `.env` nem `lattes.pdf`)
 - [x] Projeto Astro + TypeScript + Tailwind inicializado; versões fixadas em `package.json` e `.nvmrc` — plano 002 (`astro@5.18.2`, `tailwindcss@4.3.3`, `typescript@5.9.3`, Node 24)
 - [x] Estrutura de diretórios criada conforme §7.5 — plano 003 (14 `.gitkeep` versionados)
-- [ ] Conta/projeto TinaCloud criado e vinculado ao repositório
-- [ ] Conta Cloudflare com Worker criado — *configuração de hospedagem versionada em `wrangler.toml` (plano 007); falta criar conta/Worker e fazer o primeiro deploy (plano 012)*
+- [x] Conta/projeto TinaCloud criado e vinculado ao repositório — plano 011 (plano Free, vinculado a `researchgroups-ufma/haroldo-page` na `main`, GitHub App restrito a esse repositório; credenciais validadas contra o content API com canários de falsificabilidade; 1 de 2 usuários ocupados)
+- [x] Conta Cloudflare com Worker criado — `wrangler.toml` no plano 007; Worker publicado no plano 012 em <https://haroldo-page.and-near.workers.dev> (versão `85adc91c`, raiz 200, rota inexistente 404, custo US$ 0,00)
 - [x] Convenção de link de material definida — URL livre (D-07); Drive recomendado no manual, sem dependência de conta
 - [x] `.env.example` criado e documentado — plano 006 (`TINA_CLIENT_ID`, `TINA_TOKEN`, `TINA_BRANCH`, `PUBLIC_SITE_URL`)
 - [x] `README.md` inicial (instalação + como rodar) — plano 009 (`9dc42c7`, 205 linhas; 17 pontos verificados sem afirmação falsa; revisão final do usuário)
@@ -901,7 +902,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | ~~Q-08~~ | ~~A conta Google do Drive é do professor ou institucional?~~ | R-08 e a convenção de pastas | Stakeholder | Fase 0 | ✅ **2026-09-01:** questão dissolvida. O campo de material é uma **URL livre** — o professor cola o link de onde tiver hospedado (Drive, repositório institucional, arXiv, YouTube). O Google Drive passa de dependência a recomendação do manual. Ver D-07 |
 | Q-09 | Notícias e CV entram na v1.1 logo após a entrega, ou ficam indefinidos? | Planejamento pós-entrega | Stakeholder | Após a fase 5 | |
 
-> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-02 e Q-06 (fase 2), Q-04 (fase 3), Q-05 e Q-07 (fase 5).
+> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-02 e Q-06 (fase 2), Q-04 e Q-07 (fase 3), Q-05 (fase 5).
 
 ---
 

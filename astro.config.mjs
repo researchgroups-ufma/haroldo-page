@@ -37,7 +37,7 @@ const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '
  */
 export default defineConfig({
   output: 'static',
-  site: PUBLIC_SITE_URL ?? 'https://haroldo-page.workers.dev',
+  site: PUBLIC_SITE_URL ?? 'https://haroldo-page.and-near.workers.dev',
   vite: {
     plugins: [tailwindcss()],
   },

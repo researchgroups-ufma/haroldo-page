@@ -8,12 +8,13 @@
  * `@typescript-eslint/no-explicit-any` é forçado como `error`: o PRD (§10.4) proíbe `any`
  * em código de produção, não apenas desencoraja.
  */
+import { defineConfig } from 'eslint/config';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import astro from 'eslint-plugin-astro';
 import prettier from 'eslint-config-prettier';
 
-export default tseslint.config(
+export default defineConfig([
   { ignores: ['dist/**', '.astro/**', 'node_modules/**', 'coverage/**', '.wrangler/**'] },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -34,4 +35,4 @@ export default tseslint.config(
       },
     },
   },
-);
+]);
