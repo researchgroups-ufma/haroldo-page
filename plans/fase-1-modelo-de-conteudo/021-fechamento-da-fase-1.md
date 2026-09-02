@@ -119,6 +119,10 @@ dívida passa a morder aqui.
       registrada
 - [ ] §12: os 9 itens da fase 1 marcados e a tabela em `9/9 🟢`, com as caixas batendo
 - [ ] Linha de versão acrescentada em §0.1, **com o número correto** — confira o histórico
+- [ ] **Cabeçalho §0 do PRD atualizado**: `Status`, `Estado da implementação` e
+      `Última atualização`. O `Status` só aceita o vocabulário fechado do `PRD_TEMPLATE.md`
+      (`🟡 Rascunho · 🔵 Em revisão · 🟢 Aprovado · ⚫ Arquivado`); o progresso da fase vai na
+      linha `Estado da implementação`
 - [ ] `docs/CHANGELOG.md` com a fase 1; nenhuma tag criada
 - [ ] `README.md` da fase 1 criado; índice `plans/README.md` atualizado
 - [ ] Dívidas revisadas e migradas para o README da fase 1

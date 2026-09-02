@@ -36,6 +36,21 @@ resolve dívida técnica registrada pela fase 0 e continua a numeração daquele
 antecipado para antes da fase 1 porque o Astro v6 muda a API de coleções e sobe para Zod 4, e
 a fase 1 escreve exatamente os schemas que isso quebraria.
 
+## O topo do PRD tem de refletir a realidade
+
+Ao fechar um plano, uma fase ou qualquer marco, **atualize o cabeçalho §0 do `PRD.md` junto**:
+o `Status` do documento, a linha `Estado da implementação`, a `Última atualização`, a
+`Versão do PRD` e a linha correspondente no histórico §0.1.
+
+É o arquivo que responde "onde estamos" para quem chega sem contexto, e um topo desatualizado
+faz o documento mentir justamente para essa pessoa. Durante toda a fase 0 ele ficou em
+`🟡 Rascunho` com `Versão do PRD: v0.1`, enquanto o histórico já ia na v0.1.7.
+
+O vocabulário do `Status` vem do `PRD_TEMPLATE.md` e é **fechado**:
+`🟡 Rascunho · 🔵 Em revisão · 🟢 Aprovado · ⚫ Arquivado`. O progresso da implementação **não**
+vai nele — vai na linha `Estado da implementação`, que resume fase a fase e aponta para a §12
+(detalhe por item) e para este índice (execução).
+
 ## Fluxo
 
 `/novo-prd` → `/sabatina` → `/fatiar` → `/executar-plano` → `/fechar-fase`.
