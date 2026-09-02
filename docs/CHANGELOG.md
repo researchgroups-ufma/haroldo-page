@@ -23,3 +23,12 @@ Fase 0 — setup e provisionamento (planos 001 a 013):
   provisionamento que a fase 1 vai consumir.
 - `docs/adr/`: ADR-0001 (site estático, sem adapter) e ADR-0002 (pins de `vite`, `sharp` e
   `esbuild` por `overrides`, com gatilhos de revisão).
+
+### Alterado
+
+- **Astro 5.18.2 → 7.2.10**, feito antes de a fase 1 escrever os schemas de conteúdo, porque a
+  migração muda a API de coleções e sobe para Zod 4 — fazê-lo depois implicaria reescrevê-los.
+  O `npm audit` passa de 1 vulnerabilidade high para zero.
+- **Todos os `overrides` do npm removidos.** O Astro 7 exige `vite ^8.0.13` e já pede
+  nativamente as versões corrigidas de `sharp` e `esbuild`, o que dispensou os três pins. Ver
+  o desfecho no ADR-0002.

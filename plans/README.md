@@ -23,7 +23,8 @@
 | 010 | 🧑 Repositório privado no GitHub e push inicial | 🟢 DONE | **humano** | `ac6e52d` |
 | 011 | 🧑 Projeto no TinaCloud vinculado ao repositório | 🟢 DONE | **humano** | `219d61c` |
 | 012 | 🧑 Conta Cloudflare, Worker e primeiro deploy | 🟢 DONE | **humano** | `b2f0234` |
-| 013 | ADR-0001, ADR-0002, CHANGELOG e fechamento da fase 0 | 🟢 DONE | orquestrador | `9150233` |
+| 013 | ADR-0001, ADR-0002, CHANGELOG e fechamento da fase 0 | 🟢 DONE | orquestrador | `9150233`, `b1cc6c1` |
+| 014 | Upgrade do Astro 5 → 7 antes da fase 1 | 🟢 DONE | orquestrador | — |
 
 **Próximo:** nenhum. **A fase 0 está fechada** — 13 de 13 planos DONE. A fase 1 começa pelo
 modelo de conteúdo (§6.1 do PRD), e antes dela cabe o plano de upgrade do Astro (ver
@@ -58,7 +59,8 @@ modelo de conteúdo (§6.1 do PRD), e antes dela cabe o plano de upgrade do Astr
             └─ 007
 ```
 
-Todos os 13 planos estão fechados.
+Todos os 14 planos estão fechados. O 014 é posterior ao fechamento da fase 0: nasceu da
+dívida do upgrade do Astro, executado antes de a fase 1 começar.
 
 ## Restrição que limita o paralelismo
 
@@ -130,20 +132,20 @@ plano 010 foi executado apesar de o 009 ainda estar aberto na ocasião.
 
 ## Segurança — `npm audit`
 
-`npm audit` acusa **1 vulnerabilidade high**, no núcleo do `astro@5.18.2`. Eram 3: o commit
-`07521cd` corrigiu duas por `overrides` (`sharp` 0.34.5→0.35.4, `esbuild` 0.27.7→0.28.2),
-verificadas de ponta a ponta com uma página `astro:assets` temporária que provou que a
-otimização de imagem continua funcionando.
+**`npm audit`: 0 vulnerabilidades.** Estado alcançado em 2026-09-01 pelo plano 014, que subiu
+`astro@5.18.2` → `7.2.10` (dois majors) e **removeu todos os `overrides`** do `package.json`.
 
-A restante só se resolve subindo para `astro@7.2.10` — **dois majors**. Análise de 2026-09-01:
-os 8 advisories do Astro ou exigem SSR (o SSRF de Host header e as server islands são
-impossíveis aqui, porque D-01 proíbe SSR e o `wrangler.toml` não tem `main`), ou dependem de
-recursos que o site não usa (`define:vars`, spread props, `transition:*`, slots — grep
-confirmou zero ocorrências em `src/`).
+Histórico, porque o caminho explica os arquivos: eram 3 vulnerabilidades. O commit `07521cd`
+corrigiu duas por `overrides` (`sharp` 0.34.5→0.35.4, `esbuild` 0.27.7→0.28.2). A terceira, no
+núcleo do Astro, só saía com os dois majors — e a análise da época concluiu que ela era
+**inaplicável** a este site (os 8 advisories exigem SSR, impossível por D-01, ou dependem de
+recursos com zero ocorrência em `src/`).
 
-**Passa a importar na fase 1**, quando conteúdo entrar pelo TinaCMS e imagens forem
-processadas pelo `sharp` durante o build. **Recomendação: plano dedicado de upgrade do Astro
-antes de a fase 1 entregar conteúdo.**
+O upgrade foi feito assim mesmo, e **não por segurança**: o Astro v6 remove as coleções
+legadas, exige Content Layer API e sobe para Zod 4. Como o primeiro item da fase 1 é
+`src/content.config.ts` com os schemas Zod das cinco coleções, migrar depois significaria
+reescrevê-los. Com `content/` vazio e um único `.astro`, este era o momento mais barato
+possível. Ver ADR-0002 (seção "Desfecho") e a Evidência do plano 014.
 
 ## Pendências registradas nos planos posteriores
 
@@ -156,7 +158,7 @@ do arquivo antes de despachar qualquer um destes**:
 | ~~013~~ | ~~ADR-0002 do pin do vite, com os três overrides e gatilho de revisão~~ — feito |
 | ~~013~~ | ~~Migrar o `tseslint.config` depreciado~~ — feito; o build não emite mais hints |
 | ~~013~~ | ~~Reconciliar a linha comentada do `Sitemap` no `robots.txt`~~ — feito; segue comentada até a fase 5 |
-| Fase 1 | ADR do upgrade do Astro (ver "Segurança"), ou plano próprio **antes** de a fase 1 entregar conteúdo |
+| ~~Fase 1~~ | ~~ADR do upgrade do Astro, ou plano próprio antes de a fase 1 entregar conteúdo~~ — **feito pelo plano 014** em 2026-09-01 |
 | Fase 1 | Cobertura cobre só `src/lib/` e `src/i18n/`, e o `vitest.config.ts` **não tem `thresholds`** — a meta de ≥80% da §11 é relatada, nunca imposta |
 | Fase 1 | O teste da regra `process.env` varre só `.ts` sob `src/`; um `process.env` em `<script>` de arquivo `.astro` passaria batido |
 | Fase 1 | Reconferir o override do `sharp` com imagens reais — a validação usou imagem sintética |

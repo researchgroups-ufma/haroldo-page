@@ -1,6 +1,8 @@
 # ADR-0002 — Fixar `vite`, `sharp` e `esbuild` por `overrides` do npm
 
-- **Status:** Aceita
+- **Status:** **Revertida em 2026-09-01** — os gatilhos de revisão dispararam e os três
+  overrides foram removidos. Ver "Desfecho" ao fim. A decisão fica registrada porque explica
+  por que os overrides existiram entre 2026-09-01 e o upgrade do Astro
 - **Data:** 2026-09-01
 - **Decisão do PRD:** fora da tabela D — a §10.5 define `docs/adr/` como "Decisões D-01..D-06
   **e futuras**", o que autoriza registrar decisões técnicas como esta
@@ -68,3 +70,30 @@ Windows) e os advisories do próprio núcleo do Astro.
 - `plans/002-scaffolding-astro-typescript-tailwind.md` — Evidência (justificativa do vite)
 - Commit `07521cd` — overrides de `sharp` e `esbuild`
 - `plans/README.md` — seção "Segurança — `npm audit`"
+
+---
+
+## Desfecho — 2026-09-01 (plano 014)
+
+**Os três overrides foram removidos.** O upgrade do Astro 5.18.2 → 7.2.10 tornou os três
+desnecessários de uma vez:
+
+- **`vite`:** o gatilho previsto (_"remover quando o `astro` passar a exigir vite ≥ 7"_)
+  disparou — `astro@7.2.10` depende de `vite: ^8.0.13`. Manter o pin em `6.4.3` **quebraria**
+  a instalação. Validação prescrita executada: `npm ls vite --all` mostra uma única versão,
+  `vite@8.2.2`, sem `overridden`. O conflito de duas cópias que motivou o pin deixou de
+  existir, porque o peer do `@tailwindcss/vite@4.3.3` (`^5.2.0 || ^6 || ^7 || ^8`) e a
+  dependência do Astro passaram a se encontrar no 8.
+- **`sharp` e `esbuild`:** ficaram redundantes. O `astro@7.2.10` já pede nativamente
+  `optionalDependencies.sharp: ^0.35.4` e `dependencies.esbuild: ^0.28.0` — exatamente as
+  faixas corrigidas que os overrides forçavam. O override do `sharp`, que cruzava a faixa
+  `^0.34.0` declarada pelo Astro 5, deixou de cruzar coisa alguma.
+
+`npm audit` passou de **1 vulnerabilidade high** (núcleo do `astro`) para **0**.
+
+Restam no `package-lock.json` cópias mais antigas de `sharp@0.35.2` e `esbuild@0.28.1` sob
+`wrangler` → `miniflare`. São ferramenta de desenvolvimento, fora do build do site, e o
+`npm audit` não as acusa. Nenhum override foi reintroduzido por causa delas.
+
+A validação de imagem que o override do `sharp` exigia foi refeita sob o Astro 7 e continua
+verde — ver Evidência do `plans/014-upgrade-astro-7.md`.
