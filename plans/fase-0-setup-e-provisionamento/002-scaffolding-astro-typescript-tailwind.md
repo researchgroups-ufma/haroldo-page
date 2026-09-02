@@ -315,7 +315,7 @@ Date:   Tue Sep 1 12:38:28 2026 -0300
  7 files changed, 7198 insertions(+)
 ```
 
-`plans/001-repositorio-git-local-e-gitignore.md` foi deixado **fora** deste commit
+`plans/fase-0-setup-e-provisionamento/001-repositorio-git-local-e-gitignore.md` foi deixado **fora** deste commit
 (modificação pendente pré-existente, não tocada por este plano).
 
 ---

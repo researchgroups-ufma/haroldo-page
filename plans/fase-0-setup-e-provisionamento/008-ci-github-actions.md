@@ -191,13 +191,13 @@ astro build: 1 página construída, "Complete!"
 
 `git status --short`:
 ```
- M plans/008-ci-github-actions.md
+ M plans/fase-0-setup-e-provisionamento/008-ci-github-actions.md
 ?? .github/
 ```
 
 `git diff --stat`:
 ```
- plans/008-ci-github-actions.md | 2 +-
+ plans/fase-0-setup-e-provisionamento/008-ci-github-actions.md | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 ```
 

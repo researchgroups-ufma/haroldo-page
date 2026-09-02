@@ -164,19 +164,19 @@ Date:   Tue Sep 1 12:30:34 2026 -0300
  PRD.md                                             | 992 +++++++++++++++++++++
  PRD_TEMPLATE.md                                    | 485 ++++++++++
  briefing.md                                        | 706 +++++++++++++++
- plans/001-repositorio-git-local-e-gitignore.md     | 139 +++
- plans/002-scaffolding-astro-typescript-tailwind.md | 174 ++++
- plans/003-estrutura-de-diretorios.md               | 152 ++++
- plans/004-prettier-e-eslint.md                     | 153 ++++
- plans/005-vitest.md                                | 161 ++++
- plans/006-env-example-e-config-do-site.md          | 141 +++
- plans/007-wrangler-toml-workers-static-assets.md   | 139 +++
- plans/008-ci-github-actions.md                     | 146 +++
- plans/009-readme-inicial.md                        | 141 +++
- plans/010-roteiro-repositorio-github-privado.md    | 104 +++
- plans/011-roteiro-projeto-tinacloud.md             | 129 +++
- plans/012-roteiro-cloudflare-worker-e-primeiro-deploy.md | 146 +++
- plans/013-adr-changelog-e-fechamento-da-fase-0.md  | 199 +++++
+ plans/fase-0-setup-e-provisionamento/001-repositorio-git-local-e-gitignore.md     | 139 +++
+ plans/fase-0-setup-e-provisionamento/002-scaffolding-astro-typescript-tailwind.md | 174 ++++
+ plans/fase-0-setup-e-provisionamento/003-estrutura-de-diretorios.md               | 152 ++++
+ plans/fase-0-setup-e-provisionamento/004-prettier-e-eslint.md                     | 153 ++++
+ plans/fase-0-setup-e-provisionamento/005-vitest.md                                | 161 ++++
+ plans/fase-0-setup-e-provisionamento/006-env-example-e-config-do-site.md          | 141 +++
+ plans/fase-0-setup-e-provisionamento/007-wrangler-toml-workers-static-assets.md   | 139 +++
+ plans/fase-0-setup-e-provisionamento/008-ci-github-actions.md                     | 146 +++
+ plans/fase-0-setup-e-provisionamento/009-readme-inicial.md                        | 141 +++
+ plans/fase-0-setup-e-provisionamento/010-roteiro-repositorio-github-privado.md    | 104 +++
+ plans/fase-0-setup-e-provisionamento/011-roteiro-projeto-tinacloud.md             | 129 +++
+ plans/fase-0-setup-e-provisionamento/012-roteiro-cloudflare-worker-e-primeiro-deploy.md | 146 +++
+ plans/fase-0-setup-e-provisionamento/013-adr-changelog-e-fechamento-da-fase-0.md  | 199 +++++
  20 files changed, 4170 insertions(+)
 
 $ git check-ignore -v lattes.pdf .firecrawl/lattes.txt

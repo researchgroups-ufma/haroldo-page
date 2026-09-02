@@ -201,7 +201,7 @@ Result (10 files):
 
 ```
  M astro.config.mjs
- M plans/006-env-example-e-config-do-site.md
+ M plans/fase-0-setup-e-provisionamento/006-env-example-e-config-do-site.md
 ?? .env.example
 ?? src/lib/config.ts
 ?? tests/lib/config.test.ts
@@ -211,7 +211,7 @@ Result (10 files):
 
 ```
  astro.config.mjs                          | 20 ++++++++++++++++----
- plans/006-env-example-e-config-do-site.md |  4 +++-
+ plans/fase-0-setup-e-provisionamento/006-env-example-e-config-do-site.md |  4 +++-
  2 files changed, 19 insertions(+), 5 deletions(-)
 ```
 

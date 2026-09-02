@@ -203,7 +203,7 @@ momento da verificação:
 ```
  M package-lock.json
  M package.json
- M plans/007-wrangler-toml-workers-static-assets.md
+ M plans/fase-0-setup-e-provisionamento/007-wrangler-toml-workers-static-assets.md
 ?? public/_headers
 ?? wrangler.toml
 ```

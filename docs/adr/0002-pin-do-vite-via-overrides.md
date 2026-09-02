@@ -67,9 +67,9 @@ Windows) e os advisories do próprio núcleo do Astro.
 ## Referências
 
 - PRD §10.5, RNF-12
-- `plans/002-scaffolding-astro-typescript-tailwind.md` — Evidência (justificativa do vite)
+- `plans/fase-0-setup-e-provisionamento/002-scaffolding-astro-typescript-tailwind.md` — Evidência (justificativa do vite)
 - Commit `07521cd` — overrides de `sharp` e `esbuild`
-- `plans/README.md` — seção "Segurança — `npm audit`"
+- `plans/fase-0-setup-e-provisionamento/README.md` — seção "Segurança — `npm audit`"
 
 ---
 
@@ -96,4 +96,4 @@ Restam no `package-lock.json` cópias mais antigas de `sharp@0.35.2` e `esbuild@
 `npm audit` não as acusa. Nenhum override foi reintroduzido por causa delas.
 
 A validação de imagem que o override do `sharp` exigia foi refeita sob o Astro 7 e continua
-verde — ver Evidência do `plans/014-upgrade-astro-7.md`.
+verde — ver Evidência do `plans/fase-0-setup-e-provisionamento/014-upgrade-astro-7.md`.

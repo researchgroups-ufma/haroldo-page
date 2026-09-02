@@ -56,4 +56,4 @@ inexistente responde 404.
 
 - PRD §7.1 (arquitetura), §7.2 (decisão D-01), RNF-03, RNF-14, Apêndice A
 - `wrangler.toml` — plano 007
-- `plans/012-roteiro-cloudflare-worker-e-primeiro-deploy.md` — Evidência
+- `plans/fase-0-setup-e-provisionamento/012-roteiro-cloudflare-worker-e-primeiro-deploy.md` — Evidência

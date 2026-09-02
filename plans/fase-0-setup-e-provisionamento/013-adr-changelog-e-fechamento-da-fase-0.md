@@ -72,7 +72,7 @@ Os planos 002 e 006 usaram o valor **provisório** `https://haroldo-page.workers
 012 anotou a **URL real** do Worker — tipicamente
 `https://haroldo-page.<subdominio-da-conta>.workers.dev`.
 
-- Leia a Evidência do plano 012 (`plans/012-*.md`) para obter a URL real.
+- Leia a Evidência do plano 012 (`plans/fase-0-setup-e-provisionamento/012-*.md`) para obter a URL real.
 - Se ela **divergir** do provisório, substitua o default nos dois lugares
   (`astro.config.mjs` → `site`; `src/lib/config.ts` → `siteUrl`) e em
   `public/robots.txt` (linha `Sitemap:`), mantendo a leitura de `PUBLIC_SITE_URL` como
@@ -388,7 +388,7 @@ usa) e afrouxar o `astro check` (regressão).
 > Remover este override quando o `astro` passar a exigir vite ≥ 7.
 > Validar com `npm ls vite --all` mostrando uma única cópia.
 
-A justificativa completa está na seção `## Evidência` de `plans/002-scaffolding-astro-typescript-tailwind.md`.
+A justificativa completa está na seção `## Evidência` de `plans/fase-0-setup-e-provisionamento/002-scaffolding-astro-typescript-tailwind.md`.
 
 ---
 
