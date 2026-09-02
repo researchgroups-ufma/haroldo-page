@@ -31,6 +31,7 @@
 | v0.1.3 | 2026-09-01 | Desenvolvedor | §12 atualizada com o progresso real da fase 0 (planos 001–004 DONE); mapa de execução dos planos em `plans/README.md` |
 | v0.1.4 | 2026-09-01 | Desenvolvedor | **Fase 0 concluída:** checklist §12 fechado (10/10) com TinaCloud (plano 011) e Cloudflare (plano 012); ADR-0001 e ADR-0002 registrados; URL real do Worker reconciliada no código; §16 corrigida (Q-07 bloqueia a fase 3, não a 5) |
 | v0.1.5 | 2026-09-01 | Desenvolvedor | Repositório passa de **privado a público**, por necessidade do projeto: §0, §7.4 e §12 atualizadas. Consequência registrada em D-04 e RN-01 — `publicado: false` esconde do site, não do GitHub |
+| v0.1.6 | 2026-09-01 | Desenvolvedor | **Q-02 resolvida:** painel do TinaCMS em inglês é aceitável; A-08 confirmada e o TinaCMS fica. Decap deixa de ser gatilho de decisão e segue só como plano B de R-03. Nada mais bloqueia a fase 1 |
 
 ---
 
@@ -867,7 +868,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | A-05 | O volume de conteúdo permanece na ordem de grandeza da RNF-13 | Build lento; paginação e filtros passam de COULD a MUST |
 | A-06 | O professor tem e-mail institucional publicável | Revisar §9 (LGPD) e usar formulário de contato — o que exigiria serviço externo |
 | A-07 | Não haverá domínio próprio no MVP (subdomínio `*.workers.dev`) | Configurar DNS e certificado; URLs canônicas e sitemap precisam ser refeitos antes da indexação |
-| A-08 | O painel do TinaCMS em inglês é aceitável para o professor (a interface do produto não é traduzível; apenas os rótulos dos campos, que serão em português) | Migração para Decap CMS, que tem `locale: pt` → R-03 |
+| A-08 | O painel do TinaCMS em inglês é aceitável para o professor (a interface do produto não é traduzível; apenas os rótulos dos campos, que serão em português) — **confirmada em 2026-09-01 pelo stakeholder (Q-02)** | Migração para Decap CMS, que tem `locale: pt` → R-03 |
 
 > **A-08 é a premissa mais frágil deste PRD** e precisa ser confirmada com o professor antes da fase 2 (Q-02). Rótulos de campo, coleções e textos de ajuda ficam em português, mas os botões estruturais do painel (Save, Delete, Add) permanecem em inglês.
 
@@ -894,7 +895,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | ID | Questão | Bloqueia o quê | Responsável | Prazo | Resolução |
 |---|---|---|---|---|---|
 | ~~Q-01~~ | ~~Nome completo, cargo, instituição e departamento do professor~~ | Metadados do site, `<title>`, JSON-LD, conteúdo do perfil | Stakeholder | Fase 1 | ✅ **2026-09-01:** extraídos de `lattes.pdf` (currículo de 2026-08-04). Ver Apêndice C |
-| Q-02 | O professor aceita um painel cuja interface estrutural está em inglês (A-08)? | Fase 2 — decide entre manter TinaCMS ou migrar para Decap | Stakeholder + Professor | Antes da fase 2 | |
+| ~~Q-02~~ | ~~O professor aceita um painel cuja interface estrutural está em inglês (A-08)?~~ | Fase 2 — decidia entre manter TinaCMS ou migrar para Decap | Stakeholder + Professor | Antes da fase 2 | ✅ **2026-09-01:** sim, o painel em inglês é aceitável. **A-08 confirmada**; o TinaCMS fica. A migração para Decap deixa de ser gatilho de decisão e permanece apenas como plano B do risco R-03 |
 | ~~Q-03~~ | ~~Qual o limite de minutos de build do Workers Builds no plano gratuito?~~ | Confirma A-03 e o risco R-06 | Desenvolvedor | Fase 0 | ✅ **2026-09-01:** 3.000 min/mês, 1 build simultâneo, teto de 20 min por build ([doc](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/)). A-03 confirmada; R-06 rebaixado para "muito baixa"; novo risco R-12 (fila de builds) registrado |
 | Q-04 | Referências visuais do site | Fase 3 (identidade visual) | Stakeholder | Antes da fase 3 | |
 | Q-05 | Haverá domínio próprio ou institucional? Se sim, quando? | URLs canônicas, sitemap, indexação (A-07) | Stakeholder | Antes da fase 5 | |
@@ -903,7 +904,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | ~~Q-08~~ | ~~A conta Google do Drive é do professor ou institucional?~~ | R-08 e a convenção de pastas | Stakeholder | Fase 0 | ✅ **2026-09-01:** questão dissolvida. O campo de material é uma **URL livre** — o professor cola o link de onde tiver hospedado (Drive, repositório institucional, arXiv, YouTube). O Google Drive passa de dependência a recomendação do manual. Ver D-07 |
 | Q-09 | Notícias e CV entram na v1.1 logo após a entrega, ou ficam indefinidos? | Planejamento pós-entrega | Stakeholder | Após a fase 5 | |
 
-> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-02 e Q-06 (fase 2), Q-04 e Q-07 (fase 3), Q-05 (fase 5).
+> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-06 (fase 2), Q-04 e Q-07 (fase 3), Q-05 (fase 5). **Q-02 foi resolvida em 2026-09-01** — o painel em inglês é aceitável, o TinaCMS fica, e a fase 1 pode construir `tina/config.ts` sem risco de descarte.
 
 ---
 
