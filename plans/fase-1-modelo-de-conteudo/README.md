@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-01
+Última atualização: 2026-09-02
 
 **Critério de conclusão da fase** (§6.2 do PRD): *o professor consegue, localmente, criar e
 editar item de cada coleção pelo painel.* Não é "os testes passam" — é usar o `/admin`.
@@ -14,7 +14,7 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 
 | Plano | Título | Status | Agente | Commits |
 |---|---|---|---|---|
-| 015 | Instalação do TinaCMS e `/admin` no ar localmente | ⬜ TODO | implementer | — |
+| 015 | Instalação do TinaCMS e `/admin` no ar localmente | ✅ DONE | implementer | `1d35c11`, `30ab365`, `475f65f` |
 | 016 | Schemas Zod das cinco coleções | ⬜ TODO | implementer | — |
 | 017 | As cinco coleções no `tina/config.ts` | ⬜ TODO | implementer | — |
 | 018 | Grupo "Versão em inglês (opcional)" | ⬜ TODO | implementer | — |
@@ -22,7 +22,21 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 015. É a fatia vertical que descobre cedo se Tina + Astro 7 tem atrito.
+**Próximo:** plano 017 — as cinco coleções no `tina/config.ts`. O 016 está em revisão.
+
+**O que o 015 descobriu** (leia antes do 017): Tina + Astro 7 funciona, mas cobrou cinco
+correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herda:
+
+1. **`tina/tina-lock.json` é versionado**, ao contrário de `tina/__generated__/` e
+   `public/admin/`. Sem ele o TinaCloud não indexa a branch e exibe "No Tina config was found
+   on `main`" mesmo com o `tina/config.ts` presente. Ele só é gerado por `tinacms dev` — quem
+   mudar o schema precisa subir o dev uma vez e commitar o lock atualizado. **Isto vale para o
+   017**, que muda o schema.
+2. **Gitignorar não esconde do ESLint.** Todo diretório gerado precisa entrar nas três listas:
+   `.gitignore`, `eslint.config.js` e — quando não for gitignorado — `.prettierignore`.
+3. **`email: PLACEHOLDER@ufma.br`** em `content/perfil/index.md` é marcado só por comentário,
+   não por mecanismo. Quando o 017 puser `email` no schema do Tina, o painel passa a poder
+   reserializar o arquivo e o comentário some. Q-07 segue aberta até a fase 3.
 
 ## Grafo de dependências
 
