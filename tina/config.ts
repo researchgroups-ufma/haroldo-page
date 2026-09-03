@@ -13,7 +13,7 @@
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
  *  Atualizado em: 2026-09-03
- *  Versão       : 0.2.0
+ *  Versão       : 0.3.0
  *
  *  Dependências : tinacms (defineConfig), src/lib/slug.ts (slugify, reusado
  *                 nos templates de nome de arquivo — ver nota abaixo)
@@ -67,6 +67,15 @@
  *                 015). Migrar os quatro para corpo Markdown via `render()` é
  *                 decisão explícita da fase 3, quando o modelo de renderização
  *                 de texto longo estiver definido.
+ *
+ *                 O grupo "Versão em inglês (opcional)" (RN-06, RN-09, plano
+ *                 018) foi acrescentado como último campo de cada uma das
+ *                 cinco coleções — `type: 'object'` recolhível, sem `list`,
+ *                 espelhando em paridade os grupos `en` de
+ *                 `src/content.config.ts`. Nenhum subcampo é `required`: o
+ *                 grupo inteiro e cada campo dentro dele são opcionais
+ *                 (RN-09, português é canônico). A função de fallback por
+ *                 campo (RN-06) não é implementada aqui — é da fase 4.
  * ============================================================================
  */
 import { defineConfig } from 'tinacms';
@@ -202,6 +211,55 @@ export default defineConfig({
             label: 'Currículo (PDF)',
             description: 'Link do currículo em PDF (ex.: Google Drive).',
           },
+          {
+            type: 'object',
+            name: 'en',
+            label: 'Versão em inglês (opcional)',
+            description:
+              'Traduções opcionais — deixe em branco o que não for traduzir; o site usa o texto em português como reserva (RN-06).',
+            fields: [
+              { type: 'string', name: 'cargo', label: 'Cargo (EN)' },
+              { type: 'string', name: 'instituicao', label: 'Instituição (EN)' },
+              { type: 'string', name: 'departamento', label: 'Departamento (EN)' },
+              {
+                type: 'string',
+                name: 'bio',
+                label: 'Biografia (EN)',
+                ui: { component: 'textarea' },
+              },
+              {
+                type: 'string',
+                name: 'resumo_home',
+                label: 'Resumo para a Home (EN)',
+                ui: { component: 'textarea' },
+              },
+              {
+                type: 'object',
+                name: 'formacao',
+                label: 'Formação acadêmica (EN)',
+                list: true,
+                description:
+                  'Título de cada formação em inglês (grau + curso) — lista paralela à "Formação acadêmica" em português, alinhada por posição.',
+                ui: {
+                  itemProps: (item) => ({
+                    label: [item?.grau, item?.curso].filter(Boolean).join(' — ') || 'Nova formação',
+                  }),
+                },
+                fields: [
+                  { type: 'string', name: 'grau', label: 'Grau (EN)' },
+                  { type: 'string', name: 'curso', label: 'Curso (EN)' },
+                ],
+              },
+              {
+                type: 'string',
+                name: 'areas',
+                label: 'Áreas de atuação (EN)',
+                list: true,
+                description:
+                  'Lista paralela a "Áreas de atuação" em português, alinhada por posição.',
+              },
+            ],
+          },
         ],
       },
 
@@ -283,6 +341,28 @@ export default defineConfig({
             type: 'image',
             name: 'imagem',
             label: 'Imagem',
+          },
+          {
+            type: 'object',
+            name: 'en',
+            label: 'Versão em inglês (opcional)',
+            description:
+              'Traduções opcionais — deixe em branco o que não for traduzir; o site usa o texto em português como reserva (RN-06).',
+            fields: [
+              { type: 'string', name: 'titulo', label: 'Título (EN)' },
+              {
+                type: 'string',
+                name: 'resumo',
+                label: 'Resumo (EN)',
+                ui: { component: 'textarea' },
+              },
+              {
+                type: 'string',
+                name: 'corpo',
+                label: 'Texto completo (EN)',
+                ui: { component: 'textarea' },
+              },
+            ],
           },
         ],
       },
@@ -373,6 +453,22 @@ export default defineConfig({
             label: 'Linha de pesquisa relacionada',
             collections: ['linhas_pesquisa'],
             description: 'Linha de pesquisa relacionada a este projeto, se houver.',
+          },
+          {
+            type: 'object',
+            name: 'en',
+            label: 'Versão em inglês (opcional)',
+            description:
+              'Traduções opcionais — deixe em branco o que não for traduzir; o site usa o texto em português como reserva (RN-06). Só título e descrição: período, financiador, status e colaboradores são dados factuais (RN-07).',
+            fields: [
+              { type: 'string', name: 'titulo', label: 'Título (EN)' },
+              {
+                type: 'string',
+                name: 'descricao',
+                label: 'Descrição (EN)',
+                ui: { component: 'textarea' },
+              },
+            ],
           },
         ],
       },
@@ -563,13 +659,35 @@ export default defineConfig({
               { type: 'string', name: 'url', label: 'Link', required: true },
             ],
           },
+          {
+            type: 'object',
+            name: 'en',
+            label: 'Versão em inglês (opcional)',
+            description:
+              'Traduções opcionais — deixe em branco o que não for traduzir; o site usa o texto em português como reserva (RN-06).',
+            fields: [
+              { type: 'string', name: 'nome', label: 'Nome (EN)' },
+              {
+                type: 'string',
+                name: 'descricao',
+                label: 'Descrição (EN)',
+                ui: { component: 'textarea' },
+              },
+              {
+                type: 'string',
+                name: 'ementa',
+                label: 'Ementa (EN)',
+                ui: { component: 'textarea' },
+              },
+            ],
+          },
         ],
       },
 
       // `publicacoes` — pasta (content/publicacoes/*.md, §7.3). Nome de
       // arquivo prescrito: `{ano}-{slug(titulo)}` (RN-08). `titulo` e
-      // `autores` não são traduzíveis (RN-07) — sem grupo `en` aqui (plano
-      // 018 cuida do grupo "Versão em inglês" nas coleções que o admitem).
+      // `autores` não são traduzíveis (RN-07) — o grupo `en` abaixo (plano
+      // 018) só tem `resumo`.
       {
         name: 'publicacoes',
         label: 'Publicações',
@@ -664,6 +782,21 @@ export default defineConfig({
             name: 'destaque',
             label: 'Destaque',
             description: 'Quando marcado, a publicação aparece em destaque na Home.',
+          },
+          {
+            type: 'object',
+            name: 'en',
+            label: 'Versão em inglês (opcional)',
+            description:
+              'Tradução opcional do resumo — o site usa o texto em português como reserva (RN-06). Título e autores não entram: são dados factuais (RN-07), traduzi-los produziria duas citações divergentes do mesmo trabalho.',
+            fields: [
+              {
+                type: 'string',
+                name: 'resumo',
+                label: 'Resumo (EN)',
+                ui: { component: 'textarea' },
+              },
+            ],
           },
         ],
       },

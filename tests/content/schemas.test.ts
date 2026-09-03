@@ -14,8 +14,8 @@
  *                 narrowing.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-02
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-03
+ *  Versão       : 0.2.0
  *
  *  Dependências : vitest, src/content.config.ts
  *  Entradas     : nenhuma (objetos sintéticos construídos no próprio teste)
@@ -26,6 +26,15 @@
  *                 entre 1900 e 2100), os enums fechados (`tipo` de publicação,
  *                 `status` de disciplina) e a ausência de campo obrigatório
  *                 têm teste dedicado, conforme o plano 016 exige.
+ *
+ *                 O grupo `en` (RN-06, RN-09, plano 018) é coberto nas cinco
+ *                 coleções: item sem `en`, `en` parcial, `en` vazio (`{}`) e
+ *                 um campo factual dentro de `en` rejeitado por `.strict()` —
+ *                 em `publicacoes`, os dois casos exigidos por RN-07
+ *                 (`en.titulo` e `en.autores`); em `perfil`, também o
+ *                 `.strict()` do sub-objeto `en.formacao[]`
+ *                 (`formacaoEnSchema`), separado do `.strict()` do `en` de
+ *                 topo.
  * ============================================================================
  */
 import { describe, expect, it } from 'vitest';
@@ -91,6 +100,35 @@ describe('coleção perfil', () => {
     });
     expect(resultado.success).toBe(true);
   });
+
+  it('aceita item sem o grupo `en` (RN-09 — português é canônico)', () => {
+    expect(perfilSchema.safeParse(valido).success).toBe(true);
+  });
+
+  it('aceita `en` parcial — só um campo preenchido (RN-09)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      en: { cargo: 'Associate Professor', formacao: [{ grau: 'PhD' }] },
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('aceita `en` vazio (`{}`)', () => {
+    expect(perfilSchema.safeParse({ ...valido, en: {} }).success).toBe(true);
+  });
+
+  it('rejeita campo factual dentro de `en` — `nome` não é traduzível (RN-07, `.strict()`)', () => {
+    const resultado = perfilSchema.safeParse({ ...valido, en: { nome: 'Haroldo' } });
+    expect(resultado.success).toBe(false);
+  });
+
+  it('rejeita campo factual dentro de `en.formacao[]` — `instituicao` e `ano` não são traduzíveis (RN-07, `.strict()`)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      en: { formacao: [{ instituicao: 'UFMA' }] },
+    });
+    expect(resultado.success).toBe(false);
+  });
 });
 
 describe('coleção linhas-pesquisa', () => {
@@ -109,6 +147,27 @@ describe('coleção linhas-pesquisa', () => {
   it('aceita `ordem` numérica opcional', () => {
     const resultado = linhasPesquisaSchema.safeParse({ ...valido, ordem: 2 });
     expect(resultado.success).toBe(true);
+  });
+
+  it('aceita item sem o grupo `en` (RN-09 — português é canônico)', () => {
+    expect(linhasPesquisaSchema.safeParse(valido).success).toBe(true);
+  });
+
+  it('aceita `en` parcial — só um campo preenchido (RN-09)', () => {
+    const resultado = linhasPesquisaSchema.safeParse({
+      ...valido,
+      en: { titulo: 'Black holes' },
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('aceita `en` vazio (`{}`)', () => {
+    expect(linhasPesquisaSchema.safeParse({ ...valido, en: {} }).success).toBe(true);
+  });
+
+  it('rejeita campo factual dentro de `en` — `publicado` não é traduzível (`.strict()`)', () => {
+    const resultado = linhasPesquisaSchema.safeParse({ ...valido, en: { publicado: true } });
+    expect(resultado.success).toBe(false);
   });
 });
 
@@ -135,6 +194,24 @@ describe('coleção projetos', () => {
       linha_relacionada: 'buracos-negros',
     });
     expect(resultado.success).toBe(true);
+  });
+
+  it('aceita item sem o grupo `en` (RN-09 — português é canônico)', () => {
+    expect(projetosSchema.safeParse(valido).success).toBe(true);
+  });
+
+  it('aceita `en` parcial — só um campo preenchido (RN-09)', () => {
+    const resultado = projetosSchema.safeParse({ ...valido, en: { titulo: 'Shadow project' } });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('aceita `en` vazio (`{}`)', () => {
+    expect(projetosSchema.safeParse({ ...valido, en: {} }).success).toBe(true);
+  });
+
+  it('rejeita campo factual dentro de `en` — `status` não é traduzível (RN-07, `.strict()`)', () => {
+    const resultado = projetosSchema.safeParse({ ...valido, en: { status: 'em andamento' } });
+    expect(resultado.success).toBe(false);
   });
 });
 
@@ -201,6 +278,27 @@ describe('coleção disciplinas', () => {
     });
     expect(resultado.success).toBe(false);
   });
+
+  it('aceita item sem o grupo `en` (RN-09 — português é canônico)', () => {
+    expect(disciplinasSchema.safeParse(valido).success).toBe(true);
+  });
+
+  it('aceita `en` parcial — só um campo preenchido (RN-09)', () => {
+    const resultado = disciplinasSchema.safeParse({
+      ...valido,
+      en: { nome: 'Classical Mechanics' },
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('aceita `en` vazio (`{}`)', () => {
+    expect(disciplinasSchema.safeParse({ ...valido, en: {} }).success).toBe(true);
+  });
+
+  it('rejeita campo factual dentro de `en` — `semestre` não é traduzível (RN-07, `.strict()`)', () => {
+    const resultado = disciplinasSchema.safeParse({ ...valido, en: { semestre: '2026.2' } });
+    expect(resultado.success).toBe(false);
+  });
 });
 
 describe('coleção publicacoes', () => {
@@ -261,6 +359,38 @@ describe('coleção publicacoes', () => {
     expect(publicacoesSchema.safeParse(omit(valido, 'publicado')).success).toBe(
       false,
     );
+  });
+
+  it('aceita item sem o grupo `en` (RN-09 — português é canônico)', () => {
+    expect(publicacoesSchema.safeParse(valido).success).toBe(true);
+  });
+
+  it('aceita `en` parcial — só `resumo` preenchido (RN-09)', () => {
+    const resultado = publicacoesSchema.safeParse({
+      ...valido,
+      en: { resumo: 'English abstract.' },
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('aceita `en` vazio (`{}`)', () => {
+    expect(publicacoesSchema.safeParse({ ...valido, en: {} }).success).toBe(true);
+  });
+
+  it('rejeita `en.titulo` — título de artigo é dado factual, não se traduz (RN-07)', () => {
+    const resultado = publicacoesSchema.safeParse({
+      ...valido,
+      en: { titulo: 'Translated title' },
+    });
+    expect(resultado.success).toBe(false);
+  });
+
+  it('rejeita `en.autores` — autoria é dado factual, não se traduz (RN-07)', () => {
+    const resultado = publicacoesSchema.safeParse({
+      ...valido,
+      en: { autores: ['Lima Junior, H. C. D.'] },
+    });
+    expect(resultado.success).toBe(false);
   });
 });
 

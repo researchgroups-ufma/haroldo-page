@@ -10,8 +10,8 @@
  *                 entrada — quem decide o que é um dado válido é este arquivo.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-02
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-03
+ *  Versão       : 0.2.0
  *
  *  Dependências : astro:content (defineCollection, reference), astro/loaders
  *                 (glob), astro/zod (z)
@@ -37,9 +37,17 @@
  *                 Content Layer) também não. `z` vem de `astro/zod` (Zod 4);
  *                 `astro:schema` e o `z` antes exportado por `astro:content`
  *                 não existem mais. A coleção `noticias` (v1.1, NG-01 desta
- *                 fase) e o grupo `en` (RN-06/RN-09, plano 018) ficam de fora
- *                 de propósito — cada `z.object` abaixo pode ganhar um campo
- *                 `en` opcional depois, sem precisar reescrever o resto.
+ *                 fase) fica de fora de propósito.
+ *
+ *                 O grupo `en` (RN-06, RN-09, plano 018) foi acrescentado às
+ *                 cinco coleções, sempre `.optional()` e `.strict()`: opcional
+ *                 porque o português é canônico (RN-09) — todo campo dentro
+ *                 dele também é opcional individualmente —, estrito para que
+ *                 um campo factual colado ali dentro (ex.: `en.titulo` em
+ *                 `publicacoes`, RN-07) seja rejeitado em vez de
+ *                 silenciosamente descartado. A função de fallback por campo
+ *                 (RN-06: campo vazio em `en` ⇒ usa o valor em PT) é da fase
+ *                 4, não deste arquivo.
  *
  *                 Decisão de modelagem: os quatro campos "rich-text" da §7.3
  *                 (`bio`, `corpo`, `ementa`, `resumo`) são tratados como
@@ -103,6 +111,47 @@ const linksSchema = z.object({
 });
 
 /**
+ * Subconjunto traduzível de `formacaoSchema`, dentro do grupo `en` (plano 018).
+ *
+ * A §7.3 marca `formacao[]` como "✔ (título)", mas o objeto `{grau, curso,
+ * instituicao, ano}` não tem campo `titulo` — o título de uma formação é a
+ * junção de `grau` e `curso` (ex.: "Doutorado em Física" → "PhD in Physics");
+ * traduzir só `curso` produziria "Doutorado in Physics" na rota `/en`.
+ * `instituicao` e `ano` são dados factuais (RN-07) e ficam fora.
+ *
+ * `en.formacao[]` é uma lista paralela a `formacao[]`, alinhada por índice —
+ * reordenar a lista em português desalinha a tradução. O realinhamento não é
+ * implementado aqui: é um mecanismo da fase 4, junto do fallback.
+ */
+const formacaoEnSchema = z
+  .object({
+    grau: z.string().optional(),
+    curso: z.string().optional(),
+  })
+  .strict();
+
+/**
+ * Grupo `en` da coleção `perfil` (§7.3, RN-06, RN-09, plano 018) — opcional,
+ * e cada campo dentro dele também. `.strict()`: um campo factual (ex.:
+ * `email`, `nome`) colado dentro de `en` é rejeitado em vez de
+ * silenciosamente descartado.
+ *
+ * `en.areas[]` é lista paralela a `areas[]`, alinhada por índice — mesma
+ * ressalva de `formacaoEnSchema` acima.
+ */
+const perfilEnSchema = z
+  .object({
+    cargo: z.string().optional(),
+    instituicao: z.string().optional(),
+    departamento: z.string().optional(),
+    bio: z.string().optional(),
+    resumo_home: z.string().optional(),
+    formacao: z.array(formacaoEnSchema).optional(),
+    areas: z.array(z.string()).optional(),
+  })
+  .strict();
+
+/**
  * Schema Zod da coleção `perfil` — singleton em `content/perfil/index.md`
  * (§7.3).
  *
@@ -126,12 +175,22 @@ export const perfilSchema = z.object({
   email: z.email(),
   links: linksSchema.optional(),
   cv_url: z.url().optional(),
+  en: perfilEnSchema.optional(),
 });
 
 const perfil = defineCollection({
   loader: glob({ pattern: 'index.md', base: './content/perfil' }),
   schema: perfilSchema,
 });
+
+/** Grupo `en` da coleção `linhas-pesquisa` (§7.3, RN-06, RN-09, plano 018). */
+const linhasPesquisaEnSchema = z
+  .object({
+    titulo: z.string().optional(),
+    resumo: z.string().optional(),
+    corpo: z.string().optional(),
+  })
+  .strict();
 
 /**
  * Schema Zod da coleção `linhas-pesquisa` — `content/linhas-pesquisa/*.md`
@@ -146,12 +205,28 @@ export const linhasPesquisaSchema = z.object({
   corpo: z.string().optional(),
   imagem: z.string().optional(),
   publicado: z.boolean(),
+  en: linhasPesquisaEnSchema.optional(),
 });
 
 const linhasPesquisa = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './content/linhas-pesquisa' }),
   schema: linhasPesquisaSchema,
 });
+
+/**
+ * Grupo `en` da coleção `projetos` (RN-06, RN-09, plano 018).
+ *
+ * A §7.3 diz apenas "grupo `en`", sem listar campos. Decisão deste plano, por
+ * RN-07: traduzível é `titulo` e `descricao`; `periodo`, `financiador`,
+ * `status`, `colaboradores` e `linha_relacionada` são dados factuais e ficam
+ * fora.
+ */
+const projetosEnSchema = z
+  .object({
+    titulo: z.string().optional(),
+    descricao: z.string().optional(),
+  })
+  .strict();
 
 /**
  * Schema Zod da coleção `projetos` — `content/projetos/*.md` (§7.3).
@@ -174,6 +249,7 @@ export const projetosSchema = z.object({
   colaboradores: z.array(z.string()).optional(),
   linha_relacionada: reference('linhas-pesquisa').optional(),
   publicado: z.boolean(),
+  en: projetosEnSchema.optional(),
 });
 
 const projetos = defineCollection({
@@ -222,6 +298,15 @@ const linkDisciplinaSchema = z.object({
   url: z.url(),
 });
 
+/** Grupo `en` da coleção `disciplinas` (§7.3, RN-06, RN-09, plano 018). */
+const disciplinasEnSchema = z
+  .object({
+    nome: z.string().optional(),
+    descricao: z.string().optional(),
+    ementa: z.string().optional(),
+  })
+  .strict();
+
 /**
  * Schema Zod da coleção `disciplinas` — `content/disciplinas/*.md` (§7.3).
  *
@@ -242,6 +327,7 @@ export const disciplinasSchema = z.object({
   materiais: z.array(materialSchema).optional(),
   links: z.array(linkDisciplinaSchema).optional(),
   publicado: z.boolean(),
+  en: disciplinasEnSchema.optional(),
 });
 
 const disciplinas = defineCollection({
@@ -250,11 +336,25 @@ const disciplinas = defineCollection({
 });
 
 /**
+ * Grupo `en` da coleção `publicacoes` (§7.3, RN-06, RN-07, RN-09, plano 018).
+ *
+ * Apenas `resumo` — `titulo` e `autores` não entram: são dados factuais
+ * (RN-07), e traduzi-los produziria duas citações divergentes do mesmo
+ * trabalho. `.strict()` é o que torna esse limite verificável: `en.titulo`
+ * ou `en.autores` são rejeitados, não silenciosamente descartados.
+ */
+const publicacoesEnSchema = z
+  .object({
+    resumo: z.string().optional(),
+  })
+  .strict();
+
+/**
  * Schema Zod da coleção `publicacoes` — `content/publicacoes/*.md` (§7.3).
  *
  * `ano` validado entre 1900 e 2100 (F-09). `tipo` é um enum fechado. `titulo`
  * e `autores` não são traduzíveis (RN-07) — dado factual, existe uma única
- * vez, e o grupo `en` (plano 018) não vai tocá-los.
+ * vez, e o grupo `en` (plano 018) não os toca.
  */
 export const publicacoesSchema = z.object({
   titulo: z.string(),
@@ -269,6 +369,7 @@ export const publicacoesSchema = z.object({
   palavras_chave: z.array(z.string()).optional(),
   destaque: z.boolean().optional(),
   publicado: z.boolean(),
+  en: publicacoesEnSchema.optional(),
 });
 
 const publicacoes = defineCollection({
