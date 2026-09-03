@@ -127,3 +127,18 @@ npm run format:check  →  All matched files use Prettier code style!
 npm run test:coverage →  testes verdes E cobertura ≥ 80% (threshold imposto)
 npm run build         →  0 errors, 0 warnings, 0 hints; Complete!
 ```
+
+**A ordem de fechamento não é livre — descoberta no 017 e vale para todo plano que mude o
+schema.** O `npm run build` começa por `tinacms build`, que compara o schema local com o que o
+TinaCloud indexou em `main`. Enquanto o commit não subir, ele para em `ERR_CLOUD_CHECK_FAILED`
+(`Reason: [NON_BREAKING - TYPE_ADDED] ...`) e nem chega ao `astro check`. Não é defeito do
+plano, e **não** se contorna com `--skip-cloud-checks` no comando oficial — o contorno serve só
+como diagnóstico separado, para provar que a falha é só do cloud-check. A sequência que funciona:
+
+```
+revisão APROVADO → commit → push → TinaCloud reindexa → npm run build verde → Status: DONE
+```
+
+No 017 o build fechou na primeira tentativa logo após o push. Planeje o fechamento assim: o
+critério do `npm run build` fica desmarcado até o push, com o bloqueio registrado — nunca
+reescrito para caber no resultado.
