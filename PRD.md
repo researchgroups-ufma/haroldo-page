@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.8 |
+| **Versão do PRD** | v0.1.9 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 fatiada, não iniciada (planos 015–021) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
+| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015, 016 e 017 DONE; 018–021 pendentes) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-09-01 |
+| **Última atualização** | 2026-09-03 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav` |
 
@@ -35,6 +35,7 @@
 | v0.1.6 | 2026-09-01 | Desenvolvedor | **Q-02 resolvida:** painel do TinaCMS em inglês é aceitável; A-08 confirmada e o TinaCMS fica. Decap deixa de ser gatilho de decisão e segue só como plano B de R-03. Nada mais bloqueia a fase 1 |
 | v0.1.7 | 2026-09-01 | Desenvolvedor | Campo **Versão do PRD** em §0 corrigido — dizia `v0.1` desde a v0.1.1, divergindo do próprio histórico. A meta de cobertura da §11 passou de relatada a **imposta** (`thresholds` no Vitest, rodando no CI) |
 | v0.1.8 | 2026-09-01 | Desenvolvedor | **Status** passa de `🟡 Rascunho` a `🟢 Aprovado` — o documento guia a implementação desde a fase 0. Acrescentada a linha **Estado da implementação** em §0, para que o topo do PRD responda "onde estamos" sem precisar descer até a §12 |
+| v0.1.9 | 2026-09-03 | Desenvolvedor | **Fase 1 em andamento:** planos 015 (TinaCMS e `/admin` local), 016 (schemas Zod) e 017 (as cinco coleções no `tina/config.ts`) DONE. §12 passa de 0/9 a 4/9 — o item do `src/content.config.ts` estava por marcar desde o fechamento do 016. O 017 fechou a decisão que o 016 deixou aberta (`corpo`/`ementa`/`resumo` seguem em frontmatter, por incompatibilidade do `rich-text` do Tina com `z.string()`) e registrou duas divergências de paridade Zod × Tina como insumo do plano 019 |
 
 ---
 
@@ -739,7 +740,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase | Itens concluídos | Status |
 |---|---|---|
 | Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
-| Fase 1 — Modelo de conteúdo | 0/9 | ⬜ Não iniciada |
+| Fase 1 — Modelo de conteúdo | 4/9 | 🟡 Em andamento |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
 | Fase 3 — Site público (PT) | 0/11 | ⬜ Não iniciada |
 | Fase 4 — Internacionalização | 0/8 | ⬜ Não iniciada |
@@ -760,11 +761,11 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Q-03 respondida (limite de minutos de build do plano gratuito) e registrada — 3.000 min/mês, verificado 2026-09-01
 
 ### Fase 1 — Modelo de Conteúdo
-- [ ] `src/content.config.ts` com schemas Zod das 5 coleções (§7.3)
-- [ ] `tina/config.ts` com as 5 coleções, rótulos em português e textos de ajuda
-- [ ] Campo `publicado` em todas as coleções de listagem (RN-01)
+- [x] `src/content.config.ts` com schemas Zod das 5 coleções (§7.3) — plano 016 (`462ffb4`)
+- [x] `tina/config.ts` com as 5 coleções, rótulos em português e textos de ajuda — plano 017 (`8a58afb`); vocabulário acadêmico verificado no painel (RF-03), ajuda em todo campo não óbvio
+- [x] Campo `publicado` em todas as coleções de listagem (RN-01) — plano 017; ausente em `perfil`, que é singleton. `defaultItem: { publicado: false }` para o item novo não nascer inválido
 - [ ] Grupo "Versão em inglês (opcional)" nas coleções traduzíveis (RN-06)
-- [ ] Templates de nome de arquivo configurados (RN-08)
+- [x] Templates de nome de arquivo configurados (RN-08) — plano 017; `{semestre}-{slug(nome)}.md` e `{ano}-{slug(titulo)}.md` conforme o PRD, `{slug(titulo)}.md` para `linhas-pesquisa` e `projetos`, que o PRD não prescreve. Verificado criando um item de cada coleção pelo painel
 - [ ] Teste de paridade de schema passando (D-06)
 - [ ] Conteúdo placeholder representativo: 1 perfil, 2 linhas, 2 projetos, 2 disciplinas (uma com 5 aulas), 6 publicações em 3 anos
 - [ ] `/admin` funciona localmente e edita todas as coleções

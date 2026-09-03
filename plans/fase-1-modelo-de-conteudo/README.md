@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-02
+Última atualização: 2026-09-03
 
 **Critério de conclusão da fase** (§6.2 do PRD): *o professor consegue, localmente, criar e
 editar item de cada coleção pelo painel.* Não é "os testes passam" — é usar o `/admin`.
@@ -16,34 +16,53 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 |---|---|---|---|---|
 | 015 | Instalação do TinaCMS e `/admin` no ar localmente | ✅ DONE | implementer | `1d35c11`, `30ab365`, `475f65f` |
 | 016 | Schemas Zod das cinco coleções | ✅ DONE | implementer | `462ffb4` |
-| 017 | As cinco coleções no `tina/config.ts` | ⬜ TODO | implementer | — |
+| 017 | As cinco coleções no `tina/config.ts` | ✅ DONE | implementer | `8a58afb` |
 | 018 | Grupo "Versão em inglês (opcional)" | ⬜ TODO | implementer | — |
 | 019 | Teste de paridade Zod × Tina (D-06) | ⬜ TODO | implementer | — |
 | 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 017 — as cinco coleções no `tina/config.ts`.
+**Próximo:** plano 018 — Grupo "Versão em inglês (opcional)".
 
-**O que o 015 descobriu** (leia antes do 017): Tina + Astro 7 funciona, mas cobrou cinco
-correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herda:
+**O que o 015 descobriu** (leia antes do 018): Tina + Astro 7 funciona, mas cobrou cinco
+correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herdou:
 
-1. **`tina/tina-lock.json` é versionado**, ao contrário de `tina/__generated__/` e
-   `public/admin/`. Sem ele o TinaCloud não indexa a branch e exibe "No Tina config was found
-   on `main`" mesmo com o `tina/config.ts` presente. Ele só é gerado por `tinacms dev` — quem
-   mudar o schema precisa subir o dev uma vez e commitar o lock atualizado. **Isto vale para o
-   017**, que muda o schema.
+1. **`tina/tina-lock.json` é versionado** — cumprida. O lock foi regenerado e commitado no 017;
+   coerência verificada pelo revisor recompilando o config com esbuild (`IDENTICAL: true`, md5
+   `920af9a27ca48e3d97c044eb599b8e07`). **Continua valendo para o 018**, que também mexe no
+   schema.
 2. **Gitignorar não esconde do ESLint.** Todo diretório gerado precisa entrar nas três listas:
-   `.gitignore`, `eslint.config.js` e — quando não for gitignorado — `.prettierignore`.
-3. **`email: PLACEHOLDER@ufma.br`** em `content/perfil/index.md` é marcado só por comentário,
-   não por mecanismo. Quando o 017 puser `email` no schema do Tina, o painel passa a poder
-   reserializar o arquivo e o comentário some. Q-07 segue aberta até a fase 3.
+   `.gitignore`, `eslint.config.js` e — quando não for gitignorado — `.prettierignore`. O 017
+   não criou diretório gerado novo, então não a exercitou; **a regra continua valendo** para
+   qualquer plano que crie um.
+3. **`email: PLACEHOLDER@ufma.br`** em `content/perfil/index.md` é marcado só por comentário —
+   **materializou-se no 017**. Ao pôr `email` no schema do Tina, o painel passa a reserializar o
+   arquivo via `gray-matter`/`js-yaml`, que não preservam comentários YAML. O Perfil foi aberto
+   e conferido pelo orquestrador **mas não salvo**, de propósito, para preservar o marcador.
+   **Risco operacional ativo:** qualquer save real do formulário "Perfil" apaga as seis linhas de
+   comentário que registram Q-07 como aberta até a fase 3. Quem for tocar nisso precisa
+   substituir o e-mail placeholder por um institucional real **antes** do primeiro save.
 
-**O que o 016 deixa para o 017 decidir:** `corpo` (linhas-pesquisa), `ementa` (disciplinas) e
-`resumo` (publicações) estão em **frontmatter** no schema Zod, por consistência com `bio` — mas
-só `bio` tem razão técnica para isso (é o único obrigatório e o único que a §7.3 rotula como
-"corpo do arquivo"). Os três são opcionais e poderiam ser o corpo Markdown via `render()`. A
-decisão está deliberadamente em aberto: o 017 confirma ou migra, e a fase 3 é quem sabe como
-esse texto longo será renderizado. **Não herde por inércia.**
+**O que o 016 deixou aberto e o 017 fechou:** `corpo` (linhas-pesquisa), `ementa` (disciplinas) e
+`resumo` (publicações) seguem como `string` + `textarea` (frontmatter), **não** como body Markdown,
+por razão técnica verificada: o `rich-text` do Tina sem `isBody` serializa árvore de sintaxe,
+incompatível com `z.string()`; com `isBody` sai do frontmatter e o Zod não o vê. A única opção
+que preserva string plana é `type: 'string'` com `ui: { component: 'textarea' }` — solução já
+usada para `bio` desde o 015. Migrar para corpo Markdown via `render()` é decisão explícita da
+fase 3, não do 017.
+
+**O que o 017 deixa para o 019** (insumos para teste de paridade — não peguem em teste ingênuo):
+
+- **Divergência de formato de valor em `linha_relacionada`:** Tina grava o id como caminho
+  completo com extensão (`content/linhas-pesquisa/x.md`); Astro `reference()` monta id que o
+  `glob()` do Zod nunca gera (`x`). Resultado: `getEntry()` devolve `undefined` — falha
+  silenciosa na fase 3. Teste de paridade por nome/tipo/obrigatoriedade não detecta isso.
+- **Subcampo obrigatório de lista embutida não bloqueia save:** orquestrador gravou `aulas: [ {} ]`
+  com `numero`, `titulo` e `url` (obrigatórios) vazios — Zod rejeita esse frontmatter.
+- **`defaultItem` está @deprecated** em favor de `ui.defaultItem`, que não é tipada para coleção
+  baseada em `fields`. O 017 usa deliberadamente — upgrade futuro pode removê-lo.
+- **Limitação genérica do Tina:** com campo obrigatório vazio, adicionar item dispara erro sem
+  dizer qual campo falta.
 
 ## Grafo de dependências
 

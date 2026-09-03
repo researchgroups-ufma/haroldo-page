@@ -1,6 +1,6 @@
 # Plano 017 — As cinco coleções no `tina/config.ts`, com rótulos em português e templates de nome
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-03, RF-04, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10; RN-08; D-05
 **Depende de:** plano 015 (Tina instalado). Pode rodar em paralelo com o 016.
 **Modelo recomendado:** sonnet
@@ -101,19 +101,23 @@ compara duas leituras independentes da mesma fonte, em vez de uma cópia de si m
 - [x] Visual editing **não** configurado (D-02)
 - [x] **Verificação objetiva:** um item de cada coleção criado pelo painel, com o nome de
       arquivo previsto pelo template, e removido depois
-- [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
+- [x] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
 - [x] Divergências percebidas em relação ao `src/content.config.ts` **anotadas e reportadas**,
       não corrigidas aqui
 
-> **Nota sobre o critério não marcado** (texto original da linha acima preservado,
-> esclarecimento aqui fora da linha do critério, a pedido da revisão):
-> - De `npm run lint`, `npm run format:check`, `npm run test` e `npm run build`: os três
->   primeiros (`lint`, `format:check`, `test:coverage`) fecharam verdes. `npm run build`
->   ficou vermelho, bloqueado em `ERR_CLOUD_CHECK_FAILED` — a mesma armadilha #1 do README da
->   fase (herdada do plano 015): o TinaCloud só reindexa depois de commit + push, fora do
->   escopo deste plano. A revisão julgou esse vermelho **não bloqueante** para o plano 017;
->   o orquestrador roda `npm run build` de novo depois do push. Ver seção correspondente na
->   Evidência para a saída literal.
+> **Nota sobre o critério "`npm run lint`, `npm run format:check`, `npm run test` e
+> `npm run build` verdes"** (texto original da linha acima preservado, esclarecimento aqui fora
+> da linha do critério, a pedido da revisão):
+> - `lint`, `format:check` e `test:coverage` fecharam verdes ainda durante a execução do plano,
+>   antes do commit. `npm run build` ficou vermelho até o push, bloqueado em
+>   `ERR_CLOUD_CHECK_FAILED` — a mesma armadilha #1 do README da fase (herdada do plano 015): o
+>   TinaCloud só reindexa depois de commit + push, fora do alcance do executor (regra da casa:
+>   não commito). A revisão julgou esse vermelho **não bloqueante** para o plano 017, sob a
+>   condição de rodar `npm run build` de novo depois do push — o orquestrador cumpriu essa
+>   condição: suíte autoritativa verde, commit `8a58afb`, push autorizado pelo usuário,
+>   TinaCloud reindexou, e `npm run build` fechou verde na primeira tentativa em 2026-09-03,
+>   15:51. **Os quatro comandos fecharam verdes** — critério fechado. Ver a seção
+>   "`npm run build` — verde depois do push" na Evidência para a saída literal.
 >
 > **Nota sobre o critério marcado "Verificação objetiva"**: cumprido pelo orquestrador, não pelo
 > executor (implementer, sem ferramenta de navegador) — precisão pedida pela revisão, sem
@@ -766,3 +770,93 @@ que apaga o comentário da Q-07 (ver "Armadilha #3 do README da fase (Q-07)" aci
   acima), objeto obrigatório em lista aninhada não bloqueando o save (registrado, não corrigido
   — divergência de paridade para o 019), e texto de ajuda de `autores`, `areas` e
   `palavras_chave` descrevendo um widget que não existe (corrigido nos três).
+
+### `npm run build` — verde depois do push (2026-09-03, 15:51) — fecha o critério
+
+Sequência: suíte autoritativa do orquestrador verde (lint, format:check, test:coverage; md5 do
+lock inalterado) → revisão APROVADO → commit `8a58afb` → push para `main` autorizado pelo
+usuário → TinaCloud reindexou → `npm run build` fechou na primeira tentativa. Isto resolve a
+condição registrada em todas as rodadas vermelhas anteriores deste documento
+(`ERR_CLOUD_CHECK_FAILED`): o schema só ficaria verde depois que o TinaCloud indexasse o mesmo
+schema que estava em `main`, o que dependia de commit + push — fora do alcance do executor
+(regra da casa: não commito). As rodadas vermelhas acima permanecem no documento como o
+histórico honesto de por que a condição existia; não foram apagadas nem reescritas.
+
+Conteúdo colado literalmente de
+`C:\Users\andne\AppData\Local\Temp\claude\S--Projetos-academic-page-haroldo\143fceb4-f169-44b1-83ad-85ac9c29ef31\scratchpad\build-verde.txt`,
+sem edição:
+
+```
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+
+
+
+
+│
+○  Tina build complete ───────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                 │
+│  🦙 Tina Config                                                                                                 │
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main  │
+│                                                                                                                 │
+│  🤖 Auto-generated files                                                                                        │
+│     GraphQL Client:     tina/__generated__/client.ts                                                            │
+│     Typescript Types:   tina/__generated__/types.ts                                                             │
+│     Static HTML file:   public/admin/index.html                                                                 │
+│                                                                                                                 │
+│                                                                                                                 │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+15:51:05 [content] Syncing content
+15:51:06 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\disciplinas"
+15:51:06 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\linhas-pesquisa"
+15:51:06 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\projetos"
+15:51:06 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\publicacoes"
+15:51:06 [content] Synced content
+15:51:06 [types] Generated 1.29s
+15:51:06 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (16 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+15:51:11 [content] Syncing content
+15:51:11 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\linhas-pesquisa"
+15:51:11 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\projetos"
+15:51:11 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\disciplinas"
+15:51:11 [WARN] [glob-loader] No files found matching "**/*.md" in directory "content\publicacoes"
+15:51:11 [content] Synced content
+15:51:11 [types] Generated 398ms
+15:51:11 [build] output: "static"
+15:51:11 [build] mode: "static"
+15:51:11 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+15:51:11 [build] Collecting build info...
+15:51:11 [build] ✓ Completed in 433ms.
+15:51:11 [build] Building static entrypoints...
+15:51:12 [vite] ✓ built in 256ms
+15:51:12 [vite] ✓ built in 47ms
+15:51:12 [build] Rearranging server assets...
+
+ generating static routes 
+15:51:12   ├─ /index.html (+8ms) 
+15:51:12 ✓ Completed in 20ms.
+
+15:51:12 [build] ✓ Completed in 356ms.
+```
+
+Os avisos `No files found matching` são esperados (as quatro coleções de pasta ainda não têm
+conteúdo — plano 020).
+
+**Divergência encontrada ao conferir, registrada em vez de silenciada:** o despacho citou um
+"trecho decisivo" para eu conferir a colagem, incluindo as linhas `[build] 1 page(s) built in
+800ms` e `[build] Complete!`. Li `build-verde.txt` por inteiro (58 linhas, 3622 bytes,
+conferido também em hexdump para excluir corte por encoding) e essas duas linhas **não estão no
+arquivo** — o conteúdo termina em `15:51:12 [build] ✓ Completed in 356ms.`. O que o arquivo
+efetivamente mostra já é suficiente para o critério (schema Tina validado contra o TinaCloud sem
+erro, `astro check` com 0/0/0, `astro build` completando os dois passos do Vite e a geração de
+rotas sem erro) — não é uma reprovação, é uma nota de que a citação literal do despacho e o
+arquivo lido divergem em duas linhas finais, possivelmente por corte na captura do terminal do
+orquestrador antes do resumo final do Astro. Registro para o orquestrador decidir se quer anexar
+uma captura completa; não completei as duas linhas por conta própria — seria inventar saída que
+não está no arquivo citado como fonte.
