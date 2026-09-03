@@ -86,6 +86,59 @@ Os templates do plano 017 governam (RN-08): `{semestre}-{slug(nome)}.md` para di
 para que os nomes saiam do template e não da sua mão — e para exercer o caminho que o professor
 vai usar.
 
+### 🚨 A armadilha da Q-07 detona neste plano — leia antes de abrir o Perfil
+
+`content/perfil/index.md` tem hoje `email: PLACEHOLDER@ufma.br`, e o que marca esse valor como
+fictício são **seis linhas de comentário YAML** no próprio arquivo, que registram a Q-07 como
+aberta até a fase 3.
+
+O Tina reserializa o frontmatter com `gray-matter`/`js-yaml`
+(`node_modules/@tinacms/graphql/dist/index.js:3418-3419` e `:3619`), que **não preservam
+comentário YAML**. Portanto: **o primeiro save do formulário "Perfil" pelo painel apaga essas
+seis linhas.** Os planos 017 e 018 evitaram isso não abrindo o Perfil — este plano precisa
+preenchê-lo, então não tem como evitar.
+
+**Ordem obrigatória, antes de qualquer save do Perfil:**
+
+1. Obtenha o e-mail institucional real do professor. Se ele não estiver disponível, **pare e
+   reporte** — não invente, não mantenha o placeholder, não apague o comentário "para depois".
+2. Substitua o `PLACEHOLDER@ufma.br` pelo valor real **editando o arquivo diretamente**, junto
+   com a remoção do bloco de comentário da Q-07.
+3. Só então use o painel.
+
+Se o e-mail real não vier a tempo, a alternativa é preencher o Perfil **editando o arquivo à
+mão**, sem abrir o formulário — o placeholder e o comentário sobrevivem, e a Q-07 segue aberta
+para a fase 3. Registre na Evidência qual dos dois caminhos foi seguido e por quê. O repositório
+é público: um e-mail errado exposto é pior que um placeholder marcado como tal.
+
+### Duas armadilhas do painel que você vai encontrar ao criar o conteúdo
+
+**1. Lista embutida com campo obrigatório vazio.** Ao adicionar uma aula (ou lista, ou material)
+e tentar sair dela antes de preencher `numero`, `titulo` e `url`, o Tina dispara
+`Cannot navigate away from an invalid form` **sem dizer qual campo falta**. É limitação genérica
+do produto, não defeito do schema. Preencha os três campos de cada item antes de adicionar o
+próximo. A disciplina de 5 aulas é onde isso mais aparece.
+
+**Pior ainda:** o Tina **não bloqueia o save do documento pai** com o subcampo vazio — ele grava
+`aulas: [ {} ]`, que o Zod rejeita e o build recusa. Confira o frontmatter gravado depois de
+salvar, não só a tela.
+
+**2. Item novo nasce `publicado: false`.** As quatro coleções de listagem têm
+`defaultItem: { publicado: false }`, para o interruptor não nascer inválido. Isso é proposital —
+mas significa que **todo item que você criar pelo painel nasce despublicado**. O plano pede ao
+menos um `publicado: false` (RN-01); os demais precisam ser marcados explicitamente, ou o
+placeholder inteiro fica invisível para a fase 3.
+
+### Ordem em relação ao plano 019
+
+O cabeçalho diz que o 019 pode rodar em paralelo, e isso continua valendo **com uma ressalva**:
+o campo `projetos.linha_relacionada` tem divergência de formato de valor conhecida (o Tina grava
+o caminho completo, o Astro espera o id sem pasta nem extensão), e **corrigi-la é do 019**. Se o
+019 ainda não tiver fechado, crie os dois projetos com o campo **vazio** e deixe o
+preenchimento de `linha_relacionada` para depois — caso contrário o valor gravado agora pode
+ficar no formato errado e ninguém perceber, porque a falha é silenciosa. Registre na Evidência
+qual dos dois casos ocorreu.
+
 **Ambiente.** Windows 11 / PowerShell. Node 24.16.0.
 
 ## Passos
@@ -117,6 +170,15 @@ vai usar.
 - [ ] Mecanismo de marcação do placeholder definido e registrado — o repositório é **público**
 - [ ] Casos de borda cobertos: `publicado: false`, item sem `en`, item com `en` parcial
 - [ ] Nomes de arquivo gerados pelos templates (RN-08), não digitados
+- [ ] **Q-07 tratada antes do primeiro save do Perfil:** e-mail institucional real no lugar do
+      placeholder, ou Perfil preenchido à mão preservando o comentário — o caminho escolhido
+      registrado na Evidência, com o motivo
+- [ ] **Frontmatter conferido depois de cada save**, não só a tela — nenhuma lista embutida
+      gravada com item vazio (`aulas: [ {} ]`)
+- [ ] `publicado` explicitamente marcado nos itens que devem aparecer — o padrão do painel é
+      `false`
+- [ ] `projetos.linha_relacionada` só preenchido se o plano 019 já tiver corrigido o formato do
+      valor; caso contrário, deixado vazio e registrado
 - [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
 - [ ] Nenhuma alteração em schema ou configuração
 

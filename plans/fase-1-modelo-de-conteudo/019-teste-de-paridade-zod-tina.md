@@ -77,6 +77,81 @@ que este teste compare duas leituras da mesma fonte. É esperado que ele **encon
 reais** na primeira execução. Corrija-as aqui — este é o plano que tem autoridade para tocar os
 dois arquivos — e **liste cada uma na Evidência**, porque elas são a prova de que o teste serve.
 
+#### As duas divergências reais que os planos 017 e 018 já acharam — e que continuam abertas
+
+Nenhuma das duas é pega por comparação de nome/tipo/obrigatoriedade. Elas são o motivo de este
+plano existir, e o teste que não as detectar não está pronto.
+
+**1. Formato do valor de `projetos.linha_relacionada` (campo `reference`).** O Tina grava como
+valor o id completo do documento — caminho com pasta e extensão; o `glob()` loader do Astro
+gera id sem pasta e sem extensão:
+
+- **Tina grava:** `"content/linhas-pesquisa/minha-linha.md"`
+- **Astro/Zod espera:** `"minha-linha"`
+
+Fontes: `node_modules/@tinacms/graphql/dist/index.js:4931` (`id: fullPath`) e
+`node_modules/astro/dist/content/runtime.js:508-534`. O `reference()` do Astro **não valida
+existência** — aceita a string sintaticamente e `getEntry()` devolve `undefined` em runtime.
+Confirmado no painel: um projeto salvo apontando para uma linha de pesquisa gravou o caminho
+completo. **Falha silenciosa** — não aparece em `npm run build` nem em `npm run test`, e vai
+morder na fase 3. Existe um `// NOTE:` junto ao campo em `tina/config.ts`; remova-o ao corrigir.
+
+**Consequência para o teste:** ele precisa de asserção sobre o **formato do valor** de campo
+`reference`, não só sobre a forma do schema.
+
+**2. Subcampo obrigatório de lista embutida não bloqueia o save do documento pai.** Uma `aula`
+adicionada sem `numero`, `titulo` nem `url` — os três `required: true` no objeto `aulas[]` —
+foi salva pelo painel como `aulas: [ {} ]`. O Zod rejeita esse frontmatter (nenhum dos três é
+opcional): o professor levaria um build quebrado sem saber diagnosticar (F-09, RNF-09). É o
+risco R-01 do PRD acontecendo em miniatura.
+
+Não há mudança de schema do lado do Tina que resolva isso sem validação customizada. **Decida
+aqui** o que fazer — validação customizada no Tina, afrouxamento do Zod, ou aceitar e registrar
+— e justifique. Se a decisão for aceitar, ela precisa entrar como consequência conhecida para a
+fase 2 (mensagem de erro de build) e para o manual do professor na fase 5.
+
+#### Três armadilhas de falso positivo — o teste ingênuo reprova sem haver bug
+
+**1. Identificador interno da coleção.** O Tina exige `name` alfanumérico/underscore, então a
+coleção é `name: 'linhas_pesquisa'`; a chave do Zod em `collections` é `'linhas-pesquisa'`, com
+hífen, que também é o nome da pasta. **A pasta em disco é a mesma dos dois lados** — só o
+identificador GraphQL interno diverge. Comparar por igualdade de string reprova aqui sem haver
+defeito; normalize antes de comparar.
+
+**2. Restrições finas do Zod que o Tina não replica — intencional, é o próprio D-06.** O Zod é
+o portão; o Tina é a interface de entrada. Não têm equivalente no Tina, de propósito:
+`publicacoes.ano` (faixa 1900–2100), `publicacoes.autores` (mínimo 1 item), `perfil.email`
+(`z.email()`) e **todos** os campos `z.url()` (`links.*`, `cv_url`, `pdf_url`, `aulas[].url`,
+`listas[].url`, `materiais[].url`, `links[].url` de disciplinas). O Tina não tem tipo nativo de
+URL nem validação de faixa numérica sem função customizada. **Não trate como lacuna de
+paridade.**
+
+**3. O grupo `en` (plano 018) tem forma própria.** Nos dois lados ele é opcional, e **cada campo
+dentro dele também**; no Zod cada grupo é `.strict()` (seis ao todo, contando o
+`formacaoEnSchema` aninhado), e no Tina nenhum subcampo de `en` é `required`. Um teste que exija
+simetria de `required` entre os lados precisa saber que dentro de `en` a resposta correta é
+"nenhum obrigatório dos dois lados". O `en` é sempre o **último** campo da coleção no Tina.
+Campos por coleção: `perfil` (cargo, instituicao, departamento, bio, resumo_home,
+formacao[{grau, curso}], areas[]) · `linhas-pesquisa` (titulo, resumo, corpo) · `projetos`
+(titulo, descricao) · `disciplinas` (nome, descricao, ementa) · `publicacoes` (**só** resumo).
+
+### Fatos de ambiente que este plano precisa saber
+
+- **Zod é o 4.5.4**, importado de `astro/zod`. Os internos mudaram em relação ao Zod 3 — se a
+  abordagem for introspecção, é aqui que ela pode quebrar num upgrade, e essa é a limitação a
+  declarar na Evidência.
+- **O CI já roda o teste.** `.github/workflows/ci.yml` executa `npm run lint`,
+  `npm run format:check`, `npm run test:coverage` e `npm run build`. O item de aceitação "o teste
+  roda no CI" se comprova colando essas linhas — não é preciso alterar o workflow, só confirmar.
+- **A cobertura reprova**: `vitest.config.ts` tem `thresholds` em 80% e cobre
+  `src/lib/**`, `src/i18n/**` e `src/content.config.ts`.
+- **Se este plano mudar o schema** (e ele tem autoridade para isso), duas consequências herdadas
+  valem: `tina/tina-lock.json` precisa ser regenerado — e **só `tinacms dev` o regenera,
+  `tinacms build --skip-cloud-checks` não** —, e `npm run build` vai reprovar com
+  `ERR_CLOUD_CHECK_FAILED` até o commit subir. A ordem de fechamento é revisão → commit → push →
+  build verde → `Status: DONE`. O executor não faz commit nem push; quem fecha nessa ordem é o
+  orquestrador.
+
 **Ambiente.** Windows 11 / PowerShell. Node 24.16.0.
 
 ## Passos
@@ -99,6 +174,12 @@ dois arquivos — e **liste cada uma na Evidência**, porque elas são a prova d
 - [ ] **Falsificabilidade provada** nos **dois** sentidos: campo só no Tina e campo só no Zod,
       cada um fazendo o teste falhar
 - [ ] Divergências encontradas na primeira execução listadas e corrigidas
+- [ ] **As duas divergências herdadas tratadas explicitamente:** o formato do valor de
+      `projetos.linha_relacionada` (corrigido, com o `// NOTE:` de `tina/config.ts` removido) e o
+      subcampo obrigatório de lista embutida que não bloqueia o save (decidido e justificado,
+      ainda que a decisão seja aceitar e registrar)
+- [ ] **Nenhum dos três falsos positivos tratado como bug:** `linhas_pesquisa` × `'linhas-pesquisa'`,
+      restrições finas do Zod sem equivalente no Tina, e a assimetria esperada dentro do grupo `en`
 - [ ] O teste roda no CI
 - [ ] Abordagem de comparação justificada, com a limitação assumida escrita
 - [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes

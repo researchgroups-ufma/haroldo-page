@@ -22,6 +22,17 @@ propósito. O PRD explica por quê — o maior risco do projeto é o ciclo de pu
 layout, e é preferível descobrir que ele não fecha com conteúdo placeholder do que com o site
 inteiro pronto. As dependências reais estão na tabela do §6.2.
 
+**Decisão do stakeholder em 2026-09-03 — quando fatiar a fase 2.** A fase 2 só será planejada
+**depois** de a fase 1 fechar integralmente (planos 019, 020 e 021 DONE), para que o fatiamento
+já incorpore os problemas que a fase 1 descobriu e que só podem ser resolvidos na 2. A lista
+desses itens é montada pelo plano 021, no README da fase 1 — o fatiamento começa lendo ela, não
+do zero. Consequência aceita: nenhum plano da fase 2 existe enquanto isso, e a pasta
+`fase-2-pipeline-de-publicacao/` fica vazia de propósito.
+
+Vale notar, para quem for retomar: **a fase 3 depende formalmente só da fase 1**, não da 2 (ver a
+coluna de dependências do §6.2). Antecipá-la é possível; o custo seria construir o site sem a
+garantia de que o ciclo de publicação fecha. Não foi o caminho escolhido.
+
 ## Convenções
 
 **Numeração é global e contínua**, não reinicia a cada fase. O plano 019 é o próximo, esteja em
