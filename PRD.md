@@ -12,9 +12,9 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.9 |
+| **Versão do PRD** | v0.1.10 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015, 016 e 017 DONE; 018–021 pendentes) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
+| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–018 DONE; 019–021 pendentes) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -36,6 +36,7 @@
 | v0.1.7 | 2026-09-01 | Desenvolvedor | Campo **Versão do PRD** em §0 corrigido — dizia `v0.1` desde a v0.1.1, divergindo do próprio histórico. A meta de cobertura da §11 passou de relatada a **imposta** (`thresholds` no Vitest, rodando no CI) |
 | v0.1.8 | 2026-09-01 | Desenvolvedor | **Status** passa de `🟡 Rascunho` a `🟢 Aprovado` — o documento guia a implementação desde a fase 0. Acrescentada a linha **Estado da implementação** em §0, para que o topo do PRD responda "onde estamos" sem precisar descer até a §12 |
 | v0.1.9 | 2026-09-03 | Desenvolvedor | **Fase 1 em andamento:** planos 015 (TinaCMS e `/admin` local), 016 (schemas Zod) e 017 (as cinco coleções no `tina/config.ts`) DONE. §12 passa de 0/9 a 4/9 — o item do `src/content.config.ts` estava por marcar desde o fechamento do 016. O 017 fechou a decisão que o 016 deixou aberta (`corpo`/`ementa`/`resumo` seguem em frontmatter, por incompatibilidade do `rich-text` do Tina com `z.string()`) e registrou duas divergências de paridade Zod × Tina como insumo do plano 019 |
+| v0.1.10 | 2026-09-03 | Desenvolvedor | **Plano 018 DONE:** grupo "Versão em inglês (opcional)" nas cinco coleções traduzíveis (RN-06), em paridade entre `src/content.config.ts` e `tina/config.ts` (`6e5cb1f`). §12 passa de 4/9 a 5/9. `publicacoes` traduz só `resumo` (RN-07); duas decisões que o PRD não fechava ficaram registradas: `projetos` traduz `titulo`/`descricao`, `perfil.formacao[]` traduz `grau`/`curso` |
 
 ---
 
@@ -740,7 +741,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase | Itens concluídos | Status |
 |---|---|---|
 | Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
-| Fase 1 — Modelo de conteúdo | 4/9 | 🟡 Em andamento |
+| Fase 1 — Modelo de conteúdo | 5/9 | 🟡 Em andamento |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
 | Fase 3 — Site público (PT) | 0/11 | ⬜ Não iniciada |
 | Fase 4 — Internacionalização | 0/8 | ⬜ Não iniciada |
@@ -764,7 +765,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] `src/content.config.ts` com schemas Zod das 5 coleções (§7.3) — plano 016 (`462ffb4`)
 - [x] `tina/config.ts` com as 5 coleções, rótulos em português e textos de ajuda — plano 017 (`8a58afb`); vocabulário acadêmico verificado no painel (RF-03), ajuda em todo campo não óbvio
 - [x] Campo `publicado` em todas as coleções de listagem (RN-01) — plano 017; ausente em `perfil`, que é singleton. `defaultItem: { publicado: false }` para o item novo não nascer inválido
-- [ ] Grupo "Versão em inglês (opcional)" nas coleções traduzíveis (RN-06)
+- [x] Grupo "Versão em inglês (opcional)" nas coleções traduzíveis (RN-06) — plano 018 (`6e5cb1f`); grupo `en` opcional nas cinco coleções, em paridade entre `src/content.config.ts` e `tina/config.ts`; `publicacoes` traduz só `resumo` (RN-07); decisões de `projetos` (`titulo`/`descricao`) e de `perfil.formacao[]` (`grau`/`curso`) registradas na Evidência do plano
 - [x] Templates de nome de arquivo configurados (RN-08) — plano 017; `{semestre}-{slug(nome)}.md` e `{ano}-{slug(titulo)}.md` conforme o PRD, `{slug(titulo)}.md` para `linhas-pesquisa` e `projetos`, que o PRD não prescreve. Verificado criando um item de cada coleção pelo painel
 - [ ] Teste de paridade de schema passando (D-06)
 - [ ] Conteúdo placeholder representativo: 1 perfil, 2 linhas, 2 projetos, 2 disciplinas (uma com 5 aulas), 6 publicações em 3 anos

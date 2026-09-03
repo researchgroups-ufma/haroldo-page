@@ -17,20 +17,26 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 015 | Instalação do TinaCMS e `/admin` no ar localmente | ✅ DONE | implementer | `1d35c11`, `30ab365`, `475f65f` |
 | 016 | Schemas Zod das cinco coleções | ✅ DONE | implementer | `462ffb4` |
 | 017 | As cinco coleções no `tina/config.ts` | ✅ DONE | implementer | `8a58afb` |
-| 018 | Grupo "Versão em inglês (opcional)" | ⬜ TODO | implementer | — |
+| 018 | Grupo "Versão em inglês (opcional)" | ✅ DONE | implementer | `6e5cb1f` |
 | 019 | Teste de paridade Zod × Tina (D-06) | ⬜ TODO | implementer | — |
 | 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 018 — Grupo "Versão em inglês (opcional)".
+**Próximo:** plano 019 — Teste de paridade Zod × Tina (D-06).
 
-**O que o 015 descobriu** (leia antes do 018): Tina + Astro 7 funciona, mas cobrou cinco
+**O que o 015 descobriu** (leia antes do 019): Tina + Astro 7 funciona, mas cobrou cinco
 correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herdou:
 
-1. **`tina/tina-lock.json` é versionado** — cumprida. O lock foi regenerado e commitado no 017;
-   coerência verificada pelo revisor recompilando o config com esbuild (`IDENTICAL: true`, md5
-   `920af9a27ca48e3d97c044eb599b8e07`). **Continua valendo para o 018**, que também mexe no
-   schema.
+1. **`tina/tina-lock.json` é versionado** — cumprida no 017 e de novo no 018. No 017, o lock foi
+   regenerado e commitado; coerência verificada pelo revisor recompilando o config com esbuild
+   (`IDENTICAL: true`, md5 `920af9a27ca48e3d97c044eb599b8e07`). No 018, o orquestrador regenerou o
+   lock rodando `tinacms dev`; a coerência foi verificada comparando o lock do HEAD com o do
+   working tree: acrescenta 18 tipos GraphQL, todos do grupo `en` (`PerfilEnFormacao`, `PerfilEn`,
+   `Linhas_pesquisaEn`, `ProjetosEn`, `DisciplinasEn`, `PublicacoesEn` e os
+   `*Filter`/`*Mutation` correspondentes), remove zero tipos e mantém os campos em português
+   byte-idênticos. Detalhe operacional descoberto no 018: `tinacms build --skip-cloud-checks`
+   **não** reescreve o lock — só `tinacms dev` o gera. **Continua valendo para qualquer plano
+   futuro** que mude o schema.
 2. **Gitignorar não esconde do ESLint.** Todo diretório gerado precisa entrar nas três listas:
    `.gitignore`, `eslint.config.js` e — quando não for gitignorado — `.prettierignore`. O 017
    não criou diretório gerado novo, então não a exercitou; **a regra continua valendo** para
@@ -42,6 +48,9 @@ correções depois de uma revisão que já havia aprovado. Três armadilhas que 
    **Risco operacional ativo:** qualquer save real do formulário "Perfil" apaga as seis linhas de
    comentário que registram Q-07 como aberta até a fase 3. Quem for tocar nisso precisa
    substituir o e-mail placeholder por um institucional real **antes** do primeiro save.
+   **Continua ativa após o 018:** na verificação de painel do 018 (coleção "Linhas de pesquisa"),
+   o formulário "Perfil" não foi aberto nem salvo, de propósito — o risco segue intacto para o
+   020 e a fase 3.
 
 **O que o 016 deixou aberto e o 017 fechou:** `corpo` (linhas-pesquisa), `ementa` (disciplinas) e
 `resumo` (publicações) seguem como `string` + `textarea` (frontmatter), **não** como body Markdown,
@@ -63,6 +72,21 @@ fase 3, não do 017.
   baseada em `fields`. O 017 usa deliberadamente — upgrade futuro pode removê-lo.
 - **Limitação genérica do Tina:** com campo obrigatório vazio, adicionar item dispara erro sem
   dizer qual campo falta.
+
+**O que o 018 deixa para o 019 e a fase 4:**
+
+- Os seis grupos `en` (as cinco coleções mais `formacaoEnSchema`, sub-schema de `formacao[]` em
+  `perfil`) são `.strict()` no Zod, e cada um tem teste de rejeição de campo factual próprio,
+  provado falsificável. As duas divergências de paridade que o 017 deixou — formato do valor de
+  `linha_relacionada` e subcampo obrigatório de lista embutida que não bloqueia o save —
+  continuam abertas; o 018 não as tocou.
+- **Para a fase 4:** a função de fallback por campo (RN-06) não foi implementada, de propósito.
+  `en.formacao[]` e `en.areas[]` do perfil são listas paralelas às listas em português, alinhadas
+  por índice, não por identificador — reordenar a lista em português desalinha a tradução
+  correspondente, e não há mecanismo de realinhamento.
+- **Duas decisões que o PRD não fechava, agora fechadas pelo 018:** `projetos` traduz só `titulo`
+  e `descricao` (os demais campos são factuais, RN-07); `perfil.formacao[]` traduz `grau` e
+  `curso`, que juntos formam o "título" que a §7.3 menciona sem nomear o campo.
 
 ## Grafo de dependências
 
@@ -101,7 +125,8 @@ um jeito trivial de encontrar e apagar. Pela mesma razão, `publicado: false` es
 
 **5. `publicacoes` não traduz título nem autores** (RN-07). É a armadilha mais provável do 018:
 título de artigo é dado factual e traduzi-lo produziria duas citações divergentes do mesmo
-trabalho.
+trabalho. **Não se materializou:** o grupo `en` de `publicacoes` implementado no 018 tem só
+`resumo`, confirmado pela revisão contra a §7.3.
 
 ## Herdado da fase 0
 
@@ -142,3 +167,7 @@ revisão APROVADO → commit → push → TinaCloud reindexa → npm run build v
 No 017 o build fechou na primeira tentativa logo após o push. Planeje o fechamento assim: o
 critério do `npm run build` fica desmarcado até o push, com o bloqueio registrado — nunca
 reescrito para caber no resultado.
+
+O 018 confirmou o mesmo padrão: `ERR_CLOUD_CHECK_FAILED` com `Reason: [NON_BREAKING - TYPE_ADDED]
+Type 'PerfilEnFormacao' was added` enquanto o commit não tinha subido, e `npm run build` fechou
+verde depois do push de `6e5cb1f`.

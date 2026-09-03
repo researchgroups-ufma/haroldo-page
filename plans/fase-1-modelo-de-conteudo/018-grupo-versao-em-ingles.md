@@ -1,6 +1,7 @@
 # Plano 018 — Grupo "Versão em inglês (opcional)" nas coleções traduzíveis
 
-**Status:** TODO
+**Status:** DONE
+**Commit:** `6e5cb1f`
 **RFs cobertos:** fase 1, item "Grupo 'Versão em inglês (opcional)'"; D-03; RN-06, RN-07, RN-09
 **Depende de:** planos 016 (Zod) e 017 (Tina)
 **Modelo recomendado:** sonnet
@@ -93,7 +94,7 @@ consegue comparar se este plano tratar os dois lados igual. Se você acrescentar
 - [x] **Um arquivo por item** — nenhuma pasta `en/`, nenhum item espelhado (D-03)
 - [x] Função de fallback **não** implementada — é fase 4
 - [x] Testes cobrindo grupo ausente, parcial e campo factual recusado, provados falsificáveis
-- [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
+- [x] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
 
 ## Evidência
 
@@ -503,3 +504,100 @@ espelhado).
   acima). Caixa deixada vazia, não reescrita para caber no resultado.
 - **`Status:` continua `TODO`** — a promoção para `DONE` é do orquestrador, depois de verificação
   independente e nova revisão aprovada.
+
+*(Nota de fechamento: a pendência acima — `npm run build` bloqueado e `Status: TODO` — descreve o
+estado no momento em que a revisão do segundo ciclo foi aprovada. O commit e o push que a resolvem
+estão registrados na seção seguinte.)*
+
+## Fechamento — ordem com o TinaCloud
+
+Revisão APROVADA no segundo ciclo → commit `6e5cb1f` (`plano 018: grupo "Versao em ingles" nas
+cinco colecoes`, RF-14, RN-07, RN-09, D-03), feito e empurrado para `origin/main` pelo orquestrador
+→ TinaCloud reindexou o schema em `main` → `npm run build` passou a fechar verde. Isso encerra, para
+este plano, a armadilha herdada nº 2 do README da fase: o `tinacms build` compara o schema local
+com o que o TinaCloud indexou em `main`, e reprova com `ERR_CLOUD_CHECK_FAILED` enquanto o commit
+não sobe — a ordem correta é **revisão → commit → push → build**, nunca a inversa. Antes do push
+(evidência já registrada acima), o mesmo comando reprovava com:
+
+```
+Reason: [NON_BREAKING - TYPE_ADDED] Type 'PerfilEnFormacao' was added
+errorCode: 'ERR_CLOUD_CHECK_FAILED'
+```
+
+`npm run build`, rodado nesta sessão depois do push do commit `6e5cb1f`:
+
+```
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+
+
+○  Tina build complete ───────────────────────────────────────────────────────────────────────────────────────────╮
+│
+│  🦙 Tina Config
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main
+│
+│  🤖 Auto-generated files
+│     GraphQL Client:     tina/__generated__/client.ts
+│     Typescript Types:   tina/__generated__/types.ts
+│     Static HTML file:   public/admin/index.html
+│
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+[content] Syncing content
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\projetos"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\publicacoes"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\linhas-pesquisa"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\disciplinas"
+[content] Synced content
+[types] Generated 428ms
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (16 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+[content] Syncing content
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\linhas-pesquisa"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\projetos"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\disciplinas"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\publicacoes"
+[content] Synced content
+[types] Generated 408ms
+[build] output: "static"
+[build] mode: "static"
+[build] directory: S:\Projetos\academic_page\haroldo\dist\
+[build] Collecting build info...
+[build] ✓ Completed in 441ms.
+[build] Building static entrypoints...
+[vite] ✓ built in 174ms
+[vite] ✓ built in 43ms
+[build] Rearranging server assets...
+ generating static routes
+  ├─ /index.html (+9ms)
+✓ Completed in 20ms.
+[build] ✓ Completed in 268ms.
+[build] 1 page(s) built in 719ms
+[build] Complete!
+```
+
+Exit 0. `tinacms build` fechou sem cair em `ERR_CLOUD_CHECK_FAILED`, `astro check` com 0
+erros/0 warnings/0 hints, `astro build` completou. `git status --porcelain` depois do build:
+working tree limpo (só os artefatos gitignorados de sempre — `tina/__generated__`, `dist/`,
+`public/admin` — ficaram no disco, fora do diff).
+
+### Execução autoritativa independente desta rodada (atribuída a ela, não ao executor)
+
+- `npm run lint` → verde, exit 0.
+- `npm run format:check` → `All matched files use Prettier code style!`, exit 0.
+- `npm run test` → `Test Files 3 passed (3)` / `Tests 81 passed (81)`, exit 0.
+- `npm run test:coverage` → 81/81 verdes; cobertura 100% de statements (27/27), branches (2/2),
+  funcs (1/1) e lines (27/27) — acima do threshold de 80% imposto pelo `vitest.config.ts`.
+- `astro check` → 0 erros, 0 warnings, 0 hints.
+- `astro build` → verde.
+
+Com essa execução autoritativa e o `npm run build` verde (acima), a última caixa de aceitação —
+"`npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes" — está marcada.
+Todas as dez caixas de aceitação deste plano estão marcadas, cada uma com prova correspondente
+nesta Evidência (implementação + testes de schema para as nove primeiras; comandos de qualidade e
+o build pós-push para a última).
