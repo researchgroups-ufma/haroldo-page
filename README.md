@@ -142,6 +142,16 @@ O painel é só por formulários — sem edição visual/contextual (D-02), que 
 e `public/admin/` são artefatos derivados dele, gerados por `tinacms dev`/`tinacms build` e
 fora do versionamento (ver `.gitignore`) — `npm run build` os regenera antes do `astro build`.
 
+**`tina/tina-lock.json` é a exceção — o único artefato do Tina que fica versionado.**
+Diferente dos dois acima, ele precisa estar em `main` para o TinaCloud indexar a branch; sem
+ele, o painel de administração do TinaCloud mostra "No Tina config was found on main" mesmo
+com o `tina/config.ts` presente e legível no repositório — foi exatamente o que travou este
+projeto até o arquivo ser versionado. Ele também não é gerado por `tinacms build` (que roda
+no `npm run build`) — só por `tinacms dev`. Na prática: quem mudar o schema em
+`tina/config.ts` precisa subir `npm run dev` uma vez (mesmo que só para deixá-lo indexar e
+derrubar em seguida) e commitar o `tina/tina-lock.json` atualizado junto com a mudança de
+schema.
+
 ## Deploy
 
 Hoje o deploy é **manual**:

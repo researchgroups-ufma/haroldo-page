@@ -27,6 +27,10 @@ export default defineConfig([
       // `tina/__generated__/types.ts` (com `@ts-nocheck` e `any` do próprio Tina) reprova
       // `npm run lint` sempre que alguém roda `tinacms dev`/`tinacms build` localmente.
       'tina/__generated__/**',
+      // Mesmo raciocínio, para o bundle de produção do painel (`tinacms build`): gitignorado,
+      // mas o ESLint não herda o gitignore. É JS minificado de terceiros (React, mermaid,
+      // codemirror etc. empacotados pelo Tina) — nunca é código deste projeto para lintar.
+      'public/admin/**',
     ],
   },
   eslint.configs.recommended,

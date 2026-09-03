@@ -40,13 +40,9 @@ coverage/
 # produziria o arquivo errado dependendo de quem rodou por último.
 #
 # `tina/tina-lock.json` NÃO entra aqui (revisto em 2026-09-02) — é o único dos
-# três que o TinaCloud precisa encontrar em `main` para indexar a branch. Sem
-# ele versionado, o TinaCloud nunca sai de "No Tina config was found on main"
-# mesmo com `tina/config.ts` publicamente legível no repositório. Fonte:
-# https://tina.io/docs/tinacloud/troubleshooting — "Ensure tina/tina-lock.json
-# exists and is committed to your repository. This is the most common cause
-# of branches not being indexed." Também não é gerado por `tinacms build`, só
-# por `tinacms dev` — ver README.
+# três que fica versionado. Motivo e implicação (é gerado por `tinacms dev`,
+# não por `tinacms build`) estão no README, seção "Painel de edição". Fonte da
+# exigência do TinaCloud: https://tina.io/docs/tinacloud/troubleshooting.
 tina/__generated__/
 public/admin/
 
