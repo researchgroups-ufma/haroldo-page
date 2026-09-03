@@ -15,14 +15,14 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | Plano | Título | Status | Agente | Commits |
 |---|---|---|---|---|
 | 015 | Instalação do TinaCMS e `/admin` no ar localmente | ✅ DONE | implementer | `1d35c11`, `30ab365`, `475f65f` |
-| 016 | Schemas Zod das cinco coleções | ⬜ TODO | implementer | — |
+| 016 | Schemas Zod das cinco coleções | ✅ DONE | implementer | `462ffb4` |
 | 017 | As cinco coleções no `tina/config.ts` | ⬜ TODO | implementer | — |
 | 018 | Grupo "Versão em inglês (opcional)" | ⬜ TODO | implementer | — |
 | 019 | Teste de paridade Zod × Tina (D-06) | ⬜ TODO | implementer | — |
 | 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 017 — as cinco coleções no `tina/config.ts`. O 016 está em revisão.
+**Próximo:** plano 017 — as cinco coleções no `tina/config.ts`.
 
 **O que o 015 descobriu** (leia antes do 017): Tina + Astro 7 funciona, mas cobrou cinco
 correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herda:
@@ -37,6 +37,13 @@ correções depois de uma revisão que já havia aprovado. Três armadilhas que 
 3. **`email: PLACEHOLDER@ufma.br`** em `content/perfil/index.md` é marcado só por comentário,
    não por mecanismo. Quando o 017 puser `email` no schema do Tina, o painel passa a poder
    reserializar o arquivo e o comentário some. Q-07 segue aberta até a fase 3.
+
+**O que o 016 deixa para o 017 decidir:** `corpo` (linhas-pesquisa), `ementa` (disciplinas) e
+`resumo` (publicações) estão em **frontmatter** no schema Zod, por consistência com `bio` — mas
+só `bio` tem razão técnica para isso (é o único obrigatório e o único que a §7.3 rotula como
+"corpo do arquivo"). Os três são opcionais e poderiam ser o corpo Markdown via `render()`. A
+decisão está deliberadamente em aberto: o 017 confirma ou migra, e a fase 3 é quem sabe como
+esse texto longo será renderizado. **Não herde por inércia.**
 
 ## Grafo de dependências
 
