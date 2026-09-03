@@ -27,6 +27,9 @@ O TinaCMS está instalado, `tina/config.ts` existe com **uma** coleção (`perfi
   achado na Evidência)
 - `.prettierignore` — **escopo ampliado pelo orquestrador em 2026-09-02**: `content/` entra
   na lista, porque quem grava o formato ali é o TinaCMS, não o Prettier (ver Evidência)
+- `eslint.config.js` — **escopo ampliado pelo orquestrador em 2026-09-02 (ciclo de
+  correção)**: `tina/__generated__/**` entra no `ignores` — gitignorar não esconde do
+  ESLint, e o `main` já empurrado (`1d35c11`) estava vermelho por causa disso (ver Evidência)
 
 > Não toque em `src/content.config.ts` (é o plano 016) nem em `astro.config.mjs` além do que a
 > integração do Tina exigir. Se precisar de mais, pare e reporte.
@@ -109,16 +112,21 @@ Node 24.16.0.
       `git diff`; ver "Verificação objetiva (passo 6)" na Evidência para o motivo)
 - [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes —
       **bloqueado, mas só resta o `build`**: `lint`, `format:check` e `test` estão verdes
-      (o `format:check` fechou depois que `content/` entrou no `.prettierignore` — ver
-      "Decisão: `content/` fora do escopo do Prettier" na Evidência). `npm run build`
-      continua bloqueado em `tinacms build`, porque o TinaCloud ainda não indexou `main`. Ver
-      "Bloqueio do `npm run build`" abaixo.
+      (`lint` foi corrigido em 2026-09-02, ciclo de correção — ver "Correção 2" na Evidência;
+      `format:check` fechou depois que `content/` e, mais tarde, `tina/tina-lock.json`
+      entraram no `.prettierignore`). `npm run build` continua bloqueado em `tinacms build`,
+      porque o TinaCloud ainda não indexou `main` — e a causa raiz dessa falta de indexação
+      era `tina/tina-lock.json` fora do repositório, corrigido em 2026-09-02 (ver "Correção
+      1"). Falta só o push, que é do orquestrador.
 - [x] O build do site público **não** passou a emitir JS de React (D-01/D-02)
 - [x] Visual editing **não** configurado; `output` continua `'static'`
-- [x] Decisão sobre versionar ou ignorar `tina/__generated__/` registrada com motivo
+- [x] Decisão sobre versionar ou ignorar `tina/__generated__/` registrada com motivo — **e
+      revista em 2026-09-02** para `tina/tina-lock.json`, que passou a ser versionado (ver
+      "Correção 1" na Evidência)
 - [x] `README.md` com a seção do painel corrigida
 - [ ] Após o push: o TinaCloud sai de "setup did not complete" e indexa a branch `main` —
-      só verificável depois do push (fora do escopo do executor)
+      só verificável depois do push (fora do escopo do executor); o bloqueio documentado em
+      "Correção 1" (ausência de `tina/tina-lock.json` em `main`) precisa ir junto no push
 
 ## Evidência
 
@@ -538,3 +546,198 @@ modo foreground. **Isto não deve afetar o terminal interativo do orquestrador**
 de agente não deveria disparar numa sessão PowerShell humana normal — mas se `/admin` parecer
 subir e cair sozinho, ou se `http://localhost:4001/graphql` não responder, esse é o sintoma:
 rodar com `$env:ASTRO_DEV_BACKGROUND=1` antes do `npm run dev`.
+
+## Ciclo de correção — pós-fechamento (2026-09-02)
+
+A revisão tinha aprovado o plano e o commit `1d35c11` já estava em `main` quando dois
+defeitos meus apareceram, mais um terceiro ajuste de conteúdo pedido depois. Os três estão
+registrados aqui **sem apagar** o raciocínio original acima — o que muda é revisto
+explicitamente, com data e motivo, porque a fase 2 vai reler isto.
+
+### Correção 1: `tina/tina-lock.json` tinha de ser versionado, não ignorado
+
+**Eu errei.** A seção "Decisão: `tina/__generated__/`, `tina/tina-lock.json` e
+`public/admin/` — ignorados", acima, tratou os três artefatos como equivalentes (100%
+derivados, regeneráveis, sem motivo para versionar). Isso é verdade para dois deles, mas
+**não** para o `tina-lock.json`: é o arquivo que o TinaCloud lê em `main` para saber que o
+schema existe e indexar a branch. Sem ele no repositório, a mensagem "No Tina config was
+found on main" que o TinaCloud mostra é enganosa — o `tina/config.ts` está lá, publicamente
+legível (`git ls-tree origin/main` lista o arquivo; a API do GitHub devolve HTTP 200 para
+ele) — mas o TinaCloud não indexa sem o lock. Fonte:
+<https://tina.io/docs/tinacloud/troubleshooting> — *"Ensure `tina/tina-lock.json` exists and
+is committed to your repository. This is the most common cause of branches not being
+indexed."* O arquivo também não é gerado por `tinacms build` (confirmado nas rodadas da
+seção anterior: nenhuma delas o criou) — só por `tinacms dev`.
+
+**Correção:** removido `tina/tina-lock.json` do `.gitignore` (`tina/__generated__/` e
+`public/admin/` continuam ignorados — para esses dois a decisão original segue correta, o
+`tina-lock.json` era o único caso especial):
+
+```diff
+ tina/__generated__/
+-tina/tina-lock.json
+ public/admin/
+```
+
+Gerado rodando `tinacms dev` (via `npm run dev`, com `$env:ASTRO_DEV_BACKGROUND = "1"` para
+não cair no modo `--background` de detecção de agente — mesmo achado da seção anterior).
+Subiu, o arquivo apareceu, derrubei o servidor. Confirmado:
+
+```
+$ git status --short -uall
+...
+?? tina/tina-lock.json
+...
+```
+
+Agora `??` (novo, pronto para ser versionado), em vez de ausente do `git status` por estar
+gitignorado.
+
+### Correção 2: o ESLint lintava `tina/__generated__/`
+
+**Eu errei de novo, no mesmo commit.** Gitignorar um diretório não o esconde do ESLint —
+são mecanismos independentes. O `eslint.config.js` tinha `ignores: ['dist/**', '.astro/**',
+'node_modules/**', 'coverage/**', '.wrangler/**']`, sem `tina/__generated__/**`. Resultado
+real, `npm run lint` no `main` já empurrado:
+
+```
+S:\Projetos\academic_page\haroldo\tina\__generated__\types.ts
+    1:1   error  Do not use "@ts-nocheck" because it alters compilation errors  @typescript-eslint/ban-ts-comment
+   24:23  error  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+   ...
+✖ 9 problems (9 errors, 0 warnings)
+```
+
+Isso não apareceu na verificação autoritativa da minha própria execução porque
+`tina/__generated__/` foi regenerado depois daquela rodada (o `mtime` dos arquivos é
+posterior) — não é falha do verificador, é o artefato mudando depois de checado.
+
+**Correção:** acrescentado `'tina/__generated__/**'` ao `ignores` do `eslint.config.js`,
+com comentário explicando por quê (mesmo raciocínio do `.prettierignore` para `content/`:
+código gerado por ferramenta externa, não código deste projeto para o ESLint avaliar).
+
+**`tina/__generated__/` também precisa entrar no `.prettierignore`? Avaliei — não é
+necessário, e não é sorte.** Testei empiricamente antes de decidir: coloquei um arquivo
+`.ts` deliberadamente malformatado dentro de `tina/__generated__/` (que está no
+`.gitignore`, mas não estava no `.prettierignore`) e rodei `npm run format:check` — o
+arquivo malformatado **não foi sinalizado**. O Prettier deste projeto respeita o
+`.gitignore` automaticamente (confirmei também o inverso: apontar o `prettier --check`
+diretamente para arquivos dentro de `tina/__generated__/` funciona e eles passam no estilo,
+então não é que o Prettier ignore o diretório inteiro por engano — é que `prettier --check
+.`, o comando do script, nunca entra lá enquanto o diretório estiver gitignorado). Ou seja:
+não é que o gerador do Tina "calhe" de emitir no estilo do Prettier — **o `format:check`
+simplesmente nunca chega a examinar esses arquivos**, hoje. Não acrescentei
+`tina/__generated__/` ao `.prettierignore` porque seria redundante enquanto ele continuar no
+`.gitignore`. Registro para quem ler isto depois: se algum dia `tina/__generated__/` sair do
+`.gitignore` (não há motivo previsto para isso), a mesma pessoa precisa lembrar de
+acrescentá-lo ao `.prettierignore` no mesmo commit — exatamente o que aconteceu agora com o
+`tina-lock.json` na Correção 1, e é por isso que ele também entrou no `.prettierignore`
+nesta correção (arquivo agora versionado, então visível ao Prettier; formato é do
+serializador do Tina, não deste projeto):
+
+```diff
+ content/
+
++tina/tina-lock.json
+```
+
+### Correção 3 (2026-09-02, decisão do usuário): `content/perfil/index.md` ganhou `instituicao`, `resumo_home` e `email`
+
+O schema Zod do plano 016 (em execução em paralelo, já escrito na árvore em
+`src/content.config.ts` — não toquei nele) marca `instituicao`, `resumo_home` e `email`
+como obrigatórios para a coleção `perfil`, conforme a §7.3 do PRD. Sem eles,
+`astro check` reprovava a sincronização de conteúdo com `InvalidContentEntryDataError`
+(`instituicao: Required`, `resumo_home: Required`, `email: Required`). O dado estava
+incompleto, não o schema.
+
+Preenchi lendo o PRD, não de memória:
+
+- **`instituicao`** — valor do Apêndice C do PRD (dados extraídos do Lattes):
+  `Universidade Federal do Maranhão (UFMA), Campus São Luís`.
+- **`resumo_home`** — frase curta coerente com a `bio` já presente no arquivo (que cita o
+  Departamento de Física da UFMA), usando as áreas de atuação também do Apêndice C
+  (Relatividade Geral, teorias alternativas de gravitação, sombras de buracos negros):
+  `Pesquisa Relatividade Geral, teorias alternativas de gravitação e sombras de buracos negros.`
+- **`email`** — **placeholder deliberadamente falso**, decisão do usuário em 2026-09-02, não
+  meu julgamento: `PLACEHOLDER@ufma.br`. Não deduzi nem inventei o e-mail real do professor.
+  O motivo, também registrado como comentário no próprio arquivo, logo acima do campo: o PRD
+  §9 (LGPD) exige e-mail institucional, nunca pessoal, e a **Q-07** ("o e-mail exibido
+  publicamente é institucional?") continua **aberta até a fase 3** — o repositório é
+  público, e um e-mail real de pessoa real ali seria irreversível. O comentário está
+  redigido para ser impossível de não notar por quem tocar o plano 020 (conteúdo
+  placeholder) ou a fase 3.
+
+Os campos que já existiam (`nome`, `cargo`, `bio`) **não foram tocados** — continuam byte a
+byte como o painel do Tina gravou (aspas simples, espaço à direita dentro delas). Só
+acrescentei linhas novas ao frontmatter.
+
+`npx astro check`, depois da correção:
+
+```
+[content] Syncing content
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\linhas-pesquisa"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\projetos"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\publicacoes"
+[WARN] [glob-loader] No files found matching "**/*.md" in directory "content\disciplinas"
+[content] Synced content
+[types] Generated 526ms
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+...
+Result (16 files):
+- 61 errors
+- 0 warnings
+- 0 hints
+```
+
+**Não fecha em `0 errors`, e não deveria fechar por uma correção minha aqui.** Os 61 erros
+são **todos** em `tests/content/schemas.test.ts` (conferido isolando os arquivos com erro —
+nenhum é `content/perfil/index.md`, nenhum é meu). É TypeScript reclamando que
+`collections.perfil.schema` (e `collections.publicacoes.schema`) são tipos union sem
+`.safeParse` garantido — problema de tipagem no arquivo de teste do plano 016, que está em
+execução em paralelo com alterações não commitadas na árvore agora. Não toquei nele, como
+instruído. O `[content] Synced content` sem `InvalidContentEntryDataError` já confirma que o
+problema relatado — o dado incompleto de `perfil` — está resolvido.
+
+### Saída final das três verificações pedidas (depois das Correções 1 e 2), mais `git status`
+
+```
+=== npm run lint ===
+> haroldo-page@0.1.0 lint
+> eslint .
+
+=== npm run format:check ===
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+
+=== npm run test ===
+> haroldo-page@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  3 passed (3)
+      Tests  59 passed (59)
+   Start at  21:09:01
+   Duration  1.19s (transform 778ms, setup 0ms, import 1.15s, tests 36ms, environment 0ms)
+
+=== git status --short -uall ===
+ M .gitignore
+ M .prettierignore
+ M content/perfil/index.md
+ M eslint.config.js
+ M vitest.config.ts
+?? src/content.config.ts
+?? tests/content/schemas.test.ts
+?? tina/tina-lock.json
+```
+
+`npm run build` **não foi rodado** nesta rodada final, por instrução — continua bloqueado no
+`tinacms build`/TinaCloud até o `tina/tina-lock.json` ir para `main`, o que é a próxima
+etapa, do orquestrador. `vitest.config.ts` modificado e os dois arquivos `??` de
+`src/content.config.ts`/`tests/content/schemas.test.ts` são do plano 016, em execução
+paralela — não são meus e não os toquei.

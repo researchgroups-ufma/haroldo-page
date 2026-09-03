@@ -13,3 +13,9 @@ CLAUDE.md
 # Dono do formato é o TinaCMS (RF-01/RF-02), não o Prettier — sem esta linha,
 # cada salvamento pelo painel deixaria o CI vermelho para o professor.
 content/
+
+# Idem para o lockfile do Tina: agora versionado (2026-09-02, ver .gitignore),
+# mas o formato de quem escreve é o `tinacms dev`/`tinacms build`, não este
+# projeto. Sem esta linha, todo `tinacms dev` local deixaria o format:check
+# vermelho outra vez.
+tina/tina-lock.json

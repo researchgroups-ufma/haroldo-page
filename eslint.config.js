@@ -15,7 +15,20 @@ import astro from 'eslint-plugin-astro';
 import prettier from 'eslint-config-prettier';
 
 export default defineConfig([
-  { ignores: ['dist/**', '.astro/**', 'node_modules/**', 'coverage/**', '.wrangler/**'] },
+  {
+    ignores: [
+      'dist/**',
+      '.astro/**',
+      'node_modules/**',
+      'coverage/**',
+      '.wrangler/**',
+      // Gerado pelo `tinacms build`/`tinacms dev` a partir de `tina/config.ts` — gitignorado
+      // (ver `.gitignore`), mas o ESLint não herda o gitignore por padrão. Sem esta linha, o
+      // `tina/__generated__/types.ts` (com `@ts-nocheck` e `any` do próprio Tina) reprova
+      // `npm run lint` sempre que alguém roda `tinacms dev`/`tinacms build` localmente.
+      'tina/__generated__/**',
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   ...astro.configs['flat/recommended'],
