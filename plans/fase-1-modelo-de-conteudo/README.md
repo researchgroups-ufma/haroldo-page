@@ -77,6 +77,11 @@ fase 3, não do 017.
   com `numero`, `titulo` e `url` (obrigatórios) vazios — Zod rejeita esse frontmatter.
 - **`defaultItem` está @deprecated** em favor de `ui.defaultItem`, que não é tipada para coleção
   baseada em `fields`. O 017 usa deliberadamente — upgrade futuro pode removê-lo.
+  **Precisão acrescentada em 2026-09-04:** isso vale para o `defaultItem` no nível da **coleção**.
+  No nível do **campo** o `ui.defaultItem` **é** tipado — a revisão do 019 conferiu em
+  `@tinacms/schema-tools/dist/types/index.d.ts:331-348` que o `ui` de um `ObjectField` com
+  `fields:` é `Template['ui']`, que declara `itemProps`/`defaultItem`/`previewSrc`. O plano 022
+  usa essa forma. A redação original, lida sem essa distinção, desencorajaria a solução correta.
 - **Limitação genérica do Tina:** com campo obrigatório vazio, adicionar item dispara erro sem
   dizer qual campo falta.
 
@@ -153,6 +158,12 @@ fase 3, não do 017.
   qualquer subpainel, e confira o arquivo gravado a cada save. Isto é mais grave que a armadilha
   do `aulas: [ {} ]` que o 017 registrou, porque não quebra o build — grava conteúdo errado que
   passa em tudo.
+  **Onde ela cai no 022:** `ui.defaultItem: { linguagem: 'python' }` conta como valor inicial, e
+  acrescentar item a `scripts[]` é entrar e sair de subpainel. `linguagem` é o `publicado` desta
+  vez. Como a verificação de painel do 022 é a prova do R-13, conferir só o bloco de `codigo`
+  aprovaria o plano com a prova pela metade — o item gravado se confere **campo a campo**.
+  **E no 021:** o critério de conclusão da fase pede *editar* um item existente em cada coleção,
+  que é literalmente o gatilho. A tela não é prova; o arquivo é.
 - **Projeto sem linha de pesquisa grava `linha_relacionada: ''`, não omite o campo,** e o Astro
   rejeita: `Invalid content reference: ... references "" in collection "linhas-pesquisa", but
   that entry does not exist`. Note o contraste: `codigo` vazio numa disciplina é **omitido** do
@@ -237,7 +248,11 @@ trabalho. **Não se materializou:** o grupo `en` de `publicacoes` implementado n
   por acidente do hoisting) e `plans/.idea/` deixou de existir. O README da fase 0 foi corrigido:
   quatro linhas ainda descreviam como abertas pendências já resolvidas ou sem objeto.
 
-- **Dívida que esta fase criou — a única.** O plano 015 trouxe o TinaCMS, e com ele o React:
+- **Dívida de dependência que esta fase criou.** Era "a única" quando esta linha foi escrita; a
+  contagem envelheceu — os planos 019 e 020 acrescentaram outras (subcampo obrigatório que não
+  bloqueia o save, descarte silencioso no formulário, `astro check` com exit 0), listadas nas
+  seções por plano acima e consolidadas pelo 021 na seção "o que a fase 1 empurra para a fase 2".
+  O plano 015 trouxe o TinaCMS, e com ele o React:
   `npm audit` passou de 0 para **8 vulnerabilidades moderadas** em 2026-09-03, todas de
   `react-router@6.30.6`, cuja única origem é `tinacms@3.12.1 → react-router-dom` (confirmado por
   `npm ls react-router`). Advisory [GHSA-wrjc-x8rr-h8h6](https://github.com/advisories/GHSA-wrjc-x8rr-h8h6):

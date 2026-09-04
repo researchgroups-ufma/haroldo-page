@@ -3,8 +3,8 @@
 **Status:** TODO
 **RFs cobertos:** RF-37 (MUST); fase 1, item "Lista `scripts[]` em `disciplinas`"; RN-05 (exceção
 de código-fonte), RF-03, D-05, D-06, F-13
-**Depende de:** planos 016, 017, 018 e 019 (todos DONE) e **020** — este plano executa **depois do
-020 e antes do 021**
+**Depende de:** planos 016, 017, 018, 019 e **020** — todos DONE (`020` em `aa9a7cf`, 2026-09-04).
+Este plano executa **depois do 020 e antes do 021**
 **Modelo recomendado:** sonnet
 **Agente recomendado:** implementer
 **PRD:** `S:\Projetos\academic_page\haroldo\PRD.md`
@@ -31,6 +31,13 @@ aula) é da **fase 3** e **não entra neste plano** — separação decidida na 
 > Em especial: **não** edite o `PRD.md` (a emenda do RF-37 já está lá, v0.1.15), **não** edite
 > `content/**` (é escopo do 020 e da verificação de painel do orquestrador) e **não** rode
 > `tinacms dev`.
+
+> **Guarda de escopo dentro de `src/content.config.ts`.** Existe ali uma divergência de
+> documentação **já registrada e deliberadamente adiada**: a docstring de
+> `normalizeLinhaRelacionadaId` (linhas 239–241) chama a referência inválida de "falha silenciosa
+> que só apareceria na fase 3", e o plano 020 provou que o `astro check` a reporta em voz alta
+> hoje — o silencioso é o *exit code*. **A correção é do plano 021, não deste.** Não a conserte de
+> passagem: toda linha alterada por este plano tem de rastrear até `scripts[]`.
 
 ## Contexto necessário
 
@@ -162,6 +169,45 @@ onde a Decisão 8 mora. Use (pode polir o português, não pode ficar sem):
 - `itemProps` do item: rótulo pelo `titulo`, com `'Novo script'` como reserva — igual ao que
   `aulas`, `listas`, `materiais` e `links` já fazem.
 
+### ⚠️ O que o 020 descobriu depois que este plano foi escrito — leia antes de abrir o painel
+
+Este plano nasceu em `edfc822`, no mesmo dia da sabatina e **antes** de o plano 020 exercitar o
+`/admin`. As duas armadilhas abaixo foram descobertas depois e **atingem em cheio a verificação
+de painel da seção seguinte**. Quem for ao painel sem elas produz prova falsa.
+
+**1. O formulário do Tina descarta em silêncio alteração em campo que já tinha valor.** Ao voltar
+de um subpainel de grupo `object` — e **item de lista embutida é subpainel** —, o formulário
+re-inicializa a partir do documento carregado: campo que já tinha valor perde a alteração (a tela
+mostra o valor novo, o arquivo grava o antigo), enquanto campo que estava vazio sobrevive.
+Reproduzido duas vezes com A/B de uma variável no plano 020.
+
+**Por que isto morde exatamente aqui:** `ui.defaultItem: { linguagem: 'python' }` **conta como
+valor inicial**. `linguagem` é, neste plano, o que o interruptor `publicado` foi no 020 — o campo
+com maior chance de gravar diferente do que a tela mostra. E a verificação de painel deste plano
+é a prova do **R-13**: conferir só o bloco de `codigo` e não notar que `linguagem` reverteu
+aprovaria o plano com a prova pela metade.
+
+**Contorno, obrigatório:** conferir o `.md` gravado **campo a campo**, não só o bloco de código; e
+alterar `linguagem` **por último**, depois de sair de qualquer subpainel.
+
+**2. Ler a saída, não o exit code.** O `astro check` imprime `[ERROR] [content]` e ainda assim
+encerra com `0 errors` e exit 0 — descoberto no 020 com uma referência inválida. Este plano grava
+conteúdo novo pelo painel, então a linha `npm run build` da verificação autoritativa **não é
+suficiente por si só**: leia o texto da saída.
+
+**3. Dois detalhes operacionais do 020**, para não perder tempo com eles de novo:
+
+- A content layer guarda cache de quando as pastas de coleção estavam vazias. Verificação de
+  conteúdo em dev server que já estava no ar exige `astro dev --force`.
+- O processo do `tinacms dev` **sobrevive ao encerramento da tarefa** e depois trava o
+  `npm run build` com `Datalayer server is busy`. Matar o processo Node, não só a tarefa.
+
+**4. Consequência a registrar, não a consertar:** `scripts[]` traz `titulo` e `codigo`
+obrigatórios, e o painel **deixa salvar item de lista embutida com subcampo obrigatório vazio**
+(dívida herdada do 019, decidida como "aceitar e registrar"). São **mais duas instâncias** do
+mesmo problema, e elas aumentam o que a fase 2 (mensagem de erro de build, F-09/R-01) e o manual
+da fase 5 têm de cobrir. Registre na Evidência; **não** invente validação para contornar.
+
 ### ⚠️ O risco técnico que decide se este plano fecha
 
 Código Python indentado dentro de YAML depende de o `js-yaml` usado pelo Tina serializar `codigo`
@@ -182,11 +228,17 @@ verificação de painel está pendente. O que o orquestrador faz, antes de promo
    cujo `codigo` tenha, obrigatoriamente, **bloco indentado, linha em branco no meio e aspas** —
    por exemplo um `def`/`for` com corpo indentado, uma linha vazia separando duas partes, e uma
    string com aspas simples e duplas.
-2. Salva pelo painel.
+2. Salva pelo painel, tendo mexido em `linguagem` **por último** (armadilha 1 da seção anterior).
 3. Abre o `.md` gravado e **cola o conteúdo literal do frontmatter na Evidência** — não a
    descrição, o texto.
-4. Confere que a indentação e a linha em branco sobreviveram byte a byte, e que
-   `npm run build` continua verde com esse arquivo em `content/`.
+4. Confere que a indentação e a linha em branco sobreviveram byte a byte, **e que os outros cinco
+   campos do item gravaram o que a tela mostrava** — `linguagem` em especial. Confere que
+   `npm run build` continua verde com esse arquivo em `content/`, **lendo a saída** e não só o
+   exit code.
+
+O script de teste é **conteúdo inventado num repositório público, atribuído a uma pessoa real**.
+Pela decisão do stakeholder de 2026-09-04, título não carrega marca de placeholder — a marca de
+exemplo vai na `descricao`, como o plano 020 fez. Mesmo tratamento aqui.
 
 Se a indentação não sobreviver, **este plano não fecha**: é achado a reportar, e a solução (ex.:
 mudar o formato do campo) é decisão nova, não conserto silencioso.
@@ -308,6 +360,10 @@ regras da sabatina fiquem verificáveis, não para satisfazer o medidor.
 - [ ] **Verificação no painel (orquestrador):** script salvo pelo `/admin` com **bloco indentado,
       linha em branco no meio e aspas**; o `.md` gravado aberto e o **frontmatter literal colado na
       Evidência**; indentação e linha em branco preservadas byte a byte
+- [ ] **Os seis campos do item gravado conferidos um a um** contra o que a tela mostrava, com
+      `linguagem` nomeado explicitamente na Evidência — armadilha do descarte silencioso (020)
+- [ ] Docstring de `normalizeLinhaRelacionadaId` (`src/content.config.ts:239-241`) **não
+      modificada** por este plano — a correção é do 021
 - [ ] **`tina/tina-lock.json` regenerado** pelo orquestrador com `tinacms dev` e commitado, com a
       diferença de tipos GraphQL descrita na Evidência
 - [ ] `npm run build` verde — **desmarcado até o push**; `ERR_CLOUD_CHECK_FAILED` antes disso é
