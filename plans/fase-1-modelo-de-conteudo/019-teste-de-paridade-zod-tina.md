@@ -619,3 +619,5 @@ pelo orquestrador no plano 017**, não é leitura de `node_modules`. O que falta
 quatro pastas de coleção estão vazias (`[WARN] [glob-loader] No files found matching "**/*.md"`).
 Exercitá-la exige criar conteúdo, que é escopo do plano 020. Transferido para lá como item
 explícito, em vez de declarado verificado aqui.
+
+Commit: `6a42330`.

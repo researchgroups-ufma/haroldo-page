@@ -18,7 +18,7 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 016 | Schemas Zod das cinco coleções | ✅ DONE | implementer | `462ffb4` |
 | 017 | As cinco coleções no `tina/config.ts` | ✅ DONE | implementer | `8a58afb` |
 | 018 | Grupo "Versão em inglês (opcional)" | ✅ DONE | implementer | `6e5cb1f` |
-| 019 | Teste de paridade Zod × Tina (D-06) | ✅ DONE | implementer | `COMMIT019` |
+| 019 | Teste de paridade Zod × Tina (D-06) | ✅ DONE | implementer | `6a42330` |
 | 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
