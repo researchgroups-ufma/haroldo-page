@@ -131,13 +131,29 @@ placeholder inteiro fica invisível para a fase 3.
 
 ### Ordem em relação ao plano 019
 
-O cabeçalho diz que o 019 pode rodar em paralelo, e isso continua valendo **com uma ressalva**:
-o campo `projetos.linha_relacionada` tem divergência de formato de valor conhecida (o Tina grava
-o caminho completo, o Astro espera o id sem pasta nem extensão), e **corrigi-la é do 019**. Se o
-019 ainda não tiver fechado, crie os dois projetos com o campo **vazio** e deixe o
-preenchimento de `linha_relacionada` para depois — caso contrário o valor gravado agora pode
-ficar no formato errado e ninguém perceber, porque a falha é silenciosa. Registre na Evidência
-qual dos dois casos ocorreu.
+**O 019 fechou primeiro (DONE em 2026-09-03), então a ressalva original caducou** — e virou
+tarefa. A divergência de formato de valor de `projetos.linha_relacionada` foi corrigida do lado
+do Zod: `normalizeLinhaRelacionadaId` em `src/content.config.ts` tira o prefixo
+`content/linhas-pesquisa/` e a extensão `.md` antes do `reference()`. Não crie mais os projetos
+com o campo vazio — **preencha `linha_relacionada` em pelo menos um dos dois**.
+
+**Tarefa herdada do 019, que só este plano pode executar.** A correção está provada por teste
+unitário com a string literal que o Tina grava, e a premissa (o Tina grava o caminho completo)
+foi verificada no painel no plano 017. O que **nunca foi exercitado** é a ponta final:
+`getEntry()` resolvendo de fato depois da normalização. Ela não era verificável no 019 porque as
+pastas de coleção estavam vazias — `[WARN] [glob-loader] No files found matching "**/*.md"` nas
+quatro. Com o conteúdo que este plano cria, passa a ser. Portanto:
+
+1. Crie a linha de pesquisa **pelo painel**, e o projeto **pelo painel**, selecionando a linha no
+   campo de referência e salvando.
+2. Abra o arquivo `.md` gravado e **cole na Evidência o valor literal** de `linha_relacionada`.
+   Se não for `content/linhas-pesquisa/<slug>.md`, a premissa da correção do 019 está errada e
+   isso é um achado — reporte, não conserte aqui.
+3. Prove que resolve: com o conteúdo no lugar, `getEntry('linhas-pesquisa', ...)` a partir do
+   projeto deve devolver a entrada, **não** `undefined`. Cole a saída.
+
+Vale a lição da casa: **comportamento de UI de terceiro se prova exercitando a interface**, não
+lendo `node_modules`.
 
 **Ambiente.** Windows 11 / PowerShell. Node 24.16.0.
 
@@ -177,8 +193,10 @@ qual dos dois casos ocorreu.
       gravada com item vazio (`aulas: [ {} ]`)
 - [ ] `publicado` explicitamente marcado nos itens que devem aparecer — o padrão do painel é
       `false`
-- [ ] `projetos.linha_relacionada` só preenchido se o plano 019 já tiver corrigido o formato do
-      valor; caso contrário, deixado vazio e registrado
+- [x] ~~`projetos.linha_relacionada` só preenchido se o plano 019 já tiver corrigido o formato
+      do valor~~ — **o 019 fechou antes; o campo deve ser preenchido**
+- [ ] `linha_relacionada` preenchido pelo painel em pelo menos um projeto, com o valor literal
+      gravado colado na Evidência e `getEntry()` provado resolvendo (tarefa herdada do 019)
 - [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
 - [ ] Nenhuma alteração em schema ou configuração
 

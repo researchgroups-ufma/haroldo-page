@@ -229,9 +229,30 @@ const projetosEnSchema = z
   .strict();
 
 /**
+ * Normaliza o valor de `linha_relacionada` antes de `reference('linhas-pesquisa')`.
+ *
+ * Divergência real herdada dos planos 017/018 (ver README da fase 1): o painel Tina grava o id
+ * completo do documento referenciado — caminho com pasta e extensão, ex.:
+ * `"content/linhas-pesquisa/minha-linha.md"` (`@tinacms/graphql/dist/index.js:4931`,
+ * `id: fullPath`) —, enquanto o loader `glob()` do Astro gera o id sem pasta nem extensão, ex.:
+ * `"minha-linha"` (`astro/dist/content/runtime.js:508-534`). Sem esta normalização,
+ * `reference()` aceita a string sintaticamente (não valida existência) mas `getEntry()` devolve
+ * `undefined` em runtime — falha silenciosa que só apareceria na fase 3. A reconciliação foi
+ * decidida aqui, do lado do Zod, porque é comprovável por teste unitário com a string literal que
+ * o Tina grava; a nota equivalente em `tina/config.ts` foi removida (plano 019).
+ *
+ * Idempotente: um id já normalizado (sem prefixo/extensão) passa inalterado.
+ */
+const normalizeLinhaRelacionadaId = (valor: unknown): unknown => {
+  if (typeof valor !== 'string') return valor;
+  return valor.replace(/^content\/linhas-pesquisa\//, '').replace(/\.md$/, '');
+};
+
+/**
  * Schema Zod da coleção `projetos` — `content/projetos/*.md` (§7.3).
  *
- * `linha_relacionada` referencia `linhas-pesquisa` (opcional). `publicado`
+ * `linha_relacionada` referencia `linhas-pesquisa` (opcional), com o valor normalizado por
+ * `normalizeLinhaRelacionadaId` antes de `reference()` (ver docstring acima). `publicado`
  * obrigatório: RN-01, é coleção de listagem.
  */
 export const projetosSchema = z.object({
@@ -247,7 +268,9 @@ export const projetosSchema = z.object({
   descricao: z.string(),
   // "colaboradores[]" (§7.3): string livre no MVP, sem coleção própria.
   colaboradores: z.array(z.string()).optional(),
-  linha_relacionada: reference('linhas-pesquisa').optional(),
+  linha_relacionada: z
+    .preprocess(normalizeLinhaRelacionadaId, reference('linhas-pesquisa'))
+    .optional(),
   publicado: z.boolean(),
   en: projetosEnSchema.optional(),
 });

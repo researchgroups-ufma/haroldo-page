@@ -18,11 +18,11 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 016 | Schemas Zod das cinco coleções | ✅ DONE | implementer | `462ffb4` |
 | 017 | As cinco coleções no `tina/config.ts` | ✅ DONE | implementer | `8a58afb` |
 | 018 | Grupo "Versão em inglês (opcional)" | ✅ DONE | implementer | `6e5cb1f` |
-| 019 | Teste de paridade Zod × Tina (D-06) | ⬜ TODO | implementer | — |
+| 019 | Teste de paridade Zod × Tina (D-06) | ✅ DONE | implementer | `COMMIT019` |
 | 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 019 — Teste de paridade Zod × Tina (D-06).
+**Próximo:** plano 020 — Conteúdo placeholder representativo.
 
 **O que o 015 descobriu** (leia antes do 019): Tina + Astro 7 funciona, mas cobrou cinco
 correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herdou:
@@ -89,6 +89,50 @@ fase 3, não do 017.
   e `descricao` (os demais campos são factuais, RN-07); `perfil.formacao[]` traduz `grau` e
   `curso`, que juntos formam o "título" que a §7.3 menciona sem nomear o campo.
 
+**O que o 019 fechou, e o que ele deixa para o 020 e o 021:**
+
+- **A divergência de `linha_relacionada` foi corrigida do lado do Zod**, não do Tina:
+  `normalizeLinhaRelacionadaId` em `src/content.config.ts` tira o prefixo
+  `content/linhas-pesquisa/` e a extensão `.md` antes do `reference()`, e é idempotente. O
+  `// NOTE:` de `tina/config.ts` foi substituído por um comentário curto apontando para lá. A
+  escolha do lado Zod foi deliberada: correção do lado do Tina só se prova exercitando o painel,
+  e é exatamente onde este projeto já aprovou uma correção que não funcionava. **Consequência
+  boa:** o schema do Tina não mudou, então não houve `ERR_CLOUD_CHECK_FAILED` nem lock a
+  regenerar — pela primeira vez desde o 017, o `npm run build` fechou verde sem depender de push.
+- **A segunda divergência herdada — subcampo obrigatório de lista embutida não bloqueia o save —
+  foi decidida como "aceitar e registrar"**, sem mudança de schema. Justificativa conferida na
+  revisão contra `node_modules/@tinacms/schema-tools`: na variante `{type:'object', fields:[...]}`,
+  o `ui` é tipado como `Template['ui']`, que declara só `itemProps`/`defaultItem`/`previewSrc` —
+  **não existe `validate`** ali (ele existe só em `UIField<Type,List>`). **Consequência a carregar
+  adiante:** a fase 2 precisa de mensagem de erro de build que o professor consiga interpretar, e
+  o manual da fase 5 precisa avisar que o painel deixa salvar item de lista com campo obrigatório
+  vazio, e que isso quebra o build (F-09, RNF-09, risco R-01).
+- **Ponta que o 019 não conseguiu verificar e passou ao 020:** `getEntry()` resolvendo de fato
+  depois da normalização. A premissa (o Tina grava o caminho completo) já foi verificada no painel
+  no plano 017 — não é leitura de `node_modules` —, mas a resolução final exige conteúdo, e as
+  quatro pastas de coleção estão vazias. Virou item de aceitação do 020, com o valor literal
+  gravado a ser colado na Evidência.
+- **Três buracos latentes que a revisão do 019 encontrou** e que nenhum plano fecha ainda —
+  insumo para o 021 e para as fases seguintes:
+  1. O teste compara o `name` da coleção mas **nunca o `path` do Tina contra a pasta que o
+     `glob()` do Zod lê**. Trocar `path: 'content/linhas-pesquisa'` passaria despercebido —
+     divergência silenciosa da mesma família que o D-06 combate.
+  2. Em `tests/content/paridade-schema.test.ts:235`, a detecção de enum do lado Tina vem depois
+     do ramo `campo.list`: um campo futuro com `list: true` **e** `options: [...]` teria os
+     valores de enum não comparados. Não existe campo assim hoje.
+  3. A prova de falsificabilidade foi produzida com 11 testes; o 12º, acrescentado depois por
+     cobertura, não toca em `compareFields` — a prova segue válida, mas não é contra o artefato
+     final.
+- **O que a revisão descartou conferindo contra a fonte** (vale como precedente, porque são as
+  três suspeitas que um revisor apressado teria confirmado no chute): a recursão de
+  `compareFields` **não** pula ramo em silêncio — os guardas `&&` são estreitamento de tipo, e
+  canário aninhado em `aulas[]` ou dentro de `en` faria o teste falhar; o `.optional()` externo
+  **não** anula o `preprocess` (`ZodOptional` curto-circuita em `undefined`, que é o desejado); e
+  os 100% de cobertura **não** são ocos — a aritmética entre planos (016: 21/2/1 · 018: 27/2/1 ·
+  019: 31/4/2) mostra que a segunda função e as duas branches novas só podem ser de
+  `normalizeLinhaRelacionadaId`. A tabela de cobertura por arquivo sair vazia é defeito de
+  reporter registrado desde o plano 015.
+
 ## Grafo de dependências
 
 ```
@@ -100,8 +144,10 @@ fase 3, não do 017.
 - **015 ∥ 016** — o 015 mexe em `package.json` e `tina/config.ts`; o 016 em
   `src/content.config.ts`. Escopos disjuntos. **Mas o 015 mexe no lockfile**, então serialize se
   o 016 precisar instalar qualquer coisa.
-- **019 ∥ 020** — o 019 mexe em testes e, se preciso, nos dois schemas; o 020 só em `content/`.
-  Podem correr juntos, desde que o 019 não altere schema enquanto o 020 cria conteúdo contra ele.
+- **019 ∥ 020** — não se materializou: o 019 rodou sozinho e fechou primeiro, o que na prática
+  foi melhor. Ele alterou `src/content.config.ts` (a normalização de `linha_relacionada`), e o
+  020 agora cria conteúdo contra o schema já corrigido, podendo preencher o campo em vez de
+  deixá-lo vazio.
 
 ## Por onde isto pode dar errado
 

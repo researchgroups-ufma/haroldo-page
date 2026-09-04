@@ -441,13 +441,10 @@ export default defineConfig({
             description: 'Nomes de colaboradores só entram com anuência (LGPD, §9).',
           },
           {
-            // NOTE (revisão do plano 017, divergência de paridade não corrigida aqui — ver
-            // Evidência): o Tina grava aqui o id completo do documento referenciado
-            // ("content/linhas-pesquisa/<slug>.md"), enquanto o `glob` loader do
-            // `reference('linhas-pesquisa')` em `src/content.config.ts` espera o id no formato
-            // do loader ("<slug>", sem prefixo de pasta nem extensão). `getEntry()` devolve
-            // `undefined` em runtime — falha silenciosa, não capturada por `npm run build` nem
-            // `npm run test`. Reconciliar é o plano 019.
+            // O Tina grava aqui o id completo do documento referenciado
+            // ("content/linhas-pesquisa/<slug>.md"). A reconciliação com o formato de id que o
+            // loader `glob()` do Astro espera ("<slug>") é feita do lado do Zod, em
+            // `src/content.config.ts` (`normalizeLinhaRelacionadaId`, plano 019).
             type: 'reference',
             name: 'linha_relacionada',
             label: 'Linha de pesquisa relacionada',
