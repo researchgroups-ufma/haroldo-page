@@ -136,8 +136,20 @@ plano 010 foi executado apesar de o 009 ainda estar aberto na ocasião.
 
 ## Segurança — `npm audit`
 
-**`npm audit`: 0 vulnerabilidades.** Estado alcançado em 2026-09-01 pelo plano 014, que subiu
-`astro@5.18.2` → `7.2.10` (dois majors) e **removeu todos os `overrides`** do `package.json`.
+**`npm audit`: 0 vulnerabilidades — no fechamento da fase 0.** Estado alcançado em 2026-09-01
+pelo plano 014, que subiu `astro@5.18.2` → `7.2.10` (dois majors) e **removeu todos os
+`overrides`** do `package.json`.
+
+> ⚠️ **Esse número não vale mais, e não é regressão da fase 0.** Medido de novo em 2026-09-03:
+> **8 vulnerabilidades moderadas**, todas de `react-router@6.30.6`, que entra por
+> `tinacms@3.12.1 → react-router-dom` — instalado pelo **plano 015**, já na fase 1
+> (`npm ls react-router` confirma que o Tina é a única origem). O advisory é
+> [GHSA-wrjc-x8rr-h8h6](https://github.com/advisories/GHSA-wrjc-x8rr-h8h6), open redirect via
+> barra invertida em `<Link>`/`useNavigate`. **Não há correção nossa disponível:** sai quando o
+> TinaCMS subir a dependência. O alcance é o painel `/admin`, que é React, autenticado e usado
+> por uma pessoa — **o site público não carrega React** (D-01, medido no plano 015), então a
+> superfície exposta a visitante é zero. Registrado como dívida da fase 1, para a fase 2 decidir
+> se o CI passa a falhar por `npm audit` e em que nível.
 
 Histórico, porque o caminho explica os arquivos: eram 3 vulnerabilidades. O commit `07521cd`
 corrigiu duas por `overrides` (`sharp` 0.34.5→0.35.4, `esbuild` 0.27.7→0.28.2). A terceira, no
@@ -163,19 +175,24 @@ do arquivo antes de despachar qualquer um destes**:
 | ~~013~~ | ~~Migrar o `tseslint.config` depreciado~~ — feito; o build não emite mais hints |
 | ~~013~~ | ~~Reconciliar a linha comentada do `Sitemap` no `robots.txt`~~ — feito; segue comentada até a fase 5 |
 | ~~Fase 1~~ | ~~ADR do upgrade do Astro, ou plano próprio antes de a fase 1 entregar conteúdo~~ — **feito pelo plano 014** em 2026-09-01 |
-| Fase 1 | Cobertura cobre só `src/lib/` e `src/i18n/`, e o `vitest.config.ts` **não tem `thresholds`** — a meta de ≥80% da §11 é relatada, nunca imposta |
-| Fase 1 | O teste da regra `process.env` varre só `.ts` sob `src/`; um `process.env` em `<script>` de arquivo `.astro` passaria batido |
-| Fase 1 | Reconferir o override do `sharp` com imagens reais — a validação usou imagem sintética |
+| ~~Fase 1~~ | ~~Cobertura cobre só `src/lib/` e `src/i18n/`, e o `vitest.config.ts` **não tem `thresholds`**~~ — **resolvida em 2026-09-01**: `vitest.config.ts` tem os quatro `thresholds` em 80% e o CI roda `npm run test:coverage`; o plano 016 acrescentou `src/content.config.ts` ao `include` |
+| ~~Fase 1~~ | ~~O teste da regra `process.env` varre só `.ts` sob `src/`~~ — **resolvida em 2026-09-01**: `tests/lib/config.test.ts:9` define `SCANNED_EXTENSIONS = ['.ts', '.astro']` e a varredura cobre frontmatter e `<script>` |
+| ~~Fase 1~~ | ~~Reconferir o override do `sharp` com imagens reais~~ — **sem objeto desde 2026-09-01**: o plano 014 removeu **todos** os `overrides` do `package.json`; não há override de `sharp` a reconferir |
 | Fase 5 | Reativar o `Sitemap` no `robots.txt`, remover o `Disallow: /` e o `X-Robots-Tag: noindex` |
 
 ## Dívida de fora do fluxo
 
-- `vite` é importado em `astro.config.mjs` (`loadEnv`) mas **não está declarado** em
-  `package.json` — só existe como transitiva de `astro`, `@tailwindcss/vite` e `vitest`.
-- `plans/.idea/` aparece como untracked (projeto JetBrains). Nunca foi commitado; falta
-  decidir se entra no `.gitignore`.
+- ~~`vite` é importado em `astro.config.mjs` (`loadEnv`) mas **não está declarado** em
+  `package.json`~~ — **resolvida em 2026-09-03**: declarado como `devDependency` em versão
+  exata. Funcionava por acidente do hoisting do npm; qualquer mudança na árvore de dependências
+  quebraria o build com erro que não aponta para a causa.
+- ~~`plans/.idea/` aparece como untracked (projeto JetBrains)~~ — **sem objeto desde
+  2026-09-03**: o diretório não existe mais no working tree. Nada a decidir.
 - A tabela de cobertura por arquivo sai vazia no Windows (defeito cosmético do reporter de
-  texto do v8). O relatório HTML em `coverage/` mostra os arquivos corretamente.
+  texto do v8). O relatório HTML em `coverage/` mostra os arquivos corretamente. **Continua
+  valendo em 2026-09-03** — reconfirmado nas duas execuções autoritativas do plano 019. Não
+  esconde regressão: o agregado (`Coverage summary`) é medido normalmente e o `thresholds`
+  reprova a partir dele.
 - ~~`.env.example:23` com o subdomínio provisório~~ e ~~`wrangler.toml:5-6` com o comentário
   obsoleto~~ — **resolvidos em 2026-09-01**. Nenhum arquivo de código ou configuração menciona
   mais `haroldo-page.workers.dev`; as ocorrências restantes estão só em Evidências de planos,

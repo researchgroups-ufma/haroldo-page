@@ -184,8 +184,21 @@ trabalho. **Não se materializou:** o grupo `en` de `publicacoes` implementado n
   **e** revisão de código aprovada.
 - **Dívidas herdadas: nenhuma.** As cinco que a fase 0 deixou foram resolvidas em 2026-09-01 —
   URL provisória em `.env.example` e no comentário do `wrangler.toml`, campo `Versão do PRD`,
-  cobertura sem `thresholds` e a varredura de `process.env` que ignorava `.astro`. **Esta fase
-  começa com a lista limpa; mantenha assim.**
+  cobertura sem `thresholds` e a varredura de `process.env` que ignorava `.astro`. Em 2026-09-03
+  as duas últimas pendências de fora do fluxo também saíram: `vite` passou a ser declarado no
+  `package.json` (era importado em `astro.config.mjs` e existia só como transitiva — funcionava
+  por acidente do hoisting) e `plans/.idea/` deixou de existir. O README da fase 0 foi corrigido:
+  quatro linhas ainda descreviam como abertas pendências já resolvidas ou sem objeto.
+
+- **Dívida que esta fase criou — a única.** O plano 015 trouxe o TinaCMS, e com ele o React:
+  `npm audit` passou de 0 para **8 vulnerabilidades moderadas** em 2026-09-03, todas de
+  `react-router@6.30.6`, cuja única origem é `tinacms@3.12.1 → react-router-dom` (confirmado por
+  `npm ls react-router`). Advisory [GHSA-wrjc-x8rr-h8h6](https://github.com/advisories/GHSA-wrjc-x8rr-h8h6):
+  open redirect via barra invertida em `<Link>`/`useNavigate`. **Não há correção nossa** — sai
+  quando o TinaCMS subir a dependência. Alcance: o painel `/admin`, autenticado e usado por uma
+  pessoa; **o site público não carrega React** (D-01, medido no 015), então visitante nenhum é
+  exposto. Decisão a tomar na fase 2: se o CI passa a rodar `npm audit` e reprovar, e em que
+  nível de severidade — hoje ele não roda.
 - **A cobertura agora reprova.** O `vitest.config.ts` tem `thresholds` em 80% e o CI roda
   `npm run test:coverage`. Módulo novo em `src/lib/` ou `src/i18n/` sem teste **quebra o CI** —
   o que é o ponto, mas é bom saber antes de abrir o PR.
