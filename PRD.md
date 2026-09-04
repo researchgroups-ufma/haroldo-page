@@ -12,7 +12,7 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.12 |
+| **Versão do PRD** | v0.1.13 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–019 DONE; 020–021 pendentes) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
@@ -39,6 +39,7 @@
 | v0.1.10 | 2026-09-03 | Desenvolvedor | **Plano 018 DONE:** grupo "Versão em inglês (opcional)" nas cinco coleções traduzíveis (RN-06), em paridade entre `src/content.config.ts` e `tina/config.ts` (`6e5cb1f`). §12 passa de 4/9 a 5/9. `publicacoes` traduz só `resumo` (RN-07); duas decisões que o PRD não fechava ficaram registradas: `projetos` traduz `titulo`/`descricao`, `perfil.formacao[]` traduz `grau`/`curso` |
 | v0.1.11 | 2026-09-03 | Desenvolvedor | **Q-07 resolvida:** o e-mail exibido publicamente é o institucional `haroldo.lima@ufma.br`, informado pelo stakeholder. O `PLACEHOLDER@ufma.br` de `content/perfil/index.md` foi substituído e o marcador em comentário YAML — risco operacional ativo desde o plano 017, apagável por qualquer save do formulário "Perfil" — deixou de existir. **A-06 confirmada**; a fase 3 não herda mais essa questão |
 | v0.1.12 | 2026-09-03 | Desenvolvedor | **Plano 019 DONE:** teste de paridade Zod × Tina (D-06) escrito, passando e rodando no CI (`6a42330`), o que fecha a mitigação prevista para o risco R-02. §12 passa de 5/9 a 6/9. Corrigiu a divergência real de formato de valor em `projetos.linha_relacionada`, do lado do Zod. Registrou como consequência conhecida, para a fase 2 e para o manual da fase 5, que o painel não bloqueia o save de item de lista embutida com subcampo obrigatório vazio — o Zod rejeita, e o professor levaria um build quebrado sem saber diagnosticar (F-09, RNF-09, R-01) |
+| v0.1.13 | 2026-09-03 | Desenvolvedor | **Q-06 resolvida:** o professor usará `haroldo.lima@ufma.br` — o mesmo institucional da Q-07 — como conta EDITOR no TinaCloud. Era o único bloqueio de stakeholder da fase 2, que agora depende só de a fase 1 fechar. Com isso restam duas questões abertas no §16: Q-04 (fase 3) e Q-05 (fase 5) |
 
 ---
 
@@ -906,12 +907,12 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | ~~Q-03~~ | ~~Qual o limite de minutos de build do Workers Builds no plano gratuito?~~ | Confirma A-03 e o risco R-06 | Desenvolvedor | Fase 0 | ✅ **2026-09-01:** 3.000 min/mês, 1 build simultâneo, teto de 20 min por build ([doc](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/)). A-03 confirmada; R-06 rebaixado para "muito baixa"; novo risco R-12 (fila de builds) registrado |
 | Q-04 | Referências visuais do site | Fase 3 (identidade visual) | Stakeholder | Antes da fase 3 | |
 | Q-05 | Haverá domínio próprio ou institucional? Se sim, quando? | URLs canônicas, sitemap, indexação (A-07) | Stakeholder | Antes da fase 5 | |
-| Q-06 | Qual e-mail do professor será usado como EDITOR no TinaCloud? | Fase 2 | Stakeholder | Fase 2 | |
+| ~~Q-06~~ | ~~Qual e-mail do professor será usado como EDITOR no TinaCloud?~~ | Fase 2 | Stakeholder | Fase 2 | ✅ **2026-09-03:** `haroldo.lima@ufma.br` — o mesmo e-mail institucional publicado no site (Q-07). O professor entra no TinaCloud com ele, e a fase 2 deixa de ter bloqueio de stakeholder |
 | ~~Q-07~~ | ~~O e-mail exibido publicamente é institucional? (§9, LGPD)~~ | Fase 3 | Professor | Fase 3 | ✅ **2026-09-03:** sim — `haroldo.lima@ufma.br`, e-mail institucional da UFMA, informado pelo stakeholder. Substituiu o `PLACEHOLDER@ufma.br` em `content/perfil/index.md`. **A-06 confirmada**; a §9 (LGPD) fica satisfeita sem formulário de contato |
 | ~~Q-08~~ | ~~A conta Google do Drive é do professor ou institucional?~~ | R-08 e a convenção de pastas | Stakeholder | Fase 0 | ✅ **2026-09-01:** questão dissolvida. O campo de material é uma **URL livre** — o professor cola o link de onde tiver hospedado (Drive, repositório institucional, arXiv, YouTube). O Google Drive passa de dependência a recomendação do manual. Ver D-07 |
 | Q-09 | Notícias e CV entram na v1.1 logo após a entrega, ou ficam indefinidos? | Planejamento pós-entrega | Stakeholder | Após a fase 5 | |
 
-> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-06 (fase 2), Q-04 (fase 3), Q-05 (fase 5). **Q-07 foi resolvida em 2026-09-03** — o e-mail institucional já está no conteúdo e a fase 3 não a herda mais. **Q-02 foi resolvida em 2026-09-01** — o painel em inglês é aceitável, o TinaCMS fica, e a fase 1 pode construir `tina/config.ts` sem risco de descarte.
+> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-04 (fase 3), Q-05 (fase 5). **Q-06 e Q-07 foram resolvidas em 2026-09-03**, ambas pelo mesmo e-mail institucional `haroldo.lima@ufma.br`: ele é o que o site publica (Q-07, já gravado em `content/perfil/index.md`) e também a conta com que o professor entra no TinaCloud (Q-06). **A fase 2 não tem mais bloqueio de stakeholder** — o que falta para ela é a fase 1 fechar. **Q-02 foi resolvida em 2026-09-01** — o painel em inglês é aceitável, o TinaCMS fica, e a fase 1 pode construir `tina/config.ts` sem risco de descarte.
 
 ---
 

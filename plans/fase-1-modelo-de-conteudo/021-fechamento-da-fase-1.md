@@ -123,13 +123,17 @@ O que a fase 1 acrescenta à lista, e precisa ir para o README da fase 1 como he
 O §16 do PRD lista o que bloqueia cada fase adiante. Confira e registre o estado real de cada
 uma no fechamento, porque é o que a fase seguinte vai ler:
 
-- **Q-06** (qual e-mail do professor será o EDITOR no TinaCloud) — **bloqueia a fase 2**, que é a
-  próxima. Se ainda estiver aberta ao fechar a fase 1, diga isso em voz alta no README da fase e
-  no relatório: é dependência de stakeholder, não de código, e é o gargalo do próximo passo.
+- ~~**Q-06** (qual e-mail do professor será o EDITOR no TinaCloud)~~ — **resolvida em
+  2026-09-03**: `haroldo.lima@ufma.br`. Era o gargalo do próximo passo; a fase 2 não tem mais
+  bloqueio de stakeholder e depende só de a fase 1 fechar. Registre assim, e **não** repita que
+  ela bloqueia.
+- ~~**Q-07** (o e-mail exibido publicamente é institucional)~~ — **resolvida em 2026-09-03**,
+  pelo mesmo e-mail. O `PLACEHOLDER@ufma.br` já saiu de `content/perfil/index.md` (`0978b3f`), e
+  o plano 020 não encosta mais nela.
 - **Q-04** (referências visuais) — bloqueia a fase 3, que o PRD marca como a mais sensível a
-  retrabalho justamente por isso.
-- **Q-07** (o e-mail exibido publicamente é institucional) — bloqueia a fase 3; o plano 020 é
-  quem encosta nela primeiro.
+  retrabalho justamente por isso. **É a única questão que bloqueia uma fase próxima**; a Q-05
+  (domínio próprio) só morde na fase 5.
+- **Q-09** (notícias e CV na v1.1) — pós-entrega, não bloqueia nada desta fase.
 
 ### 7. A fase 2 não é fatiada aqui
 
@@ -194,8 +198,9 @@ acrescente os que aparecerem nos planos 019 e 020:
       `plans/README.md` atualizado
 - [ ] Dívidas revisadas: as cinco da fase 0 continuam resolvidas, e as novas da fase 1
       registradas no README da fase
-- [ ] Estado das questões abertas registrado — **Q-06 nomeada explicitamente** como o que
-      bloqueia a fase 2, se ainda estiver aberta
+- [ ] Estado das questões abertas registrado — Q-06 e Q-07 **resolvidas em 2026-09-03**
+      (`haroldo.lima@ufma.br` para as duas); Q-04 nomeada como a única que bloqueia uma fase
+      próxima (a 3)
 - [ ] Seção "o que a fase 1 empurra para a fase 2" escrita no README da fase, com no mínimo os
       três itens já conhecidos
 - [ ] **Nenhum arquivo criado em `plans/fase-2-pipeline-de-publicacao/`** — o fatiamento da fase 2
