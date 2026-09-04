@@ -211,7 +211,38 @@ npm run lint          →  exit 0
 npm run format:check  →  All matched files use Prettier code style!
 npm run test:coverage →  testes verdes E cobertura ≥ 80% (threshold imposto)
 npm run build         →  0 errors, 0 warnings, 0 hints; Complete!
+CI do GitHub Actions  →  conclusion "success" no commit empurrado
 ```
+
+**A última linha foi acrescentada em 2026-09-04, e o motivo dói.** Esta lista era só de
+comandos locais, e por isso ninguém olhou para o CI durante a fase inteira: **ele esteve
+vermelho em 14 commits seguidos**, de `1d35c11` (plano 015) a `d832663`. Os planos 015 a 019
+foram executados, revisados e fechados com o portão de qualidade da casa satisfeito — porque o
+portão só enxergava a máquina de quem desenvolve.
+
+Causa única, reproduzida movendo o `.env` para fora e rodando o comando: `npm run build` começa
+por `tinacms build`, que aborta com `Client not configured properly. Missing clientId, token`
+sem `TINA_CLIENT_ID`/`TINA_TOKEN`, e o workflow não tinha bloco `env:` nem secrets.
+`--skip-cloud-checks` não contorna — a falha é anterior ao cloud check, na construção do
+cliente. O PRD previa a configuração, mas como item da **fase 2**: o plano 015 antecipou a
+dependência sem antecipar a credencial. Resolvido em 2026-09-04 (`82fb4de`), com os secrets
+criados pelo stakeholder; primeiro verde desde `1a0d6e6`, de 2026-09-02.
+
+No caminho saiu também um warning que ninguém tinha lido: `actions/checkout@v4` e
+`actions/setup-node@v4` têm como alvo o Node 20, aposentado, e o runner já as forçava para o
+Node 24 — viraria falha dura. Subidas para `v7` (`d832663`), com as breaking changes de cada
+major conferidas contra as notas de release. O run seguinte passou de duas anotações para uma,
+e o verde final tem **zero**.
+
+**Lição para as próximas fases: "os comandos locais passam" não é o mesmo que "o CI passa", e
+só o segundo é evidência.** Todo fechamento de plano confere o `conclusion` do run do commit
+empurrado.
+
+**Consequência nova para o fatiamento da fase 2.** Com o `tinacms build` agora rodando no CI, o
+acoplamento com o TinaCloud ganhou uma aresta: o comando compara o schema local com o que o
+TinaCloud indexou em `main`, e num push que **altere o schema** o CI pode correr antes da
+reindexação e falhar com `ERR_CLOUD_CHECK_FAILED` sem haver defeito. Localmente havia um humano
+para esperar e repetir — nos planos 017 e 018 foi exatamente isso; no CI não há.
 
 **A ordem de fechamento não é livre — descoberta no 017 e vale para todo plano que mude o
 schema.** O `npm run build` começa por `tinacms build`, que compara o schema local com o que o

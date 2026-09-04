@@ -12,7 +12,7 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.13 |
+| **Versão do PRD** | v0.1.14 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–019 DONE; 020–021 pendentes) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
@@ -40,6 +40,7 @@
 | v0.1.11 | 2026-09-03 | Desenvolvedor | **Q-07 resolvida:** o e-mail exibido publicamente é o institucional `haroldo.lima@ufma.br`, informado pelo stakeholder. O `PLACEHOLDER@ufma.br` de `content/perfil/index.md` foi substituído e o marcador em comentário YAML — risco operacional ativo desde o plano 017, apagável por qualquer save do formulário "Perfil" — deixou de existir. **A-06 confirmada**; a fase 3 não herda mais essa questão |
 | v0.1.12 | 2026-09-03 | Desenvolvedor | **Plano 019 DONE:** teste de paridade Zod × Tina (D-06) escrito, passando e rodando no CI (`6a42330`), o que fecha a mitigação prevista para o risco R-02. §12 passa de 5/9 a 6/9. Corrigiu a divergência real de formato de valor em `projetos.linha_relacionada`, do lado do Zod. Registrou como consequência conhecida, para a fase 2 e para o manual da fase 5, que o painel não bloqueia o save de item de lista embutida com subcampo obrigatório vazio — o Zod rejeita, e o professor levaria um build quebrado sem saber diagnosticar (F-09, RNF-09, R-01) |
 | v0.1.13 | 2026-09-03 | Desenvolvedor | **Q-06 resolvida:** o professor usará `haroldo.lima@ufma.br` — o mesmo institucional da Q-07 — como conta EDITOR no TinaCloud. Era o único bloqueio de stakeholder da fase 2, que agora depende só de a fase 1 fechar. Com isso restam duas questões abertas no §16: Q-04 (fase 3) e Q-05 (fase 5) |
+| v0.1.14 | 2026-09-04 | Desenvolvedor | **CI estava vermelho havia 14 commits e ninguém tinha visto.** De `1d35c11` (plano 015) a `d832663`, todo commit falhava em `npm run build`: o `tinacms build` aborta sem `TINA_CLIENT_ID`/`TINA_TOKEN`, e o workflow não os tinha. A fase 1 inteira foi executada e fechada com o portão de qualidade satisfeito só localmente. Resolvido em `82fb4de` com secrets no GitHub — metade do item de ambiente da fase 2, antecipada. As actions `checkout`/`setup-node` também subiram de v4 (Node 20, aposentado) para v7 em `d832663`. A verificação autoritativa da fase 1 passa a incluir o `conclusion` do run do commit empurrado |
 
 ---
 
@@ -777,7 +778,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 
 ### Fase 2 — Pipeline de Publicação
 - [ ] Workers Builds conectado ao repositório, build automático no push
-- [ ] Variáveis de ambiente configuradas no Cloudflare e no GitHub
+- [ ] Variáveis de ambiente configuradas no Cloudflare e no GitHub — **metade do GitHub feita em 2026-09-04**, antecipada por necessidade: `TINA_CLIENT_ID` e `TINA_TOKEN` viraram secrets e o workflow passou a injetá-los no passo de build (`82fb4de`). Sem isso o CI estava vermelho desde o plano 015. A metade do Cloudflare continua desta fase
 - [ ] `/admin` publicado e autenticando pelo TinaCloud em produção
 - [ ] Usuário EDITOR do professor criado, com permissões verificadas contra a matriz da §9
 - [ ] Verificado que o EDITOR **não** consegue alterar schema, código ou configuração
