@@ -11,7 +11,7 @@ Este arquivo é só o mapa.
 | Pasta | Fase | Estado | Planos |
 |---|---|---|---|
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
-| [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟡 **Em andamento** | 015–019 DONE; 020–021 TODO |
+| [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟡 **Em andamento** | 015–019 DONE; 020, 022 e 021 TODO (nesta ordem) |
 | `fase-2-pipeline-de-publicacao/` | 2 — Pipeline de publicação ponta a ponta | ⬜ Não iniciada | — |
 | `fase-3-site-publico/` | 3 — Site público em português | ⬜ Não iniciada | — |
 | `fase-4-internacionalizacao/` | 4 — Internacionalização | ⬜ Não iniciada | — |
@@ -35,8 +35,9 @@ garantia de que o ciclo de publicação fecha. Não foi o caminho escolhido.
 
 ## Convenções
 
-**Numeração é global e contínua**, não reinicia a cada fase. O plano 020 é o próximo, esteja em
-que pasta estiver. Isso preserva as referências já espalhadas por commits, ADRs, Evidências e
+**Numeração é global e contínua**, não reinicia a cada fase — e **não é ordem de execução**: o
+022 roda antes do 021, como o 014 rodou depois de a fase 0 fechar. O plano 020 é o próximo,
+esteja em que pasta estiver. Isso preserva as referências já espalhadas por commits, ADRs, Evidências e
 pelo PRD — um "plano 007" identifica um arquivo só, para sempre.
 
 **Onde cada plano vai:** na pasta da fase cujo checklist (§12 do PRD) ele fecha.

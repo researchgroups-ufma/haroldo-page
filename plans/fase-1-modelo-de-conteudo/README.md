@@ -20,9 +20,15 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 018 | Grupo "Versão em inglês (opcional)" | ✅ DONE | implementer | `6e5cb1f` |
 | 019 | Teste de paridade Zod × Tina (D-06) | ✅ DONE | implementer | `6a42330` |
 | 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
+| 022 | Lista `scripts[]` em disciplinas (schema Zod + Tina e paridade) | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 020 — Conteúdo placeholder representativo.
+**Próximo:** plano 020 — Conteúdo placeholder representativo. **A fila da fase mudou em
+2026-09-04:** 020 → **022** → 021. O 022 nasceu de escopo novo trazido pelo stakeholder — scripts
+Python exibidos na página da disciplina com destaque de sintaxe e botão de copiar — sabatinado no
+mesmo dia (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões) e emendado no PRD
+(RF-37, F-13, RN-05, D-05, R-13; v0.1.16). O **schema** é fase 1 porque é aqui que campo novo
+nasce barato; a **renderização** é fase 3. O 021 continua sendo o último — ele fecha a fase.
 
 **O que o 015 descobriu** (leia antes do 019): Tina + Astro 7 funciona, mas cobrou cinco
 correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herdou:
@@ -136,9 +142,9 @@ fase 3, não do 017.
 ## Grafo de dependências
 
 ```
-014 ─┬→ 015 ─→ 017 ─┬→ 018 ─┬→ 019 ─┬→ 021
-     │              │       │       │
-     └→ 016 ────────┴───────┴→ 020 ─┘
+014 ─┬→ 015 ─→ 017 ─┬→ 018 ─┬→ 019 ─┬──────────→ 021
+     │              │       │       │            ↑
+     └→ 016 ────────┴───────┴→ 020 ─┴→ 022 ──────┘
 ```
 
 - **015 ∥ 016** — o 015 mexe em `package.json` e `tina/config.ts`; o 016 em
@@ -148,6 +154,10 @@ fase 3, não do 017.
   foi melhor. Ele alterou `src/content.config.ts` (a normalização de `linha_relacionada`), e o
   020 agora cria conteúdo contra o schema já corrigido, podendo preencher o campo em vez de
   deixá-lo vazio.
+- **020 → 022, serial, não paralelo.** O 022 altera os dois schemas; o 020 cria conteúdo contra
+  eles. Rodar juntos repetiria exatamente o risco que a nota do 019 ∥ 020 levantava. O 022
+  depois do 020 também é melhor para a verificação de painel que ele exige: já existe uma
+  disciplina de verdade onde acrescentar o script, em vez de criar uma só para o teste.
 
 ## Por onde isto pode dar errado
 

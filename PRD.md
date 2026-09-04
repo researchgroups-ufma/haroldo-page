@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.14 |
+| **Versão do PRD** | v0.1.16 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–019 DONE; 020–021 pendentes) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
+| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–019 DONE; pendentes 020, **022** e 021 — o 022 é o plano da lista `scripts[]`, criado pela sabatina de 2026-09-04, e executa **antes** do 021, que fecha a fase) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-09-03 |
+| **Última atualização** | 2026-09-04 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav` |
 
@@ -41,6 +41,8 @@
 | v0.1.12 | 2026-09-03 | Desenvolvedor | **Plano 019 DONE:** teste de paridade Zod × Tina (D-06) escrito, passando e rodando no CI (`6a42330`), o que fecha a mitigação prevista para o risco R-02. §12 passa de 5/9 a 6/9. Corrigiu a divergência real de formato de valor em `projetos.linha_relacionada`, do lado do Zod. Registrou como consequência conhecida, para a fase 2 e para o manual da fase 5, que o painel não bloqueia o save de item de lista embutida com subcampo obrigatório vazio — o Zod rejeita, e o professor levaria um build quebrado sem saber diagnosticar (F-09, RNF-09, R-01) |
 | v0.1.13 | 2026-09-03 | Desenvolvedor | **Q-06 resolvida:** o professor usará `haroldo.lima@ufma.br` — o mesmo institucional da Q-07 — como conta EDITOR no TinaCloud. Era o único bloqueio de stakeholder da fase 2, que agora depende só de a fase 1 fechar. Com isso restam duas questões abertas no §16: Q-04 (fase 3) e Q-05 (fase 5) |
 | v0.1.14 | 2026-09-04 | Desenvolvedor | **CI estava vermelho havia 14 commits e ninguém tinha visto.** De `1d35c11` (plano 015) a `d832663`, todo commit falhava em `npm run build`: o `tinacms build` aborta sem `TINA_CLIENT_ID`/`TINA_TOKEN`, e o workflow não os tinha. A fase 1 inteira foi executada e fechada com o portão de qualidade satisfeito só localmente. Resolvido em `82fb4de` com secrets no GitHub — metade do item de ambiente da fase 2, antecipada. As actions `checkout`/`setup-node` também subiram de v4 (Node 20, aposentado) para v7 em `d832663`. A verificação autoritativa da fase 1 passa a incluir o `conclusion` do run do commit empurrado |
+| v0.1.15 | 2026-09-04 | Desenvolvedor | **Sabatina "Scripts Python nas disciplinas"** (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões): `disciplinas` ganha a lista embutida `scripts[]` — código-fonte colado no próprio conteúdo, para ser exibido na página com destaque de sintaxe e botão de copiar. **RF-37** (MUST) e **F-13** criados; §7.3 ganha a linha `scripts[]`; **RN-05 emendada** com exceção nomeada para código-fonte (NG-02 e D-07 permanecem inalteradas, por decisão explícita da sabatina). O **schema** é da fase 1, em plano próprio — o **022**, executado antes do 021 —, e a **renderização** é da fase 3: a §12 ganha um item em cada uma dessas fases. A tabela de progresso da §12 ainda dizia `5/9` na fase 1 desde a v0.1.12, divergindo do próprio checklist (6 itens marcados); corrigida junto, para `6/10` |
+| v0.1.16 | 2026-09-04 | Desenvolvedor | Duas pendências que a v0.1.15 deixou em aberto de propósito, fechadas: **D-05** passa a enumerar as cinco listas embutidas da disciplina (dizia três, e `bibliografia[]` já ficava de fora antes do `scripts[]`), e o risco técnico da sabatina vira **R-13** — código indentado que perde a indentação ao ser serializado em YAML pelo painel, com a verificação no painel como mitigação obrigatória e o retorno ao link externo como contingência |
 
 ---
 
@@ -192,6 +194,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-15 | COULD | CRUD de notícias | Dado o professor em Notícias, quando cria uma postagem com título, data, resumo e corpo, então ela aparece na listagem em ordem cronológica decrescente | ⬜ |
 | RF-16 | WONT | Fluxo de aprovação por branch com preview antes de publicar | — (Editorial Workflow, plano pago do TinaCloud; ver NG-07 e R-05) | — |
 | RF-17 | WONT | Importação automática de publicações (ORCID/Crossref/OpenAlex/BibTeX) | — (ver NG-03) | — |
+| RF-37 | MUST | Gestão de scripts de código dentro da disciplina (lista `scripts[]`) | Dado o professor editando uma disciplina, quando acrescenta um script informando o título, colando o código no campo e escolhendo a linguagem (`python` por padrão), e salva, então o script aparece na página da disciplina com destaque de sintaxe e botão de copiar — agrupado sob a aula correspondente quando o campo `aula` casa com uma aula existente, e no grupo geral da disciplina quando `aula` está vazio ou não casa com nenhuma (F-13) | ⬜ |
 
 #### Site público
 
@@ -244,7 +247,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RN-02 | Publicações são ordenadas por ano decrescente; dentro do mesmo ano, pela ordem de cadastro invertida (mais recente primeiro) | `briefing.md` §10 |
 | RN-03 | Uma disciplina é "atual" ou "anterior"; a transição é manual, feita pelo professor no campo `status` | Evita lógica de data que erraria a cada calendário acadêmico atípico |
 | RN-04 | Aulas, listas e materiais são ordenados pela posição definida pelo professor na lista, não por data | Aula 12 pode ser reagendada sem virar a ordem do curso |
-| RN-05 | Todo material didático é referenciado por URL externa, sem restrição de hospedeiro; o site não hospeda o arquivo | NG-02, D-07 |
+| RN-05 | Todo material didático é referenciado por URL externa, sem restrição de hospedeiro; o site não hospeda o arquivo — **exceto código-fonte, que fica no próprio conteúdo justamente para poder ser exibido** (`disciplinas.scripts[]`, RF-37) | NG-02, D-07 |
 | RN-06 | Se um campo do grupo "Versão em inglês" estiver vazio, a rota `/en` exibe o valor em português correspondente | D-03; padrão herdado de `../docs/plano-i18n.md` |
 | RN-07 | Campos factuais (DOI, arXiv, ano, links, imagens, e-mail) não são traduzíveis — existem uma única vez | Evita divergência entre idiomas em dado que não é texto |
 | RN-08 | Nome de arquivo de conteúdo é gerado por template a partir de campos do formulário; nunca digitado pelo professor | RF-03 / RNF-06 |
@@ -266,6 +269,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | F-10 | Dois itens gerando o mesmo nome de arquivo | O Tina impede a criação duplicada; o template de nome inclui discriminador suficiente (ano + slug do título) | "Já existe um item com este nome." |
 | F-11 | Professor exclui conteúdo por engano | O conteúdo permanece recuperável no histórico do Git pelo ADMIN | Manual: "conteúdo apagado pode ser recuperado — avise o responsável técnico" |
 | F-12 | Cota do plano gratuito excedida (builds ou requisições) | O ADMIN é notificado; ver R-04 e R-06 | — |
+| F-13 | Script com `aula` apontando para uma aula que não existe na disciplina | A página agrupa sob a aula os scripts cujo número casa e reúne os demais — os órfãos e os que nunca tiveram `aula` — num grupo geral da disciplina. O build não falha e nenhum script some da página; o script aparecer fora do lugar é o próprio aviso ao professor (RF-37) | — |
 
 ---
 
@@ -381,7 +385,7 @@ Três propriedades desta arquitetura merecem registro explícito:
 | D-02 | Painel por formulários; **sem** visual editing | Visual editing do Tina | O visual editing exige `output: 'server'`, adapter, ilhas Tina por página e consumo de cota do Worker. O ganho — clicar no texto — não paga a complexidade e o risco. O fluxo do briefing (login → formulário → publicar) é atendido integralmente |
 | D-03 | i18n por grupo "Versão em inglês" recolhível **dentro do mesmo arquivo**, com fallback por campo | Pastas `pt/` e `en/` espelhadas (padrão do LaFiM com Decap) | Um único editor: um arquivo por item elimina o risco de par órfão e mantém um formulário só. O fallback vira "campo vazio ⇒ usa PT", mais simples que merge por nome de arquivo |
 | D-04 | Rascunho como campo `publicado` no schema | Editorial Workflow do TinaCloud | Indisponível no plano gratuito (apenas Team Plus, US$ 41/mês). O campo entrega o essencial: conteúdo pela metade não vaza para o site. **Consequência desde 2026-09-01:** com o repositório público, `publicado: false` esconde do *site*, não do *GitHub* — o arquivo e todo o histórico de edição ficam legíveis por qualquer pessoa |
-| D-05 | Aulas, listas e materiais como listas embutidas no arquivo da disciplina | Coleção `aulas` separada com referência à disciplina | O professor abre a disciplina e vê tudo num lugar só, sem escolher a disciplina a cada aula. Consequência aceita: aula não tem página própria — se um dia precisar (texto longo, fórmulas, vídeo), migra-se para coleção separada |
+| D-05 | Aulas, listas, materiais, bibliografia e **scripts** como listas embutidas no arquivo da disciplina | Coleção `aulas` separada com referência à disciplina | O professor abre a disciplina e vê tudo num lugar só, sem escolher a disciplina a cada aula. Consequência aceita: aula não tem página própria — se um dia precisar (texto longo, fórmulas, vídeo), migra-se para coleção separada. `scripts[]` entrou em 2026-09-04 pela sabatina de scripts Python (RF-37); é a quinta lista sob esta decisão |
 | D-06 | Zod (Astro) é o portão de validação; Tina é a interface de entrada; paridade garantida por teste | Confiar apenas no schema do Tina | Dois schemas descrevem o mesmo conteúdo; divergência silenciosa produz build quebrado que o professor não sabe diagnosticar (F-09, RNF-09) |
 | D-07 | Campo de material é uma **URL livre**, agnóstica ao hospedeiro | Campo acoplado ao Google Drive (validação de domínio, seletor de arquivos do Drive) | Decisão do stakeholder em 2026-09-01: o que importa é o professor ter um link, não onde ele hospedou. O Drive vira recomendação do manual, não dependência de arquitetura — o que também elimina o acoplamento a uma conta Google específica |
 
@@ -430,6 +434,7 @@ Conteúdo em arquivos Markdown com frontmatter, em `content/` na raiz do projeto
 | `aulas[]` | lista de objetos | | `{ numero, titulo, data?, descricao?, url }` |
 | `listas[]` | lista de objetos | | `{ titulo, data_entrega?, url }` |
 | `materiais[]` | lista de objetos | | `{ titulo, tipo (slides/notas/complementar), descricao?, url }` |
+| `scripts[]` | lista de objetos | | `{ titulo, descricao?, linguagem (python/r/matlab/bash/outro), codigo, aula?, url? }` — `codigo` é o código-fonte colado no próprio conteúdo (RN-05, RF-37); `linguagem` tem `python` como padrão; `aula` é o número da aula correspondente, sem integridade referencial (F-13); `url` aponta o arquivo original, se houver |
 | `links[]` | lista de objetos | | `{ titulo, url }` — simulações, vídeos, páginas externas |
 | `publicado` | boolean | ✔ | |
 | `en` | grupo | | `nome`, `descricao`, `ementa` |
@@ -745,9 +750,9 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase | Itens concluídos | Status |
 |---|---|---|
 | Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
-| Fase 1 — Modelo de conteúdo | 5/9 | 🟡 Em andamento |
+| Fase 1 — Modelo de conteúdo | 6/10 | 🟡 Em andamento |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
-| Fase 3 — Site público (PT) | 0/11 | ⬜ Não iniciada |
+| Fase 3 — Site público (PT) | 0/12 | ⬜ Não iniciada |
 | Fase 4 — Internacionalização | 0/8 | ⬜ Não iniciada |
 | Fase 5 — Polimento e entrega | 0/14 | ⬜ Não iniciada |
 
@@ -775,6 +780,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [ ] Conteúdo placeholder representativo: 1 perfil, 2 linhas, 2 projetos, 2 disciplinas (uma com 5 aulas), 6 publicações em 3 anos
 - [ ] `/admin` funciona localmente e edita todas as coleções
 - [ ] Testes unitários da fase escritos e passando
+- [ ] Lista `scripts[]` em `disciplinas` (RF-37): schema Zod + Tina e paridade entre os dois — plano 022, executado **antes** do 021
 
 ### Fase 2 — Pipeline de Publicação
 - [ ] Workers Builds conectado ao repositório, build automático no push
@@ -794,6 +800,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [ ] Pesquisa (RF-22)
 - [ ] Ensino (RF-23)
 - [ ] Página de disciplina (RF-24)
+- [ ] Scripts da disciplina renderizados com destaque de sintaxe e botão de copiar, agrupados por aula (RF-37, F-13)
 - [ ] Publicações agrupadas por ano (RF-25)
 - [ ] Página 404 (RF-27)
 - [ ] Responsividade verificada de 360 px a 1440 px (RF-26)
@@ -846,6 +853,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | R-05 | Ausência de preview de rascunho frustra o professor ("não vejo como vai ficar") | Média | Médio | Campo `publicado` + explicação no manual; painel mostra o texto formatado ao editar | Publicar num horário de baixo tráfego e ajustar; ou avaliar Team Plus (US$ 41/mês) | Desenvolvedor |
 | R-06 | Cota de minutos de build do plano gratuito insuficiente para a frequência de edição | Muito baixa | Médio | Cota verificada: 3.000 min/mês ÷ ~2 min por build ≈ 1.500 publicações/mês, ordens de grandeza acima do uso previsto. Medir a duração real do build na fase 2 | Agrupar publicações (rascunho + publicação em lote) ou migrar o build para GitHub Actions | Desenvolvedor |
 | R-12 | Build simultâneo único: salvamentos em sequência rápida enfileiram builds | Média | Baixo | Comportamento aceito — a fila resolve sozinha; afeta apenas a latência de M-02 quando o professor salva várias vezes seguidas | Nenhum; se incomodar, plano pago permite 6 builds paralelos | Desenvolvedor |
+| R-13 | Código-fonte indentado perde a indentação ao ser gravado no frontmatter: em Python a indentação é sintaxe, e o script chega quebrado ao aluno sem erro em lugar nenhum | Média | Alto | O painel grava via `gray-matter`/`js-yaml`; o campo tem de ser serializado como *block scalar* (`\|`) e relido sem alteração de espaçamento. **Verificação obrigatória exercitando o painel** — salvar script com bloco indentado, linha em branco e aspas, e conferir o `.md` gravado (plano 022); leitura de `node_modules` não prova (RF-37, D-05) | Se a serialização não preservar, o campo volta a ser link externo e o snippet sai do MVP — a RN-05 retoma a forma anterior | Desenvolvedor |
 | R-07 | Professor não adota a ferramenta e o site envelhece — o problema original volta | Média | Alto | Painel em vocabulário acadêmico; manual com capturas; treinamento assistido; validação M-01 antes da entrega | Sessão de acompanhamento 30 dias após a entrega, ajustando os campos que atrapalharam | Desenvolvedor |
 | R-08 | Links de material quebram ou perdem permissão pública sem que ninguém perceba | Média | Médio | Texto de ajuda no campo; instrução no manual sobre compartilhamento público; convenção de organização recomendada (não imposta) | Verificador periódico de links (script, v1.2) | Professor |
 | R-09 | Falta de conteúdo real atrasa a validação e o site é entregue com placeholder | Alta | Médio | Placeholder realista desde a fase 1; entrega técnica não depende do conteúdo | Entregar o site funcional e treinar o professor para popular; conteúdo é responsabilidade dele após a entrega | Desenvolvedor |
