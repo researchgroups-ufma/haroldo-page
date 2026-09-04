@@ -41,16 +41,17 @@ correções depois de uma revisão que já havia aprovado. Três armadilhas que 
    `.gitignore`, `eslint.config.js` e — quando não for gitignorado — `.prettierignore`. O 017
    não criou diretório gerado novo, então não a exercitou; **a regra continua valendo** para
    qualquer plano que crie um.
-3. **`email: PLACEHOLDER@ufma.br`** em `content/perfil/index.md` é marcado só por comentário —
+3. **`email: PLACEHOLDER@ufma.br`** em `content/perfil/index.md` era marcado só por comentário —
    **materializou-se no 017**. Ao pôr `email` no schema do Tina, o painel passa a reserializar o
-   arquivo via `gray-matter`/`js-yaml`, que não preservam comentários YAML. O Perfil foi aberto
-   e conferido pelo orquestrador **mas não salvo**, de propósito, para preservar o marcador.
-   **Risco operacional ativo:** qualquer save real do formulário "Perfil" apaga as seis linhas de
-   comentário que registram Q-07 como aberta até a fase 3. Quem for tocar nisso precisa
-   substituir o e-mail placeholder por um institucional real **antes** do primeiro save.
-   **Continua ativa após o 018:** na verificação de painel do 018 (coleção "Linhas de pesquisa"),
-   o formulário "Perfil" não foi aberto nem salvo, de propósito — o risco segue intacto para o
-   020 e a fase 3.
+   arquivo via `gray-matter`/`js-yaml`, que não preservam comentários YAML; qualquer save real do
+   formulário "Perfil" apagaria as seis linhas de comentário que registravam Q-07. Por isso o
+   Perfil foi aberto e conferido nos planos 017 e 018 **mas nunca salvo**.
+   **Encerrada em 2026-09-03:** o stakeholder informou o e-mail institucional
+   (`haroldo.lima@ufma.br`), ele substituiu o placeholder e o bloco de comentário foi removido —
+   não há mais marcador frágil a preservar, e **o formulário "Perfil" pode ser salvo pelo painel
+   sem perda de informação**. Q-07 e A-06 fechadas no PRD (v0.1.11). A lição de fundo continua
+   valendo para qualquer plano futuro: **comentário em YAML não sobrevive ao painel** — o que
+   precisa ser preservado vai para um arquivo que o Tina não reserializa.
 
 **O que o 016 deixou aberto e o 017 fechou:** `corpo` (linhas-pesquisa), `ementa` (disciplinas) e
 `resumo` (publicações) seguem como `string` + `textarea` (frontmatter), **não** como body Markdown,
