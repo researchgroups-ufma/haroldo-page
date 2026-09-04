@@ -29,4 +29,14 @@ jobs:
       # test:coverage em vez de test: roda os mesmos testes e ainda impoe o
       # threshold de 80% da §11 do PRD, que ate 2026-09-01 era so relatado
       - run: npm run test:coverage
+      # `npm run build` comeca por `tinacms build`, que precisa de credenciais do
+      # TinaCloud: sem elas aborta com "Client not configured properly. Missing
+      # clientId, token" — e era por isso que o CI estava vermelho desde o plano
+      # 015. As variaveis ficam neste passo, e nao no job, porque nenhum dos
+      # outros precisa delas. `TINA_BRANCH` nao entra: `tina/config.ts` ja cai
+      # em 'main' por padrao. `PUBLIC_SITE_URL` tambem nao: `astro.config.mjs`
+      # tem fallback e o build nao depende dela.
       - run: npm run build
+        env:
+          TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
+          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
