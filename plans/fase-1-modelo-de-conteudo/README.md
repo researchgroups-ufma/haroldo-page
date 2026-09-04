@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-03
+Última atualização: 2026-09-04
 
 **Critério de conclusão da fase** (§6.2 do PRD): *o professor consegue, localmente, criar e
 editar item de cada coleção pelo painel.* Não é "os testes passam" — é usar o `/admin`.
@@ -19,12 +19,12 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 017 | As cinco coleções no `tina/config.ts` | ✅ DONE | implementer | `8a58afb` |
 | 018 | Grupo "Versão em inglês (opcional)" | ✅ DONE | implementer | `6e5cb1f` |
 | 019 | Teste de paridade Zod × Tina (D-06) | ✅ DONE | implementer | `6a42330` |
-| 020 | Conteúdo placeholder representativo | ⬜ TODO | implementer | — |
+| 020 | Conteúdo placeholder representativo | ✅ DONE | implementer | `aa9a7cf` |
 | 022 | Lista `scripts[]` em disciplinas (schema Zod + Tina e paridade) | ⬜ TODO | implementer | — |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 020 — Conteúdo placeholder representativo. **A fila da fase mudou em
-2026-09-04:** 020 → **022** → 021. O 022 nasceu de escopo novo trazido pelo stakeholder — scripts
+**Próximo:** plano 022 — lista `scripts[]` em disciplinas. **A fila da fase mudou em
+2026-09-04:** 020 (DONE) → **022** → 021. O 022 nasceu de escopo novo trazido pelo stakeholder — scripts
 Python exibidos na página da disciplina com destaque de sintaxe e botão de copiar — sabatinado no
 mesmo dia (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões) e emendado no PRD
 (RF-37, F-13, RN-05, D-05, R-13; v0.1.16). O **schema** é fase 1 porque é aqui que campo novo
@@ -138,6 +138,43 @@ fase 3, não do 017.
   019: 31/4/2) mostra que a segunda função e as duas branches novas só podem ser de
   `normalizeLinhaRelacionadaId`. A tabela de cobertura por arquivo sair vazia é defeito de
   reporter registrado desde o plano 015.
+
+**O que o 020 descobriu, e que o 022 vai encontrar** (ele também exercita o painel):
+
+- **O formulário do Tina descarta em silêncio alteração em campo que já tinha valor.** Ao voltar
+  de um subpainel de grupo `object` (o "Versão em inglês", o "Período de execução", um item de
+  lista embutida), o formulário re-inicializa a partir do documento carregado: alteração em campo
+  com valor inicial é perdida — **a tela mostra o valor novo e o arquivo grava o antigo** —,
+  enquanto campo que estava vazio sobrevive. O `defaultItem: { publicado: false }` conta como
+  valor inicial, então o interruptor "Publicado" é a vítima mais provável. Reproduzido com A/B de
+  uma variável duas vezes: uma linha de pesquisa gravou `publicado: false` com o interruptor
+  ligado na tela, e no Perfil `nome` e `bio` reverteram enquanto `departamento` (vazio antes)
+  gravou o valor novo. **Contorno:** altere esses campos **por último**, depois de sair de
+  qualquer subpainel, e confira o arquivo gravado a cada save. Isto é mais grave que a armadilha
+  do `aulas: [ {} ]` que o 017 registrou, porque não quebra o build — grava conteúdo errado que
+  passa em tudo.
+- **Projeto sem linha de pesquisa grava `linha_relacionada: ''`, não omite o campo,** e o Astro
+  rejeita: `Invalid content reference: ... references "" in collection "linhas-pesquisa", but
+  that entry does not exist`. Note o contraste: `codigo` vazio numa disciplina é **omitido** do
+  frontmatter — o problema é específico do tipo `reference`. **E o `astro check` registra esse
+  `[ERROR] [content]` e ainda assim encerra com `0 errors` e exit 0**, ou seja, a linha
+  `npm run build` da verificação autoritativa não reprova por isso. Quem fechar plano que crie
+  conteúdo precisa **ler** a saída, não só o exit code.
+- **A ponta herdada do 019 fechou.** O painel gravou
+  `linha_relacionada: content/linhas-pesquisa/sombras-de-buracos-negros.md` — a premissa da
+  correção estava certa — e `getEntry()` resolveu de fato depois de `normalizeLinhaRelacionadaId`,
+  devolvendo a entrada, não `undefined`. Detalhe que quase produziu falso negativo: a content
+  layer tinha cache de quando as pastas estavam vazias, e só depois de `astro dev --force` a prova
+  valeu. **Toda verificação de conteúdo em dev server que já estava no ar precisa desse `--force`.**
+- **Restrição passada à fase 3:** título de linha, projeto e disciplina **não** carrega marca de
+  placeholder — só a `descricao` carrega. Uma listagem que renderize apenas o título exibiria
+  conteúdo inventado sobre uma pessoa real sem marcador, num repositório público. Decisão do
+  stakeholder em 2026-09-04: fica assim, porque os placeholders serão substituídos por conteúdo
+  real. A fase 3 tem de mostrar a descrição junto do título, ou marcar de outro jeito.
+- **Divergência de documentação a corrigir em plano futuro:** a docstring de
+  `src/content.config.ts:239-241` chama a referência inválida de "falha silenciosa que só
+  apareceria na fase 3". O 020 provou que o `astro check` a reporta em voz alta hoje — o
+  silencioso é o *exit code*, não o erro.
 
 ## Grafo de dependências
 

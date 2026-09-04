@@ -12,9 +12,9 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.16 |
+| **Versão do PRD** | v0.1.17 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–019 DONE; pendentes 020, **022** e 021 — o 022 é o plano da lista `scripts[]`, criado pela sabatina de 2026-09-04, e executa **antes** do 021, que fecha a fase) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
+| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–020 DONE; pendentes **022** e 021 — o 022 é o plano da lista `scripts[]`, criado pela sabatina de 2026-09-04, e executa **antes** do 021, que fecha a fase) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -43,6 +43,7 @@
 | v0.1.14 | 2026-09-04 | Desenvolvedor | **CI estava vermelho havia 14 commits e ninguém tinha visto.** De `1d35c11` (plano 015) a `d832663`, todo commit falhava em `npm run build`: o `tinacms build` aborta sem `TINA_CLIENT_ID`/`TINA_TOKEN`, e o workflow não os tinha. A fase 1 inteira foi executada e fechada com o portão de qualidade satisfeito só localmente. Resolvido em `82fb4de` com secrets no GitHub — metade do item de ambiente da fase 2, antecipada. As actions `checkout`/`setup-node` também subiram de v4 (Node 20, aposentado) para v7 em `d832663`. A verificação autoritativa da fase 1 passa a incluir o `conclusion` do run do commit empurrado |
 | v0.1.15 | 2026-09-04 | Desenvolvedor | **Sabatina "Scripts Python nas disciplinas"** (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões): `disciplinas` ganha a lista embutida `scripts[]` — código-fonte colado no próprio conteúdo, para ser exibido na página com destaque de sintaxe e botão de copiar. **RF-37** (MUST) e **F-13** criados; §7.3 ganha a linha `scripts[]`; **RN-05 emendada** com exceção nomeada para código-fonte (NG-02 e D-07 permanecem inalteradas, por decisão explícita da sabatina). O **schema** é da fase 1, em plano próprio — o **022**, executado antes do 021 —, e a **renderização** é da fase 3: a §12 ganha um item em cada uma dessas fases. A tabela de progresso da §12 ainda dizia `5/9` na fase 1 desde a v0.1.12, divergindo do próprio checklist (6 itens marcados); corrigida junto, para `6/10` |
 | v0.1.16 | 2026-09-04 | Desenvolvedor | Duas pendências que a v0.1.15 deixou em aberto de propósito, fechadas: **D-05** passa a enumerar as cinco listas embutidas da disciplina (dizia três, e `bibliografia[]` já ficava de fora antes do `scripts[]`), e o risco técnico da sabatina vira **R-13** — código indentado que perde a indentação ao ser serializado em YAML pelo painel, com a verificação no painel como mitigação obrigatória e o retorno ao link externo como contingência |
+| v0.1.17 | 2026-09-04 | Desenvolvedor | **Plano 020 DONE** (`aa9a7cf`): conteúdo placeholder representativo nas cinco coleções — 13 arquivos criados **pelo painel**, com os nomes saindo dos templates da RN-08. §12 passa de 6/10 a 7/10 na fase 1. O perfil usa os dados reais do Apêndice C; as 6 publicações são inventadas e marcadas de forma redundante (`[EXEMPLO]` no título, `[CONTEÚDO DE EXEMPLO]` no texto, `exemplo.invalid` nos URLs, `10.0000/` nos DOIs), porque o repositório é público e elas ficam atribuídas a uma pessoa real. Fechou a ponta que o 019 não conseguiu verificar: `getEntry()` resolve de fato depois de `normalizeLinhaRelacionadaId`. Dois achados novos do painel, da família F-09: o formulário descarta em silêncio alteração em campo que já tinha valor quando se volta de um subpainel; e projeto sem linha de pesquisa grava `linha_relacionada: ''`, que o Astro rejeita como referência inválida embora o `astro check` ainda encerre com `0 errors` e exit 0 — insumo para a fase 2 (F-09, RNF-09) e para o manual da fase 5 |
 
 ---
 
@@ -750,7 +751,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase | Itens concluídos | Status |
 |---|---|---|
 | Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
-| Fase 1 — Modelo de conteúdo | 6/10 | 🟡 Em andamento |
+| Fase 1 — Modelo de conteúdo | 7/10 | 🟡 Em andamento |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
 | Fase 3 — Site público (PT) | 0/12 | ⬜ Não iniciada |
 | Fase 4 — Internacionalização | 0/8 | ⬜ Não iniciada |
@@ -777,7 +778,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Grupo "Versão em inglês (opcional)" nas coleções traduzíveis (RN-06) — plano 018 (`6e5cb1f`); grupo `en` opcional nas cinco coleções, em paridade entre `src/content.config.ts` e `tina/config.ts`; `publicacoes` traduz só `resumo` (RN-07); decisões de `projetos` (`titulo`/`descricao`) e de `perfil.formacao[]` (`grau`/`curso`) registradas na Evidência do plano
 - [x] Templates de nome de arquivo configurados (RN-08) — plano 017; `{semestre}-{slug(nome)}.md` e `{ano}-{slug(titulo)}.md` conforme o PRD, `{slug(titulo)}.md` para `linhas-pesquisa` e `projetos`, que o PRD não prescreve. Verificado criando um item de cada coleção pelo painel
 - [x] Teste de paridade de schema passando (D-06) — plano 019 (`6a42330`); `tests/content/paridade-schema.test.ts` compara campos, obrigatoriedade, enums, grupo `en` e listas embutidas por introspecção do Zod 4 contra a árvore `fields` do Tina, provado falsificável nos dois sentidos. Roda no CI (`npm run test:coverage`), o que fecha a mitigação do risco R-02. Corrigiu a divergência real de `projetos.linha_relacionada` (o Tina grava o id com pasta e extensão; o `glob()` do Astro espera sem) do lado do Zod, por `normalizeLinhaRelacionadaId`
-- [ ] Conteúdo placeholder representativo: 1 perfil, 2 linhas, 2 projetos, 2 disciplinas (uma com 5 aulas), 6 publicações em 3 anos
+- [x] Conteúdo placeholder representativo: 1 perfil, 2 linhas, 2 projetos, 2 disciplinas (uma com 5 aulas), 6 publicações em 3 anos — plano 020 (`aa9a7cf`); os 13 arquivos criados **pelo painel**, com os nomes saindo dos templates da RN-08. Perfil com os dados reais do Apêndice C; as 6 publicações inventadas e marcadas de forma redundante (`[EXEMPLO]` no título, `[CONTEÚDO DE EXEMPLO]` no texto, `exemplo.invalid` nos URLs, `10.0000/` nos DOIs), porque o repositório é público e elas ficam atribuídas a uma pessoa real. Fechou a ponta herdada do 019: `getEntry()` resolve de fato depois de `normalizeLinhaRelacionadaId`
 - [ ] `/admin` funciona localmente e edita todas as coleções
 - [ ] Testes unitários da fase escritos e passando
 - [ ] Lista `scripts[]` em `disciplinas` (RF-37): schema Zod + Tina e paridade entre os dois — plano 022, executado **antes** do 021
