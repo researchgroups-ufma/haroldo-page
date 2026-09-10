@@ -11,7 +11,7 @@ Este arquivo é só o mapa.
 | Pasta | Fase | Estado | Planos |
 |---|---|---|---|
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
-| [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟡 **Em andamento** | 015–020 e 022 DONE; falta só o 021 |
+| [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–020 e 022 DONE; 021 com a execução e a demonstração do painel fechadas — falta a promoção (revisão, commit, CI) |
 | `fase-2-pipeline-de-publicacao/` | 2 — Pipeline de publicação ponta a ponta | ⬜ Não iniciada | — |
 | `fase-3-site-publico/` | 3 — Site público em português | ⬜ Não iniciada | — |
 | `fase-4-internacionalizacao/` | 4 — Internacionalização | ⬜ Não iniciada | — |

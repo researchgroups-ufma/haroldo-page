@@ -237,7 +237,8 @@ const projetosEnSchema = z
  * `id: fullPath`) —, enquanto o loader `glob()` do Astro gera o id sem pasta nem extensão, ex.:
  * `"minha-linha"` (`astro/dist/content/runtime.js:508-534`). Sem esta normalização,
  * `reference()` aceita a string sintaticamente (não valida existência) mas `getEntry()` devolve
- * `undefined` em runtime — falha silenciosa que só apareceria na fase 3. A reconciliação foi
+ * `undefined` em runtime — o `astro check` já reporta isso como `[ERROR] [content]` hoje; o que é
+ * silencioso é o exit code (0), não o erro (plano 020). A reconciliação foi
  * decidida aqui, do lado do Zod, porque é comprovável por teste unitário com a string literal que
  * o Tina grava; a nota equivalente em `tina/config.ts` foi removida (plano 019).
  *

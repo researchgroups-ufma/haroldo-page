@@ -6,6 +6,6 @@ periodo:
   fim: '2025.2'
 financiador: Sem financiamento externo
 status: concluído
-descricao: 'Investigação das forças de maré sentidas por corpos em queda em espaços-tempos de Kerr, incluindo o regime próximo ao horizonte. [CONTEÚDO DE EXEMPLO]'
+descricao: 'Investigação das forças de maré sentidas por corpos em queda em espaços-tempos de Kerr, incluindo o regime próximo ao horizonte. Editado pelo plano 021 para demonstrar o critério de conclusão da fase 1. [CONTEÚDO DE EXEMPLO]'
 ---
 

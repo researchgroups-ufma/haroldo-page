@@ -30,6 +30,15 @@ mesmo dia (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões) 
 (RF-37, F-13, RN-05, D-05, R-13; v0.1.16). O **schema** é fase 1 porque é aqui que campo novo
 nasce barato; a **renderização** é fase 3. O 021 continua sendo o último — ele fecha a fase.
 
+**Estado do 021 em 2026-09-10 (ainda `TODO`, como deve ser):** toda a execução está fechada — ADRs
+0003 a 0008, a correção da docstring de `normalizeLinhaRelacionadaId`, a soma dos testes da fase
+(107, cobertura 100%), o checklist §12 (agora **10/10**) e este README —, **e o passo 3 do plano
+também fechou**: o orquestrador demonstrou o critério de conclusão da fase (§6.2) criando e
+editando um item em cada uma das cinco coleções pelo `/admin`, com o arquivo gravado conferido a
+cada save (Evidência do plano 021). O que falta é só a parte administrativa, que não é deste
+executor: revisão de código, commit, push e `conclusion` verde do CI — depois disso o orquestrador
+promove `Status: DONE`.
+
 **O que o 015 descobriu** (leia antes do 019): Tina + Astro 7 funciona, mas cobrou cinco
 correções depois de uma revisão que já havia aprovado. Três armadilhas que o 017 herdou:
 
@@ -163,7 +172,22 @@ fase 3, não do 017.
   vez. Como a verificação de painel do 022 é a prova do R-13, conferir só o bloco de `codigo`
   aprovaria o plano com a prova pela metade — o item gravado se confere **campo a campo**.
   **E no 021:** o critério de conclusão da fase pede *editar* um item existente em cada coleção,
-  que é literalmente o gatilho. A tela não é prova; o arquivo é.
+  que é literalmente o gatilho — e a demonstração do orquestrador encontrou uma **segunda
+  manifestação da mesma causa**, não a mesma manifestação. A tela não é prova; o arquivo é.
+- **Segunda manifestação do descarte silencioso, encontrada pelo 021 ao demonstrar o critério da
+  fase.** O gatilho é idêntico ao do 020 — voltar de um subpainel de grupo `object` re-inicializa
+  o formulário a partir do documento carregado —, mas o efeito observado ao editar `resumo` e
+  `corpo` de uma linha de pesquisa (um com valor, outro vazio) e entrar/sair do subpainel "Versão
+  em inglês" foi **perda visível da edição pendente**, não gravação silenciosa do valor antigo: os
+  dois campos voltaram ao valor anterior **na própria tela**, o botão `Save` desabilitou e o
+  indicador de estado voltou a "limpo", como se nada tivesse sido editado — inclusive o campo que
+  estava vazio, que no 020 tinha sobrevivido. Reproduzido duas vezes (valor setado
+  programaticamente e digitado pelo teclado), para descartar que o método de entrada fosse a
+  causa. **Isto não desmente o 020** — a causa de fundo é uma só —, mas mostra que o caminho até
+  ela decide qual dos dois efeitos aparece, e esse caminho ainda não está mapeado. **Regra
+  operacional que cobre as duas manifestações:** salve antes de navegar entre subpainéis (o 022 já
+  tinha achado esse contorno mais confiável que "altere por último"), e nunca trate a tela como
+  prova — confira o arquivo gravado.
 - **Projeto sem linha de pesquisa grava `linha_relacionada: ''`, não omite o campo,** e o Astro
   rejeita: `Invalid content reference: ... references "" in collection "linhas-pesquisa", but
   that entry does not exist`. Note o contraste: `codigo` vazio numa disciplina é **omitido** do
@@ -171,6 +195,17 @@ fase 3, não do 017.
   `[ERROR] [content]` e ainda assim encerra com `0 errors` e exit 0**, ou seja, a linha
   `npm run build` da verificação autoritativa não reprova por isso. Quem fechar plano que crie
   conteúdo precisa **ler** a saída, não só o exit code.
+  **Confirmado de novo no 021, com a causa e o artefato distinguidos:** a **causa** não é nova —
+  é este mesmo defeito do painel, documentado desde o 020. O **artefato** foi produzido nesta
+  sessão: ao editar só a `descricao` de `content/projetos/forcas-de-mare-em-espacos-tempos-de-kerr.md`
+  pelo painel, durante a demonstração do critério da fase pelo orquestrador, o Tina acrescentou
+  `linha_relacionada: ''` a um arquivo que o plano 020 tinha criado válido, **sem** esse campo. O
+  `npm run build` daquela tentativa reproduziu o `[ERROR] [content]` com exit 0; a linha foi
+  removida à mão antes da verificação autoritativa do plano 021, que fechou sem nenhum `[ERROR]`
+  (ver Evidência do plano 021, seção 6). **Sem essa remoção manual, o commit que fecha a fase 1
+  teria ido com `lint`, `format`, `test` e `build` todos verdes e uma referência de conteúdo
+  inválida no repositório** — foi um humano lendo a saída, não o portão de qualidade, que
+  impediu isso. É a materialização concreta do item 5 da lista "empurra para a fase 2".
 - **A ponta herdada do 019 fechou.** O painel gravou
   `linha_relacionada: content/linhas-pesquisa/sombras-de-buracos-negros.md` — a premissa da
   correção estava certa — e `getEntry()` resolveu de fato depois de `normalizeLinhaRelacionadaId`,
@@ -213,26 +248,111 @@ fase 3, não do 017.
   round-trip é byte-idêntico: 323 bytes de ida e de volta, indentação preservada linha a linha
   (`[0,4,4,8,4,0,0,4,4]`), linha em branco no meio e aspas simples e duplas intactas. A
   contingência prevista no risco (voltar `codigo` a link externo) fica sem objeto.
-- **Três divergências no `README.md` da raiz, todas encontradas pelo 022 e nenhuma consertada por
-  ele** (o plano fecha o escopo em quatro arquivos; a correção é do 021, que já é o plano dos
-  ajustes de documentação):
-  1. **`npm run dev` é apresentado como a forma de rodar o painel** (`README.md:126-133`: "Isso
+- **Três divergências no `README.md` da raiz, todas encontradas pelo 022 e corrigidas pelo 021**
+  (o 022 fechou o escopo em quatro arquivos; o 021 já é o plano dos ajustes de documentação):
+  1. **`npm run dev` era apresentado como a forma de rodar o painel** (`README.md:126-133`: "Isso
      executa `tinacms dev -c \"astro dev\"`: sobe o servidor local do Tina (...) e, em seguida, o
-     `astro dev`"). No Astro 7 isso não acontece — ver o achado acima. Quem seguir o README hoje
-     cai na tela "Failed loading TinaCMS assets".
-  2. **A tabela de comandos descreve `npm run build` como "`astro check` seguido de `astro build`"**
+     `astro dev`"). No Astro 7 isso não funciona — ver o achado do 022 acima. **Corrigido pelo
+     021** para o comando que funciona (`npx astro dev --background --force` + `npx tinacms dev`,
+     com o encerramento correspondente), com a explicação de por que o antigo engana.
+  2. **A tabela de comandos descrevia `npm run build` como "`astro check` seguido de `astro build`"**
      (`README.md:81`), omitindo o `tinacms build` que vem antes — que é justamente a etapa que
      depende do TinaCloud e que deixou o CI vermelho por 14 commits. Divergência **anterior** ao
-     022, provavelmente do plano 015, que acrescentou o `tinacms build` ao script.
+     022, provavelmente do plano 015, que acrescentou o `tinacms build` ao script. **Corrigido**.
   3. **"hoje só a coleção `perfil`; as outras quatro entram no plano 017"** (`README.md:129-130`)
-     está desatualizado desde que o 017 fechou.
-  A mesma linha do README que manda subir `npm run dev` uma vez para regenerar o
-  `tina/tina-lock.json` (`README.md:148-153`) continua **correta no conteúdo** — só o comando é que
-  mudou.
-- **Divergência de documentação a corrigir no 021, ao lado da que o 020 já deixou:** a §7.3 do PRD
-  (`PRD.md:438`) lista `scripts[]` **antes** de `links[]`, enquanto o código põe `scripts` **depois**
-  de `links` nos dois lados, como o plano 022 mandou. Nada quebra — o teste de paridade compara
-  conjuntos, não ordem —, mas as duas leituras da mesma fonte divergem na ordem.
+     estava desatualizado desde que o 017 fechou. **Corrigido** para listar as cinco coleções.
+  A linha do README que manda regenerar `tina/tina-lock.json` subindo o Tina uma vez
+  (`README.md:148-153`) continuava **correta no conteúdo** — só o comando mudou: de `npm run dev`
+  para `npx tinacms dev`, que é a parte que de fato regenera o lock.
+- **Divergência de documentação corrigida pelo 021:** a §7.3 do PRD listava `scripts[]` **antes**
+  de `links[]`, enquanto o código põe `scripts` **depois** de `links` nos dois lados, como o plano
+  022 mandou. Nada quebrava — o teste de paridade compara conjuntos, não ordem —, mas as duas
+  leituras da mesma fonte divergiam na ordem; a tabela do PRD foi reordenada para bater com o
+  código.
+
+**O que o 021 descobriu ao demonstrar o critério de conclusão da fase** (§6.2: criar **e** editar
+um item em cada uma das cinco coleções pelo `/admin`, executado pelo orquestrador):
+
+- **O critério foi demonstrado nas cinco coleções**, com o arquivo gravado conferido a cada save
+  — ver a Evidência do plano 021. Os quatro itens criados (`linhas-pesquisa`, `projetos`,
+  `disciplinas`, `publicacoes`) foram removidos depois da verificação, por decisão de quem
+  demonstrou: são duplicatas descartáveis num repositório público, atribuídas a uma pessoa real, e
+  o plano 020 já cura o conjunto placeholder representativo. A prova da criação é o `git status`
+  registrado na Evidência, não a permanência dos arquivos. As quatro edições em itens existentes
+  permanecem; o `perfil` voltou ao estado do HEAD depois de editado e revertido pelo próprio
+  painel.
+- **A segunda manifestação do descarte silencioso** (perda visível da edição pendente, não
+  gravação do valor antigo) — descrita no bloco acima, junto da primeira manifestação do 020.
+- **`forcas-de-mare-em-espacos-tempos-de-kerr` voltou a gravar `linha_relacionada: ''`** ao ter só
+  a `descricao` editada. A causa não é nova — é a dívida que o 020 já tinha registrado —, mas o
+  artefato foi produzido nesta sessão, em arquivo que o plano 020 tinha criado sem esse campo; ver
+  o tratamento completo (causa × artefato, e por que só a leitura humana da saída impediu que isso
+  fosse ao commit) no item 5 da lista "empurra para a fase 2" e na Evidência do plano 021.
+- **`publicacoes.autores[]` é outra instância da dívida "subcampo obrigatório de lista embutida
+  não bloqueia o save".** Até aqui todas as instâncias conhecidas eram listas de **objetos**
+  (`aulas[]`, `listas[]`, `materiais[]`, `bibliografia[]`, `scripts[].titulo`/`scripts[].codigo`);
+  esta é a primeira em lista de **string simples**: o botão `Save` habilitou com o item de
+  `autores` vazio ao criar uma publicação pelo painel. Mesma causa (o `ui` da variante de lista
+  não declara `validate`), alcance maior do que se sabia.
+
+## O que a fase 1 empurra para a fase 2
+
+Decisão do stakeholder em 2026-09-03: a fase 2 só é fatiada depois de a fase 1 fechar
+integralmente, para que o fatiamento já incorpore o que só se descobre implementando. Esta é a
+lista de partida — os itens 1 a 3 já se sabiam quando o plano 021 foi escrito; os itens 4 a 7
+vieram dos planos 019, 020 e 022 e estão descritos em detalhe nas seções por plano, acima.
+
+1. **Acoplamento com o TinaCloud no build.** `tinacms build` compara o schema local com o que o
+   TinaCloud indexou em `main` e reprova com `ERR_CLOUD_CHECK_FAILED` enquanto o commit não sobe.
+   Funciona no fluxo local (revisão → commit → push → build), mas a fase 2 precisa verificar o
+   que acontece no build de produção do Workers, onde não há humano para ordenar os passos.
+2. **`tina/tina-lock.json` versionado e regenerado só por `tinacms dev`.** Quem mudar schema tem
+   de rodar o dev server e commitar o lock — passo manual fácil de esquecer. A fase 2 decide se
+   vira verificação de CI.
+3. **Mensagem de erro de build legível pelo professor (F-09, R-01).** O risco já se materializou
+   em miniatura: o painel aceita salvar lista embutida com subcampo obrigatório vazio
+   (`aulas[]`, `listas[]`, `materiais[]`, `bibliografia[]`, desde o 022 `scripts[].titulo` e
+   `scripts[].codigo`, e desde o 021 `publicacoes.autores[]` — a primeira instância em lista de
+   string simples, não de objetos), e o Zod rejeita só depois, no build. A fase 2 é quem monta a
+   notificação de falha de build.
+4. **O painel grava conteúdo errado sem quebrar nada**, com duas manifestações observadas da mesma
+   causa (voltar de um subpainel de grupo `object` re-inicializa o formulário a partir do
+   documento carregado): o plano 020 encontrou a gravação silenciosa do valor antigo enquanto a
+   tela mostra o novo; o plano 021, ao demonstrar o critério da fase, encontrou a perda visível da
+   edição pendente (a tela também revela o valor antigo). É a única dívida da fase 1 que passa por
+   todo o portão de qualidade — build, testes, lint e CI ficam verdes com o conteúdo errado (ou a
+   edição perdida) no disco. A fase 2 decide se existe verificação automatizável; se não existir, é
+   aviso obrigatório no manual da fase 5.
+5. **`astro check` reporta `[ERROR] [content]` e sai com exit 0** (plano 020). O `npm run build`
+   do CI não reprova por referência inválida de conteúdo. Candidato direto a passo de CI da fase
+   2 — hoje a garantia é um humano ler a saída, não o exit code. **Materialização concreta em
+   2026-09-10:** ao demonstrar o critério de conclusão da fase pelo painel (plano 021), editar só
+   a `descricao` de `content/projetos/forcas-de-mare-em-espacos-tempos-de-kerr.md` fez o Tina
+   acrescentar `linha_relacionada: ''` a um arquivo que o plano 020 tinha criado válido — sem esse
+   campo. O `npm run build` daquela tentativa reproduziu o `[ERROR] [content]` com exit 0; só não
+   chegou ao commit que fecha a fase 1 porque um humano leu a saída e removeu a linha à mão antes
+   da verificação autoritativa (Evidência do plano 021, seção 6). Sem isso, o commit teria ido com
+   `lint`, `format`, `test` e `build` todos verdes e uma referência inválida no repositório.
+6. **`npm audit` com 8 vulnerabilidades moderadas** de `react-router`, via
+   `tinacms → react-router-dom` (GHSA-wrjc-x8rr-h8h6). Sem correção nossa; o site público não
+   carrega React (D-01), então o alcance é só o `/admin`. A fase 2 decide se o CI passa a rodar
+   `npm audit` e em que severidade reprova.
+7. **Três buracos do teste de paridade** (revisão do plano 019, ainda abertos): o `path` da
+   coleção no Tina nunca é comparado contra a pasta que o `glob()` do Zod lê; a detecção de enum
+   do lado Tina vem depois do ramo `campo.list`, então um campo futuro com `list: true` **e**
+   `options` teria os valores não comparados (não existe campo assim hoje); e a prova de
+   falsificabilidade foi produzida contra 11 testes, não contra o artefato final de 12. Nenhum é
+   defeito ativo — são o próximo lugar onde a D-06 (ADR-0008) vaza.
+
+Nenhum item **novo na lista** apareceu no 022 nem no 021 — os sete continuam sendo os mesmos
+sete. O que os dois planos acrescentaram foram **instâncias** e **manifestações** dentro de itens
+já existentes: o 022 confirmou instâncias novas do item 3 (`scripts[].titulo`/`scripts[].codigo`)
+e registrou achados operacionais próprios (`npm run dev` não sobe o painel no Astro 7; a
+armadilha do item 4 tem um contorno melhor que "alterar por último"), já corrigidos ou descritos
+nas seções por plano acima; o 021 acrescentou a instância de `publicacoes.autores[]` ao item 3 e a
+segunda manifestação (perda visível, não gravação silenciosa) ao item 4, ao demonstrar o critério
+de conclusão da fase. Nenhuma dessas é item novo de fatiamento — são profundidade do que a fase 2
+já sabia que tinha de resolver.
 
 ## Grafo de dependências
 

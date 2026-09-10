@@ -5,6 +5,6 @@ autores:
   - 'LIMA JUNIOR, HAROLDO C. D.'
 ano: 2023
 tipo: outro
-resumo: 'Notas fictícias criadas como conteúdo de exemplo para a fase 1 do site. Este item fica com "Publicado" desmarcado de propósito, para exercer a RN-01. [CONTEÚDO DE EXEMPLO]'
+resumo: 'Notas fictícias criadas como conteúdo de exemplo para a fase 1 do site. Este item fica com "Publicado" desmarcado de propósito, para exercer a RN-01. Editado pelo plano 021 para demonstrar o critério de conclusão da fase 1. [CONTEÚDO DE EXEMPLO]'
 ---
 

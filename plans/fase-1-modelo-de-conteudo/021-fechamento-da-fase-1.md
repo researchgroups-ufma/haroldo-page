@@ -256,41 +256,411 @@ identificados** — confira se algum outro apareceu, mas não recomece a lista:
 
 ## Critérios de aceitação
 
-- [ ] ADRs 0003 a 0007 escritos, curtos, em português, com data absoluta
-- [ ] Caso da D-06 decidido e justificado
-- [ ] **Critério de conclusão da fase demonstrado**: item criado **e** editado em cada uma das
+- [x] ADRs 0003 a 0007 escritos, curtos, em português, com data absoluta
+- [x] Caso da D-06 decidido e justificado — ADR-0008, justificativa inline na própria seção
+      "Decisão sobre registrar esta decisão num ADR próprio"
+- [x] **Critério de conclusão da fase demonstrado**: item criado **e** editado em cada uma das
       cinco coleções pelo `/admin`, com prova no `git status` **e o arquivo gravado conferido em
-      cada save** — a tela não é prova (armadilha do descarte silencioso, seção 2)
-- [ ] Testes da fase somados e conferidos contra a meta da §11; decisão sobre `thresholds`
+      cada save** — a tela não é prova (armadilha do descarte silencioso, seção 2). Demonstrado
+      pelo orquestrador; ver Evidência
+- [x] Testes da fase somados e conferidos contra a meta da §11; decisão sobre `thresholds`
       registrada
-- [ ] §12: os **10** itens da fase 1 marcados e a tabela em `10/10 🟢`, com as caixas batendo
-- [ ] Linha de versão acrescentada em §0.1, **com o número correto** — confira o histórico
-- [ ] **Cabeçalho §0 do PRD atualizado**: `Status`, `Estado da implementação` e
+- [x] §12: os **10** itens da fase 1 marcados e a tabela em `10/10 🟢`, com as caixas batendo
+- [x] Linha de versão acrescentada em §0.1, **com o número correto** — confira o histórico
+- [x] **Cabeçalho §0 do PRD atualizado**: `Status`, `Estado da implementação` e
       `Última atualização`. O `Status` só aceita o vocabulário fechado do `PRD_TEMPLATE.md`
       (`🟡 Rascunho · 🔵 Em revisão · 🟢 Aprovado · ⚫ Arquivado`); o progresso da fase vai na
       linha `Estado da implementação`
-- [ ] `docs/CHANGELOG.md` com a fase 1; nenhuma tag criada
-- [ ] `README.md` da fase 1 **atualizado** para o estado final (ele já existe); índice
+- [x] `docs/CHANGELOG.md` com a fase 1; nenhuma tag criada
+- [x] `README.md` da fase 1 **atualizado** para o estado final (ele já existe); índice
       `plans/README.md` atualizado
-- [ ] Dívidas revisadas: as cinco da fase 0 continuam resolvidas, e as novas da fase 1
+- [x] Dívidas revisadas: as cinco da fase 0 continuam resolvidas, e as novas da fase 1
       registradas no README da fase
-- [ ] Estado das questões abertas registrado — Q-06 e Q-07 **resolvidas em 2026-09-03**
+- [x] Estado das questões abertas registrado — Q-06 e Q-07 **resolvidas em 2026-09-03**
       (`haroldo.lima@ufma.br` para as duas); Q-04 nomeada como a única que bloqueia uma fase
       próxima (a 3)
-- [ ] Seção "o que a fase 1 empurra para a fase 2" escrita no README da fase, com no mínimo os
+- [x] Seção "o que a fase 1 empurra para a fase 2" escrita no README da fase, com no mínimo os
       **sete** itens já conhecidos (seção 7)
-- [ ] **Divergências de documentação da seção 5.1 corrigidas**: a frase da docstring de
+- [x] **Divergências de documentação da seção 5.1 corrigidas**: a frase da docstring de
       `src/content.config.ts:239-241` e a redação sobre `ui.defaultItem` no README da fase 1
-- [ ] Evidência do plano 022 conferida junto das dos planos 015–020, incluindo a verificação de
+- [x] Evidência do plano 022 conferida junto das dos planos 015–020, incluindo a verificação de
       painel do R-13 (frontmatter literal gravado)
-- [ ] **Nenhum arquivo criado em `plans/fase-2-pipeline-de-publicacao/`** — o fatiamento da fase 2
+- [x] **Nenhum arquivo criado em `plans/fase-2-pipeline-de-publicacao/`** — o fatiamento da fase 2
       é decisão posterior ao fechamento desta
-- [ ] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
-- [ ] CI verde após o push
-- [ ] Nenhum item do checklist marcado sem Evidência no plano de origem
+- [x] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
+- [ ] CI verde após o push — pendente: este executor não commita nem empurra (regra de despacho
+      da casa); fica para o orquestrador, depois da revisão
+- [x] Nenhum item do checklist marcado sem Evidência no plano de origem
 
 ## Evidência
 
-<Preenchido pelo executor: lista dos planos 015–020 com Evidência conferida, descrição da
-demonstração do critério de conclusão coleção por coleção, contagem de testes, saída dos quatro
-comandos, `git show --stat HEAD` e resultado do CI.>
+Executado em 2026-09-10. **`Status` permanece `TODO`** — a promoção é do orquestrador, depois da
+revisão de código e do CI. Esta sessão não fez `git add`, commit nem push.
+
+### 1. Conferência da Evidência dos planos 015–020 e 022
+
+Todos os sete têm `**Status:** DONE` e uma seção `## Evidência` não vazia:
+
+| Plano | Status | Evidência preenchida |
+|---|---|---|
+| 015 | DONE | Sim — 418 linhas de evidência (instalação do Tina, React medido fora do bundle público) |
+| 016 | DONE | Sim — 228 linhas |
+| 017 | DONE | Sim — 730 linhas, inclui a verificação do `Required` espúrio no painel |
+| 018 | DONE | Sim — 412 linhas |
+| 019 | DONE | Sim — 436 linhas, inclui a prova de falsificabilidade do teste de paridade |
+| 020 | DONE | Sim — 325 linhas |
+| 022 | DONE | Sim — 440 linhas, inclui a seção "Evidência do orquestrador — verificação no painel
+(R-13)" com o frontmatter literal gravado (bloco YAML completo do item de `scripts[]`, com
+`codigo` em block scalar `|-`) e a prova byte a byte (323 bytes, `IDENTICO: true`, indentação
+`[0,4,4,8,4,0,0,4,4]` preservada, aspas simples e duplas intactas) — conferida nesta sessão
+(`plans/fase-1-modelo-de-conteudo/022-scripts-em-disciplinas.md:627-719`)
+
+Nenhum dos sete está com Evidência vazia ou com critério marcado sem prova.
+
+### 2. ADRs 0003 a 0008 (D-02 a D-07 e D-06)
+
+Criados em `docs/adr/`:
+
+- `0003-painel-por-formularios-sem-visual-editing.md` (D-02)
+- `0004-i18n-por-grupo-en-no-mesmo-arquivo.md` (D-03)
+- `0005-rascunho-como-campo-publicado.md` (D-04)
+- `0006-listas-embutidas-na-disciplina.md` (D-05)
+- `0007-campo-de-material-como-url-livre.md` (D-07)
+- `0008-paridade-zod-tina-como-rede-de-protecao.md` (D-06)
+
+**Decisão sobre a D-06, registrada também no próprio ADR-0008:** ganhou ADR próprio, não só o
+plano 019, por dois motivos — consistência (as outras seis decisões implementadas já têm ADR; só
+a D-06 ficar de fora tornaria `docs/adr/` uma lista incompleta sem motivo visível) e precedente já
+aberto neste projeto (o ADR-0002 foi escrito mesmo com o detalhe completo já vivendo nos planos
+002/014 — o ADR resume e aponta, não duplica). Todos os seis ADRs novos seguem o formato do
+ADR-0001 (Título · Status · Data · Contexto · Decisão · Alternativas consideradas ·
+Consequências · Referências), citam a alternativa rejeitada e a consequência aceita, e apontam
+para o plano que implementou a decisão.
+
+### 3. Correção da docstring de `normalizeLinhaRelacionadaId`
+
+`src/content.config.ts:239-241`. Frase trocada (uma só, resto da docstring intocado):
+
+```diff
+- * `undefined` em runtime — falha silenciosa que só apareceria na fase 3. A reconciliação foi
++ * `undefined` em runtime — o `astro check` já reporta isso como `[ERROR] [content]` hoje; o que é
++ * silencioso é o exit code (0), não o erro (plano 020). A reconciliação foi
+```
+
+### 4. Outra divergência de documentação corrigida (fora da seção 5.1, registrada pelo 022)
+
+O README da fase 1 sinalizava, na seção do plano 022, uma divergência de ordem entre a §7.3 do
+PRD (`scripts[]` antes de `links[]`) e o código (`scripts` depois de `links` nos dois lados) como
+"a corrigir no 021". Nada quebrava — o teste de paridade compara conjuntos, não ordem —, mas a
+tabela do PRD foi reordenada para bater com o código, por ser a mesma classe de "doc e código
+divergindo se corrige" da seção 5.1.
+
+### 5. Testes da fase
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+ Test Files  4 passed (4)
+      Tests  107 passed (107)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 32/32 )
+Branches     : 100% ( 4/4 )
+Functions    : 100% ( 2/2 )
+Lines        : 100% ( 31/31 )
+================================================================================
+```
+
+**107 testes, 4 arquivos, cobertura 100%** — o mesmo número e a mesma cobertura de antes deste
+plano (o 021 não altera código de teste, só uma frase de docstring). Acima da meta de 80% da §11.
+`thresholds` já estavam impostos em `vitest.config.ts` (statements/branches/functions/lines em
+80%) antes deste plano — confirmado lendo o arquivo, nenhuma decisão nova a tomar, só registrar o
+estado.
+
+### 6. Sequência de qualidade
+
+`npm run lint`:
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+(saída vazia, exit 0)
+
+`npm run format:check`:
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+`npm run test:coverage`: ver seção 5 acima.
+
+`npm run build` — três tentativas nesta sessão, pelos motivos abaixo. **A terceira é a
+autoritativa**; as duas primeiras ficam registradas porque documentam um episódio real.
+
+**Tentativa 1** falhou por conflito de porta com a sessão do orquestrador, que estava exercitando
+o painel em paralelo — `Tina Dev server is already in use. Datalayer server is busy on port
+9000`. Não é achado deste plano: é o `tinacms dev`/`astro dev` do orquestrador ocupando
+4001/4321/9000 no mesmo host.
+
+**Tentativa 2**, depois de as portas liberarem, rodou **durante** a demonstração do critério da
+fase pelo orquestrador (seção 7) e produziu `[ERROR] [content]`:
+
+```
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+...
+Tina build complete
+...
+[content] Invalid content reference: entry "forcas-de-mare-em-espacos-tempos-de-kerr" in
+collection "projetos" (field: linha_relacionada) references "" in collection
+"linhas-pesquisa", but that entry does not exist.
+...
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (17 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+[content] Invalid content reference: entry "forcas-de-mare-em-espacos-tempos-de-kerr" ...
+[build] output: "static"
+[build] mode: "static"
+[build] 1 page(s) built in 758ms
+[build] Complete!
+```
+
+**O que produziu essa saída, com precisão, porque sem isso ela não se reproduz:** ao editar só a
+`descricao` de `content/projetos/forcas-de-mare-em-espacos-tempos-de-kerr.md` pelo painel (seção
+7), o Tina **acrescentou** a linha `linha_relacionada: ''` ao arquivo. O arquivo **não tinha esse
+campo antes** — o plano 020 o criou válido, sem `linha_relacionada`, porque este projeto não tem
+linha de pesquisa relacionada. O painel grava o campo vazio em vez de omiti-lo (defeito já
+registrado pelo plano 020), e o Astro rejeita a referência vazia com o `[ERROR] [content]` acima.
+O orquestrador removeu a linha `linha_relacionada: ''` à mão depois da demonstração, antes da
+verificação autoritativa — por isso a tentativa 3, abaixo, fecha sem nenhuma linha `[ERROR]` ou
+`[WARN]`. Quem tentar reproduzir a tentativa 2 a partir do `content/` atual não vai achar a
+mesma saída, e é por isso que este parágrafo existe.
+
+**Distinção que importa para a fase 2, e que esta sessão não pode deixar borrada:** a **causa** é
+pré-existente e está documentada desde o plano 020 (o painel grava `linha_relacionada: ''` em vez
+de omitir o campo) — nisso a tentativa 2 não é surpresa. O **artefato** — a linha `[ERROR]`
+efetivamente produzida nesta sessão, num arquivo rastreado que antes não a disparava — **foi
+gerado agora**, durante a demonstração do critério da fase, e só não foi ao commit porque o
+orquestrador o removeu à mão antes da verificação autoritativa. Se não tivesse sido removido, a
+tentativa 3 abaixo teria a mesma linha `[ERROR]`, e o commit que fecha a fase 1 teria ido com
+`lint`, `format`, `test` e `build` todos em exit 0 e uma referência de conteúdo inválida no
+repositório. **Foi um humano lendo a saída — não o portão de qualidade — o único motivo de isso
+não ter acontecido.** É a materialização concreta do item 5 da lista "empurra para a fase 2":
+hoje a garantia contra `[ERROR] [content]` chegando ao commit é alguém ler o texto da saída, não
+o exit code, e este episódio (2026-09-10, `content/projetos/forcas-de-mare-em-espacos-tempos-de-kerr.md`)
+é exatamente o cenário em que isso quase não aconteceu.
+
+**Tentativa 3 — autoritativa**, depois de o orquestrador remover a linha:
+
+```
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+...
+Tina build complete
+...
+[content] Syncing content
+[content] Synced content
+[types] Generated 454ms
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (17 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+[content] Syncing content
+[content] Synced content
+[types] Generated 392ms
+[build] output: "static"
+[build] mode: "static"
+[build] 1 page(s) built in 683ms
+[build] Complete!
+```
+
+**Fecha verde, sem nenhuma linha `[ERROR]` ou `[WARN]`** — não há `ERR_CLOUD_CHECK_FAILED` porque
+este plano não muda schema do Tina. Esta é a saída que acompanha o estado final de `content/`
+nesta sessão.
+
+### 7. Critério de conclusão da fase — demonstração do orquestrador
+
+**Esta seção não foi produzida por este executor.** O passo 3 do plano (usar o `/admin` para
+criar e editar um item em cada uma das cinco coleções) é do orquestrador, por divisão de
+trabalho explícita no despacho. Abaixo, o que o orquestrador relatou, **conferido por este
+executor contra o estado real do repositório** (não aceito por relato — reproduzido):
+
+Painel subido com `npx astro dev --background --force` + `npx tinacms dev` (o `npm run dev` não
+serve no Astro 7, ver README da fase 1 e do root).
+
+| Coleção | Criação | Edição | Arquivo |
+|---|---|---|---|
+| `linhas-pesquisa` | ✅ | ✅ | criou `exemplo-verificacao-do-criterio-da-fase-1.md` (removido depois); editou `resumo` de `sombras-de-buracos-negros.md` |
+| `projetos` | ✅ | ✅ | criou `exemplo-projeto-de-verificacao-do-plano-021.md` (removido depois); editou `descricao` de `forcas-de-mare-em-espacos-tempos-de-kerr.md` |
+| `disciplinas` | ✅ | ✅ | criou `2026.2-exemplo-disciplina-de-verificacao-do-plano-021.md` (removido depois); editou `descricao` de `2025.1-mecanica-classica.md` |
+| `publicacoes` | ✅ | ✅ | criou `2026-exemplo-publicacao-de-verificacao-do-plano-021.md` (removido depois); editou `resumo` de `2023-exemplo-notas-sobre-geodesicas-nulas-em-metricas-estacionarias.md` |
+| `perfil` | n/a — singleton | ✅ | editou `bio` com marcador temporário e reverteu pelo próprio painel |
+
+Templates de nome da RN-08 confirmados na prática: `{slug(titulo)}.md` (linhas, projetos),
+`{semestre}-{slug(nome)}.md` (disciplinas), `{ano}-{slug(titulo)}.md` (publicações).
+
+**Verificação independente deste executor, depois do relato** — `git status --short content/` e
+`git diff content/` rodados nesta sessão, sem qualquer edição feita por este executor em
+`content/`:
+
+```
+ M content/disciplinas/2025.1-mecanica-classica.md
+ M content/linhas-pesquisa/sombras-de-buracos-negros.md
+ M content/projetos/forcas-de-mare-em-espacos-tempos-de-kerr.md
+ M content/publicacoes/2023-exemplo-notas-sobre-geodesicas-nulas-em-metricas-estacionarias.md
+```
+
+Quatro arquivos modificados, nenhum novo/não rastreado, `content/perfil/index.md` sem diferença
+— bate exatamente com o relato: os quatro itens criados foram removidos depois da verificação
+(decisão do orquestrador, registrada: são duplicatas descartáveis num repositório público,
+atribuídas a uma pessoa real, e o plano 020 já cura o conjunto placeholder representativo; a
+prova da criação é o `git status` que o orquestrador registrou antes de remover, não a
+permanência dos arquivos) e as quatro edições em item existente permanecem. `git diff` confirma
+o conteúdo das quatro edições (trechos "Editada/Editado pelo plano 021 para demonstrar o critério
+de conclusão da fase 1" nas `descricao`/`resumo`).
+
+**Achado corrigido no README da fase 1 por esta verificação:** a edição em `linhas-pesquisa`
+(`resumo` e `corpo`, um com valor e outro vazio) ao entrar/sair do subpainel "Versão em inglês"
+não reproduziu a manifestação exata do plano 020 (gravação silenciosa do valor antigo com a tela
+mostrando o novo) — reproduziu uma **segunda manifestação da mesma causa**: perda visível da
+edição pendente, com a tela revertendo e o botão `Save` desabilitando, como se nada tivesse sido
+editado. Documentado no README da fase 1, sem desmentir o 020 (a causa — re-inicialização do
+formulário ao voltar de um subpainel — é a mesma; o efeito observado depende do caminho, ainda
+não mapeado).
+
+**Achado adicional:** o botão `Save` habilitou ao criar uma publicação com `autores[]` vazio —
+mais uma instância da dívida "subcampo obrigatório de lista embutida não bloqueia o save", agora
+em lista de string simples, não só de objetos. Registrada no README da fase 1 e na lista "empurra
+para a fase 2" (item 3).
+
+**Critério de conclusão da fase (§6.2) considerado demonstrado**: as cinco coleções foram criadas
+e editadas pelo painel, com o arquivo gravado conferido a cada save (não a tela), e a verificação
+acima confirma o relato contra o estado real do repositório.
+
+### 8. Checklist §12 e progresso
+
+Antes deste plano: 8/10. Depois: **10/10 🟢** — os dois itens que faltavam eram exatamente os
+deste plano (`/admin` editando tudo e testes da fase). Tabela "📊 Progresso Geral" da fase 1
+atualizada para `10/10 🟢`, batendo com as dez caixas marcadas em `PRD.md` §12.
+
+### 9. Dívidas e questões abertas
+
+**Dívidas da fase 0:** continuam todas resolvidas — confirmado lendo a seção "Herdado da fase 0"
+do README da fase 1, sem necessidade de correção.
+
+**Dívidas que a fase 1 acrescenta:** já registradas, espalhadas pelas seções por plano do README
+da fase 1 (ver grep feito nesta sessão confirmando as cinco: `defaultItem` deprecated × tipado por
+campo; listas `en.*` alinhadas por índice; subcampo obrigatório de lista embutida não bloqueando
+o save — agora com `publicacoes.autores[]` somada; o descarte silencioso do formulário — agora com
+a segunda manifestação; `astro check` com exit 0). Consolidadas na nova seção "O que a fase 1
+empurra para a fase 2" do README.
+
+**Questões abertas (§16 do PRD):** já estavam corretas antes deste plano — Q-06 e Q-07
+**resolvidas em 2026-09-03** (`haroldo.lima@ufma.br` para ambas); Q-04 nomeada como a única
+questão que bloqueia uma fase próxima (a 3); Q-05 só morde na fase 5; Q-09 pós-entrega. Nenhuma
+edição necessária no PRD além da já existente.
+
+### 10. Seção "o que a fase 1 empurra para a fase 2"
+
+Escrita no README da fase 1, com os sete itens da seção 7 do plano, mais as duas profundidades que
+os planos 022 e 021 acrescentaram dentro dos itens 3 e 4 (não itens novos de fatiamento):
+`publicacoes.autores[]` no item 3 e a segunda manifestação do descarte silencioso no item 4.
+
+### 11. README raiz — três divergências corrigidas
+
+1. `npm run dev` não sobe o painel no Astro 7 — seção "Painel de edição" reescrita com o comando
+   que funciona (`npx astro dev --background --force` + `npx tinacms dev`) e a explicação de por
+   que o antigo engana ("Failed loading TinaCMS assets" parece erro de configuração e não é).
+2. Tabela de comandos: `npm run build` agora descrito como `tinacms build` → `astro check` →
+   `astro build`.
+3. "hoje só a coleção `perfil`" corrigido para listar as cinco coleções.
+
+A linha sobre regenerar `tina/tina-lock.json` teve o comando trocado de `npm run dev` para
+`npx tinacms dev` (só essa parte regenera o lock de fato).
+
+### 12. Arquivos afetados nesta sessão
+
+```
+ M PRD.md
+ M README.md
+ M docs/CHANGELOG.md
+ M plans/fase-1-modelo-de-conteudo/README.md
+ M plans/README.md
+ M plans/fase-1-modelo-de-conteudo/021-fechamento-da-fase-1.md
+ M src/content.config.ts
+?? docs/adr/0003-painel-por-formularios-sem-visual-editing.md
+?? docs/adr/0004-i18n-por-grupo-en-no-mesmo-arquivo.md
+?? docs/adr/0005-rascunho-como-campo-publicado.md
+?? docs/adr/0006-listas-embutidas-na-disciplina.md
+?? docs/adr/0007-campo-de-material-como-url-livre.md
+?? docs/adr/0008-paridade-zod-tina-como-rede-de-protecao.md
+```
+
+Mais as quatro edições em `content/` feitas pelo orquestrador pelo painel (seção 7), fora do
+escopo deste executor. Nenhum arquivo criado em `plans/fase-2-pipeline-de-publicacao/`.
+
+### 13. Pendente, fora deste executor
+
+- **Commit, push e `conclusion` do CI** — regra de despacho da casa: este executor não commita
+  nem empurra. Depois disso, o orquestrador confere o run do GitHub Actions e só então promove
+  `Status: DONE`.
+- **Revisão de código** — portão de qualidade da casa exige verificação independente e revisão
+  aprovada antes de `DONE`.
+
+### 14. Correções da primeira revisão (REPROVADO, seis itens)
+
+A primeira rodada de revisão reprovou com seis itens. Corrigidos nesta sessão, `Status` mantido em
+`TODO`, sem commit:
+
+1. **ADR-0006 divergia do código**: a frase da seção "Decisão" atribuía `ui.defaultItem` no nível
+   do campo às cinco listas; só `scripts[]` o tem (`tina/config.ts:666-668`) — `aulas[]`,
+   `listas[]`, `materiais[]` e `bibliografia[]` não semeiam item novo. Corrigido para descrever o
+   estado real, preservando a distinção coleção × campo.
+2. **`docs/CHANGELOG.md` dizia "em verificação pelo orquestrador"** enquanto `PRD.md`,
+   `plans/README.md` e esta Evidência já diziam "demonstrado". Alinhado: critério do §6.2
+   demonstrado, pendência é só a promoção administrativa.
+3. **O episódio de `linha_relacionada: ''`** ganhou o tratamento completo que faltava: a seção 6
+   acima agora distingue as três tentativas de `npm run build` desta sessão (conflito de porta;
+   durante a demonstração, com `[ERROR]`; autoritativa, depois da remoção manual, sem nenhum
+   `[ERROR]`/`[WARN]`), nomeia que o artefato foi produzido nesta sessão num arquivo que o plano
+   020 tinha criado sem o campo, e que só a leitura humana da saída impediu que fosse ao commit. O
+   README da fase 1 recebeu o mesmo tratamento na seção do plano 020 e no item 5 da lista "empurra
+   para a fase 2" (ambos citando arquivo e data, 2026-09-10).
+4. **`README.md` da raiz dizia que `.env` não era exigido por `npm run build`** — falso desde o
+   plano 015 (o comando é `tinacms build && astro check && astro build`, e `tinacms build` exige
+   `TINA_CLIENT_ID`/`TINA_TOKEN`). Corrigido.
+5. **`npm run start` não é alias de `npm run dev`** (`package.json`: `start` é `astro dev` puro;
+   `dev` é `tinacms dev -c "astro dev"`). A tabela de comandos passou a descrever os dois
+   corretamente.
+6. **A edição do orquestrador em `content/publicacoes/2023-exemplo-...md` apagou a justificativa
+   da RN-01** (por que aquele item fica com `publicado: false`). Restaurada, preservando a marca
+   da edição de demonstração do plano 021. O trecho não bloqueante sinalizado pelo revisor (perda
+   de ", incluindo o regime próximo ao horizonte" na `descricao` de
+   `forcas-de-mare-em-espacos-tempos-de-kerr.md`) foi restaurado também, por ser gratuito.
+
+Sequência de qualidade re-executada depois das seis correções — ver números finais na mensagem de
+fechamento desta sessão; resumo: `lint` limpo, `format:check` verde (4 arquivos reformatados por
+Prettier), **107 testes, cobertura 100%**, `npm run build` **sem nenhuma linha `[ERROR]`/`[WARN]`**
+(a `linha_relacionada: ''` de `forcas-de-mare...` não existe mais no arquivo).

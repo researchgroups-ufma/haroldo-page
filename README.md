@@ -69,27 +69,30 @@ Copy-Item .env.example .env    # PowerShell
 cp .env.example .env           # bash
 ```
 
-O `.env` não é necessário para `npm run build`, `npm run test` ou `npm run lint` hoje — só
-passa a ser exigido quando o TinaCMS for integrado (fase 1). Ver a seção
+O `.env` **é exigido por `npm run build`** (e por `npm run deploy`, que o inclui): o script
+começa por `tinacms build`, que precisa de `TINA_CLIENT_ID`/`TINA_TOKEN` para falar com o
+TinaCloud — sem eles o comando aborta com `Client not configured properly`, a mesma falha que
+deixou o CI vermelho por 14 commits antes de os secrets serem configurados. `npm run test` e
+`npm run lint` rodam sem `.env`. Ver a seção
 [Variáveis de ambiente](#variáveis-de-ambiente).
 
 ## Comandos
 
-| Comando                 | O que faz                                                                                   |
-| ----------------------- | ------------------------------------------------------------------------------------------- |
-| `npm run dev`           | Sobe o servidor de desenvolvimento do Astro em `http://localhost:4321`                      |
-| `npm run start`         | Alias de `npm run dev`                                                                      |
-| `npm run build`         | `astro check` (checagem de tipos) seguido de `astro build`; gera `dist/`                    |
-| `npm run preview`       | Serve localmente o conteúdo já buildado em `dist/`                                          |
-| `npm run astro`         | Passthrough para a CLI do Astro (`npm run astro -- <comando>`, ex.: `npm run astro -- add`) |
-| `npm run lint`          | ESLint sobre todo o projeto                                                                 |
-| `npm run lint:fix`      | ESLint com correção automática                                                              |
-| `npm run format`        | Formata todo o projeto com Prettier                                                         |
-| `npm run format:check`  | Verifica formatação sem alterar arquivos (usado no CI)                                      |
-| `npm run test`          | Roda a suíte de testes (Vitest) uma vez                                                     |
-| `npm run test:watch`    | Roda a suíte em modo watch                                                                  |
-| `npm run test:coverage` | Roda a suíte com relatório de cobertura                                                     |
-| `npm run deploy`        | `npm run build` seguido de `wrangler deploy` (deploy manual)                                |
+| Comando                 | O que faz                                                                                                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`           | `tinacms dev -c "astro dev"` — sobe o servidor do Tina e encadeia o `astro dev`. **Não serve para rodar o painel no Astro 7** (ver [Painel de edição](#painel-de-edição)) |
+| `npm run start`         | `astro dev` puro, sem o servidor do Tina — só o site, sem `/admin` funcional                                                                                              |
+| `npm run build`         | `tinacms build` (regenera o schema derivado do Tina) seguido de `astro check` (checagem de tipos) e `astro build`; gera `dist/`                                           |
+| `npm run preview`       | Serve localmente o conteúdo já buildado em `dist/`                                                                                                                        |
+| `npm run astro`         | Passthrough para a CLI do Astro (`npm run astro -- <comando>`, ex.: `npm run astro -- add`)                                                                               |
+| `npm run lint`          | ESLint sobre todo o projeto                                                                                                                                               |
+| `npm run lint:fix`      | ESLint com correção automática                                                                                                                                            |
+| `npm run format`        | Formata todo o projeto com Prettier                                                                                                                                       |
+| `npm run format:check`  | Verifica formatação sem alterar arquivos (usado no CI)                                                                                                                    |
+| `npm run test`          | Roda a suíte de testes (Vitest) uma vez                                                                                                                                   |
+| `npm run test:watch`    | Roda a suíte em modo watch                                                                                                                                                |
+| `npm run test:coverage` | Roda a suíte com relatório de cobertura                                                                                                                                   |
+| `npm run deploy`        | `npm run build` seguido de `wrangler deploy` (deploy manual)                                                                                                              |
 
 ## Estrutura de pastas
 
@@ -124,18 +127,27 @@ pelo painel; o desenvolvedor é dono de todo o resto** (§7.5 do PRD).
 
 ## Painel de edição
 
-O painel TinaCMS mora em `/admin`. Para rodá-lo localmente:
+O painel TinaCMS mora em `/admin`. **`npm run dev` não sobe o painel no Astro 7** — é um engano
+conhecido, não um erro de configuração: sem TTY, o `astro dev` daemoniza (`Dev server running at
+http://localhost:4321 (pid N)` / `Stop: astro dev stop`), o processo em primeiro plano encerra
+imediatamente e o `tinacms dev -c "astro dev"` morre junto (`child process exited with code 0`).
+A porta 4321 continua respondendo `200` e o `/admin` abre, mas o servidor do Tina (porta 4001)
+está morto, e a tela mostra **"Failed loading TinaCMS assets"**.
+
+O que funciona é subir os dois servidores separadamente:
 
 ```bash
-npm run dev
+npx astro dev --background --force
+npx tinacms dev
 ```
 
-Isso executa `tinacms dev -c "astro dev"`: sobe o servidor local do Tina (GraphQL da
-coleção, em `http://localhost:4001`) e, em seguida, o `astro dev`. Com os dois no ar, abra
-<http://localhost:4321/admin> — o painel edita os arquivos de `content/` (hoje só a coleção
-`perfil`; as outras quatro entram no plano 017) diretamente no disco, por formulário. Exige
-o `.env` preenchido (`TINA_CLIENT_ID`, `TINA_TOKEN`, `TINA_BRANCH` — ver
-[Variáveis de ambiente](#variáveis-de-ambiente)).
+Com os dois no ar, abra <http://localhost:4321/admin> — o painel edita os arquivos das cinco
+coleções de `content/` (`perfil`, `linhas-pesquisa`, `projetos`, `disciplinas`, `publicacoes`)
+diretamente no disco, por formulário. Exige o `.env` preenchido (`TINA_CLIENT_ID`, `TINA_TOKEN`,
+`TINA_BRANCH` — ver [Variáveis de ambiente](#variáveis-de-ambiente)).
+
+Ao terminar, `npx astro dev stop` e finalizar manualmente os processos `node` do `tinacms dev`
+(ele costuma deixar mais de um processo pendente).
 
 O painel é só por formulários — sem edição visual/contextual (D-02), que exigiria
 `output: 'server'` e contradiria D-01. `tina/config.ts` define o schema; `tina/__generated__/`
@@ -148,7 +160,7 @@ ele, o painel de administração do TinaCloud mostra "No Tina config was found o
 com o `tina/config.ts` presente e legível no repositório — foi exatamente o que travou este
 projeto até o arquivo ser versionado. Ele também não é gerado por `tinacms build` (que roda
 no `npm run build`) — só por `tinacms dev`. Na prática: quem mudar o schema em
-`tina/config.ts` precisa subir `npm run dev` uma vez (mesmo que só para deixá-lo indexar e
+`tina/config.ts` precisa subir `npx tinacms dev` uma vez (mesmo que só para deixá-lo indexar e
 derrubar em seguida) e commitar o `tina/tina-lock.json` atualizado junto com a mudança de
 schema.
 
