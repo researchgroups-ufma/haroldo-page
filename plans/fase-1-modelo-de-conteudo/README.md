@@ -21,10 +21,13 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 019 | Teste de paridade Zod × Tina (D-06) | ✅ DONE | implementer | `6a42330` |
 | 020 | Conteúdo placeholder representativo | ✅ DONE | implementer | `aa9a7cf` |
 | 022 | Lista `scripts[]` em disciplinas (schema Zod + Tina e paridade) | ✅ DONE | implementer | `88f1c75` |
-| 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
+| 021 | ADRs, verificação do `/admin` e fechamento | ✅ DONE | implementer | `26de58a` |
 
-**Próximo:** plano 021 — ADRs, verificação do `/admin` e fechamento da fase. **A fila da fase mudou em
-2026-09-04:** 020 (DONE) → 022 (DONE, `88f1c75`) → **021**. O 022 nasceu de escopo novo trazido pelo stakeholder — scripts
+**Fase concluída em 2026-09-10.** Os oito planos estão DONE e o critério do §6.2 foi demonstrado no
+painel (plano 021, `26de58a`, CI verde). **Não há próximo plano nesta pasta** — o próximo passo do
+projeto é fatiar a fase 2, que só podia começar depois deste fechamento, e cuja lista de entrada é a
+seção "o que a fase 1 empurra para a fase 2" mais abaixo. **A fila da fase foi, ao final:**
+020 (DONE) → 022 (DONE, `88f1c75`) → 021 (DONE, `26de58a`). O 022 nasceu de escopo novo trazido pelo stakeholder — scripts
 Python exibidos na página da disciplina com destaque de sintaxe e botão de copiar — sabatinado no
 mesmo dia (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões) e emendado no PRD
 (RF-37, F-13, RN-05, D-05, R-13; v0.1.16). O **schema** é fase 1 porque é aqui que campo novo

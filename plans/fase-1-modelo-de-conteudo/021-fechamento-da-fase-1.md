@@ -1,6 +1,6 @@
 # Plano 021 — ADRs das decisões da fase 1, verificação do `/admin` e fechamento da fase
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** fase 1, itens "`/admin` funciona localmente e edita todas as coleções" e
 "testes unitários da fase escritos e passando"; §7.2 ("cada decisão vira um ADR"); §12
 **Depende de:** planos 015 a 020 **e 022** — a fila da fase mudou em 2026-09-04 e o 022 (lista
@@ -288,7 +288,7 @@ identificados** — confira se algum outro apareceu, mas não recomece a lista:
 - [x] **Nenhum arquivo criado em `plans/fase-2-pipeline-de-publicacao/`** — o fatiamento da fase 2
       é decisão posterior ao fechamento desta
 - [x] `npm run lint`, `npm run format:check`, `npm run test` e `npm run build` verdes
-- [ ] CI verde após o push — pendente: este executor não commita nem empurra (regra de despacho
+- [x] CI verde após o push — run <https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34484710630>, `conclusion: success` sobre `26de58a` — pendente: este executor não commita nem empurra (regra de despacho
       da casa); fica para o orquestrador, depois da revisão
 - [x] Nenhum item do checklist marcado sem Evidência no plano de origem
 
