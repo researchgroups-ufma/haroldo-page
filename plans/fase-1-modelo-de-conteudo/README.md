@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-04
+Última atualização: 2026-09-10
 
 **Critério de conclusão da fase** (§6.2 do PRD): *o professor consegue, localmente, criar e
 editar item de cada coleção pelo painel.* Não é "os testes passam" — é usar o `/admin`.
@@ -20,11 +20,11 @@ editar item de cada coleção pelo painel.* Não é "os testes passam" — é us
 | 018 | Grupo "Versão em inglês (opcional)" | ✅ DONE | implementer | `6e5cb1f` |
 | 019 | Teste de paridade Zod × Tina (D-06) | ✅ DONE | implementer | `6a42330` |
 | 020 | Conteúdo placeholder representativo | ✅ DONE | implementer | `aa9a7cf` |
-| 022 | Lista `scripts[]` em disciplinas (schema Zod + Tina e paridade) | ⬜ TODO | implementer | — |
+| 022 | Lista `scripts[]` em disciplinas (schema Zod + Tina e paridade) | ✅ DONE | implementer | `88f1c75` |
 | 021 | ADRs, verificação do `/admin` e fechamento | ⬜ TODO | implementer | — |
 
-**Próximo:** plano 022 — lista `scripts[]` em disciplinas. **A fila da fase mudou em
-2026-09-04:** 020 (DONE) → **022** → 021. O 022 nasceu de escopo novo trazido pelo stakeholder — scripts
+**Próximo:** plano 021 — ADRs, verificação do `/admin` e fechamento da fase. **A fila da fase mudou em
+2026-09-04:** 020 (DONE) → 022 (DONE, `88f1c75`) → **021**. O 022 nasceu de escopo novo trazido pelo stakeholder — scripts
 Python exibidos na página da disciplina com destaque de sintaxe e botão de copiar — sabatinado no
 mesmo dia (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões) e emendado no PRD
 (RF-37, F-13, RN-05, D-05, R-13; v0.1.16). O **schema** é fase 1 porque é aqui que campo novo
@@ -186,6 +186,37 @@ fase 3, não do 017.
   `src/content.config.ts:239-241` chama a referência inválida de "falha silenciosa que só
   apareceria na fase 3". O 020 provou que o `astro check` a reporta em voz alta hoje — o
   silencioso é o *exit code*, não o erro.
+
+**O que o 022 descobriu, e que o 021 vai encontrar** (ele também exercita o painel):
+
+- **`npm run dev` não sobe o painel no Astro 7 — e falha de um jeito que engana.** Sem TTY, o
+  `astro dev` daemoniza (`Dev server running at http://localhost:4321 (pid N)` / `Stop: astro dev
+  stop`), o processo em primeiro plano encerra e o `tinacms dev -c "astro dev"` morre junto
+  (`child process exited with code 0`). A porta 4321 continua respondendo `200` e o `/admin` abre,
+  mas o servidor do Tina em 4001 está morto e a tela mostra **"Failed loading TinaCMS assets"** —
+  em modo dev o `public/admin/index.html` carrega o próprio código de
+  `http://localhost:4001/admin/src/main.tsx`. Quem ler essa mensagem como erro de configuração vai
+  depurar o lugar errado; o `index.html` fica com data de hoje e os `assets/` com data antiga, o
+  que reforça a pista falsa. **O que funciona:** subir os dois separadamente —
+  `npx astro dev --background --force` e `npx tinacms dev`. Ao terminar, `npx astro dev stop`
+  **e** matar os processos `node` do `tinacms` (o 022 deixou dois).
+- **A armadilha do descarte silencioso do 020 tem um contorno melhor do que "alterar por último":
+  salvar sem sair do subpainel.** O 022 preencheu os seis campos de um item de `scripts[]` dentro
+  do subpainel e clicou em `Save` ali mesmo, sem voltar ao formulário-pai — e os seis gravaram o
+  que a tela mostrava, inclusive `linguagem`, que foi alterada por último (`python` → `bash` →
+  `python`) justamente para ser campo genuinamente modificado e não só o valor do `ui.defaultItem`.
+  **Isto não desmente o 020:** o modo de falha dele é a re-inicialização **ao voltar** de um
+  subpainel, e este caminho não a atravessa. A lição é mais estreita e mais útil: o gatilho é a
+  volta ao formulário-pai, não o save. **Para o 021 isso importa diretamente** — o critério de
+  conclusão da fase pede *editar* um item existente em cada coleção, e é aí que a volta acontece.
+- **O R-13 não se materializou.** O `js-yaml` do painel grava `codigo` como block scalar `|-`, e o
+  round-trip é byte-idêntico: 323 bytes de ida e de volta, indentação preservada linha a linha
+  (`[0,4,4,8,4,0,0,4,4]`), linha em branco no meio e aspas simples e duplas intactas. A
+  contingência prevista no risco (voltar `codigo` a link externo) fica sem objeto.
+- **Divergência de documentação a corrigir no 021, ao lado da que o 020 já deixou:** a §7.3 do PRD
+  (`PRD.md:438`) lista `scripts[]` **antes** de `links[]`, enquanto o código põe `scripts` **depois**
+  de `links` nos dois lados, como o plano 022 mandou. Nada quebra — o teste de paridade compara
+  conjuntos, não ordem —, mas as duas leituras da mesma fonte divergem na ordem.
 
 ## Grafo de dependências
 

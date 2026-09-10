@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.17 |
+| **Versão do PRD** | v0.1.18 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–020 DONE; pendentes **022** e 021 — o 022 é o plano da lista `scripts[]`, criado pela sabatina de 2026-09-04, e executa **antes** do 021, que fecha a fase) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
+| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟡 **em andamento** (015–020 e 022 DONE; pendente só o **021**, que fecha a fase) · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-09-04 |
+| **Última atualização** | 2026-09-10 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav` |
 
@@ -44,6 +44,7 @@
 | v0.1.15 | 2026-09-04 | Desenvolvedor | **Sabatina "Scripts Python nas disciplinas"** (`docs/sabatinas/CHANGELOG_sabatina_scripts-python.md`, 11 decisões): `disciplinas` ganha a lista embutida `scripts[]` — código-fonte colado no próprio conteúdo, para ser exibido na página com destaque de sintaxe e botão de copiar. **RF-37** (MUST) e **F-13** criados; §7.3 ganha a linha `scripts[]`; **RN-05 emendada** com exceção nomeada para código-fonte (NG-02 e D-07 permanecem inalteradas, por decisão explícita da sabatina). O **schema** é da fase 1, em plano próprio — o **022**, executado antes do 021 —, e a **renderização** é da fase 3: a §12 ganha um item em cada uma dessas fases. A tabela de progresso da §12 ainda dizia `5/9` na fase 1 desde a v0.1.12, divergindo do próprio checklist (6 itens marcados); corrigida junto, para `6/10` |
 | v0.1.16 | 2026-09-04 | Desenvolvedor | Duas pendências que a v0.1.15 deixou em aberto de propósito, fechadas: **D-05** passa a enumerar as cinco listas embutidas da disciplina (dizia três, e `bibliografia[]` já ficava de fora antes do `scripts[]`), e o risco técnico da sabatina vira **R-13** — código indentado que perde a indentação ao ser serializado em YAML pelo painel, com a verificação no painel como mitigação obrigatória e o retorno ao link externo como contingência |
 | v0.1.17 | 2026-09-04 | Desenvolvedor | **Plano 020 DONE** (`aa9a7cf`): conteúdo placeholder representativo nas cinco coleções — 13 arquivos criados **pelo painel**, com os nomes saindo dos templates da RN-08. §12 passa de 6/10 a 7/10 na fase 1. O perfil usa os dados reais do Apêndice C; as 6 publicações são inventadas e marcadas de forma redundante (`[EXEMPLO]` no título, `[CONTEÚDO DE EXEMPLO]` no texto, `exemplo.invalid` nos URLs, `10.0000/` nos DOIs), porque o repositório é público e elas ficam atribuídas a uma pessoa real. Fechou a ponta que o 019 não conseguiu verificar: `getEntry()` resolve de fato depois de `normalizeLinhaRelacionadaId`. Dois achados novos do painel, da família F-09: o formulário descarta em silêncio alteração em campo que já tinha valor quando se volta de um subpainel; e projeto sem linha de pesquisa grava `linha_relacionada: ''`, que o Astro rejeita como referência inválida embora o `astro check` ainda encerre com `0 errors` e exit 0 — insumo para a fase 2 (F-09, RNF-09) e para o manual da fase 5 |
+| v0.1.18 | 2026-09-10 | Desenvolvedor | **Plano 022 DONE** (`88f1c75`): a coleção `disciplinas` ganha a lista embutida `scripts[]` nos dois lados do modelo (RF-37). §12 passa de 7/10 a 8/10 na fase 1. `linguagem` é obrigatória dos dois lados com o padrão vindo de `ui.defaultItem`, não de `.default()` no Zod — um default faria `safeParse(undefined)` passar e quebraria a classificação de obrigatoriedade do teste de paridade. Sem validação cruzada de `aula` (F-13), sem limite de tamanho em `codigo`, sem exclusividade entre `codigo` e `url`. Suíte de 93 para 107 testes. **O R-13 não se materializou:** verificado salvando pelo `/admin` um script com bloco indentado, linha em branco e aspas — o `js-yaml` escolheu block scalar `|-` e o round-trip é byte-idêntico. Dois achados operacionais novos: `npm run dev` não sobe o painel no Astro 7 (o `astro dev` daemoniza sem TTY e leva o `tinacms dev` junto, deixando o `/admin` com "Failed loading TinaCMS assets"), e salvar sem sair do subpainel evita a armadilha do descarte silencioso que o 020 registrou |
 
 ---
 
@@ -751,7 +752,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase | Itens concluídos | Status |
 |---|---|---|
 | Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
-| Fase 1 — Modelo de conteúdo | 7/10 | 🟡 Em andamento |
+| Fase 1 — Modelo de conteúdo | 8/10 | 🟡 Em andamento |
 | Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
 | Fase 3 — Site público (PT) | 0/12 | ⬜ Não iniciada |
 | Fase 4 — Internacionalização | 0/8 | ⬜ Não iniciada |
@@ -781,7 +782,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Conteúdo placeholder representativo: 1 perfil, 2 linhas, 2 projetos, 2 disciplinas (uma com 5 aulas), 6 publicações em 3 anos — plano 020 (`aa9a7cf`); os 13 arquivos criados **pelo painel**, com os nomes saindo dos templates da RN-08. Perfil com os dados reais do Apêndice C; as 6 publicações inventadas e marcadas de forma redundante (`[EXEMPLO]` no título, `[CONTEÚDO DE EXEMPLO]` no texto, `exemplo.invalid` nos URLs, `10.0000/` nos DOIs), porque o repositório é público e elas ficam atribuídas a uma pessoa real. Fechou a ponta herdada do 019: `getEntry()` resolve de fato depois de `normalizeLinhaRelacionadaId`
 - [ ] `/admin` funciona localmente e edita todas as coleções
 - [ ] Testes unitários da fase escritos e passando
-- [ ] Lista `scripts[]` em `disciplinas` (RF-37): schema Zod + Tina e paridade entre os dois — plano 022, executado **antes** do 021
+- [x] Lista `scripts[]` em `disciplinas` (RF-37): schema Zod + Tina e paridade entre os dois — plano 022 (`88f1c75`); seis campos conforme a sabatina, `linguagem` obrigatória dos dois lados com `ui.defaultItem` em vez de `.default()` no Zod, para não afrouxar a classificação de obrigatoriedade do teste de paridade. **R-13 verificado exercitando o painel:** o `js-yaml` grava `codigo` como block scalar `|-` e o round-trip é byte-idêntico (323 bytes, indentação preservada linha a linha, linha em branco e aspas intactas). A renderização continua na fase 3
 
 ### Fase 2 — Pipeline de Publicação
 - [ ] Workers Builds conectado ao repositório, build automático no push

@@ -1,6 +1,6 @@
 # Plano 022 — Lista `scripts[]` em disciplinas: schema Zod + Tina e paridade
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-37 (MUST); fase 1, item "Lista `scripts[]` em `disciplinas`"; RN-05 (exceção
 de código-fonte), RF-03, D-05, D-06, F-13
 **Depende de:** planos 016, 017, 018, 019 e **020** — todos DONE (`020` em `aa9a7cf`, 2026-09-04).
@@ -357,19 +357,19 @@ regras da sabatina fiquem verificáveis, não para satisfazer o medidor.
 - [x] Nada de renderização: sem Shiki, sem botão de copiar, sem arquivo `.astro` (fase 3)
 - [x] `PRD.md` e `content/**` não modificados pelo executor
 - [x] `npm run lint`, `npm run format:check` e `npm run test:coverage` verdes, com cobertura ≥ 80%
-- [ ] **Verificação no painel (orquestrador):** script salvo pelo `/admin` com **bloco indentado,
+- [x] **Verificação no painel (orquestrador):** script salvo pelo `/admin` com **bloco indentado,
       linha em branco no meio e aspas**; o `.md` gravado aberto e o **frontmatter literal colado na
       Evidência**; indentação e linha em branco preservadas byte a byte
-- [ ] **Os seis campos do item gravado conferidos um a um** contra o que a tela mostrava, com
+- [x] **Os seis campos do item gravado conferidos um a um** contra o que a tela mostrava, com
       `linguagem` nomeado explicitamente na Evidência — armadilha do descarte silencioso (020)
 - [x] Docstring de `normalizeLinhaRelacionadaId` (`src/content.config.ts:239-241`) **não
       modificada** por este plano — a correção é do 021
-- [ ] **`tina/tina-lock.json` regenerado** pelo orquestrador com `tinacms dev` e commitado, com a
+- [x] **`tina/tina-lock.json` regenerado** pelo orquestrador com `tinacms dev` e commitado, com a
       diferença de tipos GraphQL descrita na Evidência
-- [ ] `npm run build` verde — **desmarcado até o push**; `ERR_CLOUD_CHECK_FAILED` antes disso é
+- [x] `npm run build` verde — **desmarcado até o push**; `ERR_CLOUD_CHECK_FAILED` antes disso é
       esperado e fica registrado, não reescrito
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado
-- [ ] §12 do PRD (item `scripts[]` da fase 1) e o README da fase 1 atualizados pelo orquestrador ao
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado
+- [x] §12 do PRD (item `scripts[]` da fase 1) e o README da fase 1 atualizados pelo orquestrador ao
       promover `Status: DONE`
 
 ## Evidência
