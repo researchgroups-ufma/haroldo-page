@@ -213,6 +213,22 @@ fase 3, não do 017.
   round-trip é byte-idêntico: 323 bytes de ida e de volta, indentação preservada linha a linha
   (`[0,4,4,8,4,0,0,4,4]`), linha em branco no meio e aspas simples e duplas intactas. A
   contingência prevista no risco (voltar `codigo` a link externo) fica sem objeto.
+- **Três divergências no `README.md` da raiz, todas encontradas pelo 022 e nenhuma consertada por
+  ele** (o plano fecha o escopo em quatro arquivos; a correção é do 021, que já é o plano dos
+  ajustes de documentação):
+  1. **`npm run dev` é apresentado como a forma de rodar o painel** (`README.md:126-133`: "Isso
+     executa `tinacms dev -c \"astro dev\"`: sobe o servidor local do Tina (...) e, em seguida, o
+     `astro dev`"). No Astro 7 isso não acontece — ver o achado acima. Quem seguir o README hoje
+     cai na tela "Failed loading TinaCMS assets".
+  2. **A tabela de comandos descreve `npm run build` como "`astro check` seguido de `astro build`"**
+     (`README.md:81`), omitindo o `tinacms build` que vem antes — que é justamente a etapa que
+     depende do TinaCloud e que deixou o CI vermelho por 14 commits. Divergência **anterior** ao
+     022, provavelmente do plano 015, que acrescentou o `tinacms build` ao script.
+  3. **"hoje só a coleção `perfil`; as outras quatro entram no plano 017"** (`README.md:129-130`)
+     está desatualizado desde que o 017 fechou.
+  A mesma linha do README que manda subir `npm run dev` uma vez para regenerar o
+  `tina/tina-lock.json` (`README.md:148-153`) continua **correta no conteúdo** — só o comando é que
+  mudou.
 - **Divergência de documentação a corrigir no 021, ao lado da que o 020 já deixou:** a §7.3 do PRD
   (`PRD.md:438`) lista `scripts[]` **antes** de `links[]`, enquanto o código põe `scripts` **depois**
   de `links` nos dois lados, como o plano 022 mandou. Nada quebra — o teste de paridade compara
