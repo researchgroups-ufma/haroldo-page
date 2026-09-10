@@ -299,6 +299,101 @@ describe('coleção disciplinas', () => {
     const resultado = disciplinasSchema.safeParse({ ...valido, en: { semestre: '2026.2' } });
     expect(resultado.success).toBe(false);
   });
+
+  describe('scripts[] (RF-37, D-05)', () => {
+    const scriptMinimo = {
+      titulo: 'Integração numérica de órbitas',
+      linguagem: 'python',
+      codigo: 'print("oi")',
+    };
+
+    it('aceita o item mínimo válido — `titulo`, `linguagem` e `codigo`', () => {
+      const resultado = disciplinasSchema.safeParse({ ...valido, scripts: [scriptMinimo] });
+      expect(resultado.success).toBe(true);
+    });
+
+    it('rejeita item sem `codigo` (obrigatório)', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        scripts: [omit(scriptMinimo, 'codigo')],
+      });
+      expect(resultado.success).toBe(false);
+    });
+
+    it('rejeita item sem `titulo` (obrigatório)', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        scripts: [omit(scriptMinimo, 'titulo')],
+      });
+      expect(resultado.success).toBe(false);
+    });
+
+    it('rejeita `linguagem` fora do enum python|r|matlab|bash|outro', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        scripts: [{ ...scriptMinimo, linguagem: 'javascript' }],
+      });
+      expect(resultado.success).toBe(false);
+    });
+
+    it.each(['python', 'r', 'matlab', 'bash', 'outro'])(
+      'aceita `linguagem` = %s',
+      (linguagem) => {
+        const resultado = disciplinasSchema.safeParse({
+          ...valido,
+          scripts: [{ ...scriptMinimo, linguagem }],
+        });
+        expect(resultado.success).toBe(true);
+      },
+    );
+
+    it('aceita item sem `descricao`, `aula` e `url` — os três são opcionais', () => {
+      const resultado = disciplinasSchema.safeParse({ ...valido, scripts: [scriptMinimo] });
+      expect(resultado.success).toBe(true);
+      if (resultado.success) {
+        expect(resultado.data.scripts?.[0]).not.toHaveProperty('descricao');
+        expect(resultado.data.scripts?.[0]).not.toHaveProperty('aula');
+        expect(resultado.data.scripts?.[0]).not.toHaveProperty('url');
+      }
+    });
+
+    it('aceita `aula` sem correspondência em `aulas[]` — sem integridade referencial (F-13, Decisões 9 e 10)', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        aulas: [{ numero: 1, titulo: 'Introdução', url: 'https://exemplo.test/aula1' }],
+        scripts: [{ ...scriptMinimo, aula: 99 }],
+      });
+      expect(resultado.success).toBe(true);
+    });
+
+    it('rejeita `url` inválida', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        scripts: [{ ...scriptMinimo, url: 'não-é-uma-url' }],
+      });
+      expect(resultado.success).toBe(false);
+    });
+
+    it('preserva `codigo` com quebras de linha e indentação literalmente', () => {
+      const codigoIndentado = 'def f(x):\n    y = x + 1\n\n    return y\n';
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        scripts: [{ ...scriptMinimo, codigo: codigoIndentado }],
+      });
+      expect(resultado.success).toBe(true);
+      if (resultado.success) {
+        expect(resultado.data.scripts?.[0].codigo).toBe(codigoIndentado);
+      }
+    });
+
+    it('rejeita `en: { scripts: [...] }` — `scripts` não entra no grupo `en` (.strict(), Decisão 5)', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        en: { scripts: [scriptMinimo] },
+      });
+      expect(resultado.success).toBe(false);
+    });
+  });
 });
 
 describe('coleção publicacoes', () => {

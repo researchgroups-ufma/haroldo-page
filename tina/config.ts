@@ -658,6 +658,58 @@ export default defineConfig({
           },
           {
             type: 'object',
+            name: 'scripts',
+            label: 'Scripts',
+            list: true,
+            description:
+              'Código-fonte publicado junto dos materiais da disciplina (RF-37). Fora do grupo "Versão em inglês": código não traduz.',
+            ui: {
+              defaultItem: { linguagem: 'python' },
+              itemProps: (item) => ({ label: item?.titulo || 'Novo script' }),
+            },
+            fields: [
+              { type: 'string', name: 'titulo', label: 'Título', required: true },
+              {
+                type: 'string',
+                name: 'descricao',
+                label: 'Descrição',
+                ui: { component: 'textarea' },
+              },
+              {
+                type: 'string',
+                name: 'linguagem',
+                label: 'Linguagem',
+                required: true,
+                options: ['python', 'r', 'matlab', 'bash', 'outro'],
+                description: 'Define como o código é colorido na página.',
+              },
+              {
+                type: 'string',
+                name: 'codigo',
+                label: 'Código',
+                required: true,
+                ui: { component: 'textarea' },
+                description:
+                  'Cole aqui o código-fonte. Ele é exibido na página da disciplina com destaque de sintaxe e botão de copiar. Para scripts longos, prefira publicar o arquivo e informar apenas o link abaixo.',
+              },
+              {
+                type: 'number',
+                name: 'aula',
+                label: 'Aula',
+                description:
+                  'Número da aula correspondente, se houver. Deixe em branco para um script geral da disciplina.',
+              },
+              {
+                type: 'string',
+                name: 'url',
+                label: 'Link',
+                description:
+                  'Link opcional para o arquivo original (Drive, GitHub, repositório institucional).',
+              },
+            ],
+          },
+          {
+            type: 'object',
             name: 'en',
             label: 'Versão em inglês (opcional)',
             description:

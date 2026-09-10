@@ -321,6 +321,29 @@ const linkDisciplinaSchema = z.object({
   url: z.url(),
 });
 
+/**
+ * Script de código-fonte dentro de uma disciplina (D-05: lista embutida, não coleção própria;
+ * RF-37, RN-05 com exceção para código-fonte — Decisão 7 da sabatina de 2026-09-04).
+ *
+ * `codigo` é obrigatório e sem limite de tamanho (Decisão 8): um `.max()` produziria o modo de
+ * falha que F-09/RNF-09 mandam evitar — o painel deixa salvar e o erro só apareceria no build,
+ * ilegível para o professor. A orientação para scripts longos vive no `description` do campo em
+ * `tina/config.ts`. `aula` é numérico e opcional, sem integridade referencial com `aulas[]`
+ * (Decisões 9 e 10): `aula` sem correspondência não é erro de schema, degrada na fase 3 (F-13).
+ * `url` é URL livre, agnóstica ao hospedeiro (D-07), e convive com `codigo` sem exclusividade
+ * mútua entre os dois (Decisão 2). `linguagem` é obrigatório dos dois lados, sem `.default()`
+ * aqui — o valor inicial do item novo (`python`) vem de `ui.defaultItem` em `tina/config.ts`
+ * (Decisão 3), para não afrouxar a obrigatoriedade só do lado Zod.
+ */
+const scriptSchema = z.object({
+  titulo: z.string(),
+  descricao: z.string().optional(),
+  linguagem: z.enum(['python', 'r', 'matlab', 'bash', 'outro']),
+  codigo: z.string(),
+  aula: z.number().optional(),
+  url: z.url().optional(),
+});
+
 /** Grupo `en` da coleção `disciplinas` (§7.3, RN-06, RN-09, plano 018). */
 const disciplinasEnSchema = z
   .object({
@@ -349,6 +372,7 @@ export const disciplinasSchema = z.object({
   listas: z.array(listaSchema).optional(),
   materiais: z.array(materialSchema).optional(),
   links: z.array(linkDisciplinaSchema).optional(),
+  scripts: z.array(scriptSchema).optional(),
   publicado: z.boolean(),
   en: disciplinasEnSchema.optional(),
 });
