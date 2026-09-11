@@ -24,7 +24,7 @@ a palavra "aparece" pode significar aqui.
 | 027 | 🧑 Usuário EDITOR do professor e a matriz de permissões da §9 | ⬜ TODO | **stakeholder** | nenhum | — |
 | 028 | 🧑 Notificação de falha de build ao ADMIN, com falha real | ⬜ TODO | orquestrador | nenhum | — |
 | 029 | 🧑 Ciclo ponta a ponta cronometrado (M-02) e o critério do §6.2 | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
-| 030 | Portão de conteúdo no CI: `content/` validado e referência resolvida | ⬜ TODO | agente | implementer | — |
+| 030 | Portão de conteúdo no CI: `content/` validado e referência resolvida | ✅ DONE | agente | implementer (sonnet) | `4343e42` |
 | 031 | Coerência do `tina-lock.json` verificada no CI | ⬜ TODO | agente | implementer | — |
 | 032 | `npm audit` no CI e política de severidade | ⬜ TODO | agente | implementer | — |
 | 033 | Avisos do painel para o manual da fase 5 | ⬜ TODO | agente | implementer | — |
@@ -93,9 +93,32 @@ correspondentes.
 | 2 | `tina-lock.json` versionado, regenerado só por `tinacms dev` | **031** | **Sim, vira verificação de CI** — comparação da árvore declarativa do config contra `schema.collections` do lock, sem rodar o dev server |
 | 3 | Mensagem de erro de build legível (F-09, R-01) e o subcampo obrigatório vazio que o painel deixa salvar | **028** (notificação + mensagem real medida) e **033** (o que o manual da fase 5 tem de dizer) | O portão do **030** é quem produz a mensagem no formato de F-09; o 028 demonstra que ela chega ao ADMIN |
 | 4 | O painel grava conteúdo errado sem quebrar nada (duas manifestações) | **033** | **Não é automatizável** — o conteúdo gravado é *válido*, só não é o que o usuário quis; nenhum teste distingue intenção. Vira **aviso obrigatório do manual da fase 5**, com a entrega nomeada em `docs/avisos-do-painel-para-o-manual.md` |
-| 5 | `astro check` reporta `[ERROR] [content]` e sai com exit 0 | **030** | Vira portão de verdade: teste que valida os arquivos reais de `content/` **e resolve as referências** — porque `safeParse` sozinho aceita `linha_relacionada: ''` |
+| 5 | `astro check` reporta `[ERROR] [content]` e sai com exit 0 | **030** ✅ **quitada em 2026-09-11** (`4343e42`) | Virou portão de verdade: `tests/content/conteudo-valido.test.ts` valida os arquivos reais de `content/` **e resolve as referências** — porque `safeParse` sozinho aceita `linha_relacionada: ''`. Roda no CI **e dentro do build de deploy**, provado nominalmente no log do build `4b0d544e` |
 | 6 | `npm audit` com 8 moderadas de `react-router`, sem correção nossa | **032** (+ ADR-0010) | O CI passa a auditar, reprovando em **`high`/`critical`** e relatando `moderate`. Reprovar em `moderate` deixaria o CI vermelho para sempre — o modo de falha que já custou 14 commits a este projeto |
-| 7 | Três buracos do teste de paridade | **030** (a e c); **(b) não** | (a) o `path` do Tina passa a ser comparado com o `base:` do `glob()` do Zod; (c) a prova de falsificabilidade é reproduzida contra o artefato final; **(b) fica para a fase 3**, porque não existe hoje campo com `list: true` **e** `options`, e mudar `classifyTina` sem campo real para exercitar seria alteração sem teste possível |
+| 7 | Três buracos do teste de paridade | **030** (a e c) ✅ **quitadas em 2026-09-11** (`4343e42`); **(b) não** | (a) o `path` do Tina passou a ser comparado com o `base:` do `glob()` do Zod, com extração que reprova se não achar as cinco; (c) a prova de falsificabilidade foi reproduzida contra o artefato final; **(b) fica para a fase 3**, porque não existe hoje campo com `list: true` **e** `options`, e mudar `classifyTina` sem campo real para exercitar seria alteração sem teste possível — `classifyTina` **não foi tocada** |
+
+## Achados do plano 030 que o 034 tem de absorver
+
+Dois, nenhum corrigível dentro do escopo do 030:
+
+1. **A normalização de `linha_relacionada` está duplicada.** `normalizeLinhaRelacionadaId`
+   (`src/content.config.ts:247`) é `const` **não exportada**, então `conteudo-valido.test.ts`
+   re-implementa suas duas regexes à mão. São idênticas hoje, mas podem divergir em silêncio — e
+   é **a mesma família de defeito que a D-06 combate**, que este plano fecha em outro lugar (a
+   dívida 7a). Se alguém mudar a normalização real, o portão segue verde validando pela regra
+   velha. **Correção é plano próprio, de dois passos:** exportar a função e importá-la no teste.
+   O 030 proibia editar `src/content.config.ts`, então não havia caminho interno; o revisor
+   considerou inverter o mapeamento no teste e concluiu que só muda a duplicação de lugar.
+2. **Valor não-textual em `linha_relacionada` escapa do portão.** Verificado empiricamente pelo
+   revisor: com `linha_relacionada: 42` o teste **passa**, porque o `typeof bruto === 'string'`
+   pula em silêncio. Descartado como defeito porque o campo é `reference` no Tina, que só grava
+   string — inalcançável pelo caminho do produto, e o §2 do `CLAUDE.md` proíbe tratar cenário
+   impossível. Fica registrado para quem for reavaliar.
+
+**Imprecisão a corrigir de passagem** no próximo toque em `tests/content/conteudo-valido.test.ts`:
+o cabeçalho diz "Fecha a dívida 5 e a dívida 7(c)", mas a 7(c) foi fechada em
+`paridade-schema.test.ts`. A dívida **foi** fechada por este plano; errada é a atribuição de qual
+arquivo a fecha.
 
 ## Achados do plano 026 que o 033 tem de absorver
 

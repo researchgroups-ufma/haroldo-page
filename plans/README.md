@@ -12,7 +12,7 @@ Este arquivo é só o mapa.
 |---|---|---|---|
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
 | [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–022, todos DONE — o 021 promovido em `7d5b7e6`, com CI verde sobre `26de58a` |
-| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟡 **Em andamento** | 023–034 fatiados em 2026-09-10; 023, 024, 025 e 026 DONE — o pipeline publica sozinho desde `ab0d1f8`, e desde `7ab84da` está provado que o `/admin` em produção é quem origina o push |
+| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟡 **Em andamento** | 023–034 fatiados em 2026-09-10; 023, 024, 025, 026 e 030 DONE — o pipeline publica sozinho desde `ab0d1f8`, desde `7ab84da` está provado que o `/admin` em produção é quem origina o push, e desde `4343e42` conteúdo inválido reprova no CI e no build de deploy. **027 bloqueado no professor** |
 | `fase-3-site-publico/` | 3 — Site público em português | ⬜ Não iniciada | — |
 | `fase-4-internacionalizacao/` | 4 — Internacionalização | ⬜ Não iniciada | — |
 | `fase-5-polimento-e-entrega/` | 5 — Polimento e entrega | ⬜ Não iniciada | — |

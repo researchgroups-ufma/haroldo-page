@@ -1,6 +1,6 @@
 # Plano 030 — Portão de conteúdo: todo arquivo de `content/` validado, com referência resolvida
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **F-09**, RNF-09, R-01, R-02, D-06; §11 ("Validação de conteúdo: todo arquivo em
 `content/` passa pelo Zod — bloqueia merge"); **dívida 5** e **dívida 7(a)/(c)** da fase 1
 **Depende de:** plano **024** (o `build:pipeline` já chama `vitest run tests/content`; este plano
@@ -206,29 +206,29 @@ mexa em `classifyTina`.**
 
 ## Critérios de aceitação
 
-- [ ] `tests/content/conteudo-valido.test.ts` valida os **13 arquivos reais** de `content/` contra
+- [x] `tests/content/conteudo-valido.test.ts` valida os **13 arquivos reais** de `content/` contra
       os cinco schemas Zod, descobrindo os arquivos por varredura
-- [ ] O teste **falha** com `linha_relacionada: ''` — a asserção de existência é explícita, não
+- [x] O teste **falha** com `linha_relacionada: ''` — a asserção de existência é explícita, não
       delegada ao `safeParse`
-- [ ] Toda mensagem de falha nomeia **o arquivo** (caminho relativo à raiz) **e o campo**,
+- [x] Toda mensagem de falha nomeia **o arquivo** (caminho relativo à raiz) **e o campo**,
       conforme F-09 e §8.2
-- [ ] O teste afirma que varreu ao menos um arquivo por coleção — varredura vazia reprova
-- [ ] `paridade-schema.test.ts` compara o `path` de cada coleção do Tina com o `base:` do `glob()`
+- [x] O teste afirma que varreu ao menos um arquivo por coleção — varredura vazia reprova
+- [x] `paridade-schema.test.ts` compara o `path` de cada coleção do Tina com o `base:` do `glob()`
       do Zod (dívida 7a), com extração que falha se não encontrar as cinco
-- [ ] **Três canários de falsificabilidade** colados, com falha e verde, e `git diff` provando que
+- [x] **Três canários de falsificabilidade** colados, com falha e verde, e `git diff` provando que
       nenhum sobrou
-- [ ] Prova de falsificabilidade do `compareFields` reproduzida contra o artefato final
+- [x] Prova de falsificabilidade do `compareFields` reproduzida contra o artefato final
       (dívida 7c), com o total de testes declarado
-- [ ] `classifyTina` **não modificada** — a dívida 7(b) fica registrada para a fase 3, não
+- [x] `classifyTina` **não modificada** — a dívida 7(b) fica registrada para a fase 3, não
       resolvida às cegas
-- [ ] `gray-matter` declarado em `devDependencies` na versão exata; `npm ls gray-matter` com
+- [x] `gray-matter` declarado em `devDependencies` na versão exata; `npm ls gray-matter` com
       instância única; lockfile sem mudança de versão fixada de outro pacote
-- [ ] `content/**`, `src/content.config.ts` e `tina/config.ts` **inalterados** no estado final
-- [ ] Cabeçalho §10.1 e docstrings §10.2 no arquivo novo
-- [ ] `npm run lint`, `npm run format:check`, `npm run test:coverage` (≥ 80%) e `npm run build`
+- [x] `content/**`, `src/content.config.ts` e `tina/config.ts` **inalterados** no estado final
+- [x] Cabeçalho §10.1 e docstrings §10.2 no arquivo novo
+- [x] `npm run lint`, `npm run format:check`, `npm run test:coverage` (≥ 80%) e `npm run build`
       verdes, com a saída do build lida
-- [ ] `npm run build:pipeline` executando o portão novo, com o trecho colado
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado
+- [x] `npm run build:pipeline` executando o portão novo, com o trecho colado
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado
 
 ## Evidência
 
@@ -617,11 +617,147 @@ $ git status --short
 `content/**`, `src/content.config.ts` e `tina/config.ts` não aparecem — inalterados, conforme
 escopo do plano. `classifyTina` não foi tocada (dívida 7b permanece registrada para a fase 3).
 
-### Pendências desta sessão
+### Verificação independente — `triage-runner` (orquestrador, 2026-09-11)
 
-- **Não commitado** — por instrução explícita, quem promove `Status` a `DONE` e commita é o
-  orquestrador, depois de verificação independente e revisão.
-- **CI do GitHub Actions com `conclusion: success`**: não verificável nesta sessão porque nada foi
-  empurrado — depende do commit que o orquestrador fizer.
-- Nenhum achado de conteúdo ou de schema a reportar: os 13 arquivos reais e os dois schemas
-  passaram limpos em todas as execuções fora dos canários (que foram propositais e revertidos).
+Execução autoritativa do ciclo, despachada pelo orquestrador. **Não** é a saída do executor: os
+cinco comandos foram rodados de novo, por outro agente, que não escreveu uma linha de código.
+
+```
+npm run lint           exit 0   eslint . — sem nenhum problema reportado
+npm run format:check   exit 0   All matched files use Prettier code style!
+npm run test:coverage  exit 0   Test Files  5 passed (5)
+                                     Tests  115 passed (115)
+                                Statements 100% (32/32)   Branches 100% (4/4)
+                                Functions  100% (2/2)     Lines    100% (31/31)
+npm run build          exit 0   astro check: Result (18 files): 0 errors / 0 warnings / 0 hints
+npm run build:pipeline exit 0   vitest run tests/content:
+                                Test Files  3 passed (3)
+                                     Tests  101 passed (101)
+                                astro check: 0 errors / 0 warnings / 0 hints
+```
+
+**A saída do `npm run build` foi lida por inteiro**, não só o exit code — é a exigência que este
+projeto aprendeu a duras penas, porque o `astro check` já imprimiu `[ERROR] [content]` no corpo
+**e ainda assim** encerrou com `0 errors` e exit 0. Nesta execução não há nenhuma linha `[ERROR]`
+nem `[WARN]` no corpo: corpo e contagem concordam.
+
+**Dois achados do `triage-runner`, resolvidos pelo orquestrador — nenhum é defeito deste plano:**
+
+1. *A tabela de cobertura por arquivo vem vazia e mede só 32 statements.* **Deliberado e
+   documentado:** `vitest.config.ts:15` restringe o `include` a `src/lib/**`, `src/i18n/**` e
+   `src/content.config.ts`, conforme a §11 do PRD, com o comentário explicando que `src/lib/**`
+   cru casava até `.gitkeep` e inflava o denominador. Pré-existente — a baseline de 107 testes
+   relatava 100% do mesmo jeito.
+2. *`NativeCommandError` do PowerShell em torno do `node.exe` no `npm run build`.* É o PowerShell
+   5.1 embrulhando stderr de executável nativo em `ErrorRecord`; exit 0, e não aparece no
+   `build:pipeline`. Ruído de ambiente conhecido, registrado no `CLAUDE.md` da casa.
+
+**Correção de um número, para não se propagar:** o `triage-runner` reportou a quebra por arquivo
+do `build:pipeline` como `paridade-schema 19` / `schemas 80`. **Está trocada.** O revisor apontou,
+e o orquestrador conferiu rodando os três arquivos isoladamente:
+
+```
+tests/content/paridade-schema.test.ts    Tests  18 passed (18)
+tests/content/schemas.test.ts            Tests  81 passed (81)
+tests/content/conteudo-valido.test.ts    Tests   2 passed  (2)
+```
+
+18 + 81 + 2 = **101**, que é o total autoritativo. A soma sempre esteve certa; a quebra, não.
+
+### Revisão de código — APROVADO (orquestrador, 2026-09-11)
+
+O revisor **reproduziu em vez de aceitar**, que é a exigência desta casa depois de uma revisão
+que aprovou quatro defeitos por acreditar na alegação. O que ele reproduziu por conta própria:
+
+- **O canário (a) do passo 5**, com a mensagem saindo **literalmente igual** à colada acima;
+- **dois canários que o plano não previa**: `linha_relacionada: content/linhas-pesquisa/nao-existe.md`,
+  que exercita o **outro** ramo da asserção de existência (referência pendente, não vazia) e de
+  quebra prova que a normalização de prefixo e sufixo funciona; e `linha_relacionada:` nulo, que
+  cai no `safeParse`. **O ramo de referência pendente não tinha canário no plano** — passou a ter;
+- **os totais por arquivo**, rodando cada um isoladamente (foi assim que a troca 19/80 apareceu);
+- `npm ls gray-matter` (instância única, `4.0.3 deduped`) e o `git diff --numstat` do lockfile
+  (1 linha inserida, 0 removidas, e o único `+` é `"gray-matter": "4.0.3",`);
+- a formatação do arquivo novo, com `npx prettier ... | diff -`, devolvendo idêntico.
+
+Ele confirmou também que o `git status --short` final é igual ao inicial e que
+`git diff -- content tina/config.ts` está vazio — os canários dele não deixaram resíduo.
+
+**Duas ressalvas que o revisor levantou e descartou, registradas porque são insumo futuro:**
+
+1. **Valor não-textual em `linha_relacionada` escapa do portão.** Verificado empiricamente: com
+   `linha_relacionada: 42` o teste **passa**, porque o `typeof bruto === 'string'` pula em
+   silêncio. Descartada porque o campo é `reference` no Tina, que só grava string — o valor é
+   inalcançável pelo caminho do produto, e o §2 do `CLAUDE.md` proíbe tratar cenário impossível.
+   **Fica registrado para o plano 034.**
+2. **Imprecisão de atribuição no cabeçalho do arquivo novo:** ele diz "Fecha a dívida 5 e a dívida
+   7(c)", mas a 7(c) foi fechada em `paridade-schema.test.ts`, não nele. A 7(c) **foi** fechada
+   por este plano; a imprecisão é de qual arquivo a fecha. Corrigir de passagem no próximo toque.
+
+### Achado — a normalização de `linha_relacionada` está duplicada
+
+`normalizeLinhaRelacionadaId` (`src/content.config.ts:247`) é `const` e **não é exportada**. Por
+isso o teste novo re-implementa à mão as duas regexes:
+
+```
+src/content.config.ts:248-249   valor.replace(/^content\/linhas-pesquisa\//, '').replace(/\.md$/, '')
+conteudo-valido.test.ts         bruto.replace(/^content\/linhas-pesquisa\//, '').replace(/\.md$/, '')
+```
+
+São idênticas hoje. É uma duplicação que pode divergir em silêncio — **a mesma família de defeito
+que a D-06 combate**, e que este plano fecha em outro lugar (a dívida 7a, o `path` do Tina contra
+o `base:` do Zod). Se alguém mudar a normalização real, o portão segue verde validando pela regra
+velha.
+
+**Não é defeito do executor e não era fechável aqui:** o plano proíbe editar
+`src/content.config.ts`, e sem exportar a função não há como importá-la. O revisor considerou a
+alternativa de inverter o mapeamento — o teste montar o conjunto de formas brutas aceitáveis a
+partir dos arquivos varridos — e concluiu que só muda a duplicação de lugar.
+
+**Correção é plano próprio, de dois passos:** exportar `normalizeLinhaRelacionadaId` e importá-la
+no teste.
+
+### Passo 9 (do orquestrador) — CI e build de deploy sobre o commit empurrado
+
+Commit do trabalho: **`4343e42`**, empurrado para `main` junto com `5bbd1d1` e `8c540c4`.
+
+**Os dois pipelines do ADR-0009, verdes no mesmo push** (`gh api repos/.../commits/4343e42/check-runs`):
+
+```
+Workers Builds: haroldo-page | app=cloudflare-workers-and-pages | completed/success
+  .../builds/4b0d544e-427e-4052-99f5-914369627c57
+qualidade | app=github-actions | completed/success
+  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34654789999/job/103444709638
+```
+
+**Números do CI**, do log do run `34654789999`:
+
+```
+Run npm run test:coverage    Test Files  5 passed (5)
+Run npm run test:coverage         Tests  115 passed (115)
+Run npm run test:coverage    All files  |  100 |  100 |  100 |  100 |
+Run npm run build:pipeline   Test Files  3 passed (3)
+Run npm run build:pipeline        Tests  101 passed (101)
+Run npm run build:pipeline   - 0 errors
+Run npm run build:pipeline   1 page(s) built in 712ms
+```
+
+**E a prova que de fato importa — o portão rodando dentro do build que publica**, do log do build
+`4b0d544e` na Cloudflare:
+
+```
+2026-09-11T22:38:11.369Z  Executing user build command: npm run build:pipeline
+2026-09-11T22:38:16.338Z   ✓ tests/content/conteudo-valido.test.ts (2 tests) 27ms
+2026-09-11T22:38:16.353Z   Test Files  3 passed (3)
+2026-09-11T22:38:16.353Z        Tests  101 passed (101)
+2026-09-11T22:39:31.428Z  - 0 errors
+2026-09-11T22:39:34.563Z  22:39:34 [build] 1 page(s) built in 1.66s
+2026-09-11T22:39:34.771Z  Executing user deploy command: npx wrangler deploy
+2026-09-11T22:39:39.121Z  ✨ Success! Uploaded 2 files (100 already uploaded) (0.60 sec)
+2026-09-11T22:39:40.684Z  Current Version ID: 6b5cec66-8d4e-403c-9a33-4c726d56532e
+2026-09-11T22:39:40.948Z  ✨ Success! Build completed.
+```
+
+O arquivo novo aparece **nominalmente** no log do build de deploy. Não é inferência a partir do
+número de testes: é o `conteudo-valido.test.ts` listado pelo Vitest dentro do runner da
+Cloudflare, antes do `wrangler deploy`. **O portão vale no deploy**, que era o objetivo do plano,
+e a versão `6b5cec66` sucede a `4b948808` do plano 026.
