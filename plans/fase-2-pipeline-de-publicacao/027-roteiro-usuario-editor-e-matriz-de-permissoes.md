@@ -175,7 +175,101 @@ perde:
 
 ## Evidência
 
-<Preenchida por quem executar. Nenhuma linha da matriz se declara satisfeita por leitura de
-documentação do TinaCloud: a prova é o que a interface respondeu à tentativa. Se o professor não
-estiver disponível, o plano fica bloqueado e o bloqueio é registrado — não se substitui a sessão
-dele pela do ADMIN.>
+> **Execução parcial, registrada em 2026-09-11.** O plano **não** está DONE e o `Status:`
+> continua `TODO`. O que segue é (a) o registro formal do bloqueio e (b) os dois passos de
+> orquestrador que não dependem do professor e foram executados. O vocabulário de `Status:` deste
+> projeto tem dois valores — `TODO` e `DONE` — e não foi inventado um terceiro para descrever o
+> bloqueio: ele mora aqui.
+
+### Registro de bloqueio — 2026-09-11
+
+**O plano está bloqueado no stakeholder.** Sete dos nove passos (2 a 7) e sete dos treze critérios
+de aceitação exigem a **sessão do próprio professor**, com as permissões da conta dele. O plano
+proíbe explicitamente o contorno:
+
+> "A sessão é dele. Não peça a senha, não peça para 'usar a conta dele um minutinho', não
+> compartilhe credencial. Se ele não estiver disponível, o plano fica **bloqueado** e isso é
+> registrado — não se substitui por 'o ADMIN testou e deve funcionar igual'."
+
+**Decisão do stakeholder em 2026-09-11:** **não criar o convite ainda.** O passo 1 dispara um
+e-mail real para `haroldo.lima@ufma.br` e não foi executado — **nada foi alterado no TinaCloud**,
+e o contador de usuários do plano gratuito continua em 1 de 2, com a vaga do EDITOR livre.
+
+**O que falta para desbloquear:** disponibilidade do professor para uma sessão assistida (ele na
+máquina dele, compartilhando a tela — a forma que o plano recomenda, porque permite avisá-lo das
+armadilhas do painel **antes** de ele tropeçar nelas e encurta o ciclo de perguntas).
+
+**Por que isto não é desculpa para adiar a fase.** Os planos **030, 031, 032 e 033** são de agente
+e não dependem de pessoa nenhuma; o README da fase já recomendava rodá-los "enquanto se agenda a
+sessão do professor". O bloqueio do 027 não bloqueia a fase — bloqueia a linha 027 → 029.
+
+### Passo 8 — o EDITOR não tem acesso de escrita ao repositório (orquestrador, terminal)
+
+Executado porque não depende do professor. Saída literal do `gh`:
+
+```
+=== colaboradores do repositorio ===
+abbadrava | admin | admin=true push=true
+
+=== visibilidade ===
+private=false | visibility=public | org=researchgroups-ufma
+
+=== convites pendentes ===
+(nenhum)
+```
+
+**A matriz fala só de colaborador, mas acesso por organização passaria despercebido**, então os
+outros dois caminhos foram fechados também:
+
+```
+=== membros da organizacao ===
+abbadrava
+
+=== permissao default da org para repos ===
+default_repository_permission=read | members_can_create_repos=true
+
+=== equipes com acesso ao repo ===
+(nenhuma)
+```
+
+**Três caminhos verificados e fechados:** `haroldo.lima@ufma.br` não é colaborador do repositório,
+não é membro da organização `researchgroups-ufma`, e não existe equipe com acesso. O único
+colaborador e o único membro da organização é `abbadrava` — a conta ADMIN do desenvolvedor.
+
+**A nuance do repositório público, que a matriz não diz.** O repositório é **público** desde
+2026-09-01 (D-04): `private=false`, `visibility=public`. Portanto "Acessar o repositório GitHub ✘"
+na linha do EDITOR significa **escrita e administração**, não leitura — leitura tem qualquer
+pessoa do mundo, o professor inclusive, sem conta nenhuma. Ainda que fosse membro da organização,
+`default_repository_permission=read` não daria escrita. Os commits do professor chegarão pelo
+GitHub App do TinaCloud, não por conta própria dele.
+
+**Ressalva de método, dita por inteiro:** colaborador no GitHub é identificado por **login**, não
+por e-mail. O que está provado é que **existe um único colaborador e um único membro da
+organização**, e que ele é a conta do desenvolvedor — o que fecha a questão para qualquer conta do
+professor, seja qual for o login dela. Não foi feita (nem é possível) uma consulta por
+`haroldo.lima@ufma.br` diretamente.
+
+### Passo 9 — comunicação de A-01 / R-04 (orquestrador)
+
+**Comunicado ao stakeholder em 2026-09-11**, antes de qualquer ação sobre o convite: com o
+professor dentro, **as duas vagas do plano gratuito do TinaCloud ficam ocupadas** (1 já é do ADMIN,
+plano 011). Um terceiro editor — bolsista, secretaria — exigirá **plano pago ou migração para
+Decap** (R-03, R-04).
+
+Como o convite não foi criado, a segunda vaga **continua livre** nesta data. A comunicação fica
+registrada aqui para que o passo 9 não precise ser refeito quando a sessão acontecer.
+
+### Passos 1 a 7 — não executados
+
+| Passo | Quem | Estado |
+|---|---|---|
+| 1. Convidar `haroldo.lima@ufma.br` como EDITOR | orquestrador | **não executado** — por decisão do stakeholder em 2026-09-11; nada alterado no TinaCloud |
+| 2. Aceitar o convite | professor | bloqueado (depende do 1) |
+| 3. Entrar no `/admin` de produção | professor | bloqueado |
+| 4. Editar um item e salvar | professor | bloqueado |
+| 5. Alternar `publicado` nos dois sentidos | professor | bloqueado |
+| 6. Enviar imagem | professor | bloqueado |
+| 7. As quatro linhas "✘" da matriz da §9 | professor | bloqueado |
+
+`git status --short` não mostra alteração alguma em `content/` — nenhuma edição foi feita por
+conta deste plano, o que é o esperado enquanto os passos do professor não acontecem.

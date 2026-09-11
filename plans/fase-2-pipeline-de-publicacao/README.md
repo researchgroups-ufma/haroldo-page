@@ -33,6 +33,14 @@ a palavra "aparece" pode significar aqui.
 **Numeração é global e contínua e não é ordem de execução** — precedentes registrados: o plano 014
 rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase está abaixo.
 
+> **O 027 está bloqueado no professor desde 2026-09-11**, por decisão do stakeholder: o convite do
+> TinaCloud **não foi criado**, então a segunda vaga do plano gratuito continua livre e nada foi
+> alterado no TinaCloud. Os passos de orquestrador que não dependem dele (8 e 9) já estão
+> executados e registrados na Evidência do plano; os passos 1 a 7 esperam a sessão. O `Status:`
+> continua `TODO` — o vocabulário de status deste projeto tem dois valores, e o bloqueio mora na
+> Evidência, não num terceiro valor inventado. **Isso trava a linha 027 → 029, não a fase:** o
+> 030, o 031, o 032 e o 033 são de agente e não dependem de pessoa nenhuma.
+
 ## Ordem de execução
 
 ```
