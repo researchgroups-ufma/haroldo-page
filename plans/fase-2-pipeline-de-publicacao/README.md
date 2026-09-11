@@ -1,0 +1,210 @@
+# Planos da Fase 2 — Pipeline de publicação ponta a ponta
+
+> Mapa de execução dos planos atômicos. **Atualize a tabela de estado a cada plano fechado.**
+> A fonte de verdade do que cada plano faz é o próprio arquivo `NNN-*.md`; a do que já foi feito
+> é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
+> ordem, o paralelismo e as armadilhas.
+
+Última atualização: 2026-09-10
+
+**Critério de conclusão da fase** (§6.2 do PRD): *um usuário EDITOR edita no `/admin` em produção
+e a mudança aparece no site sem intervenção do ADMIN (M-02).* Como na fase 1, o critério não é
+"os testes passam" — é exercitar o ciclo real. **Leia antes a ressalva da seção "O que esta fase
+não consegue provar"**: não existe página que renderize conteúdo até a fase 3, e isso muda o que
+a palavra "aparece" pode significar aqui.
+
+## Estado
+
+| Plano | Título | Status | Executável por | Agente | Commits |
+|---|---|---|---|---|---|
+| 023 | Abertura da fase 2: reconciliação do estado documental | ⬜ TODO | agente | implementer (haiku) | — |
+| 024 | Comando de build dos pipelines e o cloud check do TinaCloud | ⬜ TODO | agente | implementer | — |
+| 025 | 🧑 Workers Builds ligado ao repositório e variáveis no Cloudflare | ⬜ TODO | orquestrador | nenhum | — |
+| 026 | 🧑 `/admin` publicado e autenticando pelo TinaCloud em produção | ⬜ TODO | orquestrador | nenhum | — |
+| 027 | 🧑 Usuário EDITOR do professor e a matriz de permissões da §9 | ⬜ TODO | **stakeholder** | nenhum | — |
+| 028 | 🧑 Notificação de falha de build ao ADMIN, com falha real | ⬜ TODO | orquestrador | nenhum | — |
+| 029 | 🧑 Ciclo ponta a ponta cronometrado (M-02) e o critério do §6.2 | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
+| 030 | Portão de conteúdo no CI: `content/` validado e referência resolvida | ⬜ TODO | agente | implementer | — |
+| 031 | Coerência do `tina-lock.json` verificada no CI | ⬜ TODO | agente | implementer | — |
+| 032 | `npm audit` no CI e política de severidade | ⬜ TODO | agente | implementer | — |
+| 033 | Avisos do painel para o manual da fase 5 | ⬜ TODO | agente | implementer | — |
+| 034 | Documentação do pipeline no README e fechamento da fase 2 | ⬜ TODO | agente (+ orquestrador) | implementer | — |
+
+**Numeração é global e contínua e não é ordem de execução** — precedentes registrados: o plano 014
+rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase está abaixo.
+
+## Ordem de execução
+
+```
+023  →  024  →  025  →  026  →  027  →  029
+                 │        │       │      ↑
+                 │        └───────┴──────┤
+                 └→ 028 (depois de 030) ─┘
+
+030 ∥ 031 ∥ 033   (a qualquer momento depois do 024; o 030 depende dele por package.json)
+032               (depois do 024, por ci.yml)
+
+034  ←  todos
+```
+
+**A espinha é serial e não tem atalho:** não se verifica o `/admin` em produção (026) antes de
+existir build automático que o publique (025), não se convida o professor (027) para um painel
+que ainda não se sabe se autentica, e não se cronometra o ciclo (029) antes de o EDITOR existir.
+
+**A recomendação prática é começar pela ponta que não depende de gente:** 023 → 024 e, em
+seguida, disparar **030, 031, 032 e 033** enquanto se agenda a sessão do professor. Isso põe o
+portão de conteúdo (030) no lugar **antes** do plano 028, que é quem demonstra a mensagem de erro
+chegando ao ADMIN — e é por isso que o 028 aparece fora da linha do meio no grafo.
+
+### O que pode rodar em paralelo, e o que não pode
+
+| Par | Pode? | Motivo |
+|---|---|---|
+| 030 ∥ 031 | ✅ | escopos disjuntos: o 030 mexe em `conteudo-valido.test.ts`, `paridade-schema.test.ts` e `package.json`; o 031 em `tina-lock-coerente.test.ts` e `README.md` |
+| 030 ∥ 033 | ✅ | o 033 só cria `docs/avisos-do-painel-para-o-manual.md` |
+| 031 ∥ 033 | ✅ | idem |
+| 024 ∥ 030 | ❌ | **os dois editam `package.json`/`package-lock.json`** — conflito de lockfile, a restrição que a fase 0 aprendeu nos planos 002/004/005/007 |
+| 024 ∥ 032 | ❌ | os dois editam `.github/workflows/ci.yml` |
+| 031 ∥ 032 ∥ 024 ∥ 034 | ❌ entre si | **os quatro editam `README.md`**, em seções diferentes. Agentes em paralelo compartilham o mesmo working tree; serialize |
+| 025/026/027/028/029 entre si | ❌ | são serial por dependência lógica, não por arquivo |
+| qualquer plano ∥ 029 | ❌ | o 029 mede tempo de build; outro push na `main` durante a medição enfileira build (R-12) e contamina a amostra |
+
+**A última linha é a mais fácil de esquecer.** Enquanto o plano 029 estiver cronometrando, a
+`main` fica congelada.
+
+## Herdado da fase 1 — onde cada uma das sete dívidas caiu
+
+A lista de partida é a seção "O que a fase 1 empurra para a fase 2" do
+[README da fase 1](../fase-1-modelo-de-conteudo/README.md), a partir da linha 301. Nenhuma das
+sete ficou sem tratamento; três decisões foram tomadas no fatiamento e estão escritas nos planos
+correspondentes.
+
+| # | Dívida | Onde cai | Decisão |
+|---|---|---|---|
+| 1 | Acoplamento com o TinaCloud no build (`ERR_CLOUD_CHECK_FAILED` sem humano para ordenar os passos) | **024** (+ ADR-0009), verificada em **025** e **026** | Os dois pipelines automáticos rodam `tinacms build --skip-cloud-checks`; o `npm run build` local **mantém** o cloud check e continua sendo o portão pré-push de quem mexe em schema |
+| 2 | `tina-lock.json` versionado, regenerado só por `tinacms dev` | **031** | **Sim, vira verificação de CI** — comparação da árvore declarativa do config contra `schema.collections` do lock, sem rodar o dev server |
+| 3 | Mensagem de erro de build legível (F-09, R-01) e o subcampo obrigatório vazio que o painel deixa salvar | **028** (notificação + mensagem real medida) e **033** (o que o manual da fase 5 tem de dizer) | O portão do **030** é quem produz a mensagem no formato de F-09; o 028 demonstra que ela chega ao ADMIN |
+| 4 | O painel grava conteúdo errado sem quebrar nada (duas manifestações) | **033** | **Não é automatizável** — o conteúdo gravado é *válido*, só não é o que o usuário quis; nenhum teste distingue intenção. Vira **aviso obrigatório do manual da fase 5**, com a entrega nomeada em `docs/avisos-do-painel-para-o-manual.md` |
+| 5 | `astro check` reporta `[ERROR] [content]` e sai com exit 0 | **030** | Vira portão de verdade: teste que valida os arquivos reais de `content/` **e resolve as referências** — porque `safeParse` sozinho aceita `linha_relacionada: ''` |
+| 6 | `npm audit` com 8 moderadas de `react-router`, sem correção nossa | **032** (+ ADR-0010) | O CI passa a auditar, reprovando em **`high`/`critical`** e relatando `moderate`. Reprovar em `moderate` deixaria o CI vermelho para sempre — o modo de falha que já custou 14 commits a este projeto |
+| 7 | Três buracos do teste de paridade | **030** (a e c); **(b) não** | (a) o `path` do Tina passa a ser comparado com o `base:` do `glob()` do Zod; (c) a prova de falsificabilidade é reproduzida contra o artefato final; **(b) fica para a fase 3**, porque não existe hoje campo com `list: true` **e** `options`, e mudar `classifyTina` sem campo real para exercitar seria alteração sem teste possível |
+
+## O que esta fase não consegue provar
+
+**Não existe página que renderize conteúdo.** `src/` tem apenas `content.config.ts`, `env.d.ts`,
+`lib/config.ts`, `lib/slug.ts`, `pages/index.astro` e `styles/global.css` — o site público é a
+**fase 3**, e nenhum plano desta fase constrói página. Editar uma `descricao` pelo painel não muda
+um byte do HTML publicado.
+
+Consequência direta para o critério do §6.2 e para M-02: o que a fase 2 mede é
+
+```
+save no /admin  →  commit na main  →  build automático  →  versão nova publicada no Worker
+```
+
+com cada elo provado por artefato (SHA do commit do painel, o mesmo SHA no log da Cloudflare, id
+da versão publicada, resposta HTTP). **O último elo — "o texto novo aparece na página" — fica para
+a fase 3**, e M-02 é remedida na fase 5, como o próprio PRD agenda em §3.3 ("quando medir: fases 2
+e 5"). Isso é uma limitação **declarada**, não um atalho: os planos 029 e 034 são obrigados a
+escrevê-la, e o item 7 do §12 só pode ser marcado com a ressalva na própria linha.
+
+## Por onde isto pode dar errado
+
+**1. Prova de painel de terceiro é a interface, não o código.** Metade desta fase acontece em
+painéis da Cloudflare, do TinaCloud e do GitHub. Este projeto já aprovou uma correção que não
+funcionava porque a prova foi leitura de `node_modules` em vez de exercício da interface. **A
+prova é o que a tela respondeu**, transcrita ou capturada — inclusive nas linhas "✘" da matriz da
+§9, onde ausência de botão só conta se estiver descrita.
+
+**2. Quatro planos dependem de gente.** 025, 026 e 028 exigem o orquestrador logado em painéis;
+**027 e 029 exigem o professor**. Não substitua a sessão do EDITOR pela do ADMIN "porque deve dar
+igual" — é literalmente o que o §6.2 pede. Se o professor não estiver disponível, o plano fica
+**bloqueado e registrado**; critério de aceitação não se reescreve para caber no resultado (lição
+5 da fase 0).
+
+**3. O CI não é portão do deploy.** Os dois pipelines disparam no mesmo push e correm em paralelo;
+a Cloudflare não espera o `conclusion` do GitHub Actions. Quem impede conteúdo inválido de ir ao
+ar é o próprio `build:pipeline`, que roda `vitest run tests/content` antes de tudo. Quem assumir o
+contrário vai desenhar a proteção no lugar errado.
+
+**4. O experimento do plano 028 quebra a `main` de propósito.** É o que prova F-02/RNF-04. Tenha o
+commit de reversão pronto **antes** de empurrar o quebrado, registre os horários e feche a janela
+no mesmo dia. O repositório é público.
+
+**5. As armadilhas do painel continuam valendo em produção.** A alteração descartada em silêncio
+ao voltar de um subpainel (planos 020 e 021), o item de lista salvo com subcampo obrigatório vazio
+e o `linha_relacionada: ''` não sumiram — nenhum deles é defeito nosso a consertar nesta fase. Em
+qualquer plano que salve pelo painel: **salve sem sair do subpainel** e **confira o arquivo
+gravado, campo a campo**. A tela não é prova.
+
+**6. Duas vagas, e as duas ocupadas.** Ao fim do plano 027 o plano gratuito do TinaCloud está
+cheio (A-01). Um terceiro editor exige plano pago ou Decap (R-03, R-04). Comunique ao stakeholder
+na hora, não na fase 5.
+
+**7. O `npm run dev` não sobe o painel no Astro 7.** Se algum plano precisar do painel **local**,
+o caminho é `npx astro dev --background --force` + `npx tinacms dev`, e o encerramento é
+`npx astro dev stop` **mais** matar os processos `node` do `tinacms`. O `--force` é obrigatório
+por causa do cache da content layer. Nesta fase, porém, quase tudo acontece em **produção** — e lá
+o modo de falha é outro; não transporte o diagnóstico do plano 022 para o `/admin` publicado.
+
+## Verificação autoritativa
+
+```
+npm ci                →  não reescreve o lock
+npm run lint          →  exit 0
+npm run format:check  →  All matched files use Prettier code style!
+npm run test:coverage →  testes verdes E cobertura ≥ 80% (threshold imposto)
+npm run build         →  0 errors, 0 warnings, 0 hints; Complete!  ← LEIA A SAÍDA
+CI do GitHub Actions  →  conclusion "success" no commit empurrado
+```
+
+**A última linha não é formalidade.** Durante a fase 1 inteira o CI esteve vermelho por 14 commits
+seguidos, porque a lista era só de comandos locais e ninguém olhava para o run. "Os comandos
+locais passam" **não** é o mesmo que "o CI passa", e só o segundo é evidência.
+
+**A quinta linha também não.** O `astro check` já foi flagrado duas vezes imprimindo
+`[ERROR] [content]` e encerrando com `0 errors` e exit 0 (planos 020 e 021) — a segunda vez com
+uma referência inválida que **um humano lendo a saída** impediu de entrar no commit que fechou a
+fase 1. Enquanto o plano 030 não fechar, quem lê a saída é você. Depois dele, o portão passa a ser
+o `vitest run tests/content`, que roda no CI **e** no build de deploy.
+
+**Planos com passo em painel de terceiro acrescentam uma linha própria:** o que a interface
+mostrou, transcrito ou capturado, com data e horário. Sem isso, o plano não fecha.
+
+## Portão de qualidade
+
+Vale integralmente o da fase 0 (seção "Portão de qualidade", linha 113 daquele README): um plano
+só vira `DONE` com **verificação independente com saída real** *e* **revisão de código aprovada**.
+Relato do executor dizendo "funcionou" não substitui nenhuma das duas.
+
+As **"Instruções que todo despacho de executor deve conter"** (fase 0, linha 82) valem
+integralmente aqui; as que mais importam nesta fase:
+
+1. **`git add` por caminho explícito.** Nunca `git add -A` nem `git add .`.
+2. **`Status:` fica em `TODO`** — a promoção é do orquestrador.
+3. **Evidência é saída literal, colada**, da sessão. Nada de saída de um comando rotulada como de
+   outro.
+4. **Critério de aceitação não se reescreve para caber no resultado.** Bloqueio externo deixa a
+   caixa vazia e é reportado.
+5. **Listar os arquivos que outro agente está tocando naquele momento**, com instrução de não
+   editá-los mesmo que uma verificação falhe por causa deles — ver a tabela de paralelismo.
+6. **Mandar o executor declarar o que NÃO rodou.**
+7. **Teste novo tem de ser provado falsificável.** Os planos 030, 031 e 032 exigem canário, e o
+   030 exige quatro.
+8. **Desconfiar de churn grande no lockfile** — vale para o `gray-matter` do plano 030.
+
+A seção **"Segurança — `npm audit`"** da fase 0 (linha 137) é a origem da dívida 6 e o contexto do
+plano 032. Leia-a antes de despachá-lo.
+
+## Ordem de fechamento de plano que mude schema
+
+**Nenhum plano desta fase muda schema** — nem `src/content.config.ts` nem `tina/config.ts`. Se
+algum precisar mudar, ele **para e reporta**, e a regra da fase 1 volta a valer:
+
+```
+revisão APROVADO → commit → push → TinaCloud reindexa → npm run build verde → Status: DONE
+```
+
+`--skip-cloud-checks` no comando **local** serve só como diagnóstico separado. A partir do plano
+024 ele passa a existir no `build:pipeline`, que é o comando dos pipelines automáticos — e essa é
+uma decisão registrada em ADR-0009, não uma licença para usá-lo no fechamento de plano.
