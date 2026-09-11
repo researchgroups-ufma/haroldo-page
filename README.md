@@ -78,21 +78,22 @@ deixou o CI vermelho por 14 commits antes de os secrets serem configurados. `npm
 
 ## Comandos
 
-| Comando                 | O que faz                                                                                                                                                                 |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`           | `tinacms dev -c "astro dev"` — sobe o servidor do Tina e encadeia o `astro dev`. **Não serve para rodar o painel no Astro 7** (ver [Painel de edição](#painel-de-edição)) |
-| `npm run start`         | `astro dev` puro, sem o servidor do Tina — só o site, sem `/admin` funcional                                                                                              |
-| `npm run build`         | `tinacms build` (regenera o schema derivado do Tina) seguido de `astro check` (checagem de tipos) e `astro build`; gera `dist/`                                           |
-| `npm run preview`       | Serve localmente o conteúdo já buildado em `dist/`                                                                                                                        |
-| `npm run astro`         | Passthrough para a CLI do Astro (`npm run astro -- <comando>`, ex.: `npm run astro -- add`)                                                                               |
-| `npm run lint`          | ESLint sobre todo o projeto                                                                                                                                               |
-| `npm run lint:fix`      | ESLint com correção automática                                                                                                                                            |
-| `npm run format`        | Formata todo o projeto com Prettier                                                                                                                                       |
-| `npm run format:check`  | Verifica formatação sem alterar arquivos (usado no CI)                                                                                                                    |
-| `npm run test`          | Roda a suíte de testes (Vitest) uma vez                                                                                                                                   |
-| `npm run test:watch`    | Roda a suíte em modo watch                                                                                                                                                |
-| `npm run test:coverage` | Roda a suíte com relatório de cobertura                                                                                                                                   |
-| `npm run deploy`        | `npm run build` seguido de `wrangler deploy` (deploy manual)                                                                                                              |
+| Comando                  | O que faz                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`            | `tinacms dev -c "astro dev"` — sobe o servidor do Tina e encadeia o `astro dev`. **Não serve para rodar o painel no Astro 7** (ver [Painel de edição](#painel-de-edição))                                                                                                                                                                                                                   |
+| `npm run start`          | `astro dev` puro, sem o servidor do Tina — só o site, sem `/admin` funcional                                                                                                                                                                                                                                                                                                                |
+| `npm run build`          | `tinacms build` (regenera o schema derivado do Tina) seguido de `astro check` (checagem de tipos) e `astro build`; gera `dist/`                                                                                                                                                                                                                                                             |
+| `npm run build:pipeline` | Usado pelos pipelines automáticos (GitHub Actions e, a partir do plano 025, Cloudflare Workers Builds). Tem a mais `vitest run tests/content` antes do build, e a menos o cloud check do TinaCloud (`tinacms build --skip-cloud-checks` em vez de `tinacms build`) — ver `docs/adr/0009-build-de-pipeline-sem-cloud-check.md`. **Não substitui** `npm run build` como portão pré-push local |
+| `npm run preview`        | Serve localmente o conteúdo já buildado em `dist/`                                                                                                                                                                                                                                                                                                                                          |
+| `npm run astro`          | Passthrough para a CLI do Astro (`npm run astro -- <comando>`, ex.: `npm run astro -- add`)                                                                                                                                                                                                                                                                                                 |
+| `npm run lint`           | ESLint sobre todo o projeto                                                                                                                                                                                                                                                                                                                                                                 |
+| `npm run lint:fix`       | ESLint com correção automática                                                                                                                                                                                                                                                                                                                                                              |
+| `npm run format`         | Formata todo o projeto com Prettier                                                                                                                                                                                                                                                                                                                                                         |
+| `npm run format:check`   | Verifica formatação sem alterar arquivos (usado no CI)                                                                                                                                                                                                                                                                                                                                      |
+| `npm run test`           | Roda a suíte de testes (Vitest) uma vez                                                                                                                                                                                                                                                                                                                                                     |
+| `npm run test:watch`     | Roda a suíte em modo watch                                                                                                                                                                                                                                                                                                                                                                  |
+| `npm run test:coverage`  | Roda a suíte com relatório de cobertura                                                                                                                                                                                                                                                                                                                                                     |
+| `npm run deploy`         | `npm run build` seguido de `wrangler deploy` (deploy manual)                                                                                                                                                                                                                                                                                                                                |
 
 ## Estrutura de pastas
 
@@ -105,7 +106,7 @@ haroldo-page/
 ├── package.json
 ├── .nvmrc
 ├── .env.example
-├── .github/workflows/    # CI: lint, format:check, test, build
+├── .github/workflows/    # CI: lint, format:check, test:coverage, build:pipeline
 ├── content/              # ← domínio do PROFESSOR (via painel, quando existir)
 │   ├── perfil/
 │   ├── linhas-pesquisa/
@@ -203,8 +204,13 @@ npm run test
 npm run build
 ```
 
-O CI (`.github/workflows/ci.yml`) roda exatamente essa sequência (`npm ci` → `lint` →
-`format:check` → `test` → `build`) em todo push e pull request para `main`. Suíte verde é
+O CI (`.github/workflows/ci.yml`) roda `npm ci` → `lint` → `format:check` → `test:coverage` →
+`build:pipeline` em todo push e pull request para `main` — o último passo troca `npm run build`
+por `npm run build:pipeline` porque o cloud check do TinaCloud não é sinal de defeito do pipeline
+em nenhum dos dois gatilhos: em push para `main` o commit já está lá por construção e o que
+resta é uma corrida contra a reindexação assíncrona, e em pull request o schema do branch nunca
+foi indexado (só `main` é indexado), então o cloud check falharia de forma determinística (ver
+`docs/adr/0009-build-de-pipeline-sem-cloud-check.md`). Suíte verde é
 pré-requisito de merge (§11 do PRD, RNF-10).
 
 ## Troubleshooting

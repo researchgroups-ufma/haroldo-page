@@ -12,10 +12,10 @@ jobs:
     steps:
       # v4 tem como alvo o Node 20, aposentado nos runners: o GitHub ja forcava
       # essas actions para o Node 24 e anotava um warning de depreciacao a cada
-      # execucao. checkout v5 e setup-node v5 passaram a usar Node 24 nativo.
-      # Nenhuma breaking change destas majors nos atinge: o auto-cache
-      # introduzido no setup-node v5 depende do campo `packageManager` em
-      # `package.json`, que este projeto nao tem, e o `cache: 'npm'` abaixo
+      # execucao. checkout v7 e setup-node v7 tem como alvo o Node 24 nativo.
+      # Nenhuma breaking change destas majors nos atinge: o auto-cache do
+      # setup-node depende do campo `packageManager` em `package.json`, que
+      # este projeto nao tem, e o `cache: 'npm'` abaixo
       # continua explicito; o bloqueio de fork PR do checkout v7 vale para
       # `pull_request_target`/`workflow_run`, gatilhos que este workflow nao usa.
       - uses: actions/checkout@v7
@@ -29,14 +29,23 @@ jobs:
       # test:coverage em vez de test: roda os mesmos testes e ainda impoe o
       # threshold de 80% da §11 do PRD, que ate 2026-09-01 era so relatado
       - run: npm run test:coverage
-      # `npm run build` comeca por `tinacms build`, que precisa de credenciais do
-      # TinaCloud: sem elas aborta com "Client not configured properly. Missing
-      # clientId, token" — e era por isso que o CI estava vermelho desde o plano
-      # 015. As variaveis ficam neste passo, e nao no job, porque nenhum dos
-      # outros precisa delas. `TINA_BRANCH` nao entra: `tina/config.ts` ja cai
-      # em 'main' por padrao. `PUBLIC_SITE_URL` tambem nao: `astro.config.mjs`
-      # tem fallback e o build nao depende dela.
-      - run: npm run build
+      # `build:pipeline` roda `tinacms build --skip-cloud-checks` em vez de `npm run build`: o
+      # cloud check do TinaCloud compara o schema local com o que foi indexado em `main`, e este
+      # workflow dispara nos dois gatilhos do topo do arquivo. Em `push` (sempre para `main`), o
+      # commit ja esta em `main` por construcao e o que resta do cloud check e uma corrida contra
+      # a reindexacao assincrona. Em `pull_request`, o schema do branch da PR nunca foi indexado
+      # (so `main` e indexado) e o cloud check falharia de forma deterministica, nao por corrida.
+      # Em nenhum dos dois casos o cloud check e sinal de defeito do pipeline. Decisao e
+      # alternativas rejeitadas em ADR-0009.
+      #
+      # `tinacms build` comeca por precisar de credenciais do TinaCloud: sem elas aborta com
+      # "Client not configured properly. Missing clientId, token" — e era por isso que o CI
+      # estava vermelho desde o plano 015. `--skip-cloud-checks` nao contorna essa exigencia,
+      # so a comparacao de schema. As variaveis ficam neste passo, e nao no job, porque
+      # nenhum dos outros precisa delas. `TINA_BRANCH` nao entra: `tina/config.ts` ja cai em
+      # 'main' por padrao. `PUBLIC_SITE_URL` tambem nao: `astro.config.mjs` tem fallback e o
+      # build nao depende dela.
+      - run: npm run build:pipeline
         env:
           TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
