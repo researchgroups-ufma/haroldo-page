@@ -1,6 +1,6 @@
 # Plano 025 — Roteiro humano: Workers Builds ligado ao repositório e variáveis no Cloudflare
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-11; fase 2, **itens 1 e 2** do §12 (a metade do Cloudflare); RNF-04, RNF-14,
 A-03, R-06, R-12
 **Depende de:** plano **024** (o comando `build:pipeline` precisa existir e estar em `main` antes
@@ -147,23 +147,23 @@ o erro literal antes de acrescentá-la.
 
 ## Critérios de aceitação
 
-- [ ] Workers Builds conectado a `researchgroups-ufma/haroldo-page`, branch de produção `main`,
+- [x] Workers Builds conectado a `researchgroups-ufma/haroldo-page`, branch de produção `main`,
       com a autorização do GitHub App descrita na Evidência
-- [ ] Build command `npm run build:pipeline` e deploy command `npx wrangler deploy` configurados,
+- [x] Build command `npm run build:pipeline` e deploy command `npx wrangler deploy` configurados,
       transcritos literalmente do painel
-- [ ] `TINA_CLIENT_ID` e `PUBLIC_SITE_URL` como variáveis; `TINA_TOKEN` **como segredo, mascarado
+- [x] `TINA_CLIENT_ID` e `PUBLIC_SITE_URL` como variáveis; `TINA_TOKEN` **como segredo, mascarado
       no painel**; nenhum valor de token na Evidência
-- [ ] **Um push na `main` disparou um build sem intervenção**, com SHA, status, duração e trecho
+- [x] **Um push na `main` disparou um build sem intervenção**, com SHA, status, duração e trecho
       de log colados — não um rebuild manual
-- [ ] Versão nova publicada no Worker, associada ao SHA do push; URL respondendo 200 e rota
+- [x] Versão nova publicada no Worker, associada ao SHA do push; URL respondendo 200 e rota
       inexistente respondendo 404
-- [ ] Versão de Node usada pelo build registrada e conferida contra o major do `.nvmrc`
-- [ ] Duração do build, minutos consumidos e custo (US$ 0,00) registrados — R-06, RNF-14, M-06
-- [ ] Cotas do painel conferidas contra os valores de Q-03 (3.000 min/mês, 1 build simultâneo,
+- [x] Versão de Node usada pelo build registrada e conferida contra o major do `.nvmrc`
+- [x] Duração do build, minutos consumidos e custo (US$ 0,00) registrados — R-06, RNF-14, M-06
+- [x] Cotas do painel conferidas contra os valores de Q-03 (3.000 min/mês, 1 build simultâneo,
       teto de 20 min); divergência, se houver, **reportada**
-- [ ] Worker continua sem código de runtime (D-01)
-- [ ] `git status --short` limpo — nenhum arquivo do projeto modificado
-- [ ] §12 do PRD (itens 1 e 2 da fase 2) e o README da fase 2 atualizados pelo orquestrador ao
+- [x] Worker continua sem código de runtime (D-01)
+- [x] `git status --short` limpo — nenhum arquivo do projeto modificado
+- [x] §12 do PRD (itens 1 e 2 da fase 2) e o README da fase 2 atualizados pelo orquestrador ao
       promover `Status: DONE`
 
 ## Evidência
@@ -284,8 +284,135 @@ comando que revela e
 `gh api /orgs/<org>/installations`, comparando a data de instalacao com a data de criacao do
 repositorio.
 
-### Passos 3, 5 a 9
+### Passos 3, 5 e 6 — o build automatico, provado pelo log do proprio build
 
-<Pendentes de preenchimento. O push de `954215c` ocorreu com o vinculo quebrado e nao serve como
-prova do passo 5; nao foi confirmado se chegou a gerar build algum no painel. A prova do build
-automatico vem do push seguinte.>
+O push de `954215c` ocorreu com o vinculo quebrado e **nao serve** como prova do passo 5; nao foi
+confirmado se chegou a gerar build algum. A prova vem do push seguinte, `ab0d1f8`, feito depois da
+correcao do escopo da instalacao.
+
+**Vinculo commit <-> build, verificado pelo lado do GitHub** (`gh api
+/repos/researchgroups-ufma/haroldo-page/commits/ab0d1f8/check-runs`, saida literal do terminal):
+
+```
+Workers Builds: haroldo-page | app=cloudflare-workers-and-pages | completed/success |
+  https://dash.cloudflare.com/.../workers/services/view/haroldo-page/production/builds/ace5b1b9-226e-4fa0-b7ca-8507b8fdc3f0
+qualidade | app=github-actions | completed/success |
+  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34600813475/job/103267368251
+```
+
+Isto e melhor evidencia do que a transcricao do painel: o proprio GitHub registra, no commit, o
+check run da Cloudflare com `conclusion: success` apontando para o build
+`ace5b1b9-226e-4fa0-b7ca-8507b8fdc3f0`. E mostra os **dois pipelines no mesmo push**, em paralelo,
+que e o desenho do ADR-0009.
+
+**Log do build (Cloudflare), trechos literais.** Inicio `2026-09-11T12:48:13.213Z`, fim
+`2026-09-11T12:50:15.644Z` — **duracao 2m02s**.
+
+```
+2026-09-11T12:48:19.375Z  Detected the following tools from environment: nodejs@24.21.0, npm@10.9.2
+2026-09-11T12:49:03.087Z  Executing user build command: npm run build:pipeline
+2026-09-11T12:49:03.324Z  > vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+2026-09-11T12:49:07.057Z   tests/content/schemas.test.ts (81 tests) 33ms
+2026-09-11T12:49:07.537Z   tests/content/paridade-schema.test.ts (12 tests) 14ms
+2026-09-11T12:49:07.545Z   Test Files  2 passed (2)
+2026-09-11T12:49:07.545Z        Tests  93 passed (93)
+2026-09-11T12:49:10.771Z  Starting Tina build
+... (a caixa "Tina build complete" sai como JSON, por nao haver TTY no runner; mesmo conteudo
+    das demais — API url, GraphQL Client, Typescript Types, Static HTML file; elidida aqui) ...
+2026-09-11T12:50:03.907Z  Result (17 files):
+2026-09-11T12:50:03.908Z  - 0 errors
+2026-09-11T12:50:03.908Z  - 0 warnings
+2026-09-11T12:50:03.908Z  - 0 hints
+2026-09-11T12:50:06.122Z  12:50:06 [build] 1 page(s) built in 1.14s
+2026-09-11T12:50:06.122Z  12:50:06 [build] Complete!
+2026-09-11T12:50:06.164Z  Success: Build command completed
+2026-09-11T12:50:06.520Z  Executing user deploy command: npx wrangler deploy
+2026-09-11T12:50:08.129Z  wrangler 4.128.0
+2026-09-11T12:50:08.960Z  Read 107 files from the assets directory /opt/buildhome/repo/dist
+2026-09-11T12:50:13.578Z  Success! Uploaded 99 files (3 already uploaded) (3.19 sec)
+2026-09-11T12:50:14.839Z  Uploaded haroldo-page (6.05 sec)
+2026-09-11T12:50:15.476Z    https://haroldo-page.and-near.workers.dev
+2026-09-11T12:50:15.479Z  Current Version ID: 1132cea1-e676-4e54-9b2e-7a49be7ef9a0
+2026-09-11T12:50:15.644Z  Success! Build completed.
+```
+
+**Passo 3 conferido pela execucao, nao por transcricao:** o log mostra literalmente
+`Executing user build command: npm run build:pipeline` e
+`Executing user deploy command: npx wrangler deploy` — os dois campos configurados no painel,
+provados pelo que de fato rodou. Diretorio raiz do repositorio (`/opt/buildhome/repo`), branch
+`main` (o check run esta num commit de `main`).
+
+**Node:** `nodejs@24.21.0`, **detectado do ambiente** pela Cloudflare — major **24**, igual ao
+`.nvmrc` (RNF-12). Nao foi preciso fixar a versao no painel.
+
+**O portao de conteudo rodou no build de deploy:** 93 testes de `tests/content` passaram antes do
+`tinacms build`. E o ADR-0009 funcionando — o que protege o site de conteudo invalido nao e o CI,
+e este passo.
+
+**Versao publicada:** `1132cea1-e676-4e54-9b2e-7a49be7ef9a0`, posterior a `85adc91c` do plano 012.
+O deploy deixou de ser manual.
+
+**Verificacao HTTP da producao** (terminal, logo apos o deploy):
+
+```
+/                    status=200  bytes=331  tempo=0.208436s
+/nao-existe-mesmo    status=404  bytes=0
+/admin/              status=200
+```
+
+#### Duas coisas que NAO sao provadas por essas respostas
+
+1. **O `not_found_handling = "404-page"` ainda nao esta demonstrado.** A rota inexistente responde
+   404, o que cumpre o criterio — mas com **corpo vazio**, que e indistinguivel do default `none`.
+   A causa e que `dist/` nao tem `404.html`: o build gera uma pagina so (`1 page(s) built`,
+   apenas `/index.html`), porque `src/pages/` ainda tem apenas `index.astro`. A RF-27 e da fase 3;
+   a configuracao so se prova quando existir a pagina. Registrado aqui para que a fase 3 nao
+   presuma provado.
+2. **O `/admin/` responder 200 nao e "autentica pelo TinaCloud".** Os assets do painel subiram no
+   deploy (`/admin/index.html` e `/admin/assets/*` aparecem na listagem do wrangler). Isso e fato;
+   a conclusao sobre autenticacao e o criterio do **plano 026**, que se prova abrindo o painel e
+   editando, nao com `curl`.
+
+### Passo 7 — numeros da cota e custo (painel, relatado pelo desenvolvedor)
+
+```
+Workers build minutes this month     3 / 3,000
+Requests today                       2 / 100,000
+Observability events today           0 / 200,000
+```
+
+Custo na pagina de faturamento: **US$ 0,00**.
+
+- **Duracao do build: 2m02s** (R-06 — "medir a duracao real do build na fase 2", agora medido).
+- **Consumo: 3 minutos** de 3.000 no mes — a Cloudflare arredonda para cima. Um push custa ~0,1%
+  da cota mensal; mesmo um push por dia util ficaria em ~60 min/mes. O R-06 e o R-12 tem folga de
+  duas ordens de grandeza.
+- **Custo: US$ 0,00** (RNF-14, M-06).
+
+**Cotas contra Q-03:** os **3.000 min/mes** batem com o painel — sem divergencia. Os outros dois
+valores de Q-03 (**1 build simultaneo** e **teto de 20 min por build**) **nao sao exibidos nessa
+tela**; nao foram conferidos contra o painel, e isso e ausencia de exibicao, nao divergencia
+medida. O teto de 20 min, de todo modo, esta a dez vezes da duracao observada.
+
+### Passo 8 — o Worker continua sem codigo de runtime (D-01)
+
+Relatado pelo desenvolvedor: a visao geral do Worker mostra **apenas assets estaticos, sem
+codigo**. Corrobora o achado do passo 4: a plataforma recusa variaveis de runtime neste Worker
+precisamente porque nao ha codigo onde injeta-las. D-01 preservada — nenhum `main` no
+`wrangler.toml`, nenhum adapter, nenhum SSR.
+
+### Passo 9 — nenhum arquivo do projeto modificado
+
+Os unicos arquivos tocados durante a execucao deste plano sao o proprio arquivo do plano
+(recebendo esta Evidencia e os checkboxes) e, na promocao, `PRD.md`, `plans/README.md` e o README
+da fase. Nenhum arquivo de codigo ou configuracao do projeto: `wrangler.toml`, `package.json`,
+`astro.config.mjs`, `tina/config.ts`, `src/**` e `content/**` intocados. O painel **nao** exigiu
+nenhuma alteracao em `wrangler.toml`.
+
+### Propriedade do desenho, registrada como o plano exige
+
+O GitHub Actions **nao** e portao do deploy. Os dois pipelines dispararam no mesmo push
+`ab0d1f8` e correram em paralelo — o check run da Cloudflare e o do GitHub Actions convivem no
+mesmo commit, e a Cloudflare nao esperou o `conclusion` do CI. O que protege o site de conteudo
+invalido e o `vitest run tests/content` dentro do proprio `build:pipeline` do build de deploy,
+visivel no log acima. E isso que sustenta F-02 e RNF-04.
