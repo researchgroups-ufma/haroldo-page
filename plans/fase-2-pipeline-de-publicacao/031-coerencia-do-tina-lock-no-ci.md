@@ -1,6 +1,6 @@
 # Plano 031 — `tina/tina-lock.json` desatualizado passa a reprovar no CI
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RNF-09, R-02, D-06 (mesma família); **dívida 2** da fase 1
 **Depende de:** nenhum plano de código. Pode rodar **em paralelo** com **030** e **033** — escopos
 disjuntos, e este não toca `package.json`. **Não** rode em paralelo com 024, 032 ou 034: os quatro
@@ -143,24 +143,24 @@ e `aula`, três tipos GraphQL (`DisciplinasScripts`, `DisciplinasScriptsFilter`,
 
 ## Critérios de aceitação
 
-- [ ] `tests/content/tina-lock-coerente.test.ts` compara a árvore declarativa de `tina/config.ts`
+- [x] `tests/content/tina-lock-coerente.test.ts` compara a árvore declarativa de `tina/config.ts`
       com `schema.collections` de `tina/tina-lock.json`, por caminhos qualificados
-- [ ] `type`, `required`, `list` e `options` comparados nos caminhos em comum
-- [ ] Chaves ignoradas (`ui`, `label`, `description`, funções) **listadas explicitamente e
+- [x] `type`, `required`, `list` e `options` comparados nos caminhos em comum
+- [x] Chaves ignoradas (`ui`, `label`, `description`, funções) **listadas explicitamente e
       comentadas** no arquivo
-- [ ] Número de caminhos comparados registrado; varredura vazia reprova
-- [ ] **Falsificabilidade provada nos dois sentidos**, com as quatro saídas coladas e `git diff`
+- [x] Número de caminhos comparados registrado; varredura vazia reprova
+- [x] **Falsificabilidade provada nos dois sentidos**, com as quatro saídas coladas e `git diff`
       vazio ao final
-- [ ] O teste roda no `npm run test:coverage` (CI) **e** no `vitest run tests/content` do
+- [x] O teste roda no `npm run test:coverage` (CI) **e** no `vitest run tests/content` do
       `build:pipeline`, sem alteração de workflow ou de script — comprovado por trecho de saída
-- [ ] `tina/config.ts`, `tina/tina-lock.json`, `package.json` e `.github/workflows/ci.yml`
+- [x] `tina/config.ts`, `tina/tina-lock.json`, `package.json` e `.github/workflows/ci.yml`
       **inalterados**
-- [ ] `README.md` com a frase nova na seção "Painel de edição", sem invalidar o procedimento
+- [x] `README.md` com a frase nova na seção "Painel de edição", sem invalidar o procedimento
       manual descrito ali
-- [ ] Cabeçalho §10.1 e docstrings §10.2, com a limitação assumida escrita nas "Notas"
-- [ ] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes,
+- [x] Cabeçalho §10.1 e docstrings §10.2, com a limitação assumida escrita nas "Notas"
+- [x] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes,
       com a saída do build lida
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado
 
 ## Evidência
 
@@ -686,3 +686,168 @@ verdes sem qualquer ajuste adicional — como o orquestrador antecipou, o lock j
 
 - **CI do GitHub Actions com `conclusion: success`**: nada foi empurrado para `origin` — este
   critério depende de push, que não é deste executor.
+
+### Verificação independente — `triage-runner`, ciclo 2 (orquestrador, 2026-09-11)
+
+Execução autoritativa **depois** da correção de revisão — retestar depois, nunca antes. Cinco
+comandos, todos **exit code 0**:
+
+```
+npm run lint           exit 0   eslint . — sem output
+npm run format:check   exit 0   All matched files use Prettier code style!
+npm run test:coverage  exit 0   Test Files  6 passed (6)
+                                     Tests  122 passed (122)
+                                Statements 100% (32/32)   Branches 100% (4/4)
+                                Functions  100% (2/2)     Lines    100% (31/31)
+npm run build          exit 0   astro check: Result (19 files): 0 errors / 0 warnings / 0 hints
+npm run build:pipeline exit 0   vitest run tests/content:
+                                Test Files  4 passed (4)
+                                     Tests  108 passed (108)
+```
+
+**A saída do `npm run build` foi lida por inteiro**, com `grep` explícito: **zero** ocorrências de
+`[ERROR]`, de `[WARN]` e de `ERR_CLOUD_CHECK_FAILED`. Exit 0 não basta neste projeto — o
+`astro check` já imprimiu `[ERROR] [content]` no corpo e mesmo assim encerrou com `0 errors`.
+
+**Quebra por arquivo em `tests/content`**, contada programaticamente sobre `--reporter=verbose`
+(agrupando as linhas de resultado por caminho de arquivo, não por leitura visual):
+
+```
+tina-lock-coerente.test.ts     7
+paridade-schema.test.ts       18
+conteudo-valido.test.ts        2
+schemas.test.ts               81
+                           -----
+                             108
+```
+
+A contagem do arquivo deste plano **não mudou** com a correção (7 antes e depois) — o esperado,
+já que as correções ampliam os atributos comparados em caminhos que já existiam, sem criar teste
+novo. Suíte: **115 → 122** testes, de 5 para 6 arquivos.
+
+**Nota sobre a tabela de cobertura vazia**, para ninguém reinvestigar: o reporter `text` usa
+`skipFull` por padrão e **omite da tabela todo arquivo a 100%**; somado ao `include` restrito do
+`vitest.config.ts:15` (`src/lib/**`, `src/i18n/**`, `src/content.config.ts`, deliberado pela §11),
+a tabela vazia é a saída esperada de um plano que só acrescenta teste.
+
+### Revisão de código — dois ciclos
+
+**Ciclo 1: REPROVADO**, com dois defeitos, ambos **reproduzidos** pelo revisor em vez de alegados.
+Nenhum dos dois era desvio do executor: o plano listou os atributos a comparar (`type`,
+`required`, `list`, `options`) e ele seguiu à risca, documentando as exclusões. Eram **limites do
+plano**. A decisão do orquestrador foi fechá-los aqui em vez de empurrar para o 034 — um portão
+com furo conhecido na função central dele é pior do que um portão que demora mais um ciclo.
+
+**Defeito 1 — `collections` ficava fora da assinatura comparada.** O alvo de um campo
+`type: 'reference'` podia divergir do lock sem reprovar. Reprodução que provou, com o lock
+intocado:
+
+```
+$ # tina/config.ts:451  collections: ['linhas_pesquisa'] -> ['publicacoes']
+$ npx vitest run tests/content/tina-lock-coerente.test.ts
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+```
+
+Passava verde. É a única classe de defasagem estrutural que o teste existe para pegar e não
+pegava, e caía justamente em `projetos.linha_relacionada` — o campo que o `/admin` usa para
+resolver referência, e o mesmo que o plano 030 teve de tratar à parte.
+
+**Defeito 2 — `options` era comparado sem ordem.** Um `.sort()` normalizava os dois lados antes de
+comparar, então só o **conjunto** de valores era verificado: alterar um valor falhava, mas
+**reordenar passava**. A ordem de `options` é a ordem do select que o professor vê no painel, e o
+lock a preserva. Pior que o furo: o enfraquecimento não estava comentado na linha nem nas Notas —
+quem lesse o arquivo não tinha como saber que a comparação era mais fraca do que parecia. Este
+defeito **ninguém tinha pedido para procurar**; apareceu porque o revisor exercitou o caso.
+
+**Ciclo 2: APROVADO.** O revisor reproduziu os dois canários que antes passavam e confirmou que
+agora falham:
+
+```
+"projetos.linha_relacionada: collections divergem — config=[publicacoes], lock=[linhas_pesquisa]"
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+```
+
+```
+"disciplinas.status: options divergem — config=[anterior|atual], lock=[atual|anterior]"
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+```
+
+O segundo é o que mais importa: **mesmos valores, só reordenados**.
+
+E confirmou que a correção não enfraqueceu o que já funcionava, com mais dois canários:
+
+```
+"perfil.cargo: required diverge — config=opcional, lock=obrigatório"
+"perfil.canarioRevisao031: existe só no config"
+```
+
+O canário de `required` importa por um motivo que vale registrar: a Evidência do executor provava
+os dois sentidos de **conjunto** — caminho a mais e caminho a menos —, que uma aproximação por
+contagem de ocorrências também passaria. A comparação de **atributo** nos caminhos em comum não
+tinha prova nenhuma até o revisor produzir uma.
+
+Ele conferiu ainda, de forma independente, que o lock tem **109** caminhos (script próprio em
+`node`, sem tocar no arquivo), que restou `.sort()` apenas nas linhas 233-234 — a comparação do
+**conjunto de nomes de coleção**, onde ordem não é significativa, e que é legítima —, e que o
+cabeçalho não ficou contraditório: as Notas agora dizem que `collections` **é comparado**, e a
+lista de chaves ignoradas cobre só as que de fato são.
+
+**Duas ressalvas que o revisor levantou e descartou:** `options` em forma de objeto
+(`{value,label}`) cairia em `[object Object]` na serialização — mas as cinco declarações reais são
+arrays de string, e tratar forma inexistente é o error handling especulativo que o §2 do
+`CLAUDE.md` proíbe; e divergência apenas de `label`/`description` não reprova — exclusão explícita
+do próprio plano, que não produz a falha que a frase do README descreve.
+
+### Passo 7 (do orquestrador) — CI e build de deploy sobre o commit empurrado
+
+Commit do trabalho: **`1de5d1d`**.
+
+**Os dois pipelines do ADR-0009, verdes no mesmo push:**
+
+```
+Workers Builds: haroldo-page | completed/success
+  .../builds/b6da5235-67ab-46c5-ad9d-bf05581e5a29
+qualidade | completed/success
+  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34658265557/job/103455225156
+```
+
+**Números do CI**, do log do run `34658265557`:
+
+```
+Run npm run test:coverage    Test Files  6 passed (6)
+Run npm run test:coverage         Tests  122 passed (122)
+Run npm run test:coverage    All files  |  100 |  100 |  100 |  100 |
+Run npm run build:pipeline   Test Files  4 passed (4)
+Run npm run build:pipeline        Tests  108 passed (108)
+```
+
+**O portão rodando dentro do build que publica**, do log do build `b6da5235` na Cloudflare:
+
+```
+2026-09-11T23:31:01.494Z  Executing user build command: npm run build:pipeline
+2026-09-11T23:31:06.871Z   ✓ tests/content/tina-lock-coerente.test.ts (7 tests) 9ms
+2026-09-11T23:31:07.669Z   Test Files  4 passed (4)
+2026-09-11T23:31:07.673Z        Tests  108 passed (108)
+2026-09-11T23:32:29.750Z  Executing user deploy command: npx wrangler deploy
+2026-09-11T23:32:35.946Z  Current Version ID: 043f69f3-3a60-44c2-b610-b0576602792c
+2026-09-11T23:32:36.210Z  ✨ Success! Build completed.
+```
+
+O arquivo aparece **nominalmente**, com os 7 testes, antes do `wrangler deploy` — não é inferência
+a partir do total. Versão `043f69f3` publicada, sucedendo a `6b5cec66` do plano 030.
+
+**Nenhuma alteração de workflow ou de script foi necessária**, e isso está comprovado e não
+presumido: `package.json` e `.github/workflows/ci.yml` têm diff vazio, e mesmo assim o teste novo
+roda nos dois lugares — porque o `vitest.config.ts` já casa `tests/**/*.test.ts` e o arquivo nasceu
+dentro de `tests/content/`.
+
+### O lock em `main` já estava coerente
+
+O teste passou de primeira contra o lock versionado, **sem achado**. Os 123.004 bytes conferem com
+o que o plano 022 mediu depois de acrescentar `scripts[]`, então ninguém mexeu em schema sem
+regenerar desde então. O portão nasce verde, que é o estado certo para um portão nascer — se
+tivesse nascido vermelho, a regeneração seria decisão do orquestrador, e o plano proíbe
+explicitamente o executor de regenerar o lock por conta própria.

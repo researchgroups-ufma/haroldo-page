@@ -25,7 +25,7 @@ a palavra "aparece" pode significar aqui.
 | 028 | 🧑 Notificação de falha de build ao ADMIN, com falha real | ⬜ TODO | orquestrador | nenhum | — |
 | 029 | 🧑 Ciclo ponta a ponta cronometrado (M-02) e o critério do §6.2 | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
 | 030 | Portão de conteúdo no CI: `content/` validado e referência resolvida | ✅ DONE | agente | implementer (sonnet) | `4343e42` |
-| 031 | Coerência do `tina-lock.json` verificada no CI | ⬜ TODO | agente | implementer | — |
+| 031 | Coerência do `tina-lock.json` verificada no CI | ✅ DONE | agente | implementer (sonnet) | `1de5d1d` |
 | 032 | `npm audit` no CI e política de severidade | ⬜ TODO | agente | implementer | — |
 | 033 | Avisos do painel para o manual da fase 5 | ⬜ TODO | agente | implementer | — |
 | 034 | Documentação do pipeline no README e fechamento da fase 2 | ⬜ TODO | agente (+ orquestrador) | implementer | — |
@@ -90,12 +90,34 @@ correspondentes.
 | # | Dívida | Onde cai | Decisão |
 |---|---|---|---|
 | 1 | Acoplamento com o TinaCloud no build (`ERR_CLOUD_CHECK_FAILED` sem humano para ordenar os passos) | **024** (+ ADR-0009), verificada em **025** e **026** | Os dois pipelines automáticos rodam `tinacms build --skip-cloud-checks`; o `npm run build` local **mantém** o cloud check e continua sendo o portão pré-push de quem mexe em schema |
-| 2 | `tina-lock.json` versionado, regenerado só por `tinacms dev` | **031** | **Sim, vira verificação de CI** — comparação da árvore declarativa do config contra `schema.collections` do lock, sem rodar o dev server |
+| 2 | `tina-lock.json` versionado, regenerado só por `tinacms dev` | **031** ✅ **quitada em 2026-09-11** (`1de5d1d`) | Virou verificação de CI: `tests/content/tina-lock-coerente.test.ts` compara a árvore declarativa do config contra `schema.collections` do lock — **109 caminhos qualificados**, com `type`, `required`, `list`, `options` e `collections` —, sem rodar o dev server. O lock em `main` já estava coerente: o portão nasceu verde |
 | 3 | Mensagem de erro de build legível (F-09, R-01) e o subcampo obrigatório vazio que o painel deixa salvar | **028** (notificação + mensagem real medida) e **033** (o que o manual da fase 5 tem de dizer) | O portão do **030** é quem produz a mensagem no formato de F-09; o 028 demonstra que ela chega ao ADMIN |
 | 4 | O painel grava conteúdo errado sem quebrar nada (duas manifestações) | **033** | **Não é automatizável** — o conteúdo gravado é *válido*, só não é o que o usuário quis; nenhum teste distingue intenção. Vira **aviso obrigatório do manual da fase 5**, com a entrega nomeada em `docs/avisos-do-painel-para-o-manual.md` |
 | 5 | `astro check` reporta `[ERROR] [content]` e sai com exit 0 | **030** ✅ **quitada em 2026-09-11** (`4343e42`) | Virou portão de verdade: `tests/content/conteudo-valido.test.ts` valida os arquivos reais de `content/` **e resolve as referências** — porque `safeParse` sozinho aceita `linha_relacionada: ''`. Roda no CI **e dentro do build de deploy**, provado nominalmente no log do build `4b0d544e` |
 | 6 | `npm audit` com 8 moderadas de `react-router`, sem correção nossa | **032** (+ ADR-0010) | O CI passa a auditar, reprovando em **`high`/`critical`** e relatando `moderate`. Reprovar em `moderate` deixaria o CI vermelho para sempre — o modo de falha que já custou 14 commits a este projeto |
 | 7 | Três buracos do teste de paridade | **030** (a e c) ✅ **quitadas em 2026-09-11** (`4343e42`); **(b) não** | (a) o `path` do Tina passou a ser comparado com o `base:` do `glob()` do Zod, com extração que reprova se não achar as cinco; (c) a prova de falsificabilidade foi reproduzida contra o artefato final; **(b) fica para a fase 3**, porque não existe hoje campo com `list: true` **e** `options`, e mudar `classifyTina` sem campo real para exercitar seria alteração sem teste possível — `classifyTina` **não foi tocada** |
+
+## Lição do plano 031 — normalização dentro de comparação enfraquece o teste em silêncio
+
+O 031 foi **reprovado no primeiro ciclo** por dois furos, ambos na mesma família e nenhum deles
+desvio do executor — o plano listava os atributos a comparar e ele seguiu à risca. Os dois foram
+corrigidos dentro do próprio plano, mas a lição vale para todo teste de paridade que este projeto
+ainda vai escrever:
+
+1. **Um `.sort()` de uma linha transformou "comparo as opções" em "comparo o conjunto de
+   opções".** Alterar um valor de `options` falhava; **reordenar passava**. A ordem é a do select
+   que o professor vê, e o lock a preserva. O teste teria passado para sempre dando a impressão de
+   cobrir algo que não cobria.
+2. **O que fica fora da assinatura comparada tem de ser justificado um a um.** `collections` — o
+   alvo de um campo `reference` — ficou de fora, e trocar o alvo com o lock intocado passava
+   verde: exatamente a classe de defasagem que o teste existe para pegar.
+
+**Duas regras práticas que saem daqui.** Primeira: qualquer normalização aplicada aos dois lados
+antes de comparar (`sort`, `trim`, `toLowerCase`, `filter`) **enfraquece a comparação** e tem de
+estar comentada na linha **e** na lista de limitações do cabeçalho — senão quem lê não tem como
+saber. Segunda: provar os dois sentidos de **conjunto** (item a mais, item a menos) **não prova**
+a comparação de **atributo** nos itens em comum; são canários diferentes, e uma aproximação por
+contagem de ocorrências passaria nos primeiros.
 
 ## Achados do plano 030 que o 034 tem de absorver
 
