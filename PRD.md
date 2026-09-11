@@ -12,9 +12,9 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.19 |
+| **Versão do PRD** | v0.1.20 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟢 **concluída** — critério do §6.2 demonstrado pelo orquestrador (021); falta só a promoção administrativa (revisão, commit, CI) do plano 021 · Fases 2–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
+| **Estado da implementação** | Fase 0 🟢 **concluída** (14 planos) · Fase 1 🟢 **concluída** em 2026-09-10 — os oito planos (015–022) DONE, o 021 promovido em `7d5b7e6` com CI verde sobre `26de58a` · Fase 2 🟡 **em andamento** — fatiada em 12 planos (023–034) em 2026-09-10, nenhum DONE ainda · Fases 3–5 ⬜ não iniciadas. Detalhe por item em §12; execução em `plans/README.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -46,6 +46,7 @@
 | v0.1.17 | 2026-09-04 | Desenvolvedor | **Plano 020 DONE** (`aa9a7cf`): conteúdo placeholder representativo nas cinco coleções — 13 arquivos criados **pelo painel**, com os nomes saindo dos templates da RN-08. §12 passa de 6/10 a 7/10 na fase 1. O perfil usa os dados reais do Apêndice C; as 6 publicações são inventadas e marcadas de forma redundante (`[EXEMPLO]` no título, `[CONTEÚDO DE EXEMPLO]` no texto, `exemplo.invalid` nos URLs, `10.0000/` nos DOIs), porque o repositório é público e elas ficam atribuídas a uma pessoa real. Fechou a ponta que o 019 não conseguiu verificar: `getEntry()` resolve de fato depois de `normalizeLinhaRelacionadaId`. Dois achados novos do painel, da família F-09: o formulário descarta em silêncio alteração em campo que já tinha valor quando se volta de um subpainel; e projeto sem linha de pesquisa grava `linha_relacionada: ''`, que o Astro rejeita como referência inválida embora o `astro check` ainda encerre com `0 errors` e exit 0 — insumo para a fase 2 (F-09, RNF-09) e para o manual da fase 5 |
 | v0.1.18 | 2026-09-10 | Desenvolvedor | **Plano 022 DONE** (`88f1c75`): a coleção `disciplinas` ganha a lista embutida `scripts[]` nos dois lados do modelo (RF-37). §12 passa de 7/10 a 8/10 na fase 1. `linguagem` é obrigatória dos dois lados com o padrão vindo de `ui.defaultItem`, não de `.default()` no Zod — um default faria `safeParse(undefined)` passar e quebraria a classificação de obrigatoriedade do teste de paridade. Sem validação cruzada de `aula` (F-13), sem limite de tamanho em `codigo`, sem exclusividade entre `codigo` e `url`. Suíte de 93 para 107 testes. **O R-13 não se materializou:** verificado salvando pelo `/admin` um script com bloco indentado, linha em branco e aspas — o `js-yaml` escolheu block scalar `|-` e o round-trip é byte-idêntico. Dois achados operacionais novos: `npm run dev` não sobe o painel no Astro 7 (o `astro dev` daemoniza sem TTY e leva o `tinacms dev` junto, deixando o `/admin` com "Failed loading TinaCMS assets"), e salvar sem sair do subpainel evita a armadilha do descarte silencioso que o 020 registrou |
 | v0.1.19 | 2026-09-10 | Desenvolvedor | **Plano 021 fecha a fase 1** (execução completa; `Status` do plano continua `TODO` até a promoção administrativa — revisão, commit, CI). ADRs 0003 a 0008 escritos para D-02 a D-07 e D-06 — a D-06 ganhou ADR próprio por consistência com as demais, apontando para a Evidência do plano 019 em vez de duplicá-la. Corrigida a docstring de `normalizeLinhaRelacionadaId` (`src/content.config.ts`), que chamava a referência inválida de "falha silenciosa que só apareceria na fase 3"; o `astro check` já a reporta hoje, o silencioso é o exit code. Suíte da fase em **107 testes, cobertura 100%** (sem alteração de código de teste neste plano). **O critério de conclusão da fase (§6.2) foi demonstrado pelo orquestrador**: item criado e editado pelo `/admin` nas cinco coleções, com o arquivo gravado conferido a cada save — achou a segunda manifestação do descarte silencioso do plano 020 (perda visível da edição, não gravação do valor antigo) e mais uma instância da dívida de subcampo obrigatório não bloqueado (`publicacoes.autores[]`). §12 passa de 8/10 a **10/10** — **fase 1 concluída** |
+| v0.1.20 | 2026-09-10 | Desenvolvedor | **Fase 1 promovida a concluída no §0:** o 021 virou DONE em `7d5b7e6` (CI verde sobre `26de58a`) e o topo do documento ainda dizia que faltava a promoção administrativa — o mesmo tipo de defasagem que a v0.1.7 já tinha corrigido uma vez. **Fase 2 fatiada** em 12 planos (023–034) em `plans/fase-2-pipeline-de-publicacao/`, com o tratamento explícito das sete dívidas que a fase 1 empurrou. Nenhum item do checklist da fase 2 foi entregue ainda; a fase passa a 🟡 em andamento em §0 e na tabela de progresso do §12 |
 
 ---
 
@@ -754,7 +755,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 |---|---|---|
 | Fase 0 — Setup e provisionamento | 10/10 | 🟢 Concluída |
 | Fase 1 — Modelo de conteúdo | 10/10 | 🟢 Concluída |
-| Fase 2 — Pipeline de publicação | 0/8 | ⬜ Não iniciada |
+| Fase 2 — Pipeline de publicação | 0/8 | 🟡 Em andamento |
 | Fase 3 — Site público (PT) | 0/12 | ⬜ Não iniciada |
 | Fase 4 — Internacionalização | 0/8 | ⬜ Não iniciada |
 | Fase 5 — Polimento e entrega | 0/14 | ⬜ Não iniciada |
@@ -933,7 +934,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | ~~Q-08~~ | ~~A conta Google do Drive é do professor ou institucional?~~ | R-08 e a convenção de pastas | Stakeholder | Fase 0 | ✅ **2026-09-01:** questão dissolvida. O campo de material é uma **URL livre** — o professor cola o link de onde tiver hospedado (Drive, repositório institucional, arXiv, YouTube). O Google Drive passa de dependência a recomendação do manual. Ver D-07 |
 | Q-09 | Notícias e CV entram na v1.1 logo após a entrega, ou ficam indefinidos? | Planejamento pós-entrega | Stakeholder | Após a fase 5 | |
 
-> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-04 (fase 3), Q-05 (fase 5). **Q-06 e Q-07 foram resolvidas em 2026-09-03**, ambas pelo mesmo e-mail institucional `haroldo.lima@ufma.br`: ele é o que o site publica (Q-07, já gravado em `content/perfil/index.md`) e também a conta com que o professor entra no TinaCloud (Q-06). **A fase 2 não tem mais bloqueio de stakeholder** — o que falta para ela é a fase 1 fechar. **Q-02 foi resolvida em 2026-09-01** — o painel em inglês é aceitável, o TinaCMS fica, e a fase 1 pode construir `tina/config.ts` sem risco de descarte.
+> Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueiam adiante: Q-04 (fase 3), Q-05 (fase 5). **Q-06 e Q-07 foram resolvidas em 2026-09-03**, ambas pelo mesmo e-mail institucional `haroldo.lima@ufma.br`: ele é o que o site publica (Q-07, já gravado em `content/perfil/index.md`) e também a conta com que o professor entra no TinaCloud (Q-06). **A fase 2 não tem mais bloqueio de stakeholder** — a fase 1 fechou em 2026-09-10 e a fase 2 começou. **Q-02 foi resolvida em 2026-09-01** — o painel em inglês é aceitável, o TinaCMS fica, e a fase 1 pode construir `tina/config.ts` sem risco de descarte.
 
 ---
 

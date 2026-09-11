@@ -11,8 +11,8 @@ Este arquivo é só o mapa.
 | Pasta | Fase | Estado | Planos |
 |---|---|---|---|
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
-| [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–020 e 022 DONE; 021 com a execução e a demonstração do painel fechadas — falta a promoção (revisão, commit, CI) |
-| `fase-2-pipeline-de-publicacao/` | 2 — Pipeline de publicação ponta a ponta | ⬜ Não iniciada | — |
+| [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–022, todos DONE — o 021 promovido em `7d5b7e6`, com CI verde sobre `26de58a` |
+| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟡 **Em andamento** | 023–034 fatiados em 2026-09-10; nenhum DONE |
 | `fase-3-site-publico/` | 3 — Site público em português | ⬜ Não iniciada | — |
 | `fase-4-internacionalizacao/` | 4 — Internacionalização | ⬜ Não iniciada | — |
 | `fase-5-polimento-e-entrega/` | 5 — Polimento e entrega | ⬜ Não iniciada | — |
@@ -26,8 +26,10 @@ inteiro pronto. As dependências reais estão na tabela do §6.2.
 **depois** de a fase 1 fechar integralmente (planos 019, 020 e 021 DONE), para que o fatiamento
 já incorpore os problemas que a fase 1 descobriu e que só podem ser resolvidos na 2. A lista
 desses itens é montada pelo plano 021, no README da fase 1 — o fatiamento começa lendo ela, não
-do zero. Consequência aceita: nenhum plano da fase 2 existe enquanto isso, e a pasta
-`fase-2-pipeline-de-publicacao/` fica vazia de propósito.
+do zero. **Cumprida em 2026-09-10:** a fase 1 fechou e a fase 2 foi fatiada em seguida, a
+partir da lista dos sete itens no README da fase 1 — os 12 planos estão em
+`fase-2-pipeline-de-publicacao/`, com o README da fase registrando onde cada uma das sete
+dívidas caiu.
 
 Vale notar, para quem for retomar: **a fase 3 depende formalmente só da fase 1**, não da 2 (ver a
 coluna de dependências do §6.2). Antecipá-la é possível; o custo seria construir o site sem a
@@ -36,7 +38,7 @@ garantia de que o ciclo de publicação fecha. Não foi o caminho escolhido.
 ## Convenções
 
 **Numeração é global e contínua**, não reinicia a cada fase — e **não é ordem de execução**: o
-022 rodou antes do 021, como o 014 rodou depois de a fase 0 fechar. O plano 021 é o próximo,
+022 rodou antes do 021, como o 014 rodou depois de a fase 0 fechar. O plano 023 é o próximo,
 esteja em que pasta estiver. Isso preserva as referências já espalhadas por commits, ADRs, Evidências e
 pelo PRD — um "plano 007" identifica um arquivo só, para sempre.
 
