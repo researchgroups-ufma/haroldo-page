@@ -168,6 +168,71 @@ o erro literal antes de acrescentá-la.
 
 ## Evidência
 
-<Preenchida por quem executar. Prova de painel de terceiro é **exercitar a interface e registrar o
-que ela mostrou** — leitura de documentação ou de código não substitui. Nunca cole o valor de
-`TINA_TOKEN`.>
+> **Em preenchimento.** Execução iniciada em 2026-09-11. Os passos de painel são relatados por
+> quem os executou (o desenvolvedor, no navegador); os passos de linha de comando trazem a saída
+> literal da máquina. A origem de cada bloco está dita explicitamente — painel e terminal não se
+> misturam sob o mesmo rótulo.
+
+### Passo 1 — `main` sincronizada e `build:pipeline` verde (terminal, 2026-09-11 09:29)
+
+```
+local : 2557532
+origin: 2557532
+(git status --short vazio)
+```
+
+```
+> haroldo-page@0.1.0 build:pipeline
+> vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+
+ Test Files  2 passed (2)
+      Tests  93 passed (93)
+   Start at  09:29:41
+   Duration  913ms (transform 945ms, setup 0ms, import 1.51s, tests 33ms, environment 0ms)
+
+Starting Tina build
+... (caixa "Tina build complete" — API url, GraphQL Client, Typescript Types, Static HTML file;
+    idêntica à colada na Evidência do plano 024, elidida aqui) ...
+09:30:08 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (17 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+09:30:13 [build] 1 page(s) built in 758ms
+09:30:13 [build] Complete!
+BUILD_EXIT:0
+```
+
+Saída lida por inteiro: nenhuma linha `[ERROR]` no corpo.
+
+### Achado do passo 4 — variável de build ≠ variável de runtime
+
+O painel **recusa** criar variáveis em *Settings → Variables & Secrets* para este Worker, com a
+mensagem (relatada pelo desenvolvedor, vista no painel):
+
+```
+Variables cannot be added to a Worker that only has static assets.
+```
+
+**Isso não é defeito: é a D-01 sendo cumprida pela plataforma.** O `wrangler.toml` não tem `main`,
+o Worker não executa código por requisição, e sem código não há onde injetar variável de runtime.
+
+As três variáveis deste plano são de **build**, e ficam em *Settings → Build → Build variables and
+secrets*. A documentação da Cloudflare separa as duas coisas explicitamente: *"Build variables
+will not be accessible at runtime. If you would like to configure runtime variables you can do so
+in Settings > Variables & Secrets"*
+(<https://developers.cloudflare.com/workers/ci-cd/builds/configuration/>). É o que este projeto
+precisa — `TINA_CLIENT_ID` e `TINA_TOKEN` são consumidos pelo `tinacms build`, e
+`PUBLIC_SITE_URL` pelo `astro build`; nenhuma delas tem uso em runtime num site estático.
+
+Criadas em *Build variables and secrets* (relatado pelo desenvolvedor): `TINA_CLIENT_ID` e
+`PUBLIC_SITE_URL` como variáveis, `TINA_TOKEN` como segredo.
+
+**Para quem repetir o roteiro:** a porta errada é a primeira que o painel oferece. A documentação
+consultada não trata explicitamente do caso "Worker só com assets", então a confirmação de que a
+seção de build aceita as variáveis veio de exercitar a interface, não de ler documentação.
+
+### Passos 2, 3 e 5 a 9
+
+<Pendentes de preenchimento.>
