@@ -20,7 +20,7 @@ a palavra "aparece" pode significar aqui.
 | 023 | Abertura da fase 2: reconciliação do estado documental | ✅ DONE | agente | implementer (haiku) | `ae1bbc8` |
 | 024 | Comando de build dos pipelines e o cloud check do TinaCloud | ✅ DONE | agente | implementer | `f8f416a` |
 | 025 | 🧑 Workers Builds ligado ao repositório e variáveis no Cloudflare | ✅ DONE | orquestrador | nenhum | `954215c`, `ab0d1f8` |
-| 026 | 🧑 `/admin` publicado e autenticando pelo TinaCloud em produção | ⬜ TODO | orquestrador | nenhum | — |
+| 026 | 🧑 `/admin` publicado e autenticando pelo TinaCloud em produção | ✅ DONE | orquestrador | nenhum | `7ab84da` (edição do painel) |
 | 027 | 🧑 Usuário EDITOR do professor e a matriz de permissões da §9 | ⬜ TODO | **stakeholder** | nenhum | — |
 | 028 | 🧑 Notificação de falha de build ao ADMIN, com falha real | ⬜ TODO | orquestrador | nenhum | — |
 | 029 | 🧑 Ciclo ponta a ponta cronometrado (M-02) e o critério do §6.2 | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
@@ -88,6 +88,31 @@ correspondentes.
 | 5 | `astro check` reporta `[ERROR] [content]` e sai com exit 0 | **030** | Vira portão de verdade: teste que valida os arquivos reais de `content/` **e resolve as referências** — porque `safeParse` sozinho aceita `linha_relacionada: ''` |
 | 6 | `npm audit` com 8 moderadas de `react-router`, sem correção nossa | **032** (+ ADR-0010) | O CI passa a auditar, reprovando em **`high`/`critical`** e relatando `moderate`. Reprovar em `moderate` deixaria o CI vermelho para sempre — o modo de falha que já custou 14 commits a este projeto |
 | 7 | Três buracos do teste de paridade | **030** (a e c); **(b) não** | (a) o `path` do Tina passa a ser comparado com o `base:` do `glob()` do Zod; (c) a prova de falsificabilidade é reproduzida contra o artefato final; **(b) fica para a fase 3**, porque não existe hoje campo com `list: true` **e** `options`, e mudar `classifyTina` sem campo real para exercitar seria alteração sem teste possível |
+
+## Achados do plano 026 que o 033 tem de absorver
+
+O 026 exercitou o painel **em produção** pela primeira vez e trouxe três coisas que nenhum plano
+anterior tinha visto. Nenhuma foi consertada — o 026 proíbe consertar configuração durante a
+verificação —, e as três são insumo do manual da fase 5:
+
+1. **O vocabulário de arquivo reaparece um clique adiante do menu.** O RF-03 é satisfeito no menu,
+   mas a tela de listagem de qualquer coleção mostra `Filename`, `Extension`, `Template`, o caminho
+   `content/perfil/index.md` e os botões `Add Folder` / `Add File`. É mobiliário fixo do TinaCMS,
+   não sai de `tina/config.ts`, e é a primeira tela que o professor vê depois de clicar numa
+   coleção. O manual tem de antecipar isso em vez de deixar a surpresa para ele.
+2. **A trilha de navegação trunca nomes no primeiro ponto.** `2026.2-relatividade-geral` aparece
+   como "Disciplinas / 2026" — o painel lê o `.2` como extensão. O item certo abre e grava certo;
+   o defeito é de exibição, mas confunde exatamente na coleção cujo padrão de nome (RN-08) usa
+   ponto.
+3. **O TinaCloud anunciou troca do sistema de autenticação para outubro**, exigindo TinaCMS ≥ 3.12.
+   O projeto está em 3.12.1 e **não precisa de ação agora** — mas é o risco R-03 se materializando
+   como aviso, e o painel também sinaliza a 3.13.0. Vale vigiar antes da fase 5.
+
+**Achado de infraestrutura, fora do escopo do 033:** `/admin` e `/admin/index.html` respondem
+**307** para `/admin/`, porque o `wrangler.toml` não declara `html_handling` e o default do Workers
+Static Assets é `auto-trailing-slash`. Nenhuma das três formas dá 404 e o navegador segue o
+redirecionamento, então **não há defeito a corrigir** — fica registrado para que ninguém volte a
+gastar tempo investigando o salto extra.
 
 ## O que esta fase não consegue provar
 
