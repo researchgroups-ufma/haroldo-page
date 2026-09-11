@@ -409,6 +409,46 @@ da fase. Nenhum arquivo de codigo ou configuracao do projeto: `wrangler.toml`, `
 `astro.config.mjs`, `tina/config.ts`, `src/**` e `content/**` intocados. O painel **nao** exigiu
 nenhuma alteracao em `wrangler.toml`.
 
+### Adendo (2026-09-11, apos o fechamento) — D-01 confirmada pela API, nao por relato de tela
+
+O criterio 9 foi fechado com o relato de quem olhou o painel. Horas depois, com o servidor MCP da
+Cloudflare autenticado, o mesmo fato foi obtido da API — evidencia melhor, e por isso registrada
+aqui. `GET /accounts/98e35087677f329c2adbf68711ecebbf/workers/scripts`:
+
+```
+haroldo-page:  has_assets: true   has_modules: false   compatibility_date: 2026-09-01
+               modified_on: 2026-09-11T13:03:20.794218Z
+decap-proxy:   has_assets: false  has_modules: true    (outro projeto, criado em 2026-06-07)
+```
+
+**`has_modules: false` e a confirmacao direta da D-01**: nao ha modulo de codigo no Worker, so
+assets. O `GET /workers/scripts/haroldo-page` responde `204 No Content` pelo mesmo motivo — nao ha
+script para devolver. O contraste com o `decap-proxy` da mesma conta (`has_modules: true`) mostra
+que os dois campos discriminam de fato os dois tipos de Worker.
+
+**Confirmado tambem que existe um unico `haroldo-page`** — a armadilha de "criar um segundo
+Worker", que o Contexto deste plano mandava evitar, nao ocorreu.
+
+**Historico de versoes do Worker** (`GET .../workers/scripts/haroldo-page/versions`), que situa a
+versao registrada no passo 6:
+
+| # | Versao | Criada (UTC) | Origem |
+|---|---|---|---|
+| 5 | `81e6585e` | 2026-09-11T13:03:19Z | push `25396cf`, o proprio commit de promocao deste plano |
+| 4 | `1132cea1` | 2026-09-11T12:50:13Z | push `ab0d1f8` — a prova do passo 5, registrada acima |
+| 3 | `6ec874d4` | 2026-09-02T02:13:29Z | manual |
+| — | `85adc91c` | 2026-09-02T01:27:05Z | plano 012, a original |
+
+A versao #5 nao invalida nada do que esta acima: a Evidencia do passo 6 esta amarrada ao push
+`ab0d1f8` e a versao #4, que era a corrente naquele momento. O que a #5 acrescenta e que **a
+automacao publicou duas vezes** — o commit que fechou este plano disparou o ciclo de novo,
+sozinho, o que reforca o item 1 do §12 em vez de contradiza-lo.
+
+**Nao verificado:** os endpoints de Workers Builds. `/accounts/<id>/builds/repos/github/...`
+respondeu `12000: Not found` e `/accounts/<id>/builds/builds` respondeu
+`12013: Invalid query parameter` — caminhos chutados, nao os corretos. Fica para o plano 028,
+onde a leitura de builds pela API tem uso real.
+
 ### Propriedade do desenho, registrada como o plano exige
 
 O GitHub Actions **nao** e portao do deploy. Os dois pipelines dispararam no mesmo push
