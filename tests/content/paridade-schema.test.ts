@@ -13,7 +13,8 @@
  *                 quebrado que ele não sabe diagnosticar.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-03
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-11
+ *  Versão       : 0.2.0
  *
  *  Dependências : vitest, src/content.config.ts, tina/config.ts
  *  Entradas     : nenhuma (introspecção dos dois schemas em memória)
@@ -62,8 +63,26 @@
  *                 Astro espera o id sem pasta nem extensão) não é uma
  *                 divergência de forma de schema — é testado à parte, com o
  *                 valor literal que o Tina grava.
+ *
+ *                 Plano 030 (dívida 7a): acrescentado o `describe` que compara o `path` de
+ *                 cada coleção do Tina com o `base:` do `glob()` correspondente em
+ *                 `src/content.config.ts` — o `path` do Tina nunca tinha sido comparado à pasta
+ *                 real que o Zod varre, e uma divergência ali seria silenciosa (o painel
+ *                 gravaria numa pasta que o portão de conteúdo do plano 030 nem varre). Como o
+ *                 `base:` fica em closure dentro do `Loader` que `glob()` devolve — não
+ *                 introspectável em runtime —, ele é extraído do texto-fonte de
+ *                 `content.config.ts` por regex, no mesmo espírito de `tests/lib/config.test.ts`
+ *                 (que varre `process.env` no texto-fonte de `src/`).
+ *
+ *                 Dívida 7(b) — detecção de enum do lado Tina depois do ramo `campo.list` em
+ *                 `classifyTina` (abaixo) — permanece deliberadamente não resolvida: não existe
+ *                 campo com `list: true` **e** `options: [...]` hoje, e mudar `classifyTina` sem
+ *                 um campo real para testar contra seria alteração não verificável. Fica como
+ *                 guarda para a fase 3, quando campo novo nascer.
  * ============================================================================
  */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import {
   perfilSchema,
@@ -316,8 +335,27 @@ const zodSchemas: Record<string, ZodIntrospectable> = {
 
 const tinaCollections = tinaConfig.schema.collections as unknown as (TinaFieldLike & {
   name: string;
+  path: string;
   fields: TinaFieldLike[];
 })[];
+
+/**
+ * Extrai o `base:` de cada `glob()` em `src/content.config.ts`, mapeado por nome de pasta
+ * (dívida 7a — ver Notas do cabeçalho deste arquivo).
+ *
+ * O `base:` fica em closure dentro do `Loader` que `glob()` devolve, e `defineCollection` não o
+ * expõe — por isso a extração é feita do texto-fonte por regex, não por introspecção do objeto
+ * em memória.
+ */
+function extrairBasesDoZod(): Record<string, string> {
+  const codigoFonte = readFileSync(join(__dirname, '../../src/content.config.ts'), 'utf-8');
+  const bases: Record<string, string> = {};
+  for (const match of codigoFonte.matchAll(/base:\s*'\.\/content\/([a-z-]+)'/g)) {
+    const pasta = match[1];
+    bases[pasta] = `content/${pasta}`;
+  }
+  return bases;
+}
 
 describe('paridade de schema — Zod (src/content.config.ts) × Tina (tina/config.ts)', () => {
   it('as cinco coleções existem dos dois lados, com o mesmo mapeamento de nome', () => {
@@ -339,6 +377,23 @@ describe('paridade de schema — Zod (src/content.config.ts) × Tina (tina/confi
       const erros: string[] = [];
       compareFields(nome, zodNorm, tinaNorm, erros);
       expect(erros).toEqual([]);
+    });
+  }
+});
+
+describe('dívida 7(a): path do Tina × base: do glob() do Zod, por coleção', () => {
+  it('a extração por regex encontra o base: das cinco coleções em content.config.ts', () => {
+    const basesZod = extrairBasesDoZod();
+    expect(Object.keys(basesZod).sort()).toEqual(Object.keys(zodSchemas).sort());
+  });
+
+  for (const tinaCollection of tinaCollections) {
+    const nome = normalizeCollectionName(tinaCollection.name);
+
+    it(`coleção ${nome}: path do Tina bate com a pasta que o glob() do Zod lê`, () => {
+      const basesZod = extrairBasesDoZod();
+      const pathTina = tinaCollection.path.replace(/^\.\//, '');
+      expect(pathTina).toBe(basesZod[nome]);
     });
   }
 });

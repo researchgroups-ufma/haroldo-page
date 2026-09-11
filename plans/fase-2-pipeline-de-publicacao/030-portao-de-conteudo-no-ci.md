@@ -232,5 +232,396 @@ mexa em `classifyTina`.**
 
 ## Evidência
 
-<Preenchida pelo executor. Um teste que passa sem ter sido provado falsificável não é evidência de
-nada — são três canários, mais o do `compareFields`.>
+> Executado pelo `implementer` em 2026-09-11. `Status` deliberadamente mantido em `TODO` — a
+> promoção é do orquestrador, depois de verificação independente e revisão. Nenhum commit foi
+> feito nesta sessão.
+
+### Passo 1 — leitura
+
+Lidos por completo: `src/content.config.ts`, `tests/content/paridade-schema.test.ts` e
+`tests/lib/config.test.ts`.
+
+**Por que `safeParse` aceita `linha_relacionada: ''`:** em `src/content.config.ts`,
+`linha_relacionada` é `z.preprocess(normalizeLinhaRelacionadaId, reference('linhas-pesquisa')).optional()`.
+`normalizeLinhaRelacionadaId('')` devolve `''` inalterada (é uma string, o `.replace()` não acha o
+prefixo `content/linhas-pesquisa/` nem o sufixo `.md`, então a string vazia passa intacta). O
+`reference()` do Astro (`astro/dist/content/runtime.js`, `createReference`) é uma `union` de 4
+alternativas — número, string, `{id, collection}` e `{slug, collection}` — e uma string vazia casa
+sintaticamente com a alternativa "string": o Zod só confirma que o valor tem o **formato** aceito
+por uma referência, sem consultar o sistema de arquivos. Quem resolve a referência de fato — e
+rejeitaria `''` — é a content layer do Astro (`getEntry()`), em tempo de build, fora do alcance do
+`safeParse`. Por isso o teste novo verifica a existência do id normalizado explicitamente, contra o
+conjunto de arquivos de `content/linhas-pesquisa/` obtido pela própria varredura.
+
+### Passo 2 — `gray-matter` em `devDependencies`
+
+`npm ls gray-matter` antes do `npm install` (uma única instância, transitiva):
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
+`-- @tinacms/cli@2.6.1
+  `-- @tinacms/graphql@2.4.10
+    `-- gray-matter@4.0.3
+```
+
+Após declarar `"gray-matter": "4.0.3"` em `devDependencies` e rodar `npm install`:
+
+```
+up to date, audited 1517 packages in 13s
+329 packages are looking for funding
+  run `npm fund` for details
+11 vulnerabilities (8 moderate, 3 high)
+```
+
+`npm ls gray-matter` depois (instância única, deduped):
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
++-- @tinacms/cli@2.6.1
+| `-- @tinacms/graphql@2.4.10
+|   `-- gray-matter@4.0.3 deduped
+`-- gray-matter@4.0.3
+```
+
+Churn do lockfile (`git diff --stat -- package-lock.json` / `git diff -- package-lock.json`), uma
+única linha, sem nenhuma versão fixada de outro pacote alterada:
+
+```
+ package-lock.json | 1 +
+ 1 file changed, 1 insertion(+)
+
++        "gray-matter": "4.0.3",
+```
+
+`npm ci` (reinstala a árvore inteira a partir do lock) não reescreveu o lockfile — MD5 de
+`package-lock.json` idêntico antes e depois (`ba2c92d240995637c55965e1d01a08ca`), e
+`git diff --stat -- package-lock.json` seguiu mostrando a mesma única linha depois do `npm ci`.
+
+### Passo 3 — `tests/content/conteudo-valido.test.ts`
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:18:04
+   Duration  1.68s (transform 557ms, setup 0ms, import 1.23s, tests 20ms, environment 0ms)
+```
+
+Arquivos varridos por coleção (script avulso reproduzindo a mesma função `listMarkdownFiles` do
+teste, contra `content/`):
+
+```
+perfil 1
+linhas-pesquisa 2
+projetos 2
+disciplinas 2
+publicacoes 6
+```
+
+Soma 13 — os 13 arquivos reais de `content/` (nenhum `.gitkeep` entrou, por não terminar em
+`.md`).
+
+### Passo 4 — `paridade-schema.test.ts`, dívida 7(a)
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  19:19:08
+   Duration  818ms (transform 451ms, setup 0ms, import 686ms, tests 12ms, environment 0ms)
+```
+
+As cinco coleções comparadas (`describe('dívida 7(a): path do Tina × base: do glob() do Zod, por
+coleção')`): 1 teste de extração + 5 testes de comparação `path` × `base:`, um por coleção
+(`perfil`, `linhas-pesquisa`, `projetos`, `disciplinas`, `publicacoes`) — os 6 testes novos, mais os
+12 já existentes, somam os 18 acima.
+
+### Passo 5 — três canários de falsificabilidade
+
+**(a) `linha_relacionada: ''` em `content/projetos/forcas-de-mare-em-espacos-tempos-de-kerr.md`**
+— reproduz o artefato real de 2026-09-10. Falha:
+
+```
+ ❯ tests/content/conteudo-valido.test.ts (2 tests | 1 failed) 22ms
+     × todo arquivo passa no schema Zod correspondente, com projetos.linha_relacionada resolvida 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/content/conteudo-valido.test.ts > conteúdo real de content/ — validação Zod com referência resolvida (F-09, dívida 5) > todo arquivo passa no schema Zod correspondente, com projetos.linha_relacionada resolvida
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "content/projetos/forcas-de-mare-em-espacos-tempos-de-kerr.md → campo 'linha_relacionada': referência vazia — remova o campo ou selecione uma linha de pesquisa existente",
++ ]
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+```
+
+Revertido (`linha_relacionada: ''` removida). Verde:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:19:45
+   Duration  834ms (transform 437ms, setup 0ms, import 692ms, tests 18ms, environment 0ms)
+```
+
+**(b) `ano` removido de `content/publicacoes/2024-exemplo-modos-quasinormais-de-campos-escalares-em-espacos-tempos-de-kerr.md`.** Falha:
+
+```
+ ❯ tests/content/conteudo-valido.test.ts (2 tests | 1 failed) 21ms
+     × todo arquivo passa no schema Zod correspondente, com projetos.linha_relacionada resolvida 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "content/publicacoes/2024-exemplo-modos-quasinormais-de-campos-escalares-em-espacos-tempos-de-kerr.md → campo 'ano': Invalid input: expected number, received undefined",
++ ]
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+```
+
+Revertido (`ano: 2024` restaurado). Verde:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:20:12
+   Duration  833ms (transform 434ms, setup 0ms, import 692ms, tests 19ms, environment 0ms)
+```
+
+**(c) `path` de `linhas_pesquisa` alterado só em `tina/config.ts`** (`content/linhas-pesquisa` →
+`content/linhas-pesquisa-canario`). Falha:
+
+```
+ ❯ tests/content/paridade-schema.test.ts (18 tests | 1 failed) 14ms
+     × coleção linhas-pesquisa: path do Tina bate com a pasta que o glob() do Zod lê 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/content/paridade-schema.test.ts > dívida 7(a): path do Tina × base: do glob() do Zod, por coleção > coleção linhas-pesquisa: path do Tina bate com a pasta que o glob() do Zod lê
+AssertionError: expected 'content/linhas-pesquisa-canario' to be 'content/linhas-pesquisa' // Object.is equality
+
+Expected: "content/linhas-pesquisa"
+Received: "content/linhas-pesquisa-canario"
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+```
+
+Revertido (`path: 'content/linhas-pesquisa'` restaurado). Verde:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  19:20:36
+   Duration  852ms (transform 468ms, setup 0ms, import 713ms, tests 12ms, environment 0ms)
+```
+
+Ao final dos três canários, estado limpo:
+
+```
+$ git status --short content tina/config.ts
+$ git diff -- content tina/config.ts
+```
+
+(ambos sem saída — nenhum arquivo pendente, nenhuma diferença).
+
+### Passo 6 — dívida 7(c): prova de falsificabilidade do `compareFields` contra o artefato final
+
+Canário aninhado dentro de `disciplinas.aulas[]`: `numero` alterado de `type: 'number'` para
+`type: 'string'` só em `tina/config.ts`. Falha (18 testes no arquivo, 1 falhou):
+
+```
+ ❯ tests/content/paridade-schema.test.ts (18 tests | 1 failed) 15ms
+     × coleção disciplinas: mesmos campos, obrigatoriedade, enums, grupo en e listas embutidas 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "disciplinas.aulas[].numero: tipo diverge — Zod=\"number\", Tina=\"string\"",
++ ]
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+```
+
+Revertido (`numero` de volta a `type: 'number'`). Verde (18 testes no arquivo, todos passando):
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  19:21:11
+   Duration  834ms (transform 453ms, setup 0ms, import 693ms, tests 11ms, environment 0ms)
+```
+
+`git diff -- content tina/config.ts` vazio depois da reversão.
+
+### Passo 7 — sequência de qualidade local
+
+`npm run lint` (sem saída = sucesso, ESLint não imprime nada quando não há violação):
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+`npm run format:check`:
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+`npm run test:coverage`:
+
+```
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  5 passed (5)
+      Tests  115 passed (115)
+   Start at  19:21:43
+   Duration  985ms (transform 1.43s, setup 0ms, import 2.41s, tests 77ms, environment 0ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 32/32 )
+Branches     : 100% ( 4/4 )
+Functions    : 100% ( 2/2 )
+Lines        : 100% ( 31/31 )
+================================================================================
+```
+
+115 = 107 (baseline da fase 1) + 2 (`conteudo-valido.test.ts`) + 6 (dívida 7a em
+`paridade-schema.test.ts`). Cobertura segue 100%, acima do limiar de 80% imposto no
+`vitest.config.ts` — os arquivos novos ficam fora do escopo medido (`coverage.include` só cobre
+`src/lib/**`, `src/i18n/**` e `src/content.config.ts`), então não alteram o percentual.
+
+`npm run build` (saída lida — `astro check`: **0 errors, 0 warnings, 0 hints**):
+
+```
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+...
+○  Tina build complete
+...
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (18 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+...
+[build] output: "static"
+[build] mode: "static"
+[build] 1 page(s) built in 820ms
+[build] Complete!
+```
+
+### Passo 8 — `npm run build:pipeline` executando o portão novo
+
+```
+> haroldo-page@0.1.0 build:pipeline
+> vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  3 passed (3)
+      Tests  101 passed (101)
+   Start at  19:23:04
+   Duration  873ms (transform 1.29s, setup 0ms, import 2.15s, tests 53ms, environment 0ms)
+
+Starting Tina build
+...
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (18 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+...
+[build] Complete!
+```
+
+Trecho com o arquivo novo entre os testes executados (`npx vitest run tests/content
+--reporter=verbose`, mesmo escopo do `build:pipeline`):
+
+```
+ ✓ tests/content/conteudo-valido.test.ts > conteúdo real de content/ — validação Zod com referência resolvida (F-09, dívida 5) > varreu ao menos um arquivo por coleção — varredura vazia não pode "passar" como válida 2ms
+ ✓ tests/content/conteudo-valido.test.ts > conteúdo real de content/ — validação Zod com referência resolvida (F-09, dívida 5) > todo arquivo passa no schema Zod correspondente, com projetos.linha_relacionada resolvida 18ms
+ ...
+ Test Files  3 passed (3)
+      Tests  101 passed (101)
+```
+
+### Estado final do working tree
+
+```
+$ git status --short
+ M package-lock.json
+ M package.json
+ M tests/content/paridade-schema.test.ts
+?? tests/content/conteudo-valido.test.ts
+```
+
+`content/**`, `src/content.config.ts` e `tina/config.ts` não aparecem — inalterados, conforme
+escopo do plano. `classifyTina` não foi tocada (dívida 7b permanece registrada para a fase 3).
+
+### Pendências desta sessão
+
+- **Não commitado** — por instrução explícita, quem promove `Status` a `DONE` e commita é o
+  orquestrador, depois de verificação independente e revisão.
+- **CI do GitHub Actions com `conclusion: success`**: não verificável nesta sessão porque nada foi
+  empurrado — depende do commit que o orquestrador fizer.
+- Nenhum achado de conteúdo ou de schema a reportar: os 13 arquivos reais e os dois schemas
+  passaram limpos em todas as execuções fora dos canários (que foram propositais e revertidos).
