@@ -233,6 +233,59 @@ Criadas em *Build variables and secrets* (relatado pelo desenvolvedor): `TINA_CL
 consultada não trata explicitamente do caso "Worker só com assets", então a confirmação de que a
 seção de build aceita as variáveis veio de exercitar a interface, não de ler documentação.
 
-### Passos 2, 3 e 5 a 9
+### Achado do passo 2 — o app da Cloudflare existia na organizacao, mas nao alcancava este repositorio
 
-<Pendentes de preenchimento.>
+Depois de configurados os campos de build e as tres variaveis, o painel passou a exibir (visto
+pelo desenvolvedor):
+
+```
+This project is disconnected from your Git account. This may cause deployments to fail.
+```
+
+O sintoma nao aponta para a causa. Consulta ao GitHub pelo `gh` (saida literal do terminal,
+2026-09-11):
+
+```
+conta autenticada: abbadrava
+organizacao researchgroups-ufma: {"role":"admin","state":"active"}
+repositorio haroldo-page: {"admin":true,"push":true,"private":false}
+
+instalacoes de GitHub App na organizacao:
+  {"app":"netlify","created":"2026-06-01T19:36:05.000-03:00","repos":"selected"}
+  {"app":"cloudflare-workers-and-pages","created":"2026-06-02T22:44:14.000-03:00","repos":"selected"}
+  {"app":"levi-keystatic","created":"2026-06-05T23:47:42.000-03:00","repos":"selected"}
+  {"app":"tinacloud-app","created":"2026-06-06T22:50:43.000-03:00","repos":"selected"}
+
+installation id: 137610061   selection: selected
+```
+
+**Causa:** o app `cloudflare-workers-and-pages` ja estava instalado na organizacao desde
+**2026-06-02**, com escopo `selected` — tres meses antes de este repositorio existir (criado no
+plano 010, em 2026-09-01). O `haroldo-page` nunca foi acrescentado a lista de repositorios da
+instalacao, entao a Cloudflare nao o enxergava. Nao foi possivel enumerar os repositorios da
+instalacao pelo `gh` (HTTP 403, falta o escopo `read:user` no token), entao a atribuicao de causa
+se apoia na data da instalacao e no desaparecimento do sintoma apos a correcao — nao numa
+listagem direta.
+
+**O que a fase 1 previa e nao se materializou:** o plano avisava que o repositorio esta numa
+organizacao e que a conexao poderia exigir aprovacao de owner da `researchgroups-ufma`. Nao
+exigiu terceiro: a conta do desenvolvedor (`abbadrava`) e `role: admin` da organizacao e resolveu
+sozinha.
+
+**Correcao aplicada** (relatada pelo desenvolvedor): `haroldo-page` acrescentado a
+*Repository access* da instalacao 137610061, mantendo o escopo `selected` — o padrao do plano 011
+para o TinaCloud, nao "All repositories". Em seguida, repositorio reconectado no painel da
+Cloudflare; o aviso desapareceu e **os campos de build e as tres variaveis sobreviveram a
+reconexao**, sem precisar refazer.
+
+**Para quem repetir o roteiro:** numa organizacao que ja usou Cloudflare em outro projeto, o app
+existe e o painel mostra "disconnected" sem dizer que o problema e escopo de instalacao. O
+comando que revela e
+`gh api /orgs/<org>/installations`, comparando a data de instalacao com a data de criacao do
+repositorio.
+
+### Passos 3, 5 a 9
+
+<Pendentes de preenchimento. O push de `954215c` ocorreu com o vinculo quebrado e nao serve como
+prova do passo 5; nao foi confirmado se chegou a gerar build algum no painel. A prova do build
+automatico vem do push seguinte.>
