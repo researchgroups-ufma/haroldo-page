@@ -163,7 +163,8 @@ projeto até o arquivo ser versionado. Ele também não é gerado por `tinacms b
 no `npm run build`) — só por `tinacms dev`. Na prática: quem mudar o schema em
 `tina/config.ts` precisa subir `npx tinacms dev` uma vez (mesmo que só para deixá-lo indexar e
 derrubar em seguida) e commitar o `tina/tina-lock.json` atualizado junto com a mudança de
-schema.
+schema. A coerência entre os dois arquivos é verificada automaticamente por
+`tests/content/tina-lock-coerente.test.ts`, que reprova a suíte se o lock ficar defasado.
 
 ## Deploy
 

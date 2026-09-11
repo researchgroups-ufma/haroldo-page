@@ -164,5 +164,525 @@ e `aula`, três tipos GraphQL (`DisciplinasScripts`, `DisciplinasScriptsFilter`,
 
 ## Evidência
 
-<Preenchida pelo executor. Se o teste reprovar contra o lock que está em `main`, **não regenere o
-lock** — pare e reporte: é achado, e a regeneração é do orquestrador.>
+Preenchida pelo executor em 2026-09-11. `Status:` deliberadamente deixado em `TODO` e nenhum
+checkbox de "Critérios de aceitação" foi marcado — promoção é do orquestrador, depois da
+verificação independente. O último critério ("CI do GitHub Actions com `conclusion: success`")
+não foi verificado por este executor: nada foi empurrado para `origin` nesta sessão.
+
+### Passo 1 — estrutura real do lock
+
+Recorte real de `tina/tina-lock.json` (via leitura + `json.load`, chaves de topo e de uma
+coleção qualquer):
+
+```
+top keys: ['schema', 'lookup', 'graphql']
+schema keys: ['version', 'meta', 'collections', 'config']
+num collections: 5
+collection names: ['perfil', 'linhas_pesquisa', 'projetos', 'disciplinas', 'publicacoes']
+first collection top-level keys: ['name', 'label', 'path', 'format', 'fields', 'namespace']
+{
+  "name": "perfil",
+  "label": "Perfil",
+  "path": "content/perfil",
+  "format": "md",
+  "namespace": [
+    "perfil"
+  ]
+}
+num fields in first collection: 13
+first field keys sample: ['type', 'name', 'label', 'required', 'namespace', 'searchable', 'uid']
+{
+  "type": "string",
+  "name": "nome",
+  "label": "Nome",
+  "required": true,
+  "namespace": [
+    "perfil",
+    "nome"
+  ],
+  "searchable": true,
+  "uid": false
+}
+```
+
+Campo-objeto com `list: true` traz `fields` (array de filhos), igual ao formato de
+`tina/config.ts`; campo `reference` traz `collections` (alvo) em vez de `fields`. Confirmado nos
+recortes de `disciplinas.scripts` (lista de objeto) e `projetos.linha_relacionada` (referência)
+lidos durante a implementação — estrutura compatível com a esperada pelo plano, sem surpresas
+que exigissem parar e reportar.
+
+### Passo 2 — teste novo, verde contra o lock em `main`
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > as cinco coleções existem nos dois lados, com os mesmos nomes 2ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção perfil: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção linhas_pesquisa: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção projetos: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção disciplinas: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção publicacoes: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > árvore de campos declarativos bate por caminho qualificado — type, required, list e options 1ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  20:01:21
+   Duration  201ms (transform 53ms, setup 0ms, import 76ms, tests 4ms, environment 0ms)
+```
+
+**Número de caminhos comparados (`caminhosComuns`): 109.** Obtido rodando a mesma suíte com um
+`console.log(caminhosComuns)` temporário inserido só para esta medição e removido antes de
+qualquer commit (não sobra no arquivo final):
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose --no-coverage
+...
+DEBUG caminhosComuns 109
+```
+
+O lock em `main` **não estava defasado** — o teste passou de primeira contra o artefato
+existente. Não houve achado a reportar neste passo.
+
+### Passo 3 — falsificabilidade nos dois sentidos
+
+**3a. Campo novo só em `tina/config.ts`** — inserido `canarioTeste031` (string, sem `required`)
+em `perfil.fields`, logo após `nome`:
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ ✓ ... (6 testes de nomes/path/format continuam verdes)
+ × tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > árvore de campos declarativos bate por caminho qualificado — type, required, list e options 6ms
+   → expected [ Array(1) ] to deeply equal []
+
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "perfil.canarioTeste031: existe só no config",
++ ]
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+```
+
+Revertido (`Edit` removendo o bloco inserido). Verde de novo:
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  20:02:41
+```
+
+**3b. Campo removido de `tina/config.ts`, presente no lock** — removido o bloco do campo `cargo`
+de `perfil.fields` (existe no lock):
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ ✓ ... (6 testes de nomes/path/format continuam verdes)
+ × tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > árvore de campos declarativos bate por caminho qualificado — type, required, list e options 5ms
+   → expected [ 'perfil.cargo: existe só no lock' ] to deeply equal []
+
+AssertionError: expected [ 'perfil.cargo: existe só no lock' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "perfil.cargo: existe só no lock",
++ ]
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+```
+
+Revertido (bloco de `cargo` recolocado na posição original). Verde de novo:
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  20:03:04
+```
+
+Estado final, `git diff` vazio nos dois arquivos:
+
+```
+$ git diff -- tina/config.ts tina/tina-lock.json | cat
+$ git status --porcelain -- tina/config.ts tina/tina-lock.json
+$
+```
+
+(as duas saídas vieram vazias — sem diferença, sem entradas no status.)
+
+### Passo 4 — README.md
+
+Frase acrescentada ao final do parágrafo do `tina/tina-lock.json` (seção "Painel de edição"),
+sem reescrever o procedimento manual:
+
+> A coerência entre os dois arquivos é verificada automaticamente por
+> `tests/content/tina-lock-coerente.test.ts`, que reprova a suíte se o lock ficar defasado.
+
+Reli a seção inteira ("Painel de edição") do início ao fim depois da edição: nenhuma afirmação
+ficou falsa — o procedimento manual (`npx tinacms dev` uma vez, commitar o lock) continua sendo
+o jeito de gerar o lock; a frase nova só acrescenta que agora existe verificação automática de
+que ele foi feito corretamente.
+
+### Passo 5 — o teste roda nos dois lugares sem tocar workflow/script
+
+`package.json` (não alterado — só lido):
+
+```
+"build:pipeline": "vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build",
+...
+"test:coverage": "vitest run --coverage",
+```
+
+`vitest run tests/content` (o que `build:pipeline` executa) já pega o arquivo novo:
+
+```
+$ npx vitest run tests/content --reporter=verbose
+ ✓ tests/content/tina-lock-coerente.test.ts > ... > as cinco coleções existem nos dois lados, com os mesmos nomes 2ms
+ ✓ tests/content/tina-lock-coerente.test.ts > ... > coleção perfil: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > ... > coleção linhas_pesquisa: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > ... > coleção projetos: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > ... > coleção disciplinas: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > ... > coleção publicacoes: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > ... > árvore de campos declarativos bate por caminho qualificado — type, required, list e options 1ms
+ Test Files  4 passed (4)
+      Tests  108 passed (108)
+   Duration  900ms (transform 1.44s, setup 0ms, import 2.31s, tests 59ms, environment 0ms)
+```
+
+`npm run test:coverage` (o que o CI executa) também pega o arquivo novo — ver saída completa no
+Passo 6. Nenhum arquivo de `.github/workflows/ci.yml` ou `package.json` foi tocado (`git diff`
+vazio para os dois, verificado no Passo 3).
+
+### Passo 6 — sequência de qualidade local
+
+```
+$ npm run lint
+
+> haroldo-page@0.1.0 lint
+> eslint .
+
+(sem saída — sem erros)
+```
+
+```
+$ npm run format:check
+
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+```
+$ npm run test:coverage
+
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  6 passed (6)
+      Tests  122 passed (122)
+   Start at  20:03:36
+   Duration  1.04s (transform 1.57s, setup 0ms, import 2.69s, tests 86ms, environment 1ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 32/32 )
+Branches     : 100% ( 4/4 )
+Functions    : 100% ( 2/2 )
+Lines        : 100% ( 31/31 )
+================================================================================
+```
+
+Suíte antes deste plano: 115 testes, 5 arquivos. Depois: **122 testes, 6 arquivos** (+7 testes,
++1 arquivo — bate com `tina-lock-coerente.test.ts`). Cobertura seguiu em 100%.
+
+```
+$ npm run build
+
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+...
+│  🦙 Tina Config
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main
+│
+│  🤖 Auto-generated files
+│     GraphQL Client:     tina/__generated__/client.ts
+│     Typescript Types:   tina/__generated__/types.ts
+│     Static HTML file:   public/admin/index.html
+│
+20:04:23 [content] Syncing content
+20:04:23 [content] Synced content
+20:04:23 [types] Generated 421ms
+20:04:23 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (19 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+20:04:28 [content] Syncing content
+20:04:28 [content] Synced content
+20:04:28 [types] Generated 415ms
+20:04:28 [build] output: "static"
+20:04:28 [build] mode: "static"
+20:04:28 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+20:04:28 [build] Collecting build info...
+20:04:28 [build] ✓ Completed in 449ms.
+20:04:28 [build] Building static entrypoints...
+[vite] ✓ built in 183ms
+[vite] ✓ built in 44ms
+20:04:28 [build] Rearranging server assets...
+
+generating static routes
+20:04:28   ├─ /index.html (+8ms)
+20:04:28 ✓ Completed in 18ms.
+20:04:28 [build] ✓ Completed in 273ms.
+20:04:28 [build] 1 page(s) built in 730ms
+20:04:28 [build] Complete!
+```
+
+Build lido de ponta a ponta: sem `ERR_CLOUD_CHECK_FAILED`, `astro check` com 0 erros/0
+avisos/0 hints, `astro build` completou 1 página em 730ms. Consistente com o plano não mudar
+schema.
+
+### Estado final do working tree
+
+```
+$ git status --porcelain
+ M README.md
+?? tests/content/tina-lock-coerente.test.ts
+```
+
+Só os dois arquivos previstos em "Arquivos afetados" foram tocados.
+
+## Correção pós-revisão (REPROVADO → dois defeitos, ambos reproduzidos pelo revisor)
+
+Aplicadas em 2026-09-11, mesma sessão, sem tocar em nada fora de
+`tests/content/tina-lock-coerente.test.ts`. `Status:` continua `TODO`; nenhum checkbox foi
+marcado; nada foi commitado.
+
+**Defeito 1 — `collections` (alvo de `type: 'reference'`) fora da assinatura comparada.**
+Corrigido: `FieldSignature`/`extractSignature`/`compareSignatures` passaram a incluir
+`collections`, comparado **na ordem declarada** (mesma forma de `options`), com mensagem
+`<caminho>: collections divergem — config=[...], lock=[...]`. As Notas do cabeçalho foram
+atualizadas: a linha que dizia "`collections` ... não avaliado" virou um parágrafo descrevendo
+que agora é comparado, com a referência ao achado da revisão.
+
+**Defeito 2 — `options` comparado como conjunto (`.sort()`), sem registro da fraqueza.**
+Corrigido: removido o `.sort()` de `extractSignature`; `options` (e o novo `collections`) agora
+comparam a ordem declarada. Comentário acrescentado na própria definição de `FieldSignature`
+explicando por que a ordem importa (é a ordem do select no painel) e citando o achado da
+revisão — não fica mais escondido.
+
+Depois das duas correções, o teste seguiu **verde contra o lock em `main`** (nenhuma das duas
+correções quebrou nada inesperado):
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > as cinco coleções existem nos dois lados, com os mesmos nomes 1ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção perfil: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção linhas_pesquisa: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção projetos: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção disciplinas: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > coleção publicacoes: path e format do lock batem com o config 0ms
+ ✓ tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > árvore de campos declarativos bate por caminho qualificado — type, required, list, options e collections 1ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  20:17:43
+   Duration  191ms (transform 49ms, setup 0ms, import 69ms, tests 4ms, environment 0ms)
+```
+
+**Número de caminhos comparados: continua 109** (as duas correções acrescentam atributos a
+caminhos que já existiam — `projetos.linha_relacionada` e `disciplinas.status` já contavam no
+total — não criam caminho novo). Medido com o mesmo `console.log` temporário do Passo 2,
+removido antes de qualquer commit:
+
+```
+DEBUG caminhosComuns 109
+```
+
+### Canário novo 1 (defeito 1) — alvo da referência trocado
+
+`tina/config.ts:451`, `linha_relacionada.collections`: `['linhas_pesquisa']` →
+`['publicacoes']`. Lock intocado.
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ ✓ ... (6 testes de nomes/path/format continuam verdes)
+ × tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > árvore de campos declarativos bate por caminho qualificado — type, required, list, options e collections 5ms
+   → expected [ Array(1) ] to deeply equal []
+
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "projetos.linha_relacionada: collections divergem — config=[publicacoes], lock=[linhas_pesquisa]",
++ ]
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+```
+
+Revertido (`collections: ['linhas_pesquisa']` restaurado). Verde de novo:
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  20:18:27
+```
+
+### Canário novo 2 (defeito 2) — `options` reordenado, sem mudar valores
+
+`tina/config.ts:526`, `disciplinas.status.options`: `['atual', 'anterior']` →
+`['anterior', 'atual']`. Mesmos dois valores, ordem trocada.
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ ✓ ... (6 testes de nomes/path/format continuam verdes)
+ × tests/content/tina-lock-coerente.test.ts > coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1) > árvore de campos declarativos bate por caminho qualificado — type, required, list, options e collections 5ms
+   → expected [ Array(1) ] to deeply equal []
+
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "disciplinas.status: options divergem — config=[anterior|atual], lock=[atual|anterior]",
++ ]
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+```
+
+Revertido (`options: ['atual', 'anterior']` restaurado). Verde de novo:
+
+```
+$ npx vitest run tests/content/tina-lock-coerente.test.ts --reporter=verbose
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  20:18:52
+```
+
+Estado final, `git diff` e `git status --porcelain` vazios para os dois arquivos protegidos:
+
+```
+$ git diff -- tina/config.ts tina/tina-lock.json | cat
+$ git status --porcelain -- tina/config.ts tina/tina-lock.json
+$
+```
+
+### Sequência de qualidade local, depois das correções
+
+```
+$ npm run lint
+
+> haroldo-page@0.1.0 lint
+> eslint .
+
+(sem saída — sem erros)
+```
+
+```
+$ npm run format:check
+
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+```
+$ npm run test:coverage
+
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  6 passed (6)
+      Tests  122 passed (122)
+   Start at  20:19:10
+   Duration  934ms (transform 1.44s, setup 0ms, import 2.44s, tests 78ms, environment 0ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 32/32 )
+Branches     : 100% ( 4/4 )
+Functions    : 100% ( 2/2 )
+Lines        : 100% ( 31/31 )
+================================================================================
+```
+
+**Total de testes do arquivo: continua 7** (nenhum `it` novo — as duas correções ampliam a
+mesma asserção já existente, não pedem casos novos). **Total da suíte: continua 122 testes, 6
+arquivos**, cobertura 100% — idêntico ao número reportado antes da correção.
+
+### Frase do README revisitada
+
+A frase acrescentada no Passo 4 — "A coerência entre os dois arquivos é verificada
+automaticamente por `tests/content/tina-lock-coerente.test.ts`, que reprova a suíte se o lock
+ficar defasado." — foi conferida de novo depois das duas correções e **continua verdadeira como
+está**: com `collections` comparado e `options` comparado em ordem, as duas classes de
+defasagem que escapavam antes agora reprovam. Não foi reescrita.
+
+### O que não quebrou
+
+Nenhuma das duas correções quebrou um teste existente ou baixou a cobertura: `lint`,
+`format:check`, `test:coverage` (122/122) e a comparação contra o lock em `main` seguiram
+verdes sem qualquer ajuste adicional — como o orquestrador antecipou, o lock já guardava
+`collections` e `options` na mesma ordem e nos mesmos valores do config.
+
+### Não verificado nesta sessão
+
+- **CI do GitHub Actions com `conclusion: success`**: nada foi empurrado para `origin` — este
+  critério depende de push, que não é deste executor.
