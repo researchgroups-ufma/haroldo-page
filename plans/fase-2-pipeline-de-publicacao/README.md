@@ -18,7 +18,7 @@ a palavra "aparece" pode significar aqui.
 | Plano | Título | Status | Executável por | Agente | Commits |
 |---|---|---|---|---|---|
 | 023 | Abertura da fase 2: reconciliação do estado documental | ✅ DONE | agente | implementer (haiku) | `ae1bbc8` |
-| 024 | Comando de build dos pipelines e o cloud check do TinaCloud | ⬜ TODO | agente | implementer | — |
+| 024 | Comando de build dos pipelines e o cloud check do TinaCloud | ✅ DONE | agente | implementer | `f8f416a` |
 | 025 | 🧑 Workers Builds ligado ao repositório e variáveis no Cloudflare | ⬜ TODO | orquestrador | nenhum | — |
 | 026 | 🧑 `/admin` publicado e autenticando pelo TinaCloud em produção | ⬜ TODO | orquestrador | nenhum | — |
 | 027 | 🧑 Usuário EDITOR do professor e a matriz de permissões da §9 | ⬜ TODO | **stakeholder** | nenhum | — |

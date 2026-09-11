@@ -1,6 +1,6 @@
 # Plano 024 — Comando de build dos pipelines e o acoplamento com o cloud check do TinaCloud
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-11 (publicação sem intervenção do desenvolvedor), RNF-04, RNF-12; fase 2,
 itens 1 e 2 do §12 (pré-requisito de ambos); **dívida 1** da fase 1
 **Depende de:** plano 023 (não por arquivo — por ordem: o 023 abre a fase e é trivial)
@@ -232,10 +232,8 @@ Frase de substituição sugerida (pode polir, não pode continuar dizendo v5):
       falsa remanescente nas duas seções tocadas
 - [x] `npm run lint`, `npm run format:check` e `npm run test:coverage` verdes, cobertura ≥ 80%
 - [x] `npm run build` verde, com a saída lida — nenhuma linha `[ERROR]` no corpo
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado, **executando o passo
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado, **executando o passo
       novo** — cole o trecho do log do run que mostra `npm run build:pipeline`
-      (**em branco deliberadamente**: o executor não empurra nem commita; verificação do
-      orquestrador após o push)
 - [x] `wrangler.toml` e `content/**` não modificados
 
 ## Evidência
@@ -895,8 +893,69 @@ modificado por estar recebendo esta Evidência e os checkboxes. `tina/config.ts`
 `src/content.config.ts` sem diferença (canário revertido — ver passo 5). `wrangler.toml` e
 `content/**` não tocados.
 
-### Em branco, deliberadamente
+### CI do GitHub Actions — preenchido pelo orquestrador após o push
 
-O critério "CI do GitHub Actions com `conclusion: success`... executando o passo novo" fica em
-branco: o executor não commita nem empurra (regra do dispatch). Verificação a cargo do
-orquestrador após o push.
+Commit empurrado: `f8f416a` (`4ffaab2..f8f416a`). Run **34598162602**, job `qualidade`
+(ID 103258710947), `conclusion: success` em 1m26s. Colhido com o GitHub CLI 2.100.0, instalado
+nesta máquina em 2026-09-11 — as promoções anteriores usavam a API pública, que não dá o log.
+
+`gh run watch 34598162602 --exit-status` (saída final, `WATCH_EXIT:0`):
+
+```
+✓ main CI · 34598162602
+Triggered via push about 1 minute ago
+
+JOBS
+✓ qualidade in 1m26s (ID 103258710947)
+  ✓ Set up job
+  ✓ Run actions/checkout@v7
+  ✓ Run actions/setup-node@v7
+  ✓ Run npm ci
+  ✓ Run npm run lint
+  ✓ Run npm run format:check
+  ✓ Run npm run test:coverage
+  ✓ Run npm run build:pipeline
+  ✓ Post Run actions/setup-node@v7
+  ✓ Post Run actions/checkout@v7
+  ✓ Complete job
+```
+
+O passo novo aparece no log com o nome e o comando, e com os dois secrets mascarados pelo
+runner. Trecho literal de `gh run view 34598162602 --log --job 103258710947`, com os códigos de
+escape ANSI removidos e o prefixo `qualidade	Run npm run build:pipeline	` de cada linha
+preservado:
+
+```
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:14.9698084Z ##[group]Run npm run build:pipeline
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:14.9698468Z npm run build:pipeline
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:14.9734673Z shell: /usr/bin/bash -e {0}
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:14.9734960Z env:
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:14.9735374Z   TINA_CLIENT_ID: ***
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:14.9735683Z   TINA_TOKEN: ***
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:14.9735910Z ##[endgroup]
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:15.0715854Z > haroldo-page@0.1.0 build:pipeline
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:15.0716748Z > vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:16.9649950Z  ✓ tests/content/paridade-schema.test.ts (12 tests) 15ms
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:16.9669282Z  ✓ tests/content/schemas.test.ts (81 tests) 40ms
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:16.9698897Z  Test Files  2 passed (2)
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:16.9700219Z       Tests  93 passed (93)
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:19.3268009Z Starting Tina build
+... (a caixa "Tina build complete" sai como JSON no runner, por não haver TTY — mesmo conteúdo
+    do passo 2: API url, GraphQL Client, Typescript Types, Static HTML file; elidida aqui) ...
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:48.2062810Z 12:18:48 [check] Getting diagnostics for Astro files in /home/runner/work/haroldo-page/haroldo-page...
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:52.1051274Z Result (17 files):
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:52.1052173Z - 0 errors
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:52.1052878Z - 0 warnings
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:52.1053508Z - 0 hints
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:53.8488035Z 12:18:53 [build] 1 page(s) built in 873ms
+qualidade	Run npm run build:pipeline	2026-09-11T12:18:53.8489083Z 12:18:53 [build] Complete!
+```
+
+O passo tem 85 linhas no total. Filtrando-o por `error` sem diferenciar maiúsculas, há **uma
+única** ocorrência — `- 0 errors` —, então nenhuma linha `[ERROR]` no corpo, a armadilha do
+plano 020 verificada também no runner.
+
+Duas coisas que este log prova além do critério, e que valem para o plano 025: o
+`--skip-cloud-checks` **não** dispensa as credenciais (o `env:` com os dois secrets está no passo
+e o `tinacms build` atravessou), e o `vitest run tests/content` roda no pipeline como projetado,
+com os mesmos 93 testes do local.
