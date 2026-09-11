@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-10
+Última atualização: 2026-09-11
 
 **Critério de conclusão da fase** (§6.2 do PRD): *um usuário EDITOR edita no `/admin` em produção
 e a mudança aparece no site sem intervenção do ADMIN (M-02).* Como na fase 1, o critério não é
@@ -17,7 +17,7 @@ a palavra "aparece" pode significar aqui.
 
 | Plano | Título | Status | Executável por | Agente | Commits |
 |---|---|---|---|---|---|
-| 023 | Abertura da fase 2: reconciliação do estado documental | ⬜ TODO | agente | implementer (haiku) | — |
+| 023 | Abertura da fase 2: reconciliação do estado documental | ✅ DONE | agente | implementer (haiku) | `ae1bbc8` |
 | 024 | Comando de build dos pipelines e o cloud check do TinaCloud | ⬜ TODO | agente | implementer | — |
 | 025 | 🧑 Workers Builds ligado ao repositório e variáveis no Cloudflare | ⬜ TODO | orquestrador | nenhum | — |
 | 026 | 🧑 `/admin` publicado e autenticando pelo TinaCloud em produção | ⬜ TODO | orquestrador | nenhum | — |

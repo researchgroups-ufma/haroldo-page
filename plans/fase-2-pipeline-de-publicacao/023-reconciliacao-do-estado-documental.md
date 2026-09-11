@@ -1,6 +1,6 @@
 # Plano 023 — Abertura da fase 2: reconciliação do estado documental
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** — (não fecha item do §12; cumpre a convenção "O topo do PRD tem de refletir a
 realidade" de `plans/README.md`)
 **Depende de:** nenhum
@@ -189,7 +189,7 @@ nota fica intacto.
       `git status --short`
 - [x] `npm run lint`, `npm run format:check` e `npm run test:coverage` verdes, saídas coladas
 - [x] `npm run build` verde, com a saída lida (não só o exit code) — nenhuma linha `[ERROR]`
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado
 
 ## Evidência
 
@@ -318,4 +318,77 @@ $ git diff --stat
  2 files changed, 12 insertions(+), 9 deletions(-)
 ```
 
-**Critério 10:** `conclusion: success` do CI — **PENDENTE** (portão de promoção a DONE, não de revisão; o orquestrador o fecha após o push do commit).
+**Critério 10 — CI verde.** Fechado em 2026-09-11 pelo orquestrador, após o push. O `gh` não está
+instalado nesta máquina; a consulta foi à API pública do GitHub, como manda a convenção da casa
+("comando local passando não é evidência de qualidade").
+
+```
+$ curl -s "https://api.github.com/repos/researchgroups-ufma/haroldo-page/actions/runs/34593469875"
+  "head_sha": "ae1bbc8abbce6262c3cdfe20dcf966e899dc7590",
+  "status": "completed",
+  "conclusion": "success",
+  "updated_at": "2026-09-11T11:21:10Z",
+
+$ curl -s ".../actions/runs/34593469875/jobs"
+      "conclusion": "success",
+      "name": "qualidade",
+          "name": "Set up job",                        "conclusion": "success",
+          "name": "Run actions/checkout@v7",           "conclusion": "success",
+          "name": "Run actions/setup-node@v7",         "conclusion": "success",
+          "name": "Run npm ci",                        "conclusion": "success",
+          "name": "Run npm run lint",                  "conclusion": "success",
+          "name": "Run npm run format:check",          "conclusion": "success",
+          "name": "Run npm run test:coverage",         "conclusion": "success",
+          "name": "Run npm run build",                 "conclusion": "success",
+          "name": "Post Run actions/setup-node@v7",    "conclusion": "success",
+          "name": "Post Run actions/checkout@v7",      "conclusion": "success",
+          "name": "Complete job",                      "conclusion": "success",
+```
+
+Run: https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34593469875
+
+Note-se que o `npm run build` passou **no CI**, não só localmente — a classe de defeito que deixou
+o CI vermelho por 14 commits na fase 1 (falta de `TINA_CLIENT_ID`/`TINA_TOKEN` no workflow, que o
+`.env` local escondia) não se repetiu.
+
+**Reexecução da suíte na sessão da promoção (2026-09-11, 08:16–08:17), sobre o mesmo working tree:**
+
+```
+$ npm run lint
+> haroldo-page@0.1.0 lint
+> eslint .
+
+(exit 0, sem saída)
+
+$ npm run format:check
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+
+$ npm run test:coverage
+ Test Files  4 passed (4)
+      Tests  107 passed (107)
+   Start at  08:16:53
+   Duration  1.44s (transform 1.30s, setup 0ms, import 1.93s, tests 52ms, environment 0ms)
+
+Statements   : 100% ( 32/32 )
+Branches     : 100% ( 4/4 )
+Functions    : 100% ( 2/2 )
+Lines        : 100% ( 31/31 )
+
+$ npm run build
+08:17:37 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (17 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+08:17:43 [build] 1 page(s) built in 806ms
+08:17:43 [build] Complete!
+(exit 0; varredura explícita: nenhuma linha `[ERROR]`; o build não sujou o working tree)
+```
+
+**Commits:** `1f62500` (artefatos do fatiamento, 024–034 e README da fase) e `ae1bbc8` (este plano
+e a sua execução).
