@@ -1,6 +1,6 @@
 # Plano 032 — `npm audit` no CI, com política de severidade e a exceção do TinaCMS registrada
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RNF-07, RNF-08; **dívida 6** da fase 1
 **Depende de:** plano **024** — os dois editam `.github/workflows/ci.yml` **e** `README.md`.
 **Serialize.** O 030, o 031 e o 033 já estão DONE; resta o **034**, que também edita `README.md` —
@@ -250,7 +250,7 @@ verdade, e a divergência é reportada, não escondida**.
       do npm é `major` para trás) e **3** corrigíveis adiadas com motivo escrito
 - [x] O comando de build do `ci.yml` **inalterado** por este plano
 - [x] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado, **com o passo novo
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado, **com o passo novo
       visível no log** — cole o trecho
 
       **Não verificado nesta sessão.** Nada foi commitado nem empurrado — por instrução de
@@ -816,3 +816,48 @@ commitado, nada empurrado.
 
 Nenhuma `high` sobrou depois da subida do `wrangler`. A premissa da emenda de 2026-09-12 se
 confirmou: o portão nasce verde.
+
+### Revisão de código e CI — preenchido pelo orquestrador na promoção
+
+**Revisão APROVADA no ciclo 2.** Reprovada no ciclo 1 com **três defeitos, todos de documentação
+e nenhum alcançável por teste**: (1) o ADR não descrevia o mecanismo real da correção — deixava a
+impressão de que o `sharp` saíra do projeto, quando ele permanece via `astro`, produção, e o que
+mudou foi o `miniflare` passar a deduplicar na cópia segura; (2) o ADR citava **2** advisories
+enquanto a Evidência **afirmava** citar **5** — a mesma família de defeito que reprovou o plano 033
+nesta sessão; (3) o `README.md` atribuía as 8 moderadas a uma cadeia única, quando são **duas**
+(5 via `react-router-dom`, 3 via `@tinacms/cli → altair-express-middleware`) — e essa afirmação
+falsa entrou **no mesmo parágrafo** que corrigia a afirmação falsa antiga. Os três corrigidos e
+reproduzidos pelo revisor no ciclo 2.
+
+**Commit do trabalho:** `b992282`, empurrado em 2026-09-12 (`7bd1e62..b992282`). Os dois pipelines
+verdes:
+
+```
+gh api repos/researchgroups-ufma/haroldo-page/commits/b992282/check-runs
+
+Workers Builds: haroldo-page :: success
+  https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/61821ab4-e645-4a49-993a-e8b22d9c600b
+qualidade                    :: success
+  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34705501376
+```
+
+**O passo novo no log do CI, que é o que o critério exige** — trecho literal de
+`gh run view 34705501376 --log`, filtrado por `audit`:
+
+```
+qualidade  Run npm ci                        added 1515 packages, and audited 1516 packages in 34s
+qualidade  Run npm audit --audit-level=high  ##[group]Run npm audit --audit-level=high
+qualidade  Run npm audit --audit-level=high  shell: /usr/bin/bash -e {0}
+qualidade  Run npm audit --audit-level=high  # npm audit report
+qualidade  Run npm audit --audit-level=high  qs  2.2.5 - 6.15.3
+qualidade  Run npm audit --audit-level=high  Severity: moderate
+qualidade  Run npm audit --audit-level=high  qs array-limit bypass ... GHSA-x5fp-wj9c-mxmx
+qualidade  Run npm audit --audit-level=high  qs: Denial of Service ... GHSA-4mjr-xmp4-gh2g
+qualidade  Run npm audit --audit-level=high    body-parser  1.20.5 - 1.20.6
+qualidade  Run npm audit --audit-level=high    express  4.22.2
+```
+
+**Confirma na prática o ponto 2 da decisão:** o passo roda **entre `npm ci` e o `lint`**, as
+moderadas continuam **listadas** no log com seus identificadores, e o job passa assim mesmo — a
+informação não some, só deixa de reprovar. Era isto que o plano mandava verificar exercitando em
+vez de acreditar na documentação.
