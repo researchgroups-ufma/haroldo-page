@@ -1,7 +1,8 @@
 # Plano 027 — Roteiro humano: usuário EDITOR do professor e a matriz de permissões da §9
 
 **Status:** TODO
-**RFs cobertos:** RF-01, RF-02; RNF-07; fase 2, **itens 4 e 5** do §12; matriz papel × permissão
+**RFs cobertos:** RF-01, RF-02; RNF-07; fase 5, **itens 11 e 12** do §12 (eram os itens 4 e 5 da
+fase 2 até 2026-09-12); matriz papel × permissão
 da §9; A-01, R-04
 **Depende de:** plano **026** (não convide o professor para um `/admin` que ainda não se sabe se
 autentica em produção)
@@ -14,13 +15,19 @@ devolver".
 **PRD:** `S:\Projetos\academic_page\haroldo\PRD.md`
 **Projeto:** `S:\Projetos\academic_page\haroldo`
 
+> **Migrado da fase 2 para a fase 5 em 2026-09-12**, por decisão do stakeholder registrada em
+> `docs/sabatinas/CHANGELOG_sabatina_recorte-sem-professor.md`. O motivo é de sequência: este plano
+> exige uma sessão com o professor, e a fase 5 já reservava essa sessão para o treinamento e a
+> validação assistida (M-01). O arquivo e o número **não** mudaram — a numeração deste projeto é
+> global e contínua, e o plano mudou de pasta porque mudou o checklist que ele fecha.
+
 ## Objetivo
 
 O professor tem conta própria no TinaCloud, com papel **EDITOR**, e o que ele pode e não pode
 fazer está verificado **exercitando as interfaces** contra a matriz da §9 — não contra a
 documentação do TinaCloud.
 
-Fecha os itens 4 e 5 do checklist da fase 2. O item 5 ("verificado que o EDITOR **não** consegue
+Fecha os itens 11 e 12 do checklist da fase 5. O item 5 ("verificado que o EDITOR **não** consegue
 alterar schema, código ou configuração") é a metade que costuma ser assumida sem prova: ele exige
 **tentar** e registrar o que a interface respondeu.
 

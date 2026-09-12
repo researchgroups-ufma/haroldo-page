@@ -1,14 +1,16 @@
 # Plano 034 — Documentação do pipeline no README e fechamento da fase 2
 
 **Status:** TODO
-**RFs cobertos:** §10.5 (README de manutenção); fase 2, **item 8** do §12; fechamento do checklist
-da fase (8/8) e do §0 do PRD
-**Depende de:** **todos os demais planos da fase 2 (023–033) em `DONE`.** Um README que descreve um
+**RFs cobertos:** §10.5 (README de manutenção); fase 2, **item 5** do §12; fechamento do checklist
+da fase (**5/5**) e do §0 do PRD
+**Depende de:** **todos os demais planos da fase 2 em `DONE`** — 023, 024, 025, 026, 028, 030, 031,
+032 e 033. Os planos **027 e 029 saíram da fase** em 2026-09-12 (ver
+`docs/sabatinas/CHANGELOG_sabatina_recorte-sem-professor.md`) e **não** são mais pré-requisito. Um README que descreve um
 pipeline que ainda não fechou é a mesma dívida que o plano 023 veio corrigir.
 **Modelo recomendado:** sonnet
 **Agente recomendado:** implementer
 **Executável por:** **agente** para a redação — todos os números que ele precisa já estarão colados
-nas Evidências dos planos 025 a 029. **Dois passos são do orquestrador:** conferir que os onze
+nas Evidências dos planos 025, 026 e 028. **Dois passos são do orquestrador:** conferir que os onze
 planos anteriores estão `DONE` e promover o `Status:` deste.
 **PRD:** `S:\Projetos\academic_page\haroldo\PRD.md`
 **Projeto:** `S:\Projetos\academic_page\haroldo`
@@ -17,7 +19,7 @@ planos anteriores estão `DONE` e promover o `Status:` deste.
 
 Quem chegar ao projeto sem contexto consegue, lendo o `README.md`, entender o caminho completo de
 uma edição do professor até o site publicado — e o que fazer quando ele quebra. O checklist da
-fase 2 fecha em 8/8, o §0 do PRD volta a refletir a realidade, e o que a fase 2 **não** resolveu
+fase 2 fecha em 5/5, o §0 do PRD volta a refletir a realidade, e o que a fase 2 **não** resolveu
 fica escrito com destino nomeado (fase 3, fase 5 ou dívida aberta).
 
 ## Arquivos afetados

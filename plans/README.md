@@ -4,7 +4,7 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-11
+Última atualização: 2026-09-12
 
 ## Fases
 
@@ -12,10 +12,10 @@ Este arquivo é só o mapa.
 |---|---|---|---|
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
 | [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–022, todos DONE — o 021 promovido em `7d5b7e6`, com CI verde sobre `26de58a` |
-| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟡 **Em andamento** | 023–034 fatiados em 2026-09-10; 023, 024, 025, 026, 030 e 031 DONE — o pipeline publica sozinho desde `ab0d1f8`, desde `7ab84da` está provado que o `/admin` em produção é quem origina o push, e desde `4343e42`/`1de5d1d` conteúdo inválido e `tina-lock.json` defasado reprovam no CI e no build de deploy. **027 bloqueado no professor** |
-| `fase-3-site-publico/` | 3 — Site público em português | ⬜ Não iniciada | — |
+| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟡 **Em andamento** | 023, 024, 025, 026, 030 e 031 DONE — o pipeline publica sozinho desde `ab0d1f8`, desde `7ab84da` está provado que o `/admin` em produção é quem origina o push, e desde `4343e42`/`1de5d1d` conteúdo inválido e `tina-lock.json` defasado reprovam no CI e no build de deploy. **Restam 028, 032, 033 e 034**, nenhum deles dependente do professor |
+| `fase-3-site-publico/` | 3 — Site público em português | 🔴 **Bloqueada** | não fatiada — **a Q-04 (referências visuais) continua aberta** e o §16 proíbe começar fase que dependa de questão aberta. O stakeholder fornecerá as referências |
 | `fase-4-internacionalizacao/` | 4 — Internacionalização | ⬜ Não iniciada | — |
-| `fase-5-polimento-e-entrega/` | 5 — Polimento e entrega | ⬜ Não iniciada | — |
+| [`fase-5-polimento-e-entrega/`](fase-5-polimento-e-entrega/README.md) | 5 — Polimento e entrega | ⬜ Não iniciada | não fatiada; já contém os planos **027** e **029**, migrados da fase 2 em 2026-09-12 |
 
 A ordem do roadmap **não** é 0→1→2→3→4→5 linear: a fase 2 vem antes do site público de
 propósito. O PRD explica por quê — o maior risco do projeto é o ciclo de publicação, não o
@@ -27,20 +27,48 @@ inteiro pronto. As dependências reais estão na tabela do §6.2.
 já incorpore os problemas que a fase 1 descobriu e que só podem ser resolvidos na 2. A lista
 desses itens é montada pelo plano 021, no README da fase 1 — o fatiamento começa lendo ela, não
 do zero. **Cumprida em 2026-09-10:** a fase 1 fechou e a fase 2 foi fatiada em seguida, a
-partir da lista dos sete itens no README da fase 1 — os 12 planos estão em
+partir da lista dos sete itens no README da fase 1 — os 12 planos foram para
 `fase-2-pipeline-de-publicacao/`, com o README da fase registrando onde cada uma das sete
-dívidas caiu.
+dívidas caiu. **Dez continuam lá:** o 027 e o 029 mudaram de pasta em 2026-09-12, no recorte
+descrito abaixo.
 
 Vale notar, para quem for retomar: **a fase 3 depende formalmente só da fase 1**, não da 2 (ver a
 coluna de dependências do §6.2). Antecipá-la é possível; o custo seria construir o site sem a
 garantia de que o ciclo de publicação fecha. Não foi o caminho escolhido.
 
+## Recorte de 2026-09-12 — o que anda sem o professor
+
+Decisão do stakeholder, tomada em sabatina e registrada em
+[`docs/sabatinas/CHANGELOG_sabatina_recorte-sem-professor.md`](../docs/sabatinas/CHANGELOG_sabatina_recorte-sem-professor.md)
+(4 decisões): **tudo que exige uma sessão com o professor passa para a fase 5; o que não exige é
+executado antes.** O motivo é de sequência, não de escopo — é preferível levar ao professor um site
+navegável do que gastar a sessão dele verificando um painel sobre um site que ainda não renderiza
+uma linha de conteúdo.
+
+Só dois planos dependiam dele, e os dois mudaram de pasta com o número preservado:
+
+| Plano | Era | É |
+|---|---|---|
+| **027** — usuário EDITOR e matriz de permissões | fase 2, itens 4 e 5 do §12 | fase 5, itens 11 e 12 |
+| **029** — ciclo cronometrado (M-02) | fase 2, item 7 do §12 | fase 5, item 13 |
+
+**A mudança obrigou a mexer no PRD, e não foi cosmética:** o critério de conclusão da fase 2 no §6.2
+*era* o passo do professor. Ele passou a ser o ciclo do **ADMIN** — já demonstrado pelo plano 026 —
+e o critério do EDITOR foi inteiro para a fase 5. O §3.3 também mudou: **M-02 é medida só na fase
+5**. **Nenhum requisito mudou — só onde ele é verificado.**
+
+**O que isto não resolve, e é a parte que importa:** o recorte **não alcança o site navegável**
+enquanto a **Q-04** (referências visuais) não for respondida — ela bloqueia a fase 3 pela regra do
+§16, e o responsável é o **dono do produto**, não o professor. O executável de imediato são os
+quatro planos restantes da fase 2 — **028**, **032**, **033** e **034** —, que a fecham em 5/5.
+
 ## Convenções
 
 **Numeração é global e contínua**, não reinicia a cada fase — e **não é ordem de execução**: o
-022 rodou antes do 021, como o 014 rodou depois de a fase 0 fechar. O plano 027 é o próximo,
-esteja em que pasta estiver. Isso preserva as referências já espalhadas por commits, ADRs, Evidências e
-pelo PRD — um "plano 007" identifica um arquivo só, para sempre.
+022 rodou antes do 021, como o 014 rodou depois de a fase 0 fechar, e o 027 mudou de fase sem mudar
+de número. O próximo a rodar é o **032** ou o **033**, esteja em que pasta estiver. Isso preserva as
+referências já espalhadas por commits, ADRs, Evidências e pelo PRD — um "plano 007" identifica um
+arquivo só, para sempre.
 
 **Onde cada plano vai:** na pasta da fase cujo checklist (§12 do PRD) ele fecha.
 
@@ -49,6 +77,11 @@ pelo PRD — um "plano 007" identifica um arquivo só, para sempre.
 resolve dívida técnica registrada pela fase 0 e continua a numeração daquele bloco; foi
 antecipado para antes da fase 1 porque o Astro v6 muda a API de coleções e sobe para Zod 4, e
 a fase 1 escreve exatamente os schemas que isso quebraria.
+
+**Segunda exceção registrada — os planos 027 e 029.** Foram escritos para a fase 2, fatiados com
+ela em 2026-09-10, e **mudaram de pasta em 2026-09-12** sem mudar de número, porque mudou o
+checklist que eles fecham: os itens correspondentes do §12 migraram para a fase 5 junto. É a regra
+"onde cada plano vai" sendo aplicada depois do fatiamento, não uma exceção a ela.
 
 ## O topo do PRD tem de refletir a realidade
 

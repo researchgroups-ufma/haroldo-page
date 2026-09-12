@@ -1,8 +1,9 @@
 # Plano 029 — Ciclo ponta a ponta cronometrado (M-02) e o critério de conclusão da fase
 
 **Status:** TODO
-**RFs cobertos:** RF-11; **M-02**; fase 2, **item 7** do §12; **critério de conclusão da fase 2
-(§6.2)**; R-06, R-12
+**RFs cobertos:** RF-11; **M-02**; fase 5, **item 13** do §12 (era o item 7 da fase 2 até
+2026-09-12); **critério de conclusão da fase 5 (§6.2)** — era o da fase 2 até a mesma data;
+R-06, R-12
 **Depende de:** planos **025**, **026**, **027** e **028** — nesta ordem. O 028 antes porque
 cronometrar o ciclo feliz enquanto ainda se pode quebrar a `main` de propósito é pedir para
 contaminar a amostra.
@@ -14,10 +15,16 @@ Ver "O passo humano".
 **PRD:** `S:\Projetos\academic_page\haroldo\PRD.md`
 **Projeto:** `S:\Projetos\academic_page\haroldo`
 
+> **Migrado da fase 2 para a fase 5 em 2026-09-12**, por decisão do stakeholder registrada em
+> `docs/sabatinas/CHANGELOG_sabatina_recorte-sem-professor.md`. O motivo é de sequência: este plano
+> exige uma sessão com o professor, e a fase 5 já reservava essa sessão para o treinamento e a
+> validação assistida (M-01). O arquivo e o número **não** mudaram — a numeração deste projeto é
+> global e contínua, e o plano mudou de pasta porque mudou o checklist que ele fecha.
+
 ## Objetivo
 
 Está medido, com horários registrados, quanto tempo passa entre salvar no `/admin` de produção e a
-mudança estar publicada — **M-02: < 5 min**. E o critério de conclusão da fase 2 (§6.2) está
+mudança estar publicada — **M-02: < 5 min**. E o critério de conclusão da fase 5 (§6.2) está
 demonstrado: **um usuário EDITOR edita no `/admin` em produção e a mudança chega ao ar sem
 nenhuma intervenção do ADMIN.**
 

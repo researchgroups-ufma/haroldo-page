@@ -5,13 +5,23 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-11
+Última atualização: 2026-09-12
 
-**Critério de conclusão da fase** (§6.2 do PRD): *um usuário EDITOR edita no `/admin` em produção
-e a mudança aparece no site sem intervenção do ADMIN (M-02).* Como na fase 1, o critério não é
-"os testes passam" — é exercitar o ciclo real. **Leia antes a ressalva da seção "O que esta fase
-não consegue provar"**: não existe página que renderize conteúdo até a fase 3, e isso muda o que
-a palavra "aparece" pode significar aqui.
+**Critério de conclusão da fase** (§6.2 do PRD, **reescrito em 2026-09-12**): *um usuário **ADMIN**
+edita no `/admin` em produção e a mudança é publicada sozinha, com cada elo provado por artefato.*
+Como na fase 1, o critério não é "os testes passam" — é exercitar o ciclo real, e ele **já foi
+demonstrado pelo plano 026**. **Leia antes a ressalva da seção "O que esta fase não consegue
+provar"**: não existe página que renderize conteúdo até a fase 3, e isso muda o que a palavra
+"publicada" pode significar aqui.
+
+> **O critério anterior era o do EDITOR** — *"um usuário EDITOR edita no `/admin` em produção e a
+> mudança aparece no site sem intervenção do ADMIN (M-02)"* —, e **ele não desapareceu: virou o
+> critério da fase 5**, junto com os planos **027** e **029** e com os itens 4, 5 e 7 do §12 desta
+> fase. Decisão do stakeholder em 2026-09-12, registrada em
+> `docs/sabatinas/CHANGELOG_sabatina_recorte-sem-professor.md` (4 decisões): tudo que exige uma
+> sessão com o professor passa para a fase 5, que já reservava essa sessão para o treinamento e a
+> validação assistida. **Nenhum requisito mudou — só onde ele é verificado.** A fase 2 passa de 8
+> para 5 itens no §12.
 
 ## Estado
 
@@ -21,9 +31,7 @@ a palavra "aparece" pode significar aqui.
 | 024 | Comando de build dos pipelines e o cloud check do TinaCloud | ✅ DONE | agente | implementer | `f8f416a` |
 | 025 | 🧑 Workers Builds ligado ao repositório e variáveis no Cloudflare | ✅ DONE | orquestrador | nenhum | `954215c`, `ab0d1f8` |
 | 026 | 🧑 `/admin` publicado e autenticando pelo TinaCloud em produção | ✅ DONE | orquestrador | nenhum | `7ab84da` (edição do painel) |
-| 027 | 🧑 Usuário EDITOR do professor e a matriz de permissões da §9 | ⬜ TODO | **stakeholder** | nenhum | — |
 | 028 | 🧑 Notificação de falha de build ao ADMIN, com falha real | ⬜ TODO | orquestrador | nenhum | — |
-| 029 | 🧑 Ciclo ponta a ponta cronometrado (M-02) e o critério do §6.2 | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
 | 030 | Portão de conteúdo no CI: `content/` validado e referência resolvida | ✅ DONE | agente | implementer (sonnet) | `4343e42` |
 | 031 | Coerência do `tina-lock.json` verificada no CI | ✅ DONE | agente | implementer (sonnet) | `1de5d1d` |
 | 032 | `npm audit` no CI e política de severidade | ⬜ TODO | agente | implementer | — |
@@ -33,21 +41,20 @@ a palavra "aparece" pode significar aqui.
 **Numeração é global e contínua e não é ordem de execução** — precedentes registrados: o plano 014
 rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase está abaixo.
 
-> **O 027 está bloqueado no professor desde 2026-09-11**, por decisão do stakeholder: o convite do
-> TinaCloud **não foi criado**, então a segunda vaga do plano gratuito continua livre e nada foi
-> alterado no TinaCloud. Os passos de orquestrador que não dependem dele (8 e 9) já estão
-> executados e registrados na Evidência do plano; os passos 1 a 7 esperam a sessão. O `Status:`
-> continua `TODO` — o vocabulário de status deste projeto tem dois valores, e o bloqueio mora na
-> Evidência, não num terceiro valor inventado. **Isso trava a linha 027 → 029, não a fase:** o
-> 030, o 031, o 032 e o 033 são de agente e não dependem de pessoa nenhuma.
+> **Os planos 027 e 029 não estão mais nesta fase.** Estavam bloqueados no professor desde
+> 2026-09-11 — o convite do TinaCloud nunca foi criado, então a segunda vaga do plano gratuito
+> continua livre e nada foi alterado lá. Em **2026-09-12** o stakeholder decidiu migrá-los para
+> `../fase-5-polimento-e-entrega/`, com o número preservado; os passos de orquestrador do 027 que
+> não dependem do professor (8 e 9) continuam executados e registrados na Evidência do plano.
+> **Resta nesta fase um único plano que depende de gente — o 028 —, e a pessoa é o orquestrador,
+> não o professor.**
 
 ## Ordem de execução
 
 ```
-023  →  024  →  025  →  026  →  027  →  029
-                 │        │       │      ↑
-                 │        └───────┴──────┤
-                 └→ 028 (depois de 030) ─┘
+023  →  024  →  025  →  026            (os quatro DONE)
+                 │
+                 └→ 028   (depois também de 030, DONE)
 
 030 ∥ 031 ∥ 033   (a qualquer momento depois do 024; o 030 depende dele por package.json)
 032               (depois do 024, por ci.yml)
@@ -55,14 +62,13 @@ rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase 
 034  ←  todos
 ```
 
-**A espinha é serial e não tem atalho:** não se verifica o `/admin` em produção (026) antes de
-existir build automático que o publique (025), não se convida o professor (027) para um painel
-que ainda não se sabe se autentica, e não se cronometra o ciclo (029) antes de o EDITOR existir.
+**A espinha era serial e não tinha atalho:** não se verifica o `/admin` em produção (026) antes de
+existir build automático que o publique (025). Os dois elos que sobravam — convidar o professor
+(027) e cronometrar o ciclo com ele (029) — **saíram da fase em 2026-09-12** e passaram a abrir a
+fase 5, onde o 029 continua dependendo do 028 desta fase.
 
-**A recomendação prática é começar pela ponta que não depende de gente:** 023 → 024 e, em
-seguida, disparar **030, 031, 032 e 033** enquanto se agenda a sessão do professor. Isso põe o
-portão de conteúdo (030) no lugar **antes** do plano 028, que é quem demonstra a mensagem de erro
-chegando ao ADMIN — e é por isso que o 028 aparece fora da linha do meio no grafo.
+**O que resta é curto:** **032** e **033** são de agente e podem ser disparados já; o **028** é do
+orquestrador e tem seu pré-requisito (030) satisfeito; o **034** fecha a fase depois dos três.
 
 ### O que pode rodar em paralelo, e o que não pode
 
@@ -74,11 +80,13 @@ chegando ao ADMIN — e é por isso que o 028 aparece fora da linha do meio no g
 | 024 ∥ 030 | ❌ | **os dois editam `package.json`/`package-lock.json`** — conflito de lockfile, a restrição que a fase 0 aprendeu nos planos 002/004/005/007 |
 | 024 ∥ 032 | ❌ | os dois editam `.github/workflows/ci.yml` |
 | 031 ∥ 032 ∥ 024 ∥ 034 | ❌ entre si | **os quatro editam `README.md`**, em seções diferentes. Agentes em paralelo compartilham o mesmo working tree; serialize |
-| 025/026/027/028/029 entre si | ❌ | são serial por dependência lógica, não por arquivo |
-| qualquer plano ∥ 029 | ❌ | o 029 mede tempo de build; outro push na `main` durante a medição enfileira build (R-12) e contamina a amostra |
+| 025/026/028 entre si | ❌ | são serial por dependência lógica, não por arquivo |
+| qualquer plano ∥ 028 | ❌ | o 028 quebra a `main` de propósito; outro push durante a janela do experimento confunde qual commit derrubou o build |
 
-**A última linha é a mais fácil de esquecer.** Enquanto o plano 029 estiver cronometrando, a
-`main` fica congelada.
+**A última linha é a mais fácil de esquecer.** Enquanto o plano 028 estiver com a `main` quebrada
+de propósito, ninguém mais empurra nada. A restrição equivalente do plano 029 — `main` congelada
+durante as 10 medições de M-02 — **foi junto com ele para a fase 5**, e é uma das razões da
+migração: congelar a `main` agora, às vésperas da fase 3, sairia caro.
 
 ## Herdado da fase 1 — onde cada uma das sete dívidas caiu
 
@@ -194,11 +202,13 @@ funcionava porque a prova foi leitura de `node_modules` em vez de exercício da 
 prova é o que a tela respondeu**, transcrita ou capturada — inclusive nas linhas "✘" da matriz da
 §9, onde ausência de botão só conta se estiver descrita.
 
-**2. Quatro planos dependem de gente.** 025, 026 e 028 exigem o orquestrador logado em painéis;
-**027 e 029 exigem o professor**. Não substitua a sessão do EDITOR pela do ADMIN "porque deve dar
-igual" — é literalmente o que o §6.2 pede. Se o professor não estiver disponível, o plano fica
-**bloqueado e registrado**; critério de aceitação não se reescreve para caber no resultado (lição
-5 da fase 0).
+**2. Um plano ainda depende de gente — e a gente é você.** 025, 026 e **028** exigem o orquestrador
+logado em painéis; os dois que exigiam **o professor** (027 e 029) saíram da fase em 2026-09-12.
+A regra que eles levaram junto continua valendo lá: não substitua a sessão do EDITOR pela do ADMIN
+"porque deve dar igual" — é literalmente o que o critério pede. Se o professor não estiver
+disponível, o plano fica **bloqueado e registrado**; critério de aceitação não se reescreve para
+caber no resultado (lição 5 da fase 0). **O que mudou em 2026-09-12 não foi o critério ser
+afrouxado — foi ele ser transferido de fase, por inteiro, com a exigência intacta.**
 
 **3. O CI não é portão do deploy.** Os dois pipelines disparam no mesmo push e correm em paralelo;
 a Cloudflare não espera o `conclusion` do GitHub Actions. Quem impede conteúdo inválido de ir ao
@@ -215,9 +225,10 @@ e o `linha_relacionada: ''` não sumiram — nenhum deles é defeito nosso a con
 qualquer plano que salve pelo painel: **salve sem sair do subpainel** e **confira o arquivo
 gravado, campo a campo**. A tela não é prova.
 
-**6. Duas vagas, e as duas ocupadas.** Ao fim do plano 027 o plano gratuito do TinaCloud está
-cheio (A-01). Um terceiro editor exige plano pago ou Decap (R-03, R-04). Comunique ao stakeholder
-na hora, não na fase 5.
+**6. Duas vagas, uma livre — e ela some na fase 5.** O plano gratuito do TinaCloud tem duas vagas,
+e hoje **só a do ADMIN está ocupada**: o convite do professor nunca chegou a ser criado. Ao fim do
+plano 027, já na fase 5, o plano fica cheio (A-01) e um terceiro editor passa a exigir plano pago
+ou Decap (R-03, R-04).
 
 **7. O `npm run dev` não sobe o painel no Astro 7.** Se algum plano precisar do painel **local**,
 o caminho é `npx astro dev --background --force` + `npx tinacms dev`, e o encerramento é

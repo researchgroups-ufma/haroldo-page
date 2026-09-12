@@ -1,7 +1,8 @@
 # Plano 028 — Notificação de falha de build ao ADMIN, demonstrada com uma falha real
 
 **Status:** TODO
-**RFs cobertos:** **F-02**, **F-09**, RNF-04, R-01; fluxo E da §8.1; fase 2, **item 6** do §12
+**RFs cobertos:** **F-02**, **F-09**, RNF-04, R-01; fluxo E da §8.1; fase 2, **item 4** do §12 (era o item 6 até 2026-09-12, quando três itens da fase
+migraram para a fase 5)
 **Depende de:** planos **025** (Workers Builds no ar) e **030** (o portão de conteúdo é o que
 produz a mensagem legível que este plano demonstra)
 **Modelo recomendado:** — (execução humana: painel da Cloudflare, caixa de e-mail, push
