@@ -8,7 +8,7 @@ on:
   # ultimo (o ADMIN); o de `push` iria para quem empurrou, que num save do professor e o TinaCloud.
   # 12:17 UTC (09:17 em Brasilia), fora da hora cheia, quando o GitHub atrasa agendamentos.
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '17 12 * * *'
   workflow_dispatch:
 
 permissions:
