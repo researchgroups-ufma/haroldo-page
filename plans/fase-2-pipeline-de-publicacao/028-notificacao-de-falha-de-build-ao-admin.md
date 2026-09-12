@@ -5,12 +5,15 @@
 migraram para a fase 5)
 **Depende de:** planos **025** (Workers Builds no ar) e **030** (o portão de conteúdo é o que
 produz a mensagem legível que este plano demonstra)
-**Modelo recomendado:** — (execução humana: painel da Cloudflare, caixa de e-mail, push
+**Emendado em 2026-09-12** pelo stakeholder: a Cloudflare não oferece notificação de falha do
+Workers Builds, e o canal passa a ser um **vigia agendado no GitHub Actions**. Ver "A emenda de
+2026-09-12".
+**Modelo recomendado:** — (execução do orquestrador: workflow curto, caixa de e-mail, push
 controlado na `main`)
 **Agente recomendado:** nenhum
-**Executável por:** **orquestrador** — exige configuração de notificação no painel da Cloudflare,
-acesso à caixa de e-mail do ADMIN e um push deliberadamente quebrado na `main`, revertido em
-seguida. **Não depende do professor.**
+**Executável por:** **orquestrador**, com o ADMIN em dois passos — as configurações de notificação
+da conta GitHub e a caixa de e-mail. Inclui um push deliberadamente quebrado na `main`, revertido
+em seguida. **Não depende do professor.**
 **PRD:** `S:\Projetos\academic_page\haroldo\PRD.md`
 **Projeto:** `S:\Projetos\academic_page\haroldo`
 
@@ -25,7 +28,9 @@ falha real prova apenas que existe um formulário preenchido.
 
 ## Arquivos afetados
 
-- **Nenhum arquivo de código permanente.**
+- `.github/workflows/vigia-do-deploy.yml` — **novo**, o único arquivo permanente (emenda de
+  2026-09-12).
+- `docs/adr/0011-vigia-agendado-da-falha-de-build.md` — **novo**, a decisão e as alternativas.
 - `content/**` — **um** arquivo recebe conteúdo deliberadamente inválido, é empurrado para a
   `main`, e é **revertido no mesmo dia**, assim que a notificação e o log forem capturados.
 
@@ -71,7 +76,76 @@ que não existe) provaria outra coisa.
 
 Registre na Evidência **por que** este erro e não outro.
 
+### A emenda de 2026-09-12 — por que o plano ganhou um arquivo de código
+
+O passo 1 original parou exatamente na condição que este plano previa ("se a Cloudflare não
+oferecer notificação de build no plano gratuito, isso é um achado que muda o desenho — registre e
+pare"). Medição do orquestrador em 2026-09-12, com o MCP da Cloudflare autenticado na conta
+`98e35087677f329c2adbf68711ecebbf`:
+
+- `GET /accounts/<id>/alerting/v3/available_alerts` devolve 30 grupos. **Nenhum tipo cita Workers
+  Builds.** Os dois mais próximos não servem: `pages_event_alert` é do Cloudflare Pages (este
+  projeto é Worker) e `workers_observability_alert` avisa de erro do Worker **em runtime**, não
+  do build.
+- `GET /accounts/<id>/alerting/v3/policies` devolve lista vazia.
+- A documentação da Cloudflare (changelog de 2026-01-09, "Get notified when your Workers builds
+  succeed or fail") oferece **só** Event Subscriptions: o Workers Builds publica eventos numa
+  **Queue** e um **Worker seu** consome e envia a mensagem. Não existe "mande e-mail" nativo.
+- O ADMIN conferiu o painel e confirmou: **não há opção de notificação de build**.
+
+**Decisão do stakeholder (opção C):** um workflow **agendado** no GitHub Actions lê o check run
+`Workers Builds: haroldo-page` do commit mais recente da `main` e **reprova** se o build de deploy
+falhou. A reprovação gera o e-mail de falha do próprio GitHub para o ADMIN. Alternativas
+rejeitadas, a registrar no ADR-0011:
+
+- **A — Queue + Worker notificador.** Rejeitada: infraestrutura nova na conta (que é compartilhada
+  com outro projeto), e e-mail saindo de Worker exige Email Routing com domínio verificado, que o
+  projeto não tem.
+- **B — contar com o e-mail do CI (`ci.yml`).** Rejeitada: o CI não é o build de deploy
+  (ADR-0009). Os dois rodam o mesmo `build:pipeline`, mas podem divergir (ambiente, variáveis,
+  falha de plataforma), e um CI verde com deploy vermelho passaria em silêncio.
+
+**Três fatos de plataforma que decidem o desenho** — da documentação do GitHub, "Events that
+trigger workflows", seção `schedule`, conferida em 2026-09-12:
+
+1. *"Notifications for scheduled workflows are sent to the user who last modified the cron
+   syntax in the workflow file."* **É por isso que o gatilho é `schedule` e não `push`.** Num
+   workflow de `push`, o e-mail vai para quem empurrou — e quando o professor salva pelo painel,
+   quem empurra é o TinaCloud. O F-02 é justamente esse caso. Quem escreve o cron é o ADMIN
+   (`abbadrava`).
+2. *"In a public repository, scheduled workflows are automatically disabled when no repository
+   activity has occurred in 60 days."* O repositório é público. **Risco nomeado, não resolvido
+   aqui:** se o professor passar 60 dias sem editar, o vigia desliga sozinho, e o primeiro save
+   depois disso não é vigiado. Vai para o ADR-0011 e para o manual do ADMIN (§10.5).
+3. *"The `schedule` event can be delayed during periods of high loads... High load times include
+   the start of every hour."* O cron não roda na hora cheia.
+
+**Fonte do resultado: o check run, não a API da Cloudflare** (decisão do stakeholder). O Workers
+Builds já grava `Workers Builds: haroldo-page` em cada commit (visto nos commits `7ab84da` e
+`78d5305`, app `cloudflare-workers-and-pages`). Ler pelo GitHub dispensa secret novo: basta o
+`GITHUB_TOKEN` com `checks: read`. **Commit com mais de 30 minutos e sem esse check também
+reprova**, porque a ausência do check é o sintoma do app GitHub ↔ Cloudflare desconectado, e isso
+já aconteceu no plano 025.
+
+**Frequência: uma vez por dia** (decisão do stakeholder: *"não será um site com atualizações
+constantes. É apenas para caso um dia tenha um erro, e eu fique sabendo antes mesmo do professor
+precisar perceber"*). Consequências aceitas: o aviso chega em até ~24 h, e enquanto a `main`
+continuar quebrada chega **um e-mail por dia**. O vigia olha só o commit mais recente: se um save
+quebrado for seguido de um save válido antes da execução, não há aviso, e é o correto, porque o
+site já foi atualizado.
+
+**Como provar o caminho agendado sem esperar 24 h.** `workflow_dispatch` prova a detecção, mas o
+e-mail de uma execução manual segue outra regra (vai para quem disparou). Para exercitar o caminho
+**real**, o commit quebrado do experimento muda **temporariamente** o cron para `*/5 * * * *`, e
+o commit de reversão devolve o cron diário. Os dois commits são do ADMIN, então a regra do fato 1
+continua apontando para ele. Custo: a janela de `main` quebrada passa a durar o atraso do agendador
+(dezenas de minutos), com o site no ar na versão anterior o tempo todo, que é o que se quer provar.
+
 ### Dois canais de notificação, e só um deles importa para F-02
+
+> **Superado pela emenda de 2026-09-12** no item 1: a Cloudflare não notifica, e o canal de F-02
+> passa a ser o vigia agendado, que lê o resultado do build **de deploy**. O item 2 continua
+> valendo: o e-mail do `ci.yml` é canal secundário.
 
 1. **Cloudflare Workers Builds** — é o build **do deploy**. É ele que decide se o site atualiza.
    A notificação da Cloudflare é a que satisfaz F-02/RNF-04. Configure-a para o e-mail do ADMIN
@@ -97,7 +171,9 @@ mover o deploy para o GitHub Actions, plano B da §7.4) é decisão nova, não c
 ### O que este plano NÃO faz
 
 - ⛔ **Não escreve o portão de conteúdo** — é o plano 030.
-- ⛔ **Não mexe no `ci.yml`** nem em `package.json`.
+- ⛔ **Não mexe no `ci.yml`** nem em `package.json`. O vigia é workflow **separado**: tem gatilho,
+  permissões e destinatário de e-mail diferentes, e misturá-lo ao portão de qualidade faria o
+  e-mail do vigia seguir a regra do `push`.
 - ⛔ **Não escreve o manual do professor** — os avisos consolidados são o plano 033, entrega para
   a fase 5.
 - ⛔ **Não cronometra o ciclo feliz** (M-02 é o plano 029).
@@ -108,16 +184,31 @@ mover o deploy para o GitHub Actions, plano B da §7.4) é decisão nova, não c
 
 ## Passos
 
-1. 🧑 Configurar, no painel da Cloudflare, a notificação de **falha de build** do Workers Builds
-   para o e-mail do ADMIN.
-   → verify: cole o que o painel mostra na notificação criada — evento, destino, estado.
+0. ~~Configurar no painel da Cloudflare~~ — **não existe** (emenda de 2026-09-12). A medição que
+   provou isso está na emenda e é copiada para a Evidência.
+1. 🧑 **Configurações de notificação do ADMIN no GitHub** (`github.com/settings/notifications`):
+   em *System → Actions*, e-mail marcado e "only notify for failed workflows"; e o e-mail padrão
+   de notificação da conta `abbadrava`.
+   → verify: cole o que a tela mostra nos dois lugares. Sem isso, um vigia vermelho pode não gerar
+   e-mail nenhum.
+1a. 🤖 Escrever `.github/workflows/vigia-do-deploy.yml`: gatilhos `schedule` (diário, fora da
+   hora cheia) e `workflow_dispatch`; `permissions: checks: read, contents: read`; lê o commit
+   mais recente da `main` e o check run `Workers Builds: haroldo-page`; **reprova** em
+   `conclusion` diferente de `success`, `neutral` ou `skipped`, e em commit com mais de 30 min sem
+   o check; **passa** com o build ainda em andamento; imprime SHA, conclusão e link do build. E
+   escrever o ADR-0011.
+   → verify: `npm run format:check` verde; o workflow empurrado e disparado por
+   `workflow_dispatch` sobre a `main` **válida** termina `success`, com o log mostrando o SHA e o
+   check lidos. **Prove que ele consegue reprovar**: cole a saída de uma execução local da mesma
+   lógica contra um commit cujo check falhou, ou deixe a prova para o passo 5a.
 2. 🤖/🧑 Registrar a linha de base **antes** de quebrar: id da versão publicada hoje, horário, e
    `curl.exe -sI https://haroldo-page.and-near.workers.dev/` com o `etag`/status.
    → verify: os três valores colados. Sem isso não se prova que a versão anterior permaneceu.
 3. 🤖/🧑 Preparar o commit quebrado **e o de reversão**, nesta ordem, antes de empurrar qualquer
-   coisa: acrescentar `aulas: [ {} ]` (item com `numero`, `titulo` e `url` vazios) a
-   `content/disciplinas/2025.1-mecanica-classica.md`, e confirmar localmente que
-   `npx vitest run tests/content` reprova nomeando arquivo e campo.
+   coisa. O quebrado faz **duas** mudanças: acrescenta `aulas: [ {} ]` (item com `numero`,
+   `titulo` e `url` vazios) a `content/disciplinas/2025.1-mecanica-classica.md` **e** troca o cron
+   do vigia para `*/5 * * * *` (emenda de 2026-09-12). A reversão desfaz as duas. Confirme
+   localmente que `npx vitest run tests/content` reprova nomeando arquivo e campo.
    → verify: a saída local do vitest colada — é a mensagem que se espera ver no log do build.
 4. 🧑 Empurrar o commit quebrado para a `main`, anotando o horário exato.
    → verify: SHA e horário colados.
@@ -129,13 +220,21 @@ mover o deploy para o GitHub Actions, plano B da §7.4) é decisão nova, não c
    → verify: `curl.exe -sI` na raiz devolvendo 200, o id de versão publicada **igual** ao da linha
    de base do passo 2, e o horário da conferência. Confirme também que o arquivo inválido
    **permanece no repositório** (F-02: "o conteúdo salvo permanece para correção").
-7. 🧑 Capturar a notificação: e-mail recebido pelo ADMIN.
+5a. 🤖 Acompanhar a primeira execução **agendada** do vigia depois da falha (evento `schedule`, não
+   `workflow_dispatch`).
+   → verify: id do run, `event: schedule`, `conclusion: failure`, horário de início, e o trecho do
+   log que nomeia o SHA quebrado e o link do build da Cloudflare.
+7. 🧑 Capturar a notificação: e-mail recebido pelo ADMIN **gerado pelo run agendado do passo 5a**.
    → verify: cole remetente, assunto, horário de chegada e o trecho do corpo que identifica o
-   projeto e o build. **Calcule e registre o atraso** entre a falha (passo 5) e a chegada. Registre
-   também se chegou e-mail do GitHub Actions, e em quanto tempo — como canal secundário.
-8. 🧑 Reverter: empurrar o commit de reversão e confirmar que o build volta a passar e publica.
+   repositório e o workflow `vigia-do-deploy`. **Calcule e registre dois atrasos**: da falha do
+   build (passo 5) ao início do run agendado, e do fim do run à chegada do e-mail. Registre também
+   se chegou o e-mail do `ci.yml`, e em quanto tempo, como canal secundário.
+8. 🧑 Reverter: empurrar o commit de reversão (conteúdo válido **e** cron diário de volta) e
+   confirmar que o build volta a passar e publica.
    → verify: SHA da reversão, build verde, **id de versão novo**, horário. Cole a janela total em
-   que a `main` ficou quebrada.
+   que a `main` ficou quebrada. Confirme por `git show HEAD:.github/workflows/vigia-do-deploy.yml`
+   que o cron voltou a ser o diário. E dispare o vigia por `workflow_dispatch` sobre a reversão:
+   tem de terminar `success`.
 9. 🧑 Julgar a legibilidade da mensagem contra F-09 e §8.2 e registrar o veredito, com a mensagem
    literal.
    → verify: a mensagem nomeia **arquivo** e **campo**? Se sim, F-09 está satisfeito e a evidência
@@ -144,8 +243,13 @@ mover o deploy para o GitHub Actions, plano B da §7.4) é decisão nova, não c
 
 ## Critérios de aceitação
 
-- [ ] Notificação de falha de build configurada na Cloudflare para o e-mail do ADMIN, com a tela
-      do painel transcrita
+- [ ] Ausência de notificação nativa na Cloudflare registrada com a medição da API e a confirmação
+      do painel (emenda de 2026-09-12)
+- [ ] `.github/workflows/vigia-do-deploy.yml` com gatilho `schedule` diário, `workflow_dispatch`,
+      permissões mínimas, e reprovando em build falho **e** em check ausente há mais de 30 min
+- [ ] ADR-0011 escrito, com as alternativas A e B rejeitadas e o **risco dos 60 dias** nomeado
+- [ ] Configurações de notificação de Actions da conta do ADMIN transcritas
+- [ ] **Execução agendada** (`event: schedule`) do vigia reprovando sobre o commit quebrado
 - [ ] Linha de base registrada antes do experimento: id de versão, horário e resposta HTTP
 - [ ] Falha injetada com o **erro real do professor** (`aulas: [ {} ]`), com a justificativa
       registrada
@@ -154,7 +258,8 @@ mover o deploy para o GitHub Actions, plano B da §7.4) é decisão nova, não c
       durante a janela de falha, com horário
 - [ ] **F-02 provado:** e-mail de falha recebido pelo ADMIN — remetente, assunto, horário e atraso
       calculado; e o arquivo inválido permanecendo no repositório
-- [ ] Canal secundário (GitHub Actions) registrado, sem ser tratado como o canal de F-02
+- [ ] Canal secundário (e-mail do `ci.yml`) registrado, sem ser tratado como o canal de F-02
+- [ ] Cron do vigia **de volta ao diário** na `main` depois da reversão, e vigia `success` sobre ela
 - [ ] **F-09 avaliado com a mensagem literal**: veredito explícito sobre nomear arquivo e campo;
       lacuna, se houver, registrada como pendência nomeada
 - [ ] Reversão empurrada, build verde e **versão nova publicada**, com a janela total de quebra
