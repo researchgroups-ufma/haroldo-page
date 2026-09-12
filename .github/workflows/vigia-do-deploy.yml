@@ -1,0 +1,62 @@
+name: Vigia do deploy
+
+# A Cloudflare nao notifica falha do Workers Builds (plano 028). Este workflow le o resultado do
+# build de deploy no check run do commit mais recente da `main` e reprova se ele falhou — a
+# reprovacao e o que gera o e-mail do GitHub ao ADMIN (F-02, RNF-04). Decisao em ADR-0011.
+on:
+  # `schedule`, e nao `push`: o e-mail de um workflow agendado vai para quem alterou o cron por
+  # ultimo (o ADMIN); o de `push` iria para quem empurrou, que num save do professor e o TinaCloud.
+  # 12:17 UTC (09:17 em Brasilia), fora da hora cheia, quando o GitHub atrasa agendamentos.
+  schedule:
+    - cron: '17 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  checks: read
+  contents: read
+
+jobs:
+  build-de-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conferir o Workers Builds do commit mais recente da main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CHECK: 'Workers Builds: haroldo-page'
+        run: |
+          set -euo pipefail
+          sha=$(gh api "repos/$REPO/commits/main" --jq .sha)
+          data=$(gh api "repos/$REPO/commits/$sha" --jq .commit.committer.date)
+          echo "commit: $sha ($data)"
+
+          check=$(gh api --method GET "repos/$REPO/commits/$sha/check-runs" -f check_name="$CHECK" \
+            --jq '.check_runs[0] // empty | [.status, (.conclusion // "-"), .details_url] | @tsv')
+
+          # O Workers Builds so cria o check ao terminar. Sem check ha mais de 30 min, o build nao
+          # foi registrado — sintoma do app GitHub <-> Cloudflare desconectado (plano 025).
+          if [ -z "$check" ]; then
+            idade=$(( $(date +%s) - $(date -d "$data" +%s) ))
+            if [ "$idade" -gt 1800 ]; then
+              echo "::error::Nenhum '$CHECK' em $sha, $(( idade / 60 )) min depois do commit."
+              exit 1
+            fi
+            echo "Sem '$CHECK' ainda, commit com $(( idade / 60 )) min: build em andamento."
+            exit 0
+          fi
+
+          IFS=$'\t' read -r status conclusao url <<< "$check"
+          echo "check: status=$status conclusion=$conclusao"
+          echo "build: $url"
+
+          if [ "$status" != "completed" ]; then
+            echo "Build ainda em andamento."
+            exit 0
+          fi
+          case "$conclusao" in
+            success | neutral | skipped) echo "Build de deploy verde." ;;
+            *)
+              echo "::error::Build de deploy de $sha terminou '$conclusao'. O site segue na versao anterior. Log: $url"
+              exit 1
+              ;;
+          esac
