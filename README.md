@@ -93,7 +93,7 @@ deixou o CI vermelho por 14 commits antes de os secrets serem configurados. `npm
 | `npm run test`           | Roda a suíte de testes (Vitest) uma vez                                                                                                                                                                                                                                                                                                                                                     |
 | `npm run test:watch`     | Roda a suíte em modo watch                                                                                                                                                                                                                                                                                                                                                                  |
 | `npm run test:coverage`  | Roda a suíte com relatório de cobertura                                                                                                                                                                                                                                                                                                                                                     |
-| `npm run deploy`         | `npm run build` seguido de `wrangler deploy` (deploy manual)                                                                                                                                                                                                                                                                                                                                |
+| `npm run deploy`         | `npm run build` seguido de `wrangler deploy` — caminho manual de emergência (com cloud check — ver [Deploy](#deploy))                                                                                                                                                                                                                                                                       |
 
 ## Estrutura de pastas
 
@@ -106,7 +106,7 @@ haroldo-page/
 ├── package.json
 ├── .nvmrc
 ├── .env.example
-├── .github/workflows/    # CI: lint, format:check, test:coverage, build:pipeline
+├── .github/workflows/    # ci.yml (audit, lint, format:check, test:coverage, build:pipeline) e vigia-do-deploy.yml (notifica o ADMIN)
 ├── content/              # ← domínio do PROFESSOR (via painel, quando existir)
 │   ├── perfil/
 │   ├── linhas-pesquisa/
@@ -166,19 +166,115 @@ derrubar em seguida) e commitar o `tina/tina-lock.json` atualizado junto com a m
 schema. A coerência entre os dois arquivos é verificada automaticamente por
 `tests/content/tina-lock-coerente.test.ts`, que reprova a suíte se o lock ficar defasado.
 
+## Pipeline de publicação
+
+Desde 2026-09-11 (fase 2, planos 025 e 026) o deploy é **automático**: todo push na `main`
+dispara, ao mesmo tempo, dois pipelines independentes — o CI (`.github/workflows/ci.yml`, o
+portão de qualidade) e o Cloudflare Workers Builds (o build que de fato publica). Esta seção
+responde às cinco perguntas que quem chega sem contexto precisa fazer. Os números vêm das
+Evidências dos planos citados — nada aqui é estimado.
+
+**1. O que acontece quando o professor clica em Salvar.** A cadeia inteira é: painel (`/admin`) →
+TinaCloud (grava o commit) → `main` no GitHub → Cloudflare Workers Builds dispara → roda
+`npm run build:pipeline` → `npx wrangler deploy` → versão nova no Worker. Tempos **medidos**, não
+estimados: o primeiro build automático da fase levou **2m02s**, do início ao fim (plano 025, build
+`ace5b1b9`); uma edição real salva pelo painel disparou o build seguinte **2 s** depois do commit
+(plano 026, build `8aa9d0db`); e no experimento do plano 028, um build de reversão bem-sucedido
+levou **1m59s** (`43d03ba9`, 22:05:30Z→22:07:29Z) e um build que falhou por conteúdo inválido levou
+**47 s** (`f9650b87`, 20:34:27Z→20:35:14Z — falha rápida porque o portão de conteúdo roda primeiro).
+**O que isto não mede:** o ciclo ponta a ponta do professor até uma página exibindo o texto novo
+(M-02). Não existe página que renderize conteúdo até a fase 3 — o que está medido acima é a cadeia
+até a versão nova publicada no Worker. M-02 é medida (e remedida) só na **fase 5** (plano 029),
+com o site público já existindo.
+
+**2. Quem roda o quê.** O GitHub Actions (job `qualidade`) e o Cloudflare Workers Builds disparam
+no **mesmo push** e **correm em paralelo** — a Cloudflare não espera o `conclusion` do CI antes de
+publicar (confirmado nos planos 025, 026, 030 e 031: os dois check runs aparecem juntos no mesmo
+commit, cada um com seu próprio resultado). **O CI não é portão do deploy.** O que protege o site
+de conteúdo inválido é o próprio `build:pipeline` **do build de deploy**: ele roda
+`vitest run tests/content` antes de qualquer outra coisa, e é esse portão (arquivo inválido em
+`content/`, plano 030; `tina/tina-lock.json` defasado, plano 031) que aborta o deploy se o
+conteúdo não validar. Isso é deliberado —
+[`docs/adr/0009-build-de-pipeline-sem-cloud-check.md`](docs/adr/0009-build-de-pipeline-sem-cloud-check.md) —
+e contraria a expectativa comum de que "CI verde" implica "seguro para publicar": aqui os dois são
+independentes.
+
+**3. Onde vive cada variável de ambiente.** Três lugares, e nenhum deles é o mesmo tipo de coisa:
+`.env` local (máquina do desenvolvedor, fora do versionamento); secrets do GitHub Actions
+(`TINA_CLIENT_ID` e `TINA_TOKEN`, injetados no passo de build do `ci.yml` desde `82fb4de`); e as variáveis de **build** do Cloudflare Workers Builds (`TINA_CLIENT_ID`,
+`PUBLIC_SITE_URL` e `TINA_TOKEN`, em _Settings → Build → Build variables and secrets_ — **não** em
+_Settings → Variables & Secrets_, que é para variáveis de **runtime** e que a própria plataforma
+recusa aqui: _"Variables cannot be added to a Worker that only has static assets"_, achado do
+plano 025, e é a D-01 sendo cumprida pela plataforma). Só **`TINA_TOKEN`** é segredo — mascarado em
+todo painel e nunca colado em nenhuma Evidência. `TINA_CLIENT_ID` e `PUBLIC_SITE_URL` não são:
+o primeiro fica embutido em texto claro no bundle do painel (verificado no plano 026), o segundo é
+prefixado `PUBLIC_` de propósito. Ver [Variáveis de ambiente](#variáveis-de-ambiente) e §7.6 do
+PRD para o detalhamento de cada uma. `TINA_BRANCH` não é necessária nos pipelines automáticos:
+`tina/config.ts` já cai em `'main'` por padrão.
+
+**4. O que acontece quando o build falha.** Comportamento medido no experimento controlado do
+plano 028 (erro real do professor — um item de lista salvo com subcampo obrigatório vazio):
+o site **continua no ar com a versão anterior** (RNF-04 — a versão publicada não mudou durante
+1h33 de `main` quebrada), o conteúdo inválido **permanece no repositório** para correção (F-02), e
+o log do build nomeia **o arquivo e o campo** que quebraram, no formato de F-09 (ex.:
+`content/disciplinas/2025.1-mecanica-classica.md → campo 'aulas.0.numero': expected number`).
+**Como o ADMIN fica sabendo:** a Cloudflare **não** oferece notificação nativa de falha do Workers
+Builds (medido no plano 028: `alerting/v3/available_alerts` sem nenhum tipo para Workers Builds, e
+o painel confirma a ausência da opção). O aviso vem de
+[`.github/workflows/vigia-do-deploy.yml`](.github/workflows/vigia-do-deploy.yml) — um workflow
+**agendado uma vez por dia** (12:17 UTC) mais `workflow_dispatch`, que lê o check run
+`Workers Builds: haroldo-page` do commit mais recente da `main` e **reprova** se esse build falhou,
+ou se o check está ausente há mais de 30 min (sintoma do app GitHub↔Cloudflare desconectado, como
+no plano 025). A reprovação do workflow é o que gera o e-mail de falha do GitHub ao ADMIN — decisão
+e alternativas rejeitadas em
+[`docs/adr/0011-vigia-agendado-da-falha-de-build.md`](docs/adr/0011-vigia-agendado-da-falha-de-build.md).
+**Para diagnosticar:** o link do build da Cloudflare vem no próprio log do vigia (ex.: run de
+`workflow_dispatch`, plano 028); o log do build lá mostra a mesma mensagem de arquivo e campo.
+Quatro coisas que quem mantém o projeto precisa saber:
+
+- **O vigia desliga sozinho.** _"In a public repository, scheduled workflows are automatically
+  disabled when no repository activity has occurred in 60 days."_ Se passarem 60 dias sem
+  atividade neste repositório público, o vigia para de rodar sozinho — reative em
+  _Actions → Vigia do deploy → Enable workflow_.
+- **O destinatário do e-mail é quem alterou o cron por último**, não um endereço fixo — é assim
+  que o GitHub trata notificação de workflow agendado. Trocar de ADMIN implica essa pessoa
+  commitar a linha `cron:` do arquivo.
+- **O assunto do e-mail não diz qual workflow falhou.** O assunto `Run failed` foi transcrito para
+  o e-mail do CI (plano 028); para o do vigia, só o horário e o trecho do corpo
+  ("Vigia do deploy: All jobs have failed") foram transcritos, e o mesmo assunto `Run failed` é
+  **inferido** pela forma do e-mail do CI, não medido diretamente. De um jeito ou de outro, só o
+  corpo do e-mail diz qual dos dois workflows falhou.
+- **Pendência nomeada, ainda aberta:** o caminho `schedule` (o cron diário) nunca foi observado
+  rodando de fato — o plano 028 provou a detecção e o e-mail só via `workflow_dispatch` disparado
+  manualmente, cujo e-mail segue outra regra (vai para quem disparou). Fecha quando aparecer ao
+  menos uma execução `event: schedule` no histórico do workflow, seguida de uma falha real
+  notificada por ela (condição escrita no ADR-0011).
+
+**5. O que fazer para mudar o schema**, agora que os pipelines automáticos não rodam o cloud check
+do TinaCloud (ADR-0009): a ordem continua sendo revisão → commit → push → TinaCloud reindexa a
+`main` → `npm run build` **local, com cloud check**, verde. Além disso, quem mudar
+`tina/config.ts` precisa subir `npx tinacms dev` uma vez (só para deixá-lo indexar e derrubar em
+seguida) e commitar o `tina/tina-lock.json` atualizado junto — é o único artefato do Tina que fica
+versionado, e é dele que o TinaCloud depende para indexar a branch. Desde o plano 031, essa
+coerência deixou de ser só documentação: `tests/content/tina-lock-coerente.test.ts` compara a
+árvore declarativa dos dois arquivos e reprova a suíte (no CI e no `build:pipeline`) se o lock
+ficar defasado — ver [Painel de edição](#painel-de-edição).
+
 ## Deploy
 
-Hoje o deploy é **manual**:
+`npm run deploy` continua existindo, mas como **caminho manual de emergência** — não é o caminho
+normal desde que o Workers Builds foi ligado ao repositório (plano 025, 2026-09-11). A diferença
+importa: os dois pipelines automáticos rodam `npm run build:pipeline` (sem cloud check —
+ADR-0009), enquanto `npm run deploy` roda `npm run build`, **com** o cloud check do TinaCloud —
+o comando mais estrito é o certo numa máquina onde o que está no disco pode não estar em `main`.
+Use-o só se o Workers Builds estiver indisponível:
 
 ```bash
 npm run deploy
 ```
 
-Isso roda `astro build` (gera `dist/`) e em seguida `wrangler deploy`, que publica o
+Isso roda `npm run build` (gera `dist/`) e em seguida `wrangler deploy`, que publica o
 conteúdo de `dist/` no Cloudflare Workers (Static Assets), conforme `wrangler.toml`.
-
-O deploy automático a cada push na branch principal (Cloudflare Workers Builds conectado ao
-repositório) só é ligado na **fase 2** do PRD.
 
 O site é servido inteiramente como assets estáticos, sem SSR e sem adapter (decisão D-01 do
 PRD): não há código rodando por requisição, então **nunca adicione um `adapter` ao
@@ -205,8 +301,10 @@ npm run test
 npm run build
 ```
 
-O CI (`.github/workflows/ci.yml`) roda `npm ci` → `lint` → `format:check` → `test:coverage` →
-`build:pipeline` em todo push e pull request para `main` — o último passo troca `npm run build`
+O CI (`.github/workflows/ci.yml`) roda `npm ci` → `npm audit --audit-level=high` → `lint` →
+`format:check` → `test:coverage` → `build:pipeline` em todo push e pull request para `main`. O
+passo de audit reprova em `high`/`critical` e só relata `moderate`/`low` (`docs/adr/0010-npm-audit-no-ci-e-severidade.md`).
+O último passo troca `npm run build`
 por `npm run build:pipeline` porque o cloud check do TinaCloud não é sinal de defeito do pipeline
 em nenhum dos dois gatilhos: em push para `main` o commit já está lá por construção e o que
 resta é uma corrida contra a reindexação assíncrona, e em pull request o schema do branch nunca

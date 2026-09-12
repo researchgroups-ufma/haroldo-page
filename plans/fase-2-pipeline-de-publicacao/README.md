@@ -192,6 +192,82 @@ Static Assets é `auto-trailing-slash`. Nenhuma das três formas dá 404 e o nav
 redirecionamento, então **não há defeito a corrigir** — fica registrado para que ninguém volte a
 gastar tempo investigando o salto extra.
 
+## O que a fase 2 empurra adiante, e as dívidas que ela criou
+
+Além das sete dívidas herdadas da fase 1 (tabela acima), a própria fase 2 gerou pendências. Nenhuma
+foi consertada aqui — a regra deste README é destino nomeado, não conserto de passagem.
+
+**Para a fase 3:**
+
+- a dívida **7(b)** do teste de paridade (ver tabela acima) — ganha teste quando existir campo com
+  `list: true` **e** `options`;
+- a renderização de conteúdo, sem a qual M-02 não é verificável de ponta a ponta (ver seção
+  seguinte);
+- **`not_found_handling` (`wrangler.toml`) ainda não provado de fato.** Medido no plano 025: a rota
+  inexistente responde 404 (o critério do plano estava cumprido), mas com **corpo vazio**,
+  indistinguível do default `none` — porque `dist/` só tem `index.html` (`src/pages/` ainda não tem
+  uma página 404). A configuração só se prova quando existir `404.html` no build, o que é a **RF-27
+  da fase 3**.
+
+**Para a fase 5:**
+
+- `docs/avisos-do-painel-para-o-manual.md` (plano 033) como insumo obrigatório de
+  `docs/manual-do-professor.md` (§10.5) — os cinco avisos, mais a decisão de que a dívida 4 não é
+  automatizável;
+- a remedição de M-02 e o próprio ciclo do EDITOR (planos 027 e 029, migrados em 2026-09-12);
+- o teste de restauração de conteúdo excluído (§9);
+- os dois achados do plano 026 (vocabulário de arquivo um clique adiante do menu; trilha de
+  navegação truncada no ponto) — ver seção "Achados do plano 026 que o 033 tem de absorver";
+- **o risco dos 60 dias de inatividade do vigia** (ADR-0011): workflow agendado em repositório
+  público desliga sozinho sem atividade por 60 dias, e o manual do ADMIN precisa dizer como
+  reativar (*Actions → Vigia do deploy → Enable workflow*);
+- **o assunto do e-mail de falha não nomeia o workflow** (plano 028): o assunto `Run failed` foi
+  transcrito para o e-mail do CI; para o do vigia, só horário e corpo foram transcritos, e o mesmo
+  assunto é **inferido** pela forma do e-mail do CI, não medido — de um jeito ou de outro, só o
+  corpo distingue os dois. O manual do ADMIN precisa dizer onde olhar para saber qual dos dois
+  falhou.
+
+**Dívidas novas da própria fase 2, sem fase específica atribuída:**
+
+- **A pendência do caminho `schedule` do vigia (ADR-0011).** O cron diário nunca foi observado
+  rodando: no experimento do plano 028 o GitHub não executou nenhuma execução `event: schedule` em
+  ~90 min, e a detecção/e-mail foram provados só por `workflow_dispatch` (cujo e-mail segue outra
+  regra). **Fecha quando:** aparecer ao menos uma execução `event: schedule` no histórico do
+  workflow, seguida de uma falha real notificada por ela — condição escrita no próprio ADR-0011.
+  Não bloqueia nada além de si mesma; é pendência de observação, não de código.
+- **Três moderadas com correção disponível, ficaram de fora de propósito** (`qs`, `body-parser`,
+  `express` — ADR-0010, 2026-09-12). Têm `fixAvailable: true` no `npm audit`, mas não foram
+  corrigidas: são `moderate` e não afetam o portão (que só reprova em `high`/`critical`), e
+  corrigi-las exigiria rodar `npm audit fix`, cujo churn de lockfile esta fase manda desconfiar
+  (lição da fase 0, planos 002/004/005/007) — seria escopo especulativo dentro de um plano (o 032)
+  que já mexia em dependência (ADR-0010, "Contexto"). Pendência nomeada no próprio ADR-0010; o ADR
+  não atribui gatilho de revisão específico a ela.
+- **A normalização de `linha_relacionada` está duplicada** (achado do plano 030).
+  `normalizeLinhaRelacionadaId` (`src/content.config.ts:247`) é `const` **não exportada**, então
+  `tests/content/conteudo-valido.test.ts` re-implementa suas duas regexes à mão. São idênticas
+  hoje, mas podem divergir em silêncio — a mesma família de defeito que a D-06 combate. **Fecha
+  quando:** a função for exportada de `src/content.config.ts` e importada no teste, em vez de
+  reimplementada — correção de plano próprio, de dois passos, que o 030 não podia fazer porque
+  estava proibido de editar `src/content.config.ts`.
+- **Imprecisão no cabeçalho de `tests/content/conteudo-valido.test.ts`** (achado do plano 030): o
+  cabeçalho atribui a dívida 7(c) a esse arquivo, mas ela foi fechada em `paridade-schema.test.ts`.
+  A dívida **foi** fechada pelo plano 030; errada é só a atribuição de qual arquivo a fecha.
+  **Fecha quando:** alguém corrigir a frase de passagem, no próximo plano que tocar esse arquivo.
+
+**Consideradas e descartadas como dívida, com o motivo:**
+
+- **`/admin` e `/admin/index.html` respondendo 307 para `/admin/`** (plano 026, `html_handling`
+  default do Workers Static Assets): nenhuma das três formas dá 404, o navegador segue o
+  redirecionamento sozinho, e o próprio plano registrou "não há defeito a corrigir" — é
+  comportamento aceito, não pendência.
+- **O anúncio do TinaCloud sobre a troca de autenticação em outubro** (plano 026): o projeto está
+  em TinaCMS 3.12.1, acima do corte 3.11, e não exige ação agora — é risco a vigiar (R-03), não
+  dívida.
+- **Valor não-textual em `linha_relacionada` (ex.: `42`) escapa do portão de conteúdo** (achado do
+  plano 030): o teste checa `typeof bruto === 'string'` e pula em silêncio valores que não são
+  string. Descartado como defeito porque o campo é `reference` no Tina, que só grava string —
+  inalcançável pelo caminho do produto, e o §2 do `CLAUDE.md` proíbe tratar cenário impossível.
+
 ## O que esta fase não consegue provar
 
 **Não existe página que renderize conteúdo.** `src/` tem apenas `content.config.ts`, `env.d.ts`,
@@ -207,9 +283,10 @@ save no /admin  →  commit na main  →  build automático  →  versão nova p
 
 com cada elo provado por artefato (SHA do commit do painel, o mesmo SHA no log da Cloudflare, id
 da versão publicada, resposta HTTP). **O último elo — "o texto novo aparece na página" — fica para
-a fase 3**, e M-02 é remedida na fase 5, como o próprio PRD agenda em §3.3 ("quando medir: fases 2
-e 5"). Isso é uma limitação **declarada**, não um atalho: os planos 029 e 034 são obrigados a
-escrevê-la, e o item 7 do §12 só pode ser marcado com a ressalva na própria linha.
+a fase 3**, e M-02 é medida só na **fase 5** (PRD, §3.3, coluna "Quando medir": `Fase 5`, desde o
+recorte de 2026-09-12) — não mais nesta fase. Isso é uma limitação **declarada**, não um atalho:
+este README e o plano 034 são obrigados a escrevê-la; a medição em si é do plano 029, migrado
+inteiro para a fase 5 junto com o item correspondente do §12 (que deixou de existir nesta fase).
 
 ## Por onde isto pode dar errado
 
