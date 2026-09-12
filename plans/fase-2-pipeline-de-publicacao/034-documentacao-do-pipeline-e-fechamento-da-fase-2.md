@@ -1,6 +1,6 @@
 # Plano 034 — Documentação do pipeline no README e fechamento da fase 2
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** §10.5 (README de manutenção); fase 2, **item 5** do §12; fechamento do checklist
 da fase (**5/5**) e do §0 do PRD
 **Depende de:** **todos os demais planos da fase 2 em `DONE`** — 023, 024, 025, 026, 028, 030, 031,
@@ -194,8 +194,8 @@ especial:
 - [x] Afirmações do `README.md` que a fase 2 tornou falsas: corrigidas (se no escopo) ou
       **reportadas** (se fora)
 - [x] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado — nada foi commitado nem
-      empurrado nesta sessão (regra de despacho); caixa fica vazia de propósito
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado — `ef7f258`, run
+      34725633372 (ver "Promoção")
 
 ## Evidência
 
@@ -731,3 +731,31 @@ tocado.
 
 - **CI do GitHub Actions** — nada foi commitado nem empurrado (regra de despacho: quem commita é o
   orquestrador). O critério correspondente fica com a caixa vazia, de propósito.
+
+### Promoção — preenchido pelo orquestrador
+
+**Revisão APROVADA no ciclo 4**, autorizado pelo stakeholder depois de três reprovações. Nenhuma
+reprovação foi por código; todas foram documento afirmando o que a fonte não sustentava:
+
+| Ciclo | Bloqueantes | Natureza |
+| ----- | ----------- | -------- |
+| 1 | 8 | §0 com a fase 2 "em andamento" e "concluída"; achados do 030 não absorvidos; três afirmações falsas no `README.md`; gatilho sem fonte na dívida das moderadas; aviso do assunto do e-mail fora do repasse; secrets "configurados em" commit; diffs descritos e não colados |
+| 2 | 4 | diff do Passo 5 com contexto marcado como inserção; `--stat` velho no Passo 3; assunto do e-mail do vigia chamado de "medido"; contagens da v0.1.31 desatualizadas |
+| 3 | 1 | `--stat` e hunk do Passo 6 de antes da correção A1 |
+| 4 | — | nota do ciclo 4 dizia "segundo hunk" e "uma linha"; corrigida para "primeiro" e "duas"; blocos dos Passos 3 a 6 comparados por `cmp` com `git diff HEAD` |
+
+O caixa "Ressalva do item 7" continua desmarcado por **não se aplicar**: o item migrou para a fase 5
+no recorte de 2026-09-12.
+
+**Commit do trabalho:** `ef7f258`. Os dois pipelines verdes:
+
+```
+gh api repos/researchgroups-ufma/haroldo-page/commits/ef7f258/check-runs
+
+Workers Builds: haroldo-page  success  https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/ce5acda4-b441-4f91-94ba-76252258d242
+qualidade                     success  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34725633372/job/103639137446
+```
+
+Na promoção, as frases transitórias "`Status` continua `TODO` até a promoção" foram retiradas do §0,
+da linha do item 5 no §12 e do `plans/README.md`. A linha v0.1.31 do §0.1 fica como registro
+histórico, como a v0.1.19 do plano 021.

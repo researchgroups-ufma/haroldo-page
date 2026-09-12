@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-12 (planos 028, 032 e 033 DONE)
+Última atualização: 2026-09-12 (fase concluída — plano 034 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD, **reescrito em 2026-09-12**): *um usuário **ADMIN**
 edita no `/admin` em produção e a mudança é publicada sozinha, com cada elo provado por artefato.*
@@ -36,7 +36,7 @@ provar"**: não existe página que renderize conteúdo até a fase 3, e isso mud
 | 031 | Coerência do `tina-lock.json` verificada no CI | ✅ DONE | agente | implementer (sonnet) | `1de5d1d` |
 | 032 | `npm audit` no CI e política de severidade | ✅ DONE | agente | implementer (sonnet) | `fed445b` (emenda), `b992282` |
 | 033 | Avisos do painel para o manual da fase 5 | ✅ DONE | agente | implementer (sonnet) | `0c2bd02` |
-| 034 | Documentação do pipeline no README e fechamento da fase 2 | ⬜ TODO | agente (+ orquestrador) | implementer | — |
+| 034 | Documentação do pipeline no README e fechamento da fase 2 | ✅ DONE | agente (+ orquestrador) | implementer (sonnet) | `ef7f258` |
 
 **Numeração é global e contínua e não é ordem de execução** — precedentes registrados: o plano 014
 rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase está abaixo.
@@ -67,8 +67,8 @@ existir build automático que o publique (025). Os dois elos que sobravam — co
 (027) e cronometrar o ciclo com ele (029) — **saíram da fase em 2026-09-12** e passaram a abrir a
 fase 5, onde o 029 continua dependendo do 028 desta fase.
 
-**O que resta é o 034.** O **033** (`0c2bd02`), o **032** (`b992282`) e o **028** (`5528ad6`)
-fecharam em 2026-09-12; o **034** fecha a fase.
+**Não resta nada.** O **033** (`0c2bd02`), o **032** (`b992282`), o **028** (`5528ad6`) e o **034**
+(`ef7f258`) fecharam em 2026-09-12, e a fase está concluída em 5/5.
 
 > **O 028 mudou de desenho no primeiro passo.** A Cloudflare não oferece notificação de falha do
 > Workers Builds; o aviso vem de `.github/workflows/vigia-do-deploy.yml`, um workflow **agendado**
