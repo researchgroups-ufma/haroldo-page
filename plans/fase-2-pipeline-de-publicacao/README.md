@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-12 (planos 032 e 033 DONE)
+Última atualização: 2026-09-12 (planos 028, 032 e 033 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD, **reescrito em 2026-09-12**): *um usuário **ADMIN**
 edita no `/admin` em produção e a mudança é publicada sozinha, com cada elo provado por artefato.*
@@ -31,7 +31,7 @@ provar"**: não existe página que renderize conteúdo até a fase 3, e isso mud
 | 024 | Comando de build dos pipelines e o cloud check do TinaCloud | ✅ DONE | agente | implementer | `f8f416a` |
 | 025 | 🧑 Workers Builds ligado ao repositório e variáveis no Cloudflare | ✅ DONE | orquestrador | nenhum | `954215c`, `ab0d1f8` |
 | 026 | 🧑 `/admin` publicado e autenticando pelo TinaCloud em produção | ✅ DONE | orquestrador | nenhum | `7ab84da` (edição do painel) |
-| 028 | 🧑 Notificação de falha de build ao ADMIN, com falha real | ⬜ TODO | orquestrador | nenhum | — |
+| 028 | 🧑 Notificação de falha de build ao ADMIN, com falha real | ✅ DONE | orquestrador | nenhum | `fee4e7f` (emenda), `86a6370`, `5528ad6` |
 | 030 | Portão de conteúdo no CI: `content/` validado e referência resolvida | ✅ DONE | agente | implementer (sonnet) | `4343e42` |
 | 031 | Coerência do `tina-lock.json` verificada no CI | ✅ DONE | agente | implementer (sonnet) | `1de5d1d` |
 | 032 | `npm audit` no CI e política de severidade | ✅ DONE | agente | implementer (sonnet) | `fed445b` (emenda), `b992282` |
@@ -46,8 +46,8 @@ rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase 
 > continua livre e nada foi alterado lá. Em **2026-09-12** o stakeholder decidiu migrá-los para
 > `../fase-5-polimento-e-entrega/`, com o número preservado; os passos de orquestrador do 027 que
 > não dependem do professor (8 e 9) continuam executados e registrados na Evidência do plano.
-> **Resta nesta fase um único plano que depende de gente — o 028 —, e a pessoa é o orquestrador,
-> não o professor.**
+> **Nenhum plano restante nesta fase depende de gente.** O 028, o último que dependia, fechou em
+> 2026-09-12.
 
 ## Ordem de execução
 
@@ -67,9 +67,16 @@ existir build automático que o publique (025). Os dois elos que sobravam — co
 (027) e cronometrar o ciclo com ele (029) — **saíram da fase em 2026-09-12** e passaram a abrir a
 fase 5, onde o 029 continua dependendo do 028 desta fase.
 
-**O que resta é curto:** o **033** fechou em 2026-09-12 (`0c2bd02`); o **032** é de agente mas está
-**parado numa decisão do stakeholder** (ver abaixo); o **028** é do orquestrador e tem seu
-pré-requisito (030) satisfeito; o **034** fecha a fase depois dos dois.
+**O que resta é o 034.** O **033** (`0c2bd02`), o **032** (`b992282`) e o **028** (`5528ad6`)
+fecharam em 2026-09-12; o **034** fecha a fase.
+
+> **O 028 mudou de desenho no primeiro passo.** A Cloudflare não oferece notificação de falha do
+> Workers Builds; o aviso vem de `.github/workflows/vigia-do-deploy.yml`, um workflow **agendado**
+> (uma vez por dia) que lê o check run do build de deploy e reprova quando ele falha. Agendado, e
+> não por `push`, porque o e-mail de um workflow agendado vai para quem alterou o cron por último;
+> o de `push` iria para o TinaCloud num save do professor. **Pendência nomeada:** o GitHub não
+> executou o cron na janela do experimento, e o e-mail por execução `schedule` fica por observar.
+> **Risco para o 034 documentar:** o vigia desliga sozinho após 60 dias sem commit. Ver ADR-0011.
 
 > **O bloqueio do 032 foi resolvido em 2026-09-12 e o plano fechou.** O `npm audit` reportava
 > `11 vulnerabilities (8 moderate, 3 high)`, não as 8 moderadas que a fase 1 registrou, e a política

@@ -1,6 +1,6 @@
 # Plano 028 — Notificação de falha de build ao ADMIN, demonstrada com uma falha real
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **F-02**, **F-09**, RNF-04, R-01; fluxo E da §8.1; fase 2, **item 4** do §12 (era o item 6 até 2026-09-12, quando três itens da fase
 migraram para a fase 5)
 **Depende de:** planos **025** (Workers Builds no ar) e **030** (o portão de conteúdo é o que
@@ -243,31 +243,31 @@ mover o deploy para o GitHub Actions, plano B da §7.4) é decisão nova, não c
 
 ## Critérios de aceitação
 
-- [ ] Ausência de notificação nativa na Cloudflare registrada com a medição da API e a confirmação
+- [x] Ausência de notificação nativa na Cloudflare registrada com a medição da API e a confirmação
       do painel (emenda de 2026-09-12)
-- [ ] `.github/workflows/vigia-do-deploy.yml` com gatilho `schedule` diário, `workflow_dispatch`,
+- [x] `.github/workflows/vigia-do-deploy.yml` com gatilho `schedule` diário, `workflow_dispatch`,
       permissões mínimas, e reprovando em build falho **e** em check ausente há mais de 30 min
-- [ ] ADR-0011 escrito, com as alternativas A e B rejeitadas e o **risco dos 60 dias** nomeado
-- [ ] Configurações de notificação de Actions da conta do ADMIN transcritas
+- [x] ADR-0011 escrito, com as alternativas A e B rejeitadas e o **risco dos 60 dias** nomeado
+- [x] Configurações de notificação de Actions da conta do ADMIN transcritas
 - [ ] **Execução agendada** (`event: schedule`) do vigia reprovando sobre o commit quebrado
-- [ ] Linha de base registrada antes do experimento: id de versão, horário e resposta HTTP
-- [ ] Falha injetada com o **erro real do professor** (`aulas: [ {} ]`), com a justificativa
+- [x] Linha de base registrada antes do experimento: id de versão, horário e resposta HTTP
+- [x] Falha injetada com o **erro real do professor** (`aulas: [ {} ]`), com a justificativa
       registrada
-- [ ] Build de deploy **falhou**, com log colado, passo identificado e duração
-- [ ] **RNF-04 provado:** site respondendo 200 com o **mesmo id de versão** da linha de base
+- [x] Build de deploy **falhou**, com log colado, passo identificado e duração
+- [x] **RNF-04 provado:** site respondendo 200 com o **mesmo id de versão** da linha de base
       durante a janela de falha, com horário
-- [ ] **F-02 provado:** e-mail de falha recebido pelo ADMIN — remetente, assunto, horário e atraso
+- [x] **F-02 provado:** e-mail de falha recebido pelo ADMIN — remetente, assunto, horário e atraso
       calculado; e o arquivo inválido permanecendo no repositório
-- [ ] Canal secundário (e-mail do `ci.yml`) registrado, sem ser tratado como o canal de F-02
-- [ ] Cron do vigia **de volta ao diário** na `main` depois da reversão, e vigia `success` sobre ela
-- [ ] **F-09 avaliado com a mensagem literal**: veredito explícito sobre nomear arquivo e campo;
+- [x] Canal secundário (e-mail do `ci.yml`) registrado, sem ser tratado como o canal de F-02
+- [x] Cron do vigia **de volta ao diário** na `main` depois da reversão, e vigia `success` sobre ela
+- [x] **F-09 avaliado com a mensagem literal**: veredito explícito sobre nomear arquivo e campo;
       lacuna, se houver, registrada como pendência nomeada
-- [ ] Reversão empurrada, build verde e **versão nova publicada**, com a janela total de quebra
+- [x] Reversão empurrada, build verde e **versão nova publicada**, com a janela total de quebra
       registrada
-- [ ] `git status --short` limpo ao final; `content/**` de volta ao estado válido
-- [ ] §12 do PRD (item 6 da fase 2) e o README da fase 2 atualizados pelo orquestrador ao promover
+- [x] `git status --short` limpo ao final; `content/**` de volta ao estado válido
+- [x] §12 do PRD (item 6 da fase 2) e o README da fase 2 atualizados pelo orquestrador ao promover
       `Status: DONE`
-- [ ] CI do GitHub Actions com `conclusion: success` no commit de reversão
+- [x] CI do GitHub Actions com `conclusion: success` no commit de reversão
 
 ## Evidência
 
@@ -449,3 +449,33 @@ não provado:** que o cron diário roda, e que o e-mail de uma execução `sched
 com a condição de fechamento.
 
 `git status --short` ao final da reversão: limpo.
+
+### Promoção — preenchido pelo orquestrador
+
+**Promovido a `DONE` em 2026-09-12 por decisão do stakeholder, com um critério não cumprido.** O
+critério "execução agendada (`event: schedule`) do vigia reprovando" continua desmarcado acima:
+nenhuma execução agendada ocorreu na janela. O stakeholder aceitou a pendência nomeada no ADR-0011
+em vez de quebrar a `main` de novo.
+
+Ressalvas nos critérios marcados, para ninguém ler mais do que foi provado:
+
+- **F-02:** remetente e assunto exatos foram transcritos para o e-mail do **CI**; para o do
+  **vigia**, o ADMIN transcreveu horário e o trecho do corpo ("Vigia do deploy: All jobs have
+  failed"). Pela forma do e-mail do CI, o assunto do vigia é o mesmo `Run failed`.
+- **§12:** o critério dizia "item 6 da fase 2"; desde o recorte de 2026-09-12 é o **item 4**, que é
+  o marcado no PRD.
+- **Sem revisão por agente separado**, diferente dos planos 031 a 033: o stakeholder promoveu
+  direto, e a Evidência foi montada pelo próprio orquestrador que executou.
+
+Pipelines sobre o commit da Evidência `5528ad6`:
+
+```
+gh api repos/researchgroups-ufma/haroldo-page/commits/5528ad6/check-runs
+
+Workers Builds: haroldo-page  success  https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/68d7fc4d-38f6-4641-afea-331c68b32b04
+qualidade                     success  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34722016032/job/103629529456
+```
+
+**Como fechar a pendência:** depois de 2026-09-13 12:17 UTC, `gh run list --workflow
+vigia-do-deploy.yml --event schedule` tem de listar ao menos uma execução. Se estiver vazio por
+dias, o cron diário não está rodando e o F-02 não está coberto.
