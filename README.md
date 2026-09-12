@@ -238,6 +238,12 @@ não existem mais. O arquivo de schemas é `src/content.config.ts`.
 
 **O `package.json` não tem `overrides` — e não deve voltar a ter sem motivo escrito.** Houve
 três (`vite`, `sharp`, `esbuild`), removidos no upgrade do Astro: o 7 exige `vite ^8.0.13` e
-já pede nativamente as versões corrigidas de `sharp` e `esbuild`. `npm audit` está em **zero
-vulnerabilidades**. A história completa, com o que motivou cada pin e por que cada um caiu,
-está em `docs/adr/0002-pin-do-vite-via-overrides.md`.
+já pede nativamente as versões corrigidas de `sharp` e `esbuild`. A história completa, com o
+que motivou cada pin e por que cada um caiu, está em
+`docs/adr/0002-pin-do-vite-via-overrides.md`. `npm audit` **não** está em zero vulnerabilidades:
+são **8 moderadas**, de duas origens por trás do TinaCMS — 5 via
+`tinacms@3.12.1 → react-router-dom → react-router` e 3 via
+`@tinacms/cli@2.6.1 → altair-express-middleware → express`/`body-parser → qs` —, alcançando só
+o painel `/admin` (React, autenticado, uma pessoa) — o site público não carrega React (D-01).
+O CI reprova a partir de `high`/`critical`; a política, os números medidos e as
+alternativas rejeitadas estão em `docs/adr/0010-npm-audit-no-ci-e-severidade.md`.

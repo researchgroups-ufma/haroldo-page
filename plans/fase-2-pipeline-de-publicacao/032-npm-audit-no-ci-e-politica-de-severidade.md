@@ -223,39 +223,596 @@ verdade, e a divergência é reportada, não escondida**.
 
 ## Critérios de aceitação
 
-- [ ] Estado real do `npm audit` medido e colado **antes** de qualquer mudança, com contagem por
+- [x] Estado real do `npm audit` medido e colado **antes** de qualquer mudança, com contagem por
       severidade, `npm ls react-router` e `npm ls wrangler miniflare`
-- [ ] `wrangler` subido de `4.128.0` para `4.131.1`, com `git diff -- package.json` mostrando
+- [x] `wrangler` subido de `4.128.0` para `4.131.1`, com `git diff -- package.json` mostrando
       **uma única linha** alterada
-- [ ] `npm audit` depois da subida **sem nenhuma `high`**, saída colada
-- [ ] Churn do `package-lock.json` medido (`git diff --stat`) e **contido à cadeia
+- [x] `npm audit` depois da subida **sem nenhuma `high`**, saída colada
+- [x] Churn do `package-lock.json` medido (`git diff --stat`) e **contido à cadeia
       `wrangler → miniflare → sharp`**; qualquer pacote fora dela reportado
-- [ ] `npx wrangler --version` e um `deploy --dry-run` verdes, saídas coladas — **sem deploy real**
-- [ ] Passo `npm audit --audit-level=high` no `ci.yml`, entre `npm ci` e `npm run lint`, **sem**
+- [x] `npx wrangler --version` e um `deploy --dry-run` verdes, saídas coladas — **sem deploy real**
+- [x] Passo `npm audit --audit-level=high` no `ci.yml`, entre `npm ci` e `npm run lint`, **sem**
       `continue-on-error`
-- [ ] Comportamento da bandeira verificado na prática: exit code colado e confirmação de que as
+- [x] Comportamento da bandeira verificado na prática: exit code colado e confirmação de que as
       moderadas continuam **listadas** no log
-- [ ] **Falsificabilidade provada** (`--audit-level=moderate` reprovando hoje), com exit code
+- [x] **Falsificabilidade provada** (`--audit-level=moderate` reprovando hoje), com exit code
       colado
-- [ ] `docs/adr/0010-npm-audit-no-ci-e-severidade.md` escrito, com os **dois retratos** do audit
+- [x] `docs/adr/0010-npm-audit-no-ci-e-severidade.md` escrito, com os **dois retratos** do audit
       (antes e depois do passo 2), as alternativas rejeitadas — inclusive **reprovar só em
       `critical`** e **exceção datada para o advisory do `sharp`** —, consequências e **gatilho de
       revisão**
-- [ ] `README.md` sem a afirmação de "zero vulnerabilidades", com o estado real e o ponteiro para
+- [x] `README.md` sem a afirmação de "zero vulnerabilidades", com o estado real e o ponteiro para
       o ADR
-- [ ] Nenhum `override` criado; **nenhuma** versão de dependência alterada além do `wrangler`;
+- [x] Nenhum `override` criado; **nenhuma** versão de dependência alterada além do `wrangler`;
       `npm audit fix` **não** executado — `git diff -- package.json` mostrando só a linha do
       `wrangler`
-- [ ] As moderadas **não** corrigidas, e o ADR registrando o número real: **5** sem saída (o "fix"
+- [x] As moderadas **não** corrigidas, e o ADR registrando o número real: **5** sem saída (o "fix"
       do npm é `major` para trás) e **3** corrigíveis adiadas com motivo escrito
-- [ ] O comando de build do `ci.yml` **inalterado** por este plano
-- [ ] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes
+- [x] O comando de build do `ci.yml` **inalterado** por este plano
+- [x] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes
 - [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado, **com o passo novo
       visível no log** — cole o trecho
 
+      **Não verificado nesta sessão.** Nada foi commitado nem empurrado — por instrução de
+      despacho, quem verifica o CI é o `triage-runner`, depois da revisão. Caixa fica vazia de
+      propósito.
+
 ## Evidência
 
-<Preenchida pelo executor, na execução — não depois da revisão. O passo de auditoria só vale se
-tiver sido provado capaz de reprovar: cole o exit code das duas execuções. E cole os **dois
-retratos** do `npm audit`, antes e depois da subida do `wrangler` — o "antes" não pode ser
-reconstruído depois que o lock mudar.>
+Sessão executada em 2026-09-12, Windows 11 / PowerShell 5.1 (comandos npm/wrangler) e Git Bash
+(comandos `git`). Node conforme `.nvmrc`. `HEAD` no início = `fed445b`.
+
+### Passo 1 — retrato "ANTES" (antes de qualquer mudança)
+
+`npm audit`:
+
+```
+# npm audit report
+
+qs  2.2.5 - 6.15.3
+Severity: moderate
+qs array-limit bypass via bracket-key comma parsing - https://github.com/advisories/GHSA-x5fp-wj9c-mxmx
+qs: Denial of Service via Attacker Controlled isBuffer - https://github.com/advisories/GHSA-4mjr-xmp4-gh2g
+fix available via `npm audit fix`
+node_modules/qs
+  body-parser  1.20.5 - 1.20.6
+  Depends on vulnerable versions of qs
+  node_modules/body-parser
+  express  4.22.2
+  Depends on vulnerable versions of qs
+  node_modules/express
+
+react-router  6.0.0 - 7.17.0
+Severity: moderate
+React Router: Open redirect via backslash in <Link> and useNavigate (CVE-2025-68470 bypass) - https://github.com/advisories/GHSA-wrjc-x8rr-h8h6
+React Router: Arbitrary Constructor Injection via deserializeErrors() in React Router SSR Hydration - https://github.com/advisories/GHSA-337j-9hxr-rhxg
+fix available via `npm audit fix --force`
+Will install tinacms@1.5.5, which is a breaking change
+node_modules/react-router
+  react-router-dom  6.0.0-alpha.0 - 7.17.0
+  Depends on vulnerable versions of react-router
+  node_modules/react-router-dom
+    @tinacms/app  <=0.0.0-ffbb4fa-20260624122203 || >=0.0.23
+    Depends on vulnerable versions of react-router-dom
+    Depends on vulnerable versions of tinacms
+    node_modules/@tinacms/app
+      @tinacms/cli  <=0.0.0-ffbb4fa-20260624122203 || >=0.61.24
+      Depends on vulnerable versions of @tinacms/app
+      Depends on vulnerable versions of tinacms
+      node_modules/@tinacms/cli
+    tinacms  <=0.0.0-ffbb4fa-20260624122203 || >=1.5.6
+    Depends on vulnerable versions of react-router-dom
+    node_modules/tinacms
+
+sharp  <0.35.4
+Severity: high
+sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545 - https://github.com/advisories/GHSA-rgj7-g3m4-5g8c
+fix available via `npm audit fix --force`
+Will install wrangler@4.131.1, which is outside the stated dependency range
+node_modules/miniflare/node_modules/sharp
+  miniflare  <=0.0.0-fec45ed61 || 4.20250508.3 - 5.20260908.0-alpha
+  Depends on vulnerable versions of sharp
+  node_modules/miniflare
+    wrangler  <=0.0.0-7ae5dd357 || 4.16.0 - 4.130.0
+    Depends on vulnerable versions of miniflare
+    node_modules/wrangler
+
+11 vulnerabilities (8 moderate, 3 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+```
+
+`npm audit --json` (metadata.vulnerabilities):
+
+```
+info     : 0
+low      : 0
+moderate : 8
+high     : 3
+critical : 0
+total    : 11
+```
+
+`npm ls react-router`:
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
+`-- tinacms@3.12.1
+  `-- react-router-dom@6.30.6
+    `-- react-router@6.30.6
+```
+
+`npm ls wrangler miniflare`:
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
+`-- wrangler@4.128.0
+  `-- miniflare@5.20260831.0-alpha
+```
+
+### Passo 2 — subida do `wrangler` 4.128.0 → 4.131.1
+
+`git diff -- package.json`:
+
+```diff
+diff --git a/package.json b/package.json
+index c999918..4a35713 100644
+--- a/package.json
++++ b/package.json
+@@ -44,6 +44,6 @@
+     "typescript-eslint": "8.69.0",
+     "vite": "8.2.2",
+     "vitest": "4.1.11",
+-    "wrangler": "4.128.0"
++    "wrangler": "4.131.1"
+   }
+ }
+```
+
+Uma única linha alterada — confirmado.
+
+`npm install` (atualiza o lock):
+
+```
+removed 2 packages, changed 4 packages, and audited 1515 packages in 12s
+
+327 packages are looking for funding
+  run `npm fund` for details
+
+8 moderate severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+```
+
+`npm audit` depois da subida — retrato "DEPOIS" (as três `high` sumiram):
+
+```
+# npm audit report
+
+qs  2.2.5 - 6.15.3
+Severity: moderate
+qs array-limit bypass via bracket-key comma parsing - https://github.com/advisories/GHSA-x5fp-wj9c-mxmx
+qs: Denial of Service via Attacker Controlled isBuffer - https://github.com/advisories/GHSA-4mjr-xmp4-gh2g
+fix available via `npm audit fix`
+node_modules/qs
+  body-parser  1.20.5 - 1.20.6
+  Depends on vulnerable versions of qs
+  node_modules/body-parser
+  express  4.22.2
+  Depends on vulnerable versions of qs
+  node_modules/express
+
+react-router  6.0.0 - 7.17.0
+Severity: moderate
+React Router: Open redirect via backslash in <Link> and useNavigate (CVE-2025-68470 bypass) - https://github.com/advisories/GHSA-wrjc-x8rr-h8h6
+React Router: Arbitrary Constructor Injection via deserializeErrors() in React Router SSR Hydration - https://github.com/advisories/GHSA-337j-9hxr-rhxg
+fix available via `npm audit fix --force`
+Will install tinacms@1.5.5, which is a breaking change
+node_modules/react-router
+  react-router-dom  6.0.0-alpha.0 - 7.17.0
+  Depends on vulnerable versions of react-router
+  node_modules/react-router-dom
+    @tinacms/app  <=0.0.0-ffbb4fa-20260624122203 || >=0.0.23
+    Depends on vulnerable versions of react-router-dom
+    Depends on vulnerable versions of tinacms
+    node_modules/@tinacms/app
+      @tinacms/cli  <=0.0.0-ffbb4fa-20260624122203 || >=0.61.24
+      Depends on vulnerable versions of @tinacms/app
+      Depends on vulnerable versions of tinacms
+      node_modules/@tinacms/cli
+    tinacms  <=0.0.0-ffbb4fa-20260624122203 || >=1.5.6
+    Depends on vulnerable versions of react-router-dom
+    node_modules/tinacms
+
+8 moderate severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+```
+
+Nenhuma `high` restante — a premissa do plano se confirmou.
+
+`git diff --stat -- package-lock.json`:
+
+```
+ package-lock.json | 682 +++---------------------------------------------------
+ 1 file changed, 36 insertions(+), 646 deletions(-)
+```
+
+Pacotes tocados (extraídos das linhas `node_modules/...` adicionadas/removidas no diff):
+apenas `node_modules/miniflare/node_modules/sharp` e seus binários de plataforma
+(`@img/sharp-*`), todos sob `node_modules/miniflare/node_modules/`, mais as próprias entradas
+`node_modules/wrangler` (versão) e `node_modules/miniflare` (versão). Nenhum pacote fora da
+cadeia `wrangler → miniflare → sharp`.
+
+`npm ls wrangler miniflare` (árvore nova):
+
+```
+haroldo-page@0.1.0 S:\Projetos\academic_page\haroldo
+`-- wrangler@4.131.1
+  `-- miniflare@5.20260911.0-alpha
+```
+
+### Passo 3 — `wrangler` novo, sem deploy real
+
+`npx wrangler --version`:
+
+```
+4.131.1
+```
+
+`npx wrangler deploy --dry-run`:
+
+```
+ ⛅️ wrangler 4.131.1
+────────────────────
+✨ Read 107 files from the assets directory S:\Projetos\academic_page\haroldo\dist
+Total Upload: 0.31 KiB / gzip: 0.22 KiB
+No bindings found.
+--dry-run: exiting now.
+```
+
+Nenhum deploy real ocorreu ("--dry-run: exiting now.").
+
+### Passo 4 — comportamento de `npm audit --audit-level=high` na árvore corrigida
+
+```
+# npm audit report
+
+qs  2.2.5 - 6.15.3
+Severity: moderate
+qs array-limit bypass via bracket-key comma parsing - https://github.com/advisories/GHSA-x5fp-wj9c-mxmx
+qs: Denial of Service via Attacker Controlled isBuffer - https://github.com/advisories/GHSA-4mjr-xmp4-gh2g
+fix available via `npm audit fix`
+node_modules/qs
+  body-parser  1.20.5 - 1.20.6
+  Depends on vulnerable versions of qs
+  node_modules/body-parser
+  express  4.22.2
+  Depends on vulnerable versions of qs
+  node_modules/express
+
+react-router  6.0.0 - 7.17.0
+Severity: moderate
+React Router: Open redirect via backslash in <Link> and useNavigate (CVE-2025-68470 bypass) - https://github.com/advisories/GHSA-wrjc-x8rr-h8h6
+React Router: Arbitrary Constructor Injection via deserializeErrors() in React Router SSR Hydration - https://github.com/advisories/GHSA-337j-9hxr-rhxg
+fix available via `npm audit fix --force`
+Will install tinacms@1.5.5, which is a breaking change
+node_modules/react-router
+  react-router-dom  6.0.0-alpha.0 - 7.17.0
+  Depends on vulnerable versions of react-router
+  node_modules/react-router-dom
+    @tinacms/app  <=0.0.0-ffbb4fa-20260624122203 || >=0.0.23
+    Depends on vulnerable versions of react-router-dom
+    Depends on vulnerable versions of tinacms
+    node_modules/@tinacms/app
+      @tinacms/cli  <=0.0.0-ffbb4fa-20260624122203 || >=0.61.24
+      Depends on vulnerable versions of @tinacms/app
+      Depends on vulnerable versions of tinacms
+      node_modules/@tinacms/cli
+    tinacms  <=0.0.0-ffbb4fa-20260624122203 || >=1.5.6
+    Depends on vulnerable versions of react-router-dom
+    node_modules/tinacms
+
+8 moderate severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+EXIT CODE: 0
+```
+
+As 8 moderadas continuam **listadas** integralmente no log; a bandeira só afeta o exit code
+(0, porque nenhuma `high` restou).
+
+### Passo 5 — falsificabilidade (`--audit-level=moderate`)
+
+```
+[mesma listagem das 8 moderadas acima]
+EXIT CODE: 1
+```
+
+Confirma que o passo é capaz de reprovar: `--audit-level=high` → exit 0; `--audit-level=moderate`,
+na mesma árvore → exit 1, pelas 8 moderadas. Os dois exit codes lado a lado: **high = 0**,
+**moderate = 1**.
+
+### Passo 6 — `ci.yml`
+
+`git diff -- .github/workflows/ci.yml`:
+
+```diff
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 351334f..c430019 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -24,6 +24,9 @@ jobs:
+           node-version-file: '.nvmrc'
+           cache: 'npm'
+       - run: npm ci
++      # Reprova em high/critical, nao em moderate: as moderadas de hoje nao tem correcao nossa
++      # disponivel (ADR-0010) e reprovar por elas deixaria o portao vermelho permanentemente.
++      - run: npm audit --audit-level=high
+       - run: npm run lint
+       - run: npm run format:check
+       # test:coverage em vez de test: roda os mesmos testes e ainda impoe o
+```
+
+Apenas o passo novo e seu comentário — comando de build inalterado.
+
+### Passo 7 — ADR-0010
+
+Escrito em `docs/adr/0010-npm-audit-no-ci-e-severidade.md`, com os dois retratos (antes: 11
+vulnerabilidades / 8 moderate, 3 high; depois: 8 moderate, 0 high), os **cinco** identificadores
+de advisory — GHSA-wrjc-x8rr-h8h6 e GHSA-337j-9hxr-rhxg (via `react-router-dom`),
+GHSA-x5fp-wj9c-mxmx e GHSA-4mjr-xmp4-gh2g (via `@tinacms/cli → altair-express-middleware → qs`),
+GHSA-rgj7-g3m4-5g8c (`sharp`/`libheif`) —, confirmados por `grep -o "GHSA-[a-z0-9-]*"
+docs/adr/0010-npm-audit-no-ci-e-severidade.md | sort -u` batendo exatamente com esta lista (ver
+"Correções pós-revisão (ciclo 1)" abaixo), as alternativas rejeitadas (moderate, **só
+`critical`**, **exceção datada para o `sharp`**, `continue-on-error`, `overrides`, não auditar),
+a pendência nomeada (5 sem saída via `tinacms`, 3 — `body-parser`/`express`/`qs` — corrigíveis
+adiadas) e o gatilho de revisão.
+
+### Passo 8 — README.md
+
+`git diff -- README.md` (estado final, depois da correção 3 do ciclo 1):
+
+```diff
+diff --git a/README.md b/README.md
+index c7ab1b6..ff487f4 100644
+--- a/README.md
++++ b/README.md
+@@ -238,6 +238,12 @@ não existem mais. O arquivo de schemas é `src/content.config.ts`.
+ 
+ **O `package.json` não tem `overrides` — e não deve voltar a ter sem motivo escrito.** Houve
+ três (`vite`, `sharp`, `esbuild`), removidos no upgrade do Astro: o 7 exige `vite ^8.0.13` e
+-já pede nativamente as versões corrigidas de `sharp` e `esbuild`. `npm audit` está em **zero
+-vulnerabilidades**. A história completa, com o que motivou cada pin e por que cada um caiu,
+-está em `docs/adr/0002-pin-do-vite-via-overrides.md`.
++já pede nativamente as versões corrigidas de `sharp` e `esbuild`. A história completa, com o
++que motivou cada pin e por que cada um caiu, está em
++`docs/adr/0002-pin-do-vite-via-overrides.md`. `npm audit` **não** está em zero vulnerabilidades:
++são **8 moderadas**, de duas origens por trás do TinaCMS — 5 via
++`tinacms@3.12.1 → react-router-dom → react-router` e 3 via
++`@tinacms/cli@2.6.1 → altair-express-middleware → express`/`body-parser → qs` —, alcançando só
++o painel `/admin` (React, autenticado, uma pessoa) — o site público não carrega React (D-01).
++O CI reprova a partir de `high`/`critical`; a política, os números medidos e as
++alternativas rejeitadas estão em `docs/adr/0010-npm-audit-no-ci-e-severidade.md`.
+```
+
+Número inserido é o **depois** do passo 2 (8 moderadas), como exigido. As duas origens (5 via
+`react-router-dom`, 3 via `altair-express-middleware`) estão descritas separadamente, não
+fundidas.
+
+### Passo 9 — sequência de qualidade local
+
+`npm run lint`:
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+`npm run format:check` (depois de `npx prettier --write docs/adr/0010-npm-audit-no-ci-e-severidade.md`
+— a formatação da tabela markdown do ADR novo):
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+`npm run test:coverage`:
+
+```
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  6 passed (6)
+      Tests  122 passed (122)
+   Start at  13:11:53
+   Duration  1.08s (transform 1.80s, setup 0ms, import 2.85s, tests 92ms, environment 0ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 32/32 )
+Branches     : 100% ( 4/4 )
+Functions    : 100% ( 2/2 )
+Lines        : 100% ( 31/31 )
+================================================================================
+```
+
+`npm run build` (lida — com o cloud check do TinaCloud, credenciais do `.env` presentes):
+
+```
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+
+○  Tina build complete ───────────────────────────────────────────────────────────────────────
+│  🦙 Tina Config
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main
+│  🤖 Auto-generated files
+│     GraphQL Client:     tina/__generated__/client.ts
+│     Typescript Types:   tina/__generated__/types.ts
+│     Static HTML file:   public/admin/index.html
+├────────────────────────────────────────────────────────────────────────────────────────────
+13:13:16 [content] Syncing content
+13:13:16 [content] Synced content
+13:13:16 [types] Generated 462ms
+13:13:16 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (19 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+13:13:22 [content] Syncing content
+13:13:22 [content] Synced content
+13:13:22 [types] Generated 443ms
+13:13:22 [build] output: "static"
+13:13:22 [build] mode: "static"
+13:13:22 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+13:13:22 [build] Collecting build info...
+13:13:22 [build] ✓ Completed in 484ms.
+13:13:22 [build] Building static entrypoints...
+13:13:23 [vite] ✓ built in 281ms
+13:13:23 [vite] ✓ built in 45ms
+13:13:23 [build] Rearranging server assets...
+
+ generating static routes
+13:13:23   ├─ /index.html (+10ms)
+13:13:23 ✓ Completed in 21ms.
+
+13:13:23 [build] ✓ Completed in 375ms.
+13:13:23 [build] 1 page(s) built in 868ms
+13:13:23 [build] Complete!
+EXIT CODE: 0
+```
+
+### Correções pós-revisão (ciclo 1)
+
+A revisão do ciclo 1 reprovou com três defeitos, todos em `docs/adr/0010-...md` e/ou
+`README.md` — nada no `ci.yml`, no `package.json` nem no `package-lock.json`, que não foram
+tocados neste ciclo.
+
+1. **Mecanismo real da correção do `sharp`.** O ADR dava a entender que o `sharp` saiu do
+   projeto. Não saiu: `astro@7.2.10` (produção) já trazia `sharp@0.35.4` no nível superior antes
+   deste plano (`git show HEAD:package-lock.json` confirma) — a cópia vulnerável era a
+   **aninhada** sob `miniflare` (`sharp@0.35.2`). A subida do `wrangler` fez o `miniflare` novo
+   **deduplicar** na cópia segura já existente, em vez de instalar a sua própria. Confirmado com
+   `npm ls sharp`:
+   ```
+   +-- astro@7.2.10
+   | `-- sharp@0.35.4
+   `-- wrangler@4.131.1
+     `-- miniflare@5.20260911.0-alpha
+       `-- sharp@0.35.4 deduped
+   ```
+   e com `git diff -- package-lock.json | grep -B1 -A5
+   '"node_modules/miniflare/node_modules/sharp"'`, mostrando a entrada `0.35.2` **removida**
+   (linhas `-`), não alterada. O ADR foi corrigido: a razão de o `sharp` não entrar no Worker
+   publicado não é `devDependency` (ele é produção, via `astro`) — é ser usado só em tempo de
+   build (otimização de imagem do Astro), num site estático sem runtime de Node no Worker
+   (D-01, `has_modules: false`, plano 025). Esse ponto do "devDependency" continua válido, mas
+   só para o `wrangler` em si, não para o `sharp`.
+2. **Advisories incompletos.** O ADR citava só 2 identificadores; a Evidência do passo 7
+   afirmava 5. Corrigido citando os 5 no ADR — 2 via `react-router-dom`
+   (GHSA-wrjc-x8rr-h8h6, GHSA-337j-9hxr-rhxg) e 2 via `@tinacms/cli → altair-express-middleware`
+   (GHSA-x5fp-wj9c-mxmx, GHSA-4mjr-xmp4-gh2g), mais o já presente GHSA-rgj7-g3m4-5g8c do
+   `sharp`. Reconferido com `grep -o "GHSA-[a-z0-9-]*"
+   docs/adr/0010-npm-audit-no-ci-e-severidade.md | sort -u`:
+   ```
+   GHSA-337j-9hxr-rhxg
+   GHSA-4mjr-xmp4-gh2g
+   GHSA-rgj7-g3m4-5g8c
+   GHSA-wrjc-x8rr-h8h6
+   GHSA-x5fp-wj9c-mxmx
+   ```
+   5 identificadores, batendo com a lista do passo 7 acima.
+3. **README fundia as duas origens das 8 moderadas.** O texto dizia que as 8 vinham todas de
+   `react-router`. Só 5 vêm dali; as outras 3 (`qs`, `body-parser`, `express`) vêm de
+   `@tinacms/cli@2.6.1 → altair-express-middleware`, confirmado por `npm ls qs`:
+   ```
+   `-- @tinacms/cli@2.6.1
+     +-- altair-express-middleware@7.3.6
+     | `-- express@4.22.2
+     |   `-- qs@6.15.3 deduped
+     `-- body-parser@1.20.6
+       `-- qs@6.15.3
+   ```
+   Corrigido no README descrevendo as duas cadeias separadamente (ver Passo 8 acima).
+
+`npm run format:check` depois das correções — rodado sozinho, por instrução do coordenador, sem
+a suíte inteira:
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+(Precisou de um `npx prettier --write docs/adr/0010-npm-audit-no-ci-e-severidade.md` antes,
+para o reflow de parágrafo do conteúdo novo — mesmo padrão do ciclo anterior, nenhuma mudança de
+conteúdo além do reflow.)
+
+### `git status --short` ao final (depois do ciclo 1 de correções)
+
+```
+ M .github/workflows/ci.yml
+ M README.md
+ M package-lock.json
+ M package.json
+ M plans/fase-2-pipeline-de-publicacao/032-npm-audit-no-ci-e-politica-de-severidade.md
+?? docs/adr/0010-npm-audit-no-ci-e-severidade.md
+```
+
+`ci.yml`, `package.json` e `package-lock.json` **inalterados** desde o fechamento do primeiro
+ciclo — só `README.md`, o ADR novo e este próprio plano (Evidência) mudaram no ciclo 1. Nada
+commitado, nada empurrado.
+
+### O que NÃO foi rodado / não pôde ser verificado
+
+- **CI do GitHub Actions** — nada foi commitado nem empurrado nesta sessão (regra de despacho).
+  A caixa correspondente no critério de aceitação fica vazia. Quem verifica o CI é o
+  `triage-runner`, depois da revisão.
+- Nenhuma verificação foi pulada por bloqueio externo: as credenciais do TinaCloud (`.env`)
+  estavam presentes e o `npm run build` completou com o cloud check.
+- No ciclo 1 de correção, só `npm run format:check` foi rodado, por instrução explícita do
+  coordenador ("Não rode a suíte inteira — eu redisparo a verificação autoritativa"). `lint`,
+  `test:coverage` e `build` **não** foram re-executados neste ciclo; não há motivo para esperar
+  que mudem, já que nenhuma correção tocou código-fonte, testes ou schema — mas a re-execução
+  fica para o `triage-runner`, por instrução.
+
+### Premissa do plano — confirmada pela medição
+
+Nenhuma `high` sobrou depois da subida do `wrangler`. A premissa da emenda de 2026-09-12 se
+confirmou: o portão nasce verde.
