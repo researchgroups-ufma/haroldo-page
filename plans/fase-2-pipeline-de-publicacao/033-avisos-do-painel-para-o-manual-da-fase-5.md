@@ -1,6 +1,6 @@
 # Plano 033 — Avisos do painel que o manual da fase 5 é obrigado a cobrir
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **F-09**, **R-01**, RNF-05, RNF-09; §10.5 (`docs/manual-do-professor.md`, entrega
 da fase 5); **dívidas 3 e 4** da fase 1
 **Depende de:** nenhum. **Totalmente paralelizável** — não toca nenhum arquivo que outro plano da
@@ -156,7 +156,7 @@ o arquivo e todo o histórico de edição ficam legíveis por qualquer pessoa. R
       na Evidência
 - [x] Nenhum outro arquivo modificado — `git status --short` mostrando apenas o arquivo novo
 - [x] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes
-- [ ] CI do GitHub Actions com `conclusion: success` no commit empurrado
+- [x] CI do GitHub Actions com `conclusion: success` no commit empurrado
 
 ## Evidência
 
@@ -262,9 +262,43 @@ cobertura do `test:coverage` vem vazia (só cabeçalho e separadores), embora o 
 em todas as métricas. Já acontecia antes desta execução — é o comportamento conhecido do reporter
 `text` do v8 no Windows com `skipFull`, registrado desde os planos 015/016/021 do projeto.
 
-### 3. Pendente, fora deste executor
+### 3. Revisão de código
 
-- **Commit, push e `conclusion` do CI** — regra de despacho da casa: este executor não commita nem
-  empurra. O critério "CI do GitHub Actions com `conclusion: success`" fica **desmarcado** até o
-  push, sem ser reescrito para caber no resultado.
-- **Promoção de `Status: DONE`** — do orquestrador, depois da revisão de código e do CI.
+**APROVADO no terceiro ciclo.** Reprovado nos dois primeiros, nenhum deles por defeito no documento
+entregue — o revisor abriu cada fonte citada e todas as conferências passaram já no primeiro ciclo:
+
+1. **Ciclo 1 — a seção `## Evidência` deste arquivo não tinha sido preenchida.** O passo 3 e o
+   último critério de aceitação exigem a conferência das citações registrada aqui; o placeholder
+   continuava no lugar. Corrigido. Achado não bloqueante aceito no mesmo ciclo: o cabeçalho do
+   documento dizia que a versão 3.12.1 do TinaCMS valia para "todos os avisos", mas os Avisos 4 e 5
+   não são comportamento do painel — a frase passou a delimitar os Avisos 1 a 3.
+2. **Ciclo 2 — o bloco de saída colado na seção 2 era o do ciclo 1, não o do reteste.** Dois
+   indícios: `740ms` em vez de `708ms`, e um `git status --short` com um arquivo só, quando a
+   árvore já tinha dois. **O bloco errado veio da mensagem de despacho do orquestrador; não foi
+   desvio do executor**, que colou o que lhe foi dado. Corrigido com a saída do reteste real.
+3. **Ciclo 3 — APROVADO**, sem ressalva. O revisor concordou explicitamente com não disparar uma
+   quarta execução completa da suíte: a única mudança daquele ciclo era texto dentro desta
+   Evidência, que nenhum teste importa e que o build do Astro não lê; exigir um run novo geraria um
+   número de milissegundos que a própria edição da Evidência tornaria velho no instante seguinte —
+   regressão infinita. O `lint` e o `format:check` rodados pelo orquestrador sobre a árvore final
+   fecharam o risco residual, que era o Markdown novo formatar certo.
+
+### 4. CI e build de deploy sobre o commit empurrado
+
+Commit do trabalho: **`0c2bd02`**, empurrado em 2026-09-12 (`b01e267..0c2bd02`). Os **dois**
+pipelines dispararam no mesmo push e os dois fecharam verdes:
+
+```
+gh api repos/researchgroups-ufma/haroldo-page/commits/0c2bd02/check-runs
+
+Workers Builds: haroldo-page :: conclusion=success :: 2026-09-12T13:07:50Z
+  https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/1fb6e0dd-cbc9-44bb-87bf-3c67d50469e5
+qualidade                    :: conclusion=success :: 13:06:06Z -> 13:07:23Z
+  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34695465499
+
+gh run view 34695465499
+run 34695465499 | completed | success | 0c2bd02 | plano 033: avisos do painel para o manual...
+```
+
+**A segunda linha não é formalidade.** Durante a fase 1 inteira o CI esteve vermelho por 14 commits
+seguidos porque a verificação era só de comandos locais e ninguém olhava para o run.

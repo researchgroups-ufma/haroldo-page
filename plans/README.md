@@ -4,7 +4,7 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-12
+Última atualização: 2026-09-12 (plano 033 DONE)
 
 ## Fases
 
@@ -12,7 +12,7 @@ Este arquivo é só o mapa.
 |---|---|---|---|
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
 | [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–022, todos DONE — o 021 promovido em `7d5b7e6`, com CI verde sobre `26de58a` |
-| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟡 **Em andamento** | 023, 024, 025, 026, 030 e 031 DONE — o pipeline publica sozinho desde `ab0d1f8`, desde `7ab84da` está provado que o `/admin` em produção é quem origina o push, e desde `4343e42`/`1de5d1d` conteúdo inválido e `tina-lock.json` defasado reprovam no CI e no build de deploy. **Restam 028, 032, 033 e 034**, nenhum deles dependente do professor |
+| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟡 **Em andamento** | 023, 024, 025, 026, 030 e 031 DONE — o pipeline publica sozinho desde `ab0d1f8`, desde `7ab84da` está provado que o `/admin` em produção é quem origina o push, e desde `4343e42`/`1de5d1d` conteúdo inválido e `tina-lock.json` defasado reprovam no CI e no build de deploy. o **033** fechou em `0c2bd02`, com os dois pipelines verdes. **Restam 028, 032 e 034**, nenhum deles dependente do professor |
 | `fase-3-site-publico/` | 3 — Site público em português | 🔴 **Bloqueada** | não fatiada — **a Q-04 (referências visuais) continua aberta** e o §16 proíbe começar fase que dependa de questão aberta. O stakeholder fornecerá as referências |
 | `fase-4-internacionalizacao/` | 4 — Internacionalização | ⬜ Não iniciada | — |
 | [`fase-5-polimento-e-entrega/`](fase-5-polimento-e-entrega/README.md) | 5 — Polimento e entrega | ⬜ Não iniciada | não fatiada; já contém os planos **027** e **029**, migrados da fase 2 em 2026-09-12 |
@@ -59,14 +59,15 @@ e o critério do EDITOR foi inteiro para a fase 5. O §3.3 também mudou: **M-02
 
 **O que isto não resolve, e é a parte que importa:** o recorte **não alcança o site navegável**
 enquanto a **Q-04** (referências visuais) não for respondida — ela bloqueia a fase 3 pela regra do
-§16, e o responsável é o **dono do produto**, não o professor. O executável de imediato são os
-quatro planos restantes da fase 2 — **028**, **032**, **033** e **034** —, que a fecham em 5/5.
+§16, e o responsável é o **dono do produto**, não o professor. Dos quatro planos restantes da fase
+2, o **033** fechou em 2026-09-12; sobram **028**, **032** e **034**, que a levam a 5/5.
 
 ## Convenções
 
 **Numeração é global e contínua**, não reinicia a cada fase — e **não é ordem de execução**: o
 022 rodou antes do 021, como o 014 rodou depois de a fase 0 fechar, e o 027 mudou de fase sem mudar
-de número. O próximo a rodar é o **032** ou o **033**, esteja em que pasta estiver. Isso preserva as
+de número. O **033** fechou em 2026-09-12; o próximo é o **028** ou o **032**, esteja em que pasta
+estiver — e o 032 espera uma decisão do stakeholder sobre a política do `npm audit`. Isso preserva as
 referências já espalhadas por commits, ADRs, Evidências e pelo PRD — um "plano 007" identifica um
 arquivo só, para sempre.
 

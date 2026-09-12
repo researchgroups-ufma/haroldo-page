@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-12
+Última atualização: 2026-09-12 (plano 033 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD, **reescrito em 2026-09-12**): *um usuário **ADMIN**
 edita no `/admin` em produção e a mudança é publicada sozinha, com cada elo provado por artefato.*
@@ -35,7 +35,7 @@ provar"**: não existe página que renderize conteúdo até a fase 3, e isso mud
 | 030 | Portão de conteúdo no CI: `content/` validado e referência resolvida | ✅ DONE | agente | implementer (sonnet) | `4343e42` |
 | 031 | Coerência do `tina-lock.json` verificada no CI | ✅ DONE | agente | implementer (sonnet) | `1de5d1d` |
 | 032 | `npm audit` no CI e política de severidade | ⬜ TODO | agente | implementer | — |
-| 033 | Avisos do painel para o manual da fase 5 | ⬜ TODO | agente | implementer | — |
+| 033 | Avisos do painel para o manual da fase 5 | ✅ DONE | agente | implementer (sonnet) | `0c2bd02` |
 | 034 | Documentação do pipeline no README e fechamento da fase 2 | ⬜ TODO | agente (+ orquestrador) | implementer | — |
 
 **Numeração é global e contínua e não é ordem de execução** — precedentes registrados: o plano 014
@@ -67,8 +67,18 @@ existir build automático que o publique (025). Os dois elos que sobravam — co
 (027) e cronometrar o ciclo com ele (029) — **saíram da fase em 2026-09-12** e passaram a abrir a
 fase 5, onde o 029 continua dependendo do 028 desta fase.
 
-**O que resta é curto:** **032** e **033** são de agente e podem ser disparados já; o **028** é do
-orquestrador e tem seu pré-requisito (030) satisfeito; o **034** fecha a fase depois dos três.
+**O que resta é curto:** o **033** fechou em 2026-09-12 (`0c2bd02`); o **032** é de agente mas está
+**parado numa decisão do stakeholder** (ver abaixo); o **028** é do orquestrador e tem seu
+pré-requisito (030) satisfeito; o **034** fecha a fase depois dos dois.
+
+> **O 032 não está pronto para despacho.** O `npm audit` hoje reporta
+> `11 vulnerabilities (8 moderate, 3 high)`, não as 8 moderadas que a fase 1 registrou — as três
+> `high` são `sharp`/libheif (GHSA-rgj7-g3m4-5g8c) via `miniflare` via `wrangler`, uma
+> devDependency, cadeia diferente da do `tinacms → react-router-dom`. O plano foi escrito com a
+> política "reprova em `high`/`critical`, relata `moderate`", que **deixaria o CI vermelho no
+> primeiro push** — exatamente o modo de falha que já custou 14 commits a este projeto. Antes de
+> despachar, o stakeholder decide entre subir o `wrangler`, reprovar só em `critical`, ou registrar
+> exceção nomeada e datada para esse advisory.
 
 ### O que pode rodar em paralelo, e o que não pode
 
