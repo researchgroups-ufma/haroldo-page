@@ -33,8 +33,9 @@ jobs:
           check=$(gh api --method GET "repos/$REPO/commits/$sha/check-runs" -f check_name="$CHECK" \
             --jq '.check_runs[0] // empty | [.status, (.conclusion // "-"), .details_url] | @tsv')
 
-          # O Workers Builds so cria o check ao terminar. Sem check ha mais de 30 min, o build nao
-          # foi registrado — sintoma do app GitHub <-> Cloudflare desconectado (plano 025).
+          # O check aparece segundos depois do push, ja `in_progress` (visto no plano 028). Sem check
+          # ha mais de 30 min, o build nao foi registrado — sintoma do app GitHub <-> Cloudflare
+          # desconectado (plano 025).
           if [ -z "$check" ]; then
             idade=$(( $(date +%s) - $(date -d "$data" +%s) ))
             if [ "$idade" -gt 1800 ]; then

@@ -37,9 +37,10 @@ falhou.** A reprovação gera o e-mail de falha do GitHub Actions ao ADMIN.
    GitHub atrasa agendamentos nesse horário.
 3. **Fonte: o check run no GitHub, não a API da Cloudflare.** O `GITHUB_TOKEN` com
    `checks: read` basta; não há secret novo para manter.
-4. **Reprova também quando falta o check** num commit com mais de 30 minutos. O Workers Builds só
-   cria o check ao terminar; se ele não existe muito depois do commit, o build não foi registrado,
-   que é o sintoma do app GitHub ↔ Cloudflare desconectado (plano 025).
+4. **Reprova também quando falta o check** num commit com mais de 30 minutos. O check aparece
+   segundos depois do push, já `in_progress` (visto no plano 028); se ele não existe muito depois
+   do commit, o build não foi registrado, que é o sintoma do app GitHub ↔ Cloudflare desconectado
+   (plano 025).
 5. **Olha só o commit mais recente.** Um save quebrado seguido de um save válido antes da execução
    não gera aviso, e é o correto, porque o site já foi atualizado.
 
@@ -68,9 +69,17 @@ falhou.** A reprovação gera o e-mail de falha do GitHub Actions ao ADMIN.
   (_Actions → Vigia do deploy → Enable workflow_).
 - **O destinatário depende de quem mexeu no cron por último.** Quem alterar essa linha passa a
   receber os avisos. Trocar de ADMIN significa essa pessoa fazer um commit no cron.
-- **Falso alarme possível:** a idade é medida pela data do commit, não pela do push. Um commit
-  feito mais de 30 min antes de ser empurrado, com o vigia rodando logo depois do push, reprova
-  sem motivo. É raro com uma execução por dia, e a execução seguinte corrige.
+- **Falso alarme improvável, mas possível:** a idade é medida pela data do commit, não pela do
+  push. Um commit feito mais de 30 min antes de ser empurrado só reprova sem motivo se o vigia
+  rodar antes de o check aparecer, e o check aparece segundos depois do push.
+- **Pendência nomeada: o e-mail pelo caminho `schedule` não foi observado.** No experimento do
+  plano 028 o cron foi trocado para `*/5` às 20:34Z de 2026-09-12 e o GitHub **não executou
+  nenhuma** execução agendada em ~90 min (workflow `active`, cron na `main`). A detecção e o
+  e-mail foram provados por `workflow_dispatch` (run 34720806455, e-mail em menos de 1 min), cujo
+  e-mail vai para quem dispara. Que o e-mail de execução agendada vai para quem alterou o cron por
+  último é regra **documentada** pelo GitHub, não observada. Fecha quando: (a) houver ao menos uma
+  execução `schedule` do vigia no histórico, provando que o cron diário roda; e (b) a primeira
+  falha real gerar e-mail vindo de uma execução `schedule`.
 - O e-mail depende das configurações de notificação da conta do ADMIN
   (_Settings → Notifications → Actions_), que ficam fora do repositório.
 

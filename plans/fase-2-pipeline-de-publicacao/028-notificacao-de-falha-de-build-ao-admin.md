@@ -271,6 +271,181 @@ mover o deploy para o GitHub Actions, plano B da §7.4) é decisão nova, não c
 
 ## Evidência
 
-<Preenchida por quem executar. O experimento sem os horários não prova F-02: "a notificação
-chegou" precisa de quando falhou e quando chegou. E o log lido, não só o exit code — o `astro
-check` deste projeto já imprimiu `[ERROR]` com exit 0 duas vezes.>
+> Executado pelo orquestrador em 2026-09-12, com o ADMIN nos passos de painel e caixa de e-mail.
+> Horários em UTC; o ADMIN relatou em BRT (UTC−3). `Status` mantido em `TODO`: a promoção depende
+> de decisão do stakeholder sobre o critério não cumprido (ver "Critério não cumprido").
+
+### Commits
+
+| SHA       | O que é                                                            | Push (UTC) |
+| --------- | ------------------------------------------------------------------ | ---------- |
+| `fee4e7f` | emenda do plano                                                    | 20:28:20Z  |
+| `86a6370` | `vigia-do-deploy.yml` + ADR-0011                                   | 20:28:20Z  |
+| `b8e4560` | **EXPERIMENTO**: `aulas: [ {} ]` + cron `*/5`                      | 20:34:24Z  |
+| `8a246be` | reversão de `b8e4560` (conteúdo válido, cron `17 12 * * *` de volta) | 22:05:27Z  |
+
+### Passo 0 — a Cloudflare não notifica
+
+Medição na emenda: `available_alerts` com 30 grupos e nenhum de Workers Builds; `policies` vazia;
+documentação oferece só Event Subscriptions. O ADMIN conferiu o painel: nenhuma opção.
+
+### Passo 1 — notificações da conta do ADMIN
+
+Relato do ADMIN: *System → Actions* com notificação **no GitHub e por e-mail**, **só para workflows
+que falharem**. O e-mail padrão da conta não foi transcrito; a chegada dos e-mails abaixo na caixa
+do ADMIN é a prova de que o destino está certo.
+
+### Passo 1a — o vigia
+
+Lógica exercitada localmente antes do push, com o mesmo script (SHA passado por variável):
+
+```
+== main atual
+commit: 78d5305fb2c6491498f30d0c2cbb784738f80ca5 (2026-09-12T16:35:44Z)
+check: status=completed conclusion=success
+Build de deploy verde.
+exit=0
+== 26de58a (antes do Workers Builds)
+::error::Nenhum 'Workers Builds: haroldo-page' em 26de58a55d3206bb8f578267539929e01f379697, 3281 min depois do commit.
+exit=1
+```
+
+Na `main` válida: `86a6370` com Workers Builds `success` (build `cac443a6`) e `qualidade`
+`success`. Vigia por `workflow_dispatch`, run 34717315883, `success`:
+
+```
+commit: 86a6370d5b3f641e94ab38676e77d630bac8dc25 (2026-09-12T20:28:17Z)
+check: status=completed conclusion=success
+Build de deploy verde.
+```
+
+`npm run format:check`: "All matched files use Prettier code style!"; `npm run lint` sem erro.
+
+### Passo 2 — linha de base
+
+- Versão publicada: `c3d2f67f-122a-453d-a48b-815710c418ee`, 100%, deploy `2bdeb078` de 20:30:36Z
+- `curl.exe -sI https://haroldo-page.and-near.workers.dev/` às **20:33:42Z**: `HTTP/1.1 200 OK`. O
+  Worker não devolve `etag` na raiz; a identidade da versão vem da API de deployments.
+
+### Passo 3 — o erro injetado, e por que este
+
+`aulas: [ {} ]` em `content/disciplinas/2025.1-mecanica-classica.md`: é o erro que o professor
+produz **sozinho pelo painel** (dívida 3 da fase 1, aviso 2 de `docs/avisos-do-painel-para-o-manual.md`).
+Erro sintético provaria outra coisa. Saída local de `npx vitest run tests/content`:
+
+```
++   "content/disciplinas/2025.1-mecanica-classica.md → campo 'aulas.0.numero': Invalid input: expected number, received undefined",
++   "content/disciplinas/2025.1-mecanica-classica.md → campo 'aulas.0.titulo': Invalid input: expected string, received undefined",
++   "content/disciplinas/2025.1-mecanica-classica.md → campo 'aulas.0.url': Invalid input: expected string, received undefined",
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 107 passed (108)
+```
+
+### Passos 4 e 5 — a falha do build de deploy
+
+Push de `b8e4560` às **20:34:24Z**. Build `f9650b87` (`GET /accounts/<id>/builds/builds/<uuid>`):
+`created_on` 20:34:25Z, `running_on` 20:34:27Z, `stopped_on` **20:35:14Z**, `build_outcome: fail`,
+`commit_hash` `b8e45609…`. **Duração: 47 s.** Reprovou no **primeiro** passo do `build:pipeline`,
+o `vitest run tests/content`. Log lido (`.../logs`), não só o veredito:
+
+```
+Executing user build command: npm run build:pipeline
+> vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+ ✓ tests/content/paridade-schema.test.ts (18 tests) 22ms
+ ✓ tests/content/schemas.test.ts (81 tests) 32ms
+ ✓ tests/content/tina-lock-coerente.test.ts (7 tests) 7ms
+ ❯ tests/content/conteudo-valido.test.ts (2 tests | 1 failed) 31ms
++   "content/disciplinas/2025.1-mecanica-classica.md → campo 'aulas.0.numero': Invalid input: expected number, received undefined",
++   "content/disciplinas/2025.1-mecanica-classica.md → campo 'aulas.0.titulo': Invalid input: expected string, received undefined",
++   "content/disciplinas/2025.1-mecanica-classica.md → campo 'aulas.0.url': Invalid input: expected string, received undefined",
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 107 passed (108)
+Failed: error occurred while running build command
+```
+
+Check runs de `b8e4560`: `Workers Builds: haroldo-page` `failure` (20:35:15Z); `qualidade`
+`failure` (20:39:59Z, run 34717493871). Nem `astro check` nem `astro build` chegaram a rodar.
+
+### Passo 6 — RNF-04 e F-02 com a `main` quebrada
+
+- `curl.exe -sI` às **20:40:31Z**: `HTTP/1.1 200 OK`
+- Deployment ativo às 20:40:29Z: ainda `2bdeb078`, versão **`c3d2f67f`** a 100%, **igual à linha
+  de base**
+- O arquivo inválido **permanece na `main`** (`GET contents/...?ref=main` terminando em
+  `aulas:` / `  - {}`)
+
+### Passo 5a — o vigia com a `main` quebrada
+
+**Nenhuma execução `schedule` ocorreu.** De 20:34Z a 22:05Z (~90 min), `gh run list --event
+schedule` vazio e `actions/runs?event=schedule` com `total_count: 0`. Workflow `active`
+(`id 356732123`), cron `*/5 * * * *` confirmado na `main`. É o agendador do GitHub não pegando o cron
+recém-alterado; a documentação só promete *"can be delayed during periods of high loads"*.
+
+Decisão do ADMIN: rodar por `workflow_dispatch`. Run **34720806455**, disparado 21:44:31Z,
+terminado 21:44:40Z, `conclusion: failure`:
+
+```
+commit: b8e45609be3f459fd61a0966ce38c86cdbb82578 (2026-09-12T20:34:22Z)
+check: status=completed conclusion=failure
+build: https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/f9650b87-8b0a-4a4a-aecd-b102a286c278
+##[error]Build de deploy de b8e45609be3f459fd61a0966ce38c86cdbb82578 terminou 'failure'. O site segue na versao anterior. Log: https://dash.cloudflare.com/…/builds/f9650b87-…
+##[error]Process completed with exit code 1.
+```
+
+### Passo 7 — e-mails
+
+| Canal                        | Origem                         | Chegada (relato do ADMIN) | Atraso                   | Conteúdo                                                                      |
+| ---------------------------- | ------------------------------ | ------------------------- | ------------------------ | ----------------------------------------------------------------------------- |
+| **Vigia** (canal de F-02)    | run 34720806455, `workflow_dispatch` | 18:45 BRT = 21:45Z        | < 1 min após o fim do run | corpo com "Vigia do deploy: All jobs have failed" e os dados do run            |
+| CI (secundário)              | run 34717493871, `push`        | 17:40 BRT = 20:40Z        | ~1 min após a falha      | `GitHub <notifications@github.com>`, `[researchgroups-ufma/haroldo-page] Run failed` |
+
+Atraso total que o experimento **mediu**, da falha do build (20:35:14Z) ao e-mail do vigia: não é
+representativo, porque o disparo foi manual às 21:44Z. Em produção, o atraso é de até ~24 h, pelo
+cron diário, mais o atraso do agendador.
+
+Observação para o manual: o assunto do e-mail do GitHub **não nomeia o workflow**; o CI e o vigia
+chegam com o mesmo `Run failed`, e só o corpo diz qual é.
+
+### Passo 8 — reversão
+
+Push de `8a246be` às **22:05:27Z**. Build `43d03ba9`: `running_on` 22:05:30Z, `stopped_on`
+22:07:29Z, `success`. Deployment `4ce5ae50` às 22:07:26Z com a **versão nova
+`b1c13465-a767-4cfc-8c0b-d1d31facd4f9`** a 100%. `qualidade` `success` (run 34721768721).
+`curl.exe -sI` às 22:08:01Z: `200 OK`. `git show HEAD:.github/workflows/vigia-do-deploy.yml`:
+`- cron: '17 12 * * *'`. Vigia por `workflow_dispatch` sobre a reversão, run 34721890077,
+`success`:
+
+```
+commit: 8a246be9d7f2566ed9f4cdae70d8993510a7e443 (2026-09-12T22:05:23Z)
+check: status=completed conclusion=success
+Build de deploy verde.
+```
+
+**Janela total de `main` quebrada:** 20:34:24Z → 22:07:26Z, **1 h 33 min**, com o site em
+`c3d2f67f` durante toda ela.
+
+### Passo 9 — F-09
+
+**Satisfeito.** A mensagem nomeia **arquivo** (`content/disciplinas/2025.1-mecanica-classica.md`),
+**campo** (`aulas.0.numero`, `aulas.0.titulo`, `aulas.0.url`) e **o esperado** (`expected number`,
+`expected string`), no formato do exemplo do PRD. O vigia acrescenta o link do log. Lacuna menor,
+não bloqueante: `Invalid input` vem do Zod em inglês e `aulas.0` é índice a partir de zero; a
+mensagem é para o ADMIN (§8.2), não para o professor.
+
+### Achado lateral
+
+O check `Workers Builds: haroldo-page` aparece `in_progress` enquanto o build roda (visto em
+`86a6370`), e não só ao terminar, como o comentário do workflow e o ADR-0011 diziam na primeira
+versão. Corrigidos no commit desta Evidência. O comportamento do vigia não muda, porque `status !=
+completed` já passava.
+
+### Critério não cumprido
+
+**"Execução agendada (`event: schedule`) do vigia reprovando sobre o commit quebrado"**: não
+ocorreu nenhuma execução agendada em ~90 min. Provado em seu lugar: a detecção (run manual
+reprovando com a mensagem certa) e a entrega do e-mail ao ADMIN em menos de 1 min. **O que segue
+não provado:** que o cron diário roda, e que o e-mail de uma execução `schedule` vai para o ADMIN
+(regra documentada pelo GitHub, não observada). Registrado como pendência nomeada no ADR-0011,
+com a condição de fechamento.
+
+`git status --short` ao final da reversão: limpo.
