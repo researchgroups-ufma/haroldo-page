@@ -28,7 +28,8 @@ jobs:
           set -euo pipefail
           sha=$(gh api "repos/$REPO/commits/main" --jq .sha)
           data=$(gh api "repos/$REPO/commits/$sha" --jq .commit.committer.date)
-          echo "commit: $sha ($data)"
+          idade=$(( $(date +%s) - $(date -d "$data" +%s) ))
+          echo "commit: $sha ($data), $(( idade / 60 )) min atras"
 
           check=$(gh api --method GET "repos/$REPO/commits/$sha/check-runs" -f check_name="$CHECK" \
             --jq '.check_runs[0] // empty | [.status, (.conclusion // "-"), .details_url] | @tsv')
@@ -37,7 +38,6 @@ jobs:
           # ha mais de 30 min, o build nao foi registrado — sintoma do app GitHub <-> Cloudflare
           # desconectado (plano 025).
           if [ -z "$check" ]; then
-            idade=$(( $(date +%s) - $(date -d "$data" +%s) ))
             if [ "$idade" -gt 1800 ]; then
               echo "::error::Nenhum '$CHECK' em $sha, $(( idade / 60 )) min depois do commit."
               exit 1
@@ -50,7 +50,15 @@ jobs:
           echo "check: status=$status conclusion=$conclusao"
           echo "build: $url"
 
+          # 60 min, nao 30, para o check que nunca chega a `completed`: o §7.4 da teto de 20 min por
+          # build e so 1 build simultaneo no plano gratuito, entao saves em sequencia enfileiram — um
+          # limite menor daria alarme falso numa fila legitima, e com uma execucao por dia o custo de
+          # esperar mais e nulo.
           if [ "$status" != "completed" ]; then
+            if [ "$idade" -gt 3600 ]; then
+              echo "::error::Check '$CHECK' de $sha preso em '$status' ha $(( idade / 60 )) min. Log: $url"
+              exit 1
+            fi
             echo "Build ainda em andamento."
             exit 0
           fi

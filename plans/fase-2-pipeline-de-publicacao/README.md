@@ -37,6 +37,7 @@ provar"**: não existe página que renderize conteúdo até a fase 3, e isso mud
 | 032 | `npm audit` no CI e política de severidade | ✅ DONE | agente | implementer (sonnet) | `fed445b` (emenda), `b992282` |
 | 033 | Avisos do painel para o manual da fase 5 | ✅ DONE | agente | implementer (sonnet) | `0c2bd02` |
 | 034 | Documentação do pipeline no README e fechamento da fase 2 | ✅ DONE | agente (+ orquestrador) | implementer (sonnet) | `ef7f258` |
+| 035 | Correções da revisão de integração da fase 2 | ⬜ TODO | agente | implementer | — |
 
 **Numeração é global e contínua e não é ordem de execução** — precedentes registrados: o plano 014
 rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase está abaixo.
@@ -253,6 +254,40 @@ foi consertada aqui — a regra deste README é destino nomeado, não conserto d
   cabeçalho atribui a dívida 7(c) a esse arquivo, mas ela foi fechada em `paridade-schema.test.ts`.
   A dívida **foi** fechada pelo plano 030; errada é só a atribuição de qual arquivo a fecha.
   **Fecha quando:** alguém corrigir a frase de passagem, no próximo plano que tocar esse arquivo.
+- **`PRD.md` §11 (≈:750) atribui a validação de conteúdo ao `astro build` no CI e diz "Bloqueia
+  merge"** (achado da revisão de integração da fase 2, 2026-09-12). O portão real é
+  `vitest run tests/content` (CI e `build:pipeline`), e a `main` **não tem proteção de branch** —
+  `gh api repos/researchgroups-ufma/haroldo-page/branches/main/protection` responde
+  `Branch not protected`. O TinaCloud empurra direto na `main`. **Fecha quando:** o §11 for corrigido
+  para nomear `vitest run tests/content` como o portão, e a célula "Bloqueia merge" refletir a
+  ausência de proteção de branch — ou a proteção for criada.
+- **README da fase 2, "Verificação autoritativa" (≈:368-386), parou antes do plano 030** (achado da
+  revisão de integração da fase 2, 2026-09-12). Não lista o `npm audit` nem o check `Workers
+  Builds`, e ainda diz "Enquanto o plano 030 não fechar" — o 030 fechou em 2026-09-11. A fase 3
+  herda essa seção como roteiro se ninguém atualizar antes. **Fecha quando:** a seção for reescrita
+  com os passos atuais (incluindo `npm audit` e o check `Workers Builds`) e sem a frase condicional
+  ao 030.
+- **`npm run build` chamado de "portão pré-push"** — achado da revisão de integração da fase 2,
+  2026-09-12. `grep -n "pré-push" README.md docs/adr/0009-build-de-pipeline-sem-cloud-check.md
+  plans/fase-2-pipeline-de-publicacao/README.md` acha três passagens com esse nome: `README.md:86`,
+  `ADR-0009:58` e este README (linha 1 da tabela "Herdado da fase 1", "onde cada uma das sete
+  dívidas caiu"). Para mudança de schema, o cloud check só passa **depois** do
+  push e da reindexação do TinaCloud; seguida à risca numa branch, `npm run build` local reprova
+  com `ERR_CLOUD_CHECK_FAILED` até a reindexação acontecer — a ordem certa é publicada logo abaixo,
+  na seção "Ordem de fechamento de plano que mude schema". **A seção Qualidade do `README.md`
+  (≈:294-303, "Antes de abrir um PR, rode…") não usa o nome "portão pré-push"**, mas descreve o
+  mesmo `npm run build` como passo anterior ao PR, e a mesma trava vale para ela — é um segundo
+  caso, sem o rótulo. O plano 035 editou o ADR-0009 e o `README.md` sem corrigir nenhuma das duas
+  passagens, por instrução explícita de registrar, não consertar. **Fecha quando:** as três
+  passagens nomeadas forem reescritas para descrever a ordem real (revisão → commit → push →
+  TinaCloud reindexa → `npm run build` verde) em vez de chamar o comando de "portão pré-push", **e**
+  a seção Qualidade do `README.md` ganhar a mesma ressalva sobre schema.
+- **PRD §7.4 (≈:492): o "Plano B" do Workers Builds (deploy pelo GitHub Actions) muda o nome do
+  check e faz o vigia reprovar todo dia com "Nenhum check"** (achado da revisão de integração da
+  fase 2, 2026-09-12). A célula não aponta o ADR-0011. O ADR rejeita esse caminho porque ele
+  "desfaz o plano 025 para resolver um problema de notificação" (Alternativas consideradas); a
+  mudança de nome do check aparece só entre os "Gatilhos de revisão" do ADR, não como motivo da
+  rejeição. **Fecha quando:** a célula do "Plano B" no §7.4 referenciar o ADR-0011.
 
 **Consideradas e descartadas como dívida, com o motivo:**
 

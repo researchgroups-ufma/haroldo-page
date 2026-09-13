@@ -263,18 +263,19 @@ ficar defasado — ver [Painel de edição](#painel-de-edição).
 ## Deploy
 
 `npm run deploy` continua existindo, mas como **caminho manual de emergência** — não é o caminho
-normal desde que o Workers Builds foi ligado ao repositório (plano 025, 2026-09-11). A diferença
-importa: os dois pipelines automáticos rodam `npm run build:pipeline` (sem cloud check —
-ADR-0009), enquanto `npm run deploy` roda `npm run build`, **com** o cloud check do TinaCloud —
-o comando mais estrito é o certo numa máquina onde o que está no disco pode não estar em `main`.
-Use-o só se o Workers Builds estiver indisponível:
+normal desde que o Workers Builds foi ligado ao repositório (plano 025, 2026-09-11). Desde a
+emenda de 2026-09-12 (revisão de integração da fase 2, ADR-0009 ponto 4), ele roda
+`vitest run tests/content && npm run build && wrangler deploy`: o mesmo portão de conteúdo que os
+pipelines automáticos rodam em `build:pipeline`, **mais** o cloud check do TinaCloud que
+`npm run build` já tinha. Use-o só se o Workers Builds estiver indisponível:
 
 ```bash
 npm run deploy
 ```
 
-Isso roda `npm run build` (gera `dist/`) e em seguida `wrangler deploy`, que publica o
-conteúdo de `dist/` no Cloudflare Workers (Static Assets), conforme `wrangler.toml`.
+Isso roda `vitest run tests/content` (recusa conteúdo inválido salvo pelo painel), depois
+`npm run build` (gera `dist/`) e em seguida `wrangler deploy`, que publica o conteúdo de `dist/`
+no Cloudflare Workers (Static Assets), conforme `wrangler.toml`.
 
 O site é servido inteiramente como assets estáticos, sem SSR e sem adapter (decisão D-01 do
 PRD): não há código rodando por requisição, então **nunca adicione um `adapter` ao

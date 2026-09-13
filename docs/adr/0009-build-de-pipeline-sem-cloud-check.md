@@ -72,6 +72,15 @@ Quatro pontos, cada um com razão própria:
    é o caminho de emergência, rodado por um humano numa máquina onde o disco pode não estar em
    sincronia com `main`.
 
+   **Emenda (2026-09-12, revisão de integração da fase 2):** o `deploy` **não rodava**
+   `vitest run tests/content` — só o `astro check`, que sai com exit 0 diante de referência
+   inválida (planos 020/021, ponto 3 acima). Com o Workers Builds fora do ar e a `main` com
+   conteúdo inválido salvo pelo painel, `npm run deploy` publicaria o que o deploy automático
+   recusaria. `package.json` passa a ter
+   `"deploy": "vitest run tests/content && npm run build && wrangler deploy"`: o deploy de
+   emergência roda o mesmo portão de conteúdo do `build:pipeline`, **mais** o cloud check que já
+   tinha.
+
 ## Alternativas consideradas
 
 - **Manter o cloud check no pipeline e reexecutar o job quando falhar por reindexação.**

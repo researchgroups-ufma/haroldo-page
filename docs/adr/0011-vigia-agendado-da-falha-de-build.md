@@ -37,10 +37,17 @@ falhou.** A reprovação gera o e-mail de falha do GitHub Actions ao ADMIN.
    GitHub atrasa agendamentos nesse horário.
 3. **Fonte: o check run no GitHub, não a API da Cloudflare.** O `GITHUB_TOKEN` com
    `checks: read` basta; não há secret novo para manter.
-4. **Reprova também quando falta o check** num commit com mais de 30 minutos. O check aparece
-   segundos depois do push, já `in_progress` (visto no plano 028); se ele não existe muito depois
-   do commit, o build não foi registrado, que é o sintoma do app GitHub ↔ Cloudflare desconectado
-   (plano 025).
+4. **Reprova em dois casos, cada um com seu limite.** **(a) Check ausente** num commit com mais de
+   **30 minutos**: o check aparece segundos depois do push, já `in_progress` (visto no plano 028);
+   se ele não existe muito depois do commit, o build não foi registrado, que é o sintoma do app
+   GitHub ↔ Cloudflare desconectado (plano 025). **(b) Check presente mas nunca `completed`** (preso
+   em `queued` ou `in_progress`) num commit com mais de **60 minutos** — emenda de 2026-09-12,
+   revisão de integração da fase 2: sem esse limite, um build travado por incidente da Cloudflare
+   faz o vigia responder "em andamento" indefinidamente, todo dia, sem que ninguém seja avisado. O
+   limite é maior que o do caso (a) porque o §7.4 dá teto de 20 min por build e só 1 build
+   simultâneo no plano gratuito da Cloudflare, então saves em sequência enfileiram; um limite menor
+   daria alarme falso numa fila legítima, e com uma execução por dia o custo de esperar mais é
+   nulo.
 5. **Olha só o commit mais recente.** Um save quebrado seguido de um save válido antes da execução
    não gera aviso, e é o correto, porque o site já foi atualizado.
 
@@ -71,7 +78,11 @@ falhou.** A reprovação gera o e-mail de falha do GitHub Actions ao ADMIN.
   receber os avisos. Trocar de ADMIN significa essa pessoa fazer um commit no cron.
 - **Falso alarme improvável, mas possível:** a idade é medida pela data do commit, não pela do
   push. Um commit feito mais de 30 min antes de ser empurrado só reprova sem motivo se o vigia
-  rodar antes de o check aparecer, e o check aparece segundos depois do push.
+  rodar antes de o check aparecer, e o check aparece segundos depois do push. **Emenda (2026-09-12,
+  revisão de integração da fase 2):** com o limite de 60 min do item 4(b), o mesmo risco vale para o
+  check não concluído — um commit feito mais de 60 min antes do push, cujo build ainda esteja
+  `queued`/`in_progress` às 12:17 UTC (fila legítima do plano gratuito, só 1 build simultâneo — ver
+  item 4), também reprova sem que o build de deploy tenha de fato falhado.
 - **Pendência nomeada: o e-mail pelo caminho `schedule` não foi observado.** No experimento do
   plano 028 o cron foi trocado para `*/5` às 20:34Z de 2026-09-12 e o GitHub **não executou
   nenhuma** execução agendada em ~90 min (workflow `active`, cron na `main`). A detecção e o

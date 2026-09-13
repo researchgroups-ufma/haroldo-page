@@ -60,14 +60,14 @@ e o critério do EDITOR foi inteiro para a fase 5. O §3.3 também mudou: **M-02
 **O que isto não resolve, e é a parte que importa:** o recorte **não alcança o site navegável**
 enquanto a **Q-04** (referências visuais) não for respondida — ela bloqueia a fase 3 pela regra do
 §16, e o responsável é o **dono do produto**, não o professor. Dos quatro planos restantes da fase
-2, o **033**, o **032** e o **028** fecharam em 2026-09-12; sobra o **034**, que a leva a 5/5.
+2, o **033**, o **032**, o **028** e o **034** fecharam em 2026-09-12, levando-a a 5/5.
 
 ## Convenções
 
 **Numeração é global e contínua**, não reinicia a cada fase — e **não é ordem de execução**: o
 022 rodou antes do 021, como o 014 rodou depois de a fase 0 fechar, e o 027 mudou de fase sem mudar
-de número. O **033**, o **032** e o **028** fecharam em 2026-09-12; o próximo é o **034**, que fecha
-a fase 2. Isso preserva as
+de número. O **033**, o **032**, o **028** e o **034** fecharam em 2026-09-12, o último fechando a
+fase 2. Isso preserva as
 referências já espalhadas por commits, ADRs, Evidências e pelo PRD — um "plano 007" identifica um
 arquivo só, para sempre.
 
