@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-12 (fase concluída — plano 034 DONE)
+Última atualização: 2026-09-12 (fase concluída — planos 034 e 035 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD, **reescrito em 2026-09-12**): *um usuário **ADMIN**
 edita no `/admin` em produção e a mudança é publicada sozinha, com cada elo provado por artefato.*
@@ -37,7 +37,7 @@ provar"**: não existe página que renderize conteúdo até a fase 3, e isso mud
 | 032 | `npm audit` no CI e política de severidade | ✅ DONE | agente | implementer (sonnet) | `fed445b` (emenda), `b992282` |
 | 033 | Avisos do painel para o manual da fase 5 | ✅ DONE | agente | implementer (sonnet) | `0c2bd02` |
 | 034 | Documentação do pipeline no README e fechamento da fase 2 | ✅ DONE | agente (+ orquestrador) | implementer (sonnet) | `ef7f258` |
-| 035 | Correções da revisão de integração da fase 2 | ⬜ TODO | agente | implementer | — |
+| 035 | Correções da revisão de integração da fase 2 | ✅ DONE | agente | implementer (sonnet) | `f7c31d3` |
 
 **Numeração é global e contínua e não é ordem de execução** — precedentes registrados: o plano 014
 rodou depois de a fase 0 fechar, e o 022 rodou antes do 021. A ordem desta fase está abaixo.

@@ -4,7 +4,7 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-12 (fase 2 concluída — plano 034 DONE)
+Última atualização: 2026-09-12 (fase 2 concluída — planos 034 e 035 DONE)
 
 ## Fases
 

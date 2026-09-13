@@ -1,6 +1,6 @@
 # Plano 035 — Correções da revisão de integração da fase 2: deploy de emergência e vigia com build travado
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **F-02**, **F-09**, RNF-04, §10.5; bloqueantes da revisão de integração do
 `/fechar-fase` da fase 2
 **Depende de:** planos 024, 028, 030 e 034 (todos DONE)
@@ -164,8 +164,7 @@ commits `—`).
 - [x] Quatro dívidas registradas no README da fase, com "fecha quando"; linha do 035 na tabela
 - [x] `npm run lint`, `npm run format:check`, `npm run test:coverage` e `npm run build` verdes
 - [x] `PRD.md` intocado; `Status:` em `TODO`
-- [ ] CI e Workers Builds com `success` no commit empurrado (orquestrador) — não se aplica a este
-      executor: nenhum commit foi feito nesta execução, por instrução do despacho.
+- [x] CI e Workers Builds com `success` no commit empurrado (orquestrador) — `f7c31d3`, ver "Promoção"
 
 ## Evidência
 
@@ -731,3 +730,32 @@ $ git status --short
 
 Nenhum commit, nenhum push, `npm run deploy`/`wrangler deploy` não rodados, `Status:` continua
 `TODO`.
+
+### Promoção — preenchido pelo orquestrador
+
+**Revisão APROVADA no ciclo 2.** O ciclo 1 aprovou o código (o revisor extraiu o script do YAML com
+`yaml.safe_load` e repetiu, com um `gh` falso próprio, `in_progress` 90 min → exit 1, 10 min → exit
+0, `queued` 61 min → exit 1, 59 min → exit 0) e reprovou três frases: a dívida do §7.4 atribuía ao
+ADR-0011 uma razão que ele não dá; a Evidência dizia "três" linhas pré-existentes onde eram duas; e a
+dívida do "portão pré-push" contava quatro passagens com o rótulo onde há três. Os dois não
+bloqueantes baratos (linha defasada da "Verificação autoritativa" e o falso alarme do limite de
+60 min nas Consequências do ADR-0011) foram corrigidos junto. Ficou de fora, deliberadamente, o
+comentário de 4 linhas no workflow (o plano pedia "numa linha"; o conteúdo está certo).
+
+**Commit do trabalho:** `f7c31d3`. Os dois pipelines verdes:
+
+```
+gh api repos/researchgroups-ufma/haroldo-page/commits/f7c31d3/check-runs
+
+Workers Builds: haroldo-page  success  https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/e393d260-7225-4e16-abef-8a2283e29ed0
+qualidade                     success  https://github.com/researchgroups-ufma/haroldo-page/actions/runs/34732029361/job/103656459729
+```
+
+**Vigia alterado rodando no runner de verdade**, por `workflow_dispatch` sobre `f7c31d3`, run
+34732151287, `success`:
+
+```
+commit: f7c31d312743ee4edce5ee7056a2754d5456def3 (2026-09-13T02:02:19Z), 2 min atras
+check: status=completed conclusion=success
+Build de deploy verde.
+```
