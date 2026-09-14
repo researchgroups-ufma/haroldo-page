@@ -22,6 +22,12 @@ dist/
 # Se o stakeholder quiser versioná-lo, basta remover esta linha.
 lattes.pdf
 
+# Referências visuais da Q-04 — insumo local, não versionado por decisão do
+# stakeholder (2026-09-14): inclui capturas de portfólios de terceiros e o
+# repositório é público. `docs/identidade-visual.md` já traduz tudo o que o
+# projeto precisa delas.
+ref/
+
 # Estado local do Wrangler
 .wrangler/
 

@@ -4,7 +4,7 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-12 (fase 2 concluída — planos 034 e 035 DONE)
+Última atualização: 2026-09-14 (fase 3 fatiada em 18 planos, 036–053)
 
 ## Fases
 
@@ -13,7 +13,7 @@ Este arquivo é só o mapa.
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
 | [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–022, todos DONE — o 021 promovido em `7d5b7e6`, com CI verde sobre `26de58a` |
 | [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟢 **Concluída (5/5)** | 023, 024, 025, 026, 030 e 031 DONE — o pipeline publica sozinho desde `ab0d1f8`, desde `7ab84da` está provado que o `/admin` em produção é quem origina o push, e desde `4343e42`/`1de5d1d` conteúdo inválido e `tina-lock.json` defasado reprovam no CI e no build de deploy. o **033** fechou em `0c2bd02` e o **032** em `b992282`, os dois com os pipelines verdes — o CI passa a auditar dependências, reprovando em `high`/`critical`. O **028** fechou em `5528ad6`: falha do build de deploy chega ao ADMIN por um vigia agendado no GitHub Actions (ADR-0011), com uma pendência nomeada. **O 034 documentou o pipeline no README e fechou o checklist da fase em 5/5** — promovido a DONE, trabalho em `ef7f258`, com CI e Workers Builds verdes |
-| `fase-3-site-publico/` | 3 — Site público em português | 🔴 **Bloqueada** | não fatiada — **a Q-04 (referências visuais) continua aberta** e o §16 proíbe começar fase que dependa de questão aberta. O stakeholder fornecerá as referências |
+| [`fase-3-site-publico/`](fase-3-site-publico/README.md) | 3 — Site público em português | ⬜ Não iniciada — **fatiada** | **fatiada em 2026-09-14** em 18 planos, **036–053**, todos TODO. A Q-04 foi respondida e adaptada ao projeto em [`docs/identidade-visual.md`](../docs/identidade-visual.md), fonte única do visual, com os recortes da sabatina `identidade-visual`. Uma questão para o stakeholder (Q-RN02, ordem dentro do ano em Publicações) **não bloqueia a execução**, mas bloqueia o fechamento (plano 053) |
 | `fase-4-internacionalizacao/` | 4 — Internacionalização | ⬜ Não iniciada | — |
 | [`fase-5-polimento-e-entrega/`](fase-5-polimento-e-entrega/README.md) | 5 — Polimento e entrega | ⬜ Não iniciada | não fatiada; já contém os planos **027** e **029**, migrados da fase 2 em 2026-09-12 |
 
