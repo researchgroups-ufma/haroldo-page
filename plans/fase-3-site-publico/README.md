@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-16 (planos 036 e 037 DONE)
+Última atualização: 2026-09-16 (planos 036, 037 e 038 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -24,7 +24,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 |---|---|---|---|---|---|
 | 036 | Tokens de cor, escala tipográfica e Archivo auto-hospedada | ✅ DONE | agente | implementer (sonnet) | `fb117b6` |
 | 037 | Dicionário de interface em PT e mapa de navegação | ✅ DONE | agente | implementer (sonnet) | `23d1aa0` |
-| 038 | Texto corrido em parágrafos, contagem com dois dígitos e data pt-BR | ⬜ TODO | agente | implementer (sonnet) | — |
+| 038 | Texto corrido em parágrafos, contagem com dois dígitos e data pt-BR | ✅ DONE | agente | implementer (sonnet) | `1d0d3a5` |
 | 039 | Filtro de rascunho (RN-01), singleton e ordenação de pesquisa | ⬜ TODO | agente | implementer (sonnet) | — |
 | 040 | Publicações agrupadas por ano (RN-02), autor destacado e links DOI/arXiv | ⬜ TODO | agente | implementer (sonnet) | — |
 | 041 | Disciplinas: slug da URL, atuais × anteriores, contagens e scripts por aula (F-13) | ⬜ TODO | agente | implementer (sonnet) | — |
@@ -112,7 +112,7 @@ Cada uma está escrita, com o detalhe, no "Contexto necessário" do plano que a 
 2. **Texto longo é texto simples, em parágrafos por linha em branco — não Markdown (plano 038).**
    `bio`, `corpo`, `ementa`, `resumo` e as `descricao` são `type: 'string'` com
    `ui.component: 'textarea'` em `tina/config.ts`: o professor não vê pré-visualização de Markdown,
-   e um `*` ou `_` de fórmula viraria itálico sem aviso. Separador: `/\n\s*\n/`; quebra simples
+   e um `*` ou `_` de fórmula viraria itálico sem aviso. Separador: `/\n\s*\n/` (o plano 038 implementou `/\n[ \t]*\n/`, com o mesmo resultado depois de `trim` e filtro — nota de 2026-09-16); quebra simples
    vira espaço (colapso normal do HTML). Renderizado **sempre** por interpolação `{p}` (escapada
    pelo Astro), **nunca** `set:html`. Markdown/LaTeX é RF-33 (COULD), fora desta fase.
 3. **Slug da disciplina = `slugify` do nome do arquivo, sem a extensão (plano 041).**

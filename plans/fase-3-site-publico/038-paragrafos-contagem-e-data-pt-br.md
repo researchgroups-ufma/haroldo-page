@@ -1,6 +1,6 @@
 # Plano 038 — Texto corrido em parágrafos, contagem com dois dígitos e data pt-BR
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** §8.3 (datas por locale), RF-21/RF-22/RF-24 (texto longo legível), §11 (formatação
 de datas por locale, teste unitário)
 **Depende de:** nenhum
@@ -89,11 +89,11 @@ referência ao PRD (`§8.3`) no comentário da regra de data.
 
 ## Critérios de aceitação
 
-- [ ] `toParagraphs`, `padCount` e `formatDate` com os comportamentos listados, e nenhum uso de `Date`/`Intl` em `date.ts`
-- [ ] Todos os casos de teste listados existem e passam
-- [ ] Canários (a) e (b) mostrados vermelhos e revertidos
-- [ ] Cobertura agregada ≥ 80%; `lint` e `format:check` verdes, com saída colada
-- [ ] Cabeçalho §10.1 e TSDoc, com a docstring de `toParagraphs` proibindo `set:html`
+- [x] `toParagraphs`, `padCount` e `formatDate` com os comportamentos listados, e nenhum uso de `Date`/`Intl` em `date.ts`
+- [x] Todos os casos de teste listados existem e passam
+- [x] Canários (a) e (b) mostrados vermelhos e revertidos
+- [x] Cobertura agregada ≥ 80%; `lint` e `format:check` verdes, com saída colada
+- [x] Cabeçalho §10.1 e TSDoc, com a docstring de `toParagraphs` proibindo `set:html`
 
 ## Evidência
 
@@ -441,3 +441,57 @@ Lines        : 100% ( 63/63 )
 - Verificação no navegador — não aplicável (plano sem página/rota).
 - CI do GitHub Actions e Workers Builds — nada foi commitado nem empurrado nesta sessão.
 - `git add` / commit — não executado, por instrução explícita (Status permanece `TODO`).
+
+### Verificação autoritativa e promoção (orquestrador, 2026-09-16)
+
+**Verificação independente, ciclo 0** (`triage-runner`, antes da revisão; trechos literais):
+`npm run test:coverage` → `Tests  167 passed (167)`, `Branches : 93.75% ( 15/16 )`;
+`npm run build:pipeline` → `Tests  108 passed (108)`, `Result (27 files):` `0 errors`,
+`0 warnings`, `0 hints`, `Complete!`, 0 linhas `[ERROR]`.
+
+**Revisão, ciclo 0: REPROVADA** com um bloqueante — o `afterEach` do teste de fuso fazia
+`process.env.TZ = originalTz` com `originalTz === undefined`, e o Node grava a string `"undefined"`,
+deixando o processo em UTC em vez de restaurar a ausência da variável. Correção e canário na
+subseção "Ciclo 1 de correção", acima.
+
+**Determinismo de fuso também em máquina UTC (o CI)**, conferido pelo orquestrador no Node desta
+máquina, porque o canário (b) desta máquina (UTC−3) ficaria vermelho mesmo sem a troca de `TZ`:
+
+```
+$ TZ=UTC node -e "console.log('env TZ=UTC antes do start', new Date('2026-08-10').toLocaleDateString('pt-BR')); process.env.TZ='America/Fortaleza'; console.log('trocado p/ Fortaleza', new Date('2026-08-10').toLocaleDateString('pt-BR'))"
+env TZ=UTC antes do start 10/08/2026
+trocado p/ Fortaleza 09/08/2026
+```
+
+**Verificação independente, ciclo 1** (`triage-runner`, sobre a correção; trechos literais):
+
+```
+$ npm run test:coverage
+ Test Files  10 passed (10)
+      Tests  167 passed (167)
+Statements   : 100% ( 66/66 )
+Branches     : 93.75% ( 15/16 )
+Functions    : 100% ( 22/22 )
+Lines        : 100% ( 63/63 )
+```
+
+```
+$ TZ=UTC npx vitest run tests/lib/date.test.ts
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+```
+
+`npm run lint` exit 0; `npm run format:check` → `All matched files use Prettier code style!`. Build
+não repetido no ciclo 1: só `tests/lib/date.test.ts` mudou, fora do build.
+
+**Revisão, ciclo 1: APROVADA.** Não bloqueante: o README da fase (decisão 2) dava o separador como
+`/\n\s*\n/` e o plano e o código usam `/\n[ \t]*\n/` — mesmo resultado depois de `trim` e filtro;
+nota acrescentada no README.
+
+**CI sobre o commit empurrado `1d0d3a5`:**
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/1d0d3a5/check-runs --jq '.check_runs[] | "\(.name)\t\(.conclusion)\t\(.details_url)"'
+Workers Builds: haroldo-page	success	https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/fdd6b95c-93a8-4cc3-908e-0638e0f9a6d5
+qualidade	success	https://github.com/researchgroups-ufma/haroldo-page/actions/runs/35156351826/job/104996591174
+```
