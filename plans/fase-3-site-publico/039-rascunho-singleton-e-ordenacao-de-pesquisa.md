@@ -1,6 +1,6 @@
 # Plano 039 — Filtro de rascunho (RN-01), singleton e ordenação de pesquisa
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RN-01, RF-10, RF-22, RF-13, RF-20 (contagem de linhas); §11 (filtro de rascunhos)
 **Depende de:** nenhum
 **Modelo recomendado:** sonnet
@@ -116,12 +116,12 @@ do rascunho (RN-01). Comente com `// RN-01`.
 
 ## Critérios de aceitação
 
-- [ ] As seis funções exportadas existem com as assinaturas e regras acima, sem importar `astro:content`
-- [ ] `relatedLineAnchor` não produz âncora para linha não publicada
-- [ ] Invariante com `content/publicacoes` real passa sem afirmar contagem exata
-- [ ] Canários (a) e (b) mostrados vermelhos e revertidos
-- [ ] `astro check`, `lint`, `format:check` e `test:coverage` (≥ 80%) verdes, com saída colada
-- [ ] Cabeçalho §10.1 e TSDoc; comentários `// RN-01` nas regras de rascunho
+- [x] As seis funções exportadas existem com as assinaturas e regras acima, sem importar `astro:content`
+- [x] `relatedLineAnchor` não produz âncora para linha não publicada
+- [x] Invariante com `content/publicacoes` real passa sem afirmar contagem exata
+- [x] Canários (a) e (b) mostrados vermelhos e revertidos
+- [x] `astro check`, `lint`, `format:check` e `test:coverage` (≥ 80%) verdes, com saída colada
+- [x] Cabeçalho §10.1 e TSDoc; comentários `// RN-01` nas regras de rascunho
 
 ## Evidência
 
@@ -502,3 +502,46 @@ portão original deste plano (os dois testes novos deste ciclo, um por item bloq
 `Status:` continua `TODO`; nenhum checkbox marcado; nada commitado; nenhum arquivo fora de
 `src/lib/research.ts` (só nos dois canários, revertidos) e `tests/lib/research.test.ts` foi
 tocado neste ciclo.
+
+### Verificação autoritativa e promoção (orquestrador, 2026-09-16)
+
+**Verificação independente, ciclo 0** (`triage-runner`; trechos literais): `ls src/lib/` sem
+`__typecheck039.ts`; `npm run test:coverage` → `Tests  183 passed (183)`, `Branches : 95.65% ( 44/46 )`;
+`npm run build:pipeline` → `Tests  108 passed (108)`, `Result (31 files):` `0 errors`, `0 warnings`,
+`0 hints`, `Complete!`, 0 linhas `[ERROR]`.
+
+**Revisão, ciclo 0: REPROVADA** com dois bloqueantes, ambos de teste que não discriminava a regra:
+(1) "Óptica" vs "Ondas" sai igual com `localeCompare('pt-BR')` e com comparação código a código —
+trocar o comparador não quebrava o teste; (2) o desempate por `titulo` entre linhas com a mesma
+`ordem` não tinha teste (ramo de `research.ts:44`). A prova de tipos por arquivo temporário foi
+aceita como cumprimento do passo 4. Correções e canários na subseção "Ciclo 1 de correção", acima.
+
+**Verificação independente, ciclo 1** (`triage-runner`; trechos literais):
+
+```
+$ npm run test:coverage
+ Test Files  12 passed (12)
+      Tests  185 passed (185)
+Statements   : 100% ( 101/101 )
+Branches     : 97.82% ( 45/46 )
+Functions    : 100% ( 32/32 )
+Lines        : 100% ( 90/90 )
+```
+
+`npm run lint` exit 0; `npm run format:check` → `All matched files use Prettier code style!`;
+`npx astro check` → `Result (31 files):` `0 errors`, `0 warnings`, `0 hints`. Build não repetido no
+ciclo 1: só `tests/lib/research.test.ts` mudou.
+
+**Revisão, ciclo 1: APROVADA**, com `research.ts` conferido idêntico ao do ciclo 0. Não bloqueantes:
+o comentário de `tests/lib/research.test.ts:24` atribui a `localeCompare` o array que é devolvido
+pelo `sort`; uma frase da subseção do ciclo 1 diz que `git diff` mostraria a reversão em
+`research.ts`, que não é rastreado — a prova válida é o `grep`, colado; o invariante de
+`published.test.ts` só discrimina enquanto existir um rascunho real em `content/publicacoes/`.
+
+**CI sobre o commit empurrado `5705e73`:**
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/5705e73/check-runs --jq '.check_runs[] | "\(.name)\t\(.conclusion)\t\(.details_url)"'
+Workers Builds: haroldo-page	success	https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/2457476d-89f2-4f85-bb67-c3726e4a1e07
+qualidade	success	https://github.com/researchgroups-ufma/haroldo-page/actions/runs/35157907737/job/105001616710
+```

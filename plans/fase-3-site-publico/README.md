@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-16 (planos 036, 037 e 038 DONE)
+Última atualização: 2026-09-16 (planos 036 a 039 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -25,7 +25,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | 036 | Tokens de cor, escala tipográfica e Archivo auto-hospedada | ✅ DONE | agente | implementer (sonnet) | `fb117b6` |
 | 037 | Dicionário de interface em PT e mapa de navegação | ✅ DONE | agente | implementer (sonnet) | `23d1aa0` |
 | 038 | Texto corrido em parágrafos, contagem com dois dígitos e data pt-BR | ✅ DONE | agente | implementer (sonnet) | `1d0d3a5` |
-| 039 | Filtro de rascunho (RN-01), singleton e ordenação de pesquisa | ⬜ TODO | agente | implementer (sonnet) | — |
+| 039 | Filtro de rascunho (RN-01), singleton e ordenação de pesquisa | ✅ DONE | agente | implementer (sonnet) | `5705e73` |
 | 040 | Publicações agrupadas por ano (RN-02), autor destacado e links DOI/arXiv | ⬜ TODO | agente | implementer (sonnet) | — |
 | 041 | Disciplinas: slug da URL, atuais × anteriores, contagens e scripts por aula (F-13) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 042 | Layout base, cabeçalho com menu do celular e rodapé | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
