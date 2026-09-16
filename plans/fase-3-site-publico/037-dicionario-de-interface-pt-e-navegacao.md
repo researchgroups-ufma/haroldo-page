@@ -1,6 +1,6 @@
 # Plano 037 — Dicionário de interface em PT e mapa de navegação
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** §10.4 (strings de interface fora dos componentes), §7.6; pré-requisito de M-07
 (fase 4) e do item "Layout base, cabeçalho, rodapé e navegação" do §12 da fase 3
 **Depende de:** nenhum
@@ -142,8 +142,8 @@ com o `href` (assim `/ensino/2026-2-relatividade-geral/` ativa "Ensino", §5.1 d
 
 ## Critérios de aceitação
 
-- [ ] `src/i18n/pt.ts` contém exatamente as chaves listadas, com os valores literais
-- [ ] Os quatro mapas de enum são tipados a partir dos schemas Zod
+- [x] `src/i18n/pt.ts` contém exatamente as chaves listadas, com os valores literais
+- [x] Os quatro mapas de enum são tipados a partir dos schemas Zod
 
 > **Nota 2026-09-16 (revisão do 037):** o plano se contradiz — o "Contexto necessário" nomeia **cinco**
 > chaves que são "exatamente os valores dos enums" (`research.status`, `course.status`,
@@ -152,11 +152,11 @@ com o `href` (assim `/ensino/2026-2-relatividade-geral/` ativa "Ensino", §5.1 d
 > executor tipou e testou os cinco; o revisor julgou o critério satisfeito, porque tipar só quatro
 > violaria a lista nomeada. O texto do critério não foi alterado.
 
-- [ ] `NAV_ITEMS` com cinco itens, `href` com barra final; `isActivePath` cobre os seis casos listados
-- [ ] `tests/i18n/pt.test.ts` e `tests/lib/navigation.test.ts` passam; canários (a) e (b) mostrados vermelhos e revertidos
-- [ ] Nenhum `en`, seletor ou função de locale criado
-- [ ] Cobertura agregada ≥ 80% e `lint`/`format:check` verdes, com saída colada
-- [ ] Cabeçalho §10.1 e TSDoc nos dois módulos
+- [x] `NAV_ITEMS` com cinco itens, `href` com barra final; `isActivePath` cobre os seis casos listados
+- [x] `tests/i18n/pt.test.ts` e `tests/lib/navigation.test.ts` passam; canários (a) e (b) mostrados vermelhos e revertidos
+- [x] Nenhum `en`, seletor ou função de locale criado
+- [x] Cobertura agregada ≥ 80% e `lint`/`format:check` verdes, com saída colada
+- [x] Cabeçalho §10.1 e TSDoc nos dois módulos
 
 ## Evidência
 
@@ -378,3 +378,46 @@ todas as quatro métricas, acima do threshold imposto por `vitest.config.ts`.
    linha do Prettier em `summary`, `type: {...} satisfies Record<...>` etc. diferente da que eu
    havia escrito). Corrigido com `npx prettier --write src/i18n/pt.ts` — sem alteração de lógica,
    `astro check` e a suíte inteira reconferidos depois, ambos verdes.
+
+### Verificação autoritativa e promoção (orquestrador, 2026-09-16)
+
+**Verificação independente** (`triage-runner`, sobre o working tree revisado, antes do commit;
+trechos literais da saída dele):
+
+```
+$ npm run test:coverage
+ Test Files  8 passed (8)
+      Tests  148 passed (148)
+Statements   : 100% ( 53/53 )
+Branches     : 91.66% ( 11/12 )
+Functions    : 100% ( 17/17 )
+Lines        : 100% ( 52/52 )
+```
+
+```
+$ npm run build:pipeline
+ Test Files  4 passed (4)
+      Tests  108 passed (108)
+Result (23 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+```
+
+`npm run lint` exit 0; `npm run format:check` → `All matched files use Prettier code style!`;
+`build:pipeline` terminou em `Complete!` com 0 linhas `[ERROR]`.
+
+**Revisão:** aprovada no primeiro ciclo, com o dicionário conferido chave a chave contra a lista
+fechada e os mapas contra os enums de `src/content.config.ts`. A contradição "quatro × cinco" mapas
+ficou como nota datada abaixo do critério. Não bloqueantes registrados: o cabeçalho de `pt.ts`
+herdou a mesma frase ("quatro grupos ... e `publications.type`"); o ramo de `isActivePath` com
+`href` sem barra final não é testado (nenhum `href` real cai nele); a Evidência acima descreve esse
+ramo invertido na primeira frase.
+
+**CI sobre o commit empurrado `23d1aa0`:**
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/23d1aa0/check-runs --jq '.check_runs[] | "\(.name)\t\(.conclusion)\t\(.details_url)"'
+Workers Builds: haroldo-page	success	https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/0e68efdf-c02b-45bd-8e13-0c24a42a0c8e
+qualidade	success	https://github.com/researchgroups-ufma/haroldo-page/actions/runs/35154284081/job/104989883954
+```
