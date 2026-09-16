@@ -144,6 +144,14 @@ com o `href` (assim `/ensino/2026-2-relatividade-geral/` ativa "Ensino", §5.1 d
 
 - [ ] `src/i18n/pt.ts` contém exatamente as chaves listadas, com os valores literais
 - [ ] Os quatro mapas de enum são tipados a partir dos schemas Zod
+
+> **Nota 2026-09-16 (revisão do 037):** o plano se contradiz — o "Contexto necessário" nomeia **cinco**
+> chaves que são "exatamente os valores dos enums" (`research.status`, `course.status`,
+> `course.materialType`, `script.language`, `publications.type`), mas diz "essas quatro", "os outros
+> três" e "os quatro mapas". Provável resíduo de `course.status` acrescentado depois da contagem. O
+> executor tipou e testou os cinco; o revisor julgou o critério satisfeito, porque tipar só quatro
+> violaria a lista nomeada. O texto do critério não foi alterado.
+
 - [ ] `NAV_ITEMS` com cinco itens, `href` com barra final; `isActivePath` cobre os seis casos listados
 - [ ] `tests/i18n/pt.test.ts` e `tests/lib/navigation.test.ts` passam; canários (a) e (b) mostrados vermelhos e revertidos
 - [ ] Nenhum `en`, seletor ou função de locale criado
@@ -152,4 +160,221 @@ com o `href` (assim `/ensino/2026-2-relatividade-geral/` ativa "Ensino", §5.1 d
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir. Declare também o que NÃO rodou.>
+Executado em 2026-09-16. Ordem real: edições dos quatro arquivos novos → `git rm` dos dois
+`.gitkeep` → `astro check` → `vitest run` dos dois testes novos → canário (a) → reversão → canário
+(b) → reversão → confirmação da reversão (`grep`, já que os arquivos são novos e não aparecem em
+`git diff`) → portão (`lint`, `format:check`, `test:coverage`).
+
+### Passo 1 — `git rm` dos `.gitkeep`
+
+```
+$ git rm src/i18n/.gitkeep src/lib/.gitkeep && git status --short src
+rm 'src/i18n/.gitkeep'
+rm 'src/lib/.gitkeep'
+D  src/i18n/.gitkeep
+D  src/lib/.gitkeep
+?? src/i18n/
+?? src/lib/navigation.ts
+```
+
+### Passos 2 e 3 — `astro check` (após `src/i18n/pt.ts` e `src/lib/navigation.ts`, estado final)
+
+```
+$ npx astro check
+[content] Syncing content
+[content] Synced content
+[types] Generated 421ms
+[check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (23 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+```
+
+### Passo 4 — testes novos
+
+```
+$ npx vitest run tests/i18n tests/lib/navigation.test.ts
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  2 passed (2)
+      Tests  26 passed (26)
+   Start at  18:40:17
+   Duration  823ms (transform 482ms, setup 0ms, import 737ms, tests 11ms, environment 0ms)
+```
+
+### Passo 5 — canários
+
+**(a) `course.lessons: 'Aulas'` → `course.lessons: ''`** (`src/i18n/pt.ts`), vermelho:
+
+```
+$ npx vitest run tests/i18n
+
+ ❯ tests/i18n/pt.test.ts (20 tests | 1 failed) 8ms
+     × percorre o dicionário inteiro sem achar string vazia 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/i18n/pt.test.ts > pt — nenhuma string folha vazia > percorre o dicionário inteiro sem achar string vazia
+AssertionError: expected '' not to be '' // Object.is equality
+ ❯ tests/i18n/pt.test.ts:111:24
+    109|     expect(leaves.length).toBeGreaterThan(0);
+    110|     for (const leaf of leaves) {
+    111|       expect(leaf).not.toBe('');
+       |                        ^
+    112|     }
+    113|   });
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 19 passed (20)
+```
+
+Revertido. Confirmação (arquivo é novo, sem histórico em `git diff`; confirmado por `grep`):
+
+```
+$ grep -n "lessons: 'Aulas'," src/i18n/pt.ts
+140:    lessons: 'Aulas',
+```
+
+**(b) inversão de `normalizedPathname === '/'` para `normalizedPathname !== '/'`** em `isActivePath`
+(`src/lib/navigation.ts`), vermelho:
+
+```
+$ npx vitest run tests/lib/navigation.test.ts
+
+ ❯ tests/lib/navigation.test.ts (6 tests | 1 failed) 8ms
+     × "/" ativo só em "/" 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/navigation.test.ts > isActivePath > "/" ativo só em "/"
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/lib/navigation.test.ts:7:36
+      5| describe('isActivePath', () => {
+      6|   it('"/" ativo só em "/"', () => {
+      7|     expect(isActivePath('/', '/')).toBe(true);
+       |                                    ^
+      8|     expect(isActivePath('/', '/sobre/')).toBe(false);
+      9|   });
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+```
+
+Revertido. Confirmação:
+
+```
+$ grep -n "normalizedPathname === '/';" src/lib/navigation.ts
+55:    return normalizedPathname === '/';
+```
+
+Suíte completa, depois das duas reversões, verde de novo:
+
+```
+$ npx vitest run tests/i18n tests/lib/navigation.test.ts
+
+ Test Files  2 passed (2)
+      Tests  26 passed (26)
+```
+
+### Passo 6 — portão
+
+```
+$ npm run lint
+
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+(sem saída adicional — `exit 0`)
+
+```
+$ npm run format:check
+
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+(a primeira execução, antes de `prettier --write src/i18n/pt.ts`, reprovou por formatação — corrigida
+e reconferida; ver "Divergências" abaixo)
+
+```
+$ npm run test:coverage
+
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  8 passed (8)
+      Tests  148 passed (148)
+   Start at  18:41:28
+   Duration  1.09s (transform 2.04s, setup 0ms, import 3.64s, tests 100ms, environment 1ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    91.66 |     100 |     100 |
+ src/lib           |     100 |     87.5 |     100 |     100 |
+  navigation.ts    |     100 |    83.33 |     100 |     100 | 51
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 53/53 )
+Branches     : 91.66% ( 11/12 )
+Functions    : 100% ( 17/17 )
+Lines        : 100% ( 52/52 )
+================================================================================
+```
+
+A branch não coberta (linha 51 de `navigation.ts`) é o ramo `href` já terminado em `/` no
+ternário de `isActivePath` — todo `href` de `NAV_ITEMS` e todo `href` passado nos testes já tem a
+barra final; o ramo alternativo (`href` sem barra) nunca é exercitado. Cobertura agregada ≥ 80% em
+todas as quatro métricas, acima do threshold imposto por `vitest.config.ts`.
+
+### O que NÃO rodou
+
+- Verificação no navegador (não se aplica a este plano — nenhum componente `.astro` novo).
+- `npm ci`, `npm audit`, `npm run build:pipeline`, `npm run test:dist`, CI do GitHub Actions,
+  Workers Builds — verificação autoritativa, é do orquestrador/triage-runner, não desta sessão.
+- `git commit` — não commitado, por instrução; `Status:` permanece `TODO`.
+
+### Divergências e pontos ambíguos encontrados
+
+1. **Contagem "quatro" vs. cinco mapas de enum.** O "Contexto necessário" diz "As chaves de
+   `research.status`, `course.status`, `course.materialType`, `script.language` e
+   `publications.type` são exatamente os valores dos enums" (cinco itens), mas a frase seguinte diz
+   "Tipar **essas quatro**..."; o critério de aceitação repete "**Os quatro** mapas de enum são
+   tipados"; e a seção de testes fala em `publications.type` "e o mesmo para **os outros três**
+   enums" (quatro no total). As três formulações concordam entre si em "quatro", mas a primeira
+   frase lista cinco chaves distintas. Não há como excluir uma das cinco sem contradizer a frase
+   normativa "**são exatamente** os valores dos enums" (que é, junto da lista de valores literais,
+   parte da lista fechada que a Regra 3 do despacho proíbe reescrever). Resolvido tipando e testando
+   **as cinco**: `research.status` (via `projetosSchema`), `course.status` e `course.materialType` e
+   `script.language` (as três via `disciplinasSchema`, a última duas por indireção nos itens de
+   `materiais[]`/`scripts[]`) e `publications.type` (via `publicacoesSchema`) — o que ainda bate com
+   "a partir dos schemas exportados (`projetosSchema`, `disciplinasSchema`, `publicacoesSchema`)",
+   citados como exatamente três. Interpreto "quatro" como resíduo de uma versão anterior do plano
+   que não foi atualizado quando a quinta chave (`script.language` ou `course.materialType`) foi
+   acrescentada à lista — nenhuma leitura razoável justifica tipar/testar só quatro das cinco chaves
+   listadas como "exatamente os valores dos enums". Reportado para o orquestrador decidir se o
+   número na prosa do plano deve ser corrigido para "cinco" na promoção.
+2. **Formatação de `src/i18n/pt.ts`:** a primeira passada de `format:check` reprovou (quebra de
+   linha do Prettier em `summary`, `type: {...} satisfies Record<...>` etc. diferente da que eu
+   havia escrito). Corrigido com `npx prettier --write src/i18n/pt.ts` — sem alteração de lógica,
+   `astro check` e a suíte inteira reconferidos depois, ambos verdes.
