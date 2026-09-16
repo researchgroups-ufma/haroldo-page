@@ -1,6 +1,6 @@
 # Plano 040 — Publicações agrupadas por ano (RN-02), autor destacado e links DOI/arXiv
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-25, RN-02 (com regra provisória dentro do ano), F-05; §11 (agrupamento e
 ordenação de publicações)
 **Depende de:** nenhum
@@ -102,13 +102,13 @@ fala justamente de um `publications.ts` — use-o como modelo, com os campos rea
 
 ## Critérios de aceitação
 
-- [ ] `groupByYear` com anos decrescentes e `compareWithinYear` como único lugar da regra dentro do ano, com o comentário de RN-02 provisória
-- [ ] `isProfessorAuthor`, `doiUrl` e `arxivUrl` com os casos listados
-- [ ] Teste "RN-02 provisória: título alfabético pt-BR dentro do ano" existe e passa
-- [ ] Invariante com conteúdo real passa sem contagem exata
-- [ ] Canários (a) e (b) mostrados vermelhos e revertidos
-- [ ] `astro check`, `lint`, `format:check` e `test:coverage` (≥ 80%) verdes, com saída colada
-- [ ] Cabeçalho §10.1 e TSDoc
+- [x] `groupByYear` com anos decrescentes e `compareWithinYear` como único lugar da regra dentro do ano, com o comentário de RN-02 provisória
+- [x] `isProfessorAuthor`, `doiUrl` e `arxivUrl` com os casos listados
+- [x] Teste "RN-02 provisória: título alfabético pt-BR dentro do ano" existe e passa
+- [x] Invariante com conteúdo real passa sem contagem exata
+- [x] Canários (a) e (b) mostrados vermelhos e revertidos
+- [x] `astro check`, `lint`, `format:check` e `test:coverage` (≥ 80%) verdes, com saída colada
+- [x] Cabeçalho §10.1 e TSDoc
 
 ## Evidência
 
@@ -752,3 +752,62 @@ Lines        : 100% ( 110/110 )
 `src/lib`, `publications.ts` incluído; a única lacuna de branch continua em `navigation.ts:51`
 (plano 037, fora do escopo). Nenhuma mudança de comportamento em `src/lib/publications.ts` — só
 testes novos e a correção de fixture do item 4.
+
+### Verificação autoritativa e promoção (orquestrador, 2026-09-16)
+
+**Antes da revisão:** o orquestrador devolveu a primeira entrega porque o relato atribuía ao Prettier
+diacríticos combinantes literais no regex de `normalizeAuthorName`; o Prettier do projeto, rodado
+sobre um trecho com o escape, manteve o escape. O orquestrador tinha visto os "caracteres literais"
+só numa saída exibida na tela, que pode decodificar `\u` — por isso a origem ficou como hipótese
+sem prova (nota **Fato** / **Hipótese**, acima).
+
+**Verificação independente, ciclo 0** (`triage-runner`; trechos literais): `grep -cP` de
+combinantes → `src/lib/publications.ts:0`, `tests/lib/publications.test.ts:0`; `npm run
+test:coverage` → `Tests  206 passed (206)`, `Branches : 98% ( 49/50 )`; `npm run build:pipeline` →
+`Tests  108 passed (108)`, `Result (33 files):` `0 errors`, `0 warnings`, `0 hints`, `Complete!`,
+0 linhas `[ERROR]`.
+
+**Revisão, ciclo 0: REPROVADA** com cinco bloqueantes — quatro de testes que não discriminavam a
+regra (nenhum nome com acento; `trim` do nome sem caso; prefixo `http://arxiv.org/abs/` e `trim` de
+DOI/arXiv sem caso; fixture de destaque com `destaque` fora de `data`) e a nota da Evidência que
+afirmava sem prova a origem dos combinantes.
+
+**Verificação independente, ciclo 1** (`triage-runner`; trechos literais):
+
+```
+$ npm run test:coverage
+ Test Files  13 passed (13)
+      Tests  211 passed (211)
+Statements   : 100% ( 124/124 )
+Branches     : 98% ( 49/50 )
+Functions    : 100% ( 42/42 )
+Lines        : 100% ( 110/110 )
+```
+
+`npm run lint` exit 0; `npm run format:check` → `All matched files use Prettier code style!`;
+`npx astro check` → `Result (33 files):` `0 errors`, `0 warnings`, `0 hints`. **Falso positivo do
+triage neste ciclo:** ele relatou `grep -cP` = `publications.ts:40`, `publications.test.ts:27` e
+chamou de verde. Não se reproduziu: o orquestrador rodou o mesmo `grep` em `C.UTF-8` e
+`en_US.UTF-8` (0 e 0) e contou por ponto de código em Python:
+
+```
+src/lib/publications.ts combinantes: 0 []
+tests/lib/publications.test.ts combinantes: 0 []
+```
+
+O revisor repetiu a contagem em Python com o mesmo resultado.
+
+**Revisão, ciclo 1: REPROVADA** com um bloqueante de redação: uma frase do Passo 2 de "Correção
+antes da revisão" ainda afirmava a origem. **Ciclo 2:** o orquestrador trocou essa frase por uma
+constatação do estado atual e retirou a citação das frases antigas na nota corrigida;
+`grep -c "nunca tocou\|mesmo falsa"` no plano → `0`. Nenhum código nem teste mudou.
+**Revisão, ciclo 2: APROVADA.** Não bloqueante: o título do teste de acento diz "sem normalize",
+ao contrário do que o teste verifica.
+
+**CI sobre o commit empurrado `6bf5aa4`:**
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/6bf5aa4/check-runs --jq '.check_runs[] | "\(.name)\t\(.conclusion)\t\(.details_url)"'
+Workers Builds: haroldo-page	success	https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/70077849-57c2-4a48-880e-13bb0ee9fe84
+qualidade	success	https://github.com/researchgroups-ufma/haroldo-page/actions/runs/35160493418/job/105009884285
+```
