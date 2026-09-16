@@ -112,4 +112,643 @@ fala justamente de um `publications.ts` — use-o como modelo, com os campos rea
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir. Declare também o que NÃO rodou.>
+Status permanece `TODO` e nenhum checkbox foi marcado, conforme regra do despacho — esta seção
+documenta o que foi executado nesta sessão para revisão independente.
+
+### Passo 1 — `npx astro check`
+
+```
+[19:36:21] [content] Syncing content
+[19:36:21] [content] Synced content
+[19:36:21] [types] Generated 416ms
+[19:36:21] [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (33 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+```
+
+### Passo 2 — `npx vitest run tests/lib/publications.test.ts`
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  19:36:30
+   Duration  207ms (transform 31ms, setup 0ms, import 69ms, tests 17ms, environment 0ms)
+```
+
+### Passo 3 — Canários
+
+**Canário (a)** — `groupByYear`: troquei `(a, b) => b - a` por `(a, b) => a - b` (ordem ascendente
+em vez de decrescente):
+
+```
+ FAIL  tests/lib/publications.test.ts > groupByYear > agrupa anos distintos em ordem decrescente (RF-25)
+AssertionError: expected [ 2024, 2026 ] to deeply equal [ 2026, 2024 ]
+
+- Expected
++ Received
+
+  [
+-   2026,
+    2024,
++   2026,
+  ]
+
+ ❯ tests/lib/publications.test.ts:20:53
+
+ FAIL  tests/lib/publications.test.ts > groupByYear — invariante com conteúdo real de content/publicacoes > a soma dos itens de todos os grupos é igual ao total de entradas, e os anos saem estritamente decrescentes
+AssertionError: expected 2024 to be less than 2023
+ ❯ tests/lib/publications.test.ts:144:30
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 19 passed (21)
+```
+
+Revertido de volta a `(a, b) => b - a`.
+
+**Canário (b)** — `isProfessorAuthor`: troquei `normalizeAuthorName(author) === normalizeAuthorName(citationName)`
+por `normalizeAuthorName(author).includes(normalizeAuthorName(citationName))`:
+
+```
+ FAIL  tests/lib/publications.test.ts > isProfessorAuthor > não casa 'LIMA JUNIOR, HAROLDO C. D., et al.' (sem casamento parcial)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/lib/publications.test.ts:94:83
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 passed (21)
+```
+
+Revertido de volta a `===`.
+
+**Prova da reversão.** `src/lib/publications.ts` é arquivo novo, não rastreado — `git diff` não
+mostra nada para ele (confirmado: `git status --short` lista `?? src/lib/publications.ts`). A prova
+é por `grep`, depois da reversão de ambos os canários. Refeito no arquivo final (a linha do `===`
+mudou de número entre este passo e o ciclo 1 de correção, por causa da correção do escape em
+`normalizeAuthorName` — a função ganhou linhas com a formatação multi-linha, não por mudança de
+lógica):
+
+```
+$ grep -n "b - a\|a - b\|includes(normalizeAuthorName\|=== normalizeAuthorName" src/lib/publications.ts
+61:  const years = [...new Set(entries.map((entry) => entry.data.ano))].sort((a, b) => b - a);
+95:  return normalizeAuthorName(author) === normalizeAuthorName(citationName);
+```
+
+Linha 61 com `b - a` (decrescente) e linha 95 com `===` (igualdade exata) — os dois canários estão
+revertidos.
+
+### Passo 4 — Portão
+
+`npm run lint`:
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+`npm run format:check`:
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+`npm run test:coverage`:
+
+```
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  13 passed (13)
+      Tests  206 passed (206)
+   Start at  19:36:44
+   Duration  1.17s (transform 2.82s, setup 0ms, import 4.71s, tests 177ms, environment 2ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |       98 |     100 |     100 |
+ src/lib           |     100 |    97.82 |     100 |     100 |
+  navigation.ts    |     100 |    83.33 |     100 |     100 | 51
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 124/124 )
+Branches     : 98% ( 49/50 )
+Functions    : 100% ( 42/42 )
+Lines        : 100% ( 110/110 )
+================================================================================
+```
+
+`src/lib/publications.ts` está em 100% de statements/branches/functions/lines (a linha "All files"
+soma todo `src/lib`; a única lacuna de branch do relatório é `navigation.ts:51`, arquivo do plano
+037, fora do escopo deste plano). Threshold do projeto (≥ 80%) superado.
+
+### O que NÃO rodou
+
+- Verificação no navegador (não se aplica — este plano não toca `.astro`/UI).
+- `npm ci`, `npm audit`, `npm run build:pipeline`, `npm run test:dist`, CI do GitHub Actions e
+  Workers Builds — verificação autoritativa é do orquestrador/`triage-runner`, não desta sessão.
+- Nenhum `git add` ou commit foi feito.
+
+
+### Nota corrigida em 2026-09-16, ciclo 1 (substitui as duas versões anteriores desta nota)
+
+As duas versões anteriores desta nota ("Achado a registrar" e a primeira "Nota corrigida")
+afirmavam como fato uma origem para o caractere combinante literal sem prova em bytes do arquivo
+original, e a segunda se contradizia sobre o que o Prettier fez com a linha. Reescrita em duas partes, separando o que tem prova do que não tem.
+
+**Fato.** Bytes finais da linha do regex em `src/lib/publications.ts:77`, obtidos agora com `od -c`:
+
+```
+$ sed -n '77p' src/lib/publications.ts | od -c
+0000000                   .   r   e   p   l   a   c   e   (   /   [   \
+0000020   u   0   3   0   0   -   \   u   0   3   6   f   ]   /   g   ,
+0000040       '   '   )  \n
+0000045
+```
+
+Backslash literal antes de cada bloco de dígitos hex (`u0300`, `u036f`) — escape ASCII, não
+caractere combinante. Contagem de caracteres combinantes (`U+0300`–`U+036F`) nos dois arquivos do
+plano, no arquivo inteiro:
+
+```
+$ LC_ALL=en_US.UTF-8 grep -cP '[\x{0300}-\x{036f}]' src/lib/publications.ts tests/lib/publications.test.ts
+src/lib/publications.ts:0
+tests/lib/publications.test.ts:0
+```
+
+Zero ocorrências nos dois arquivos. E o Prettier, rodado agora sobre o arquivo já corrigido:
+
+```
+$ npx prettier --write src/lib/publications.ts
+src/lib/publications.ts 98ms (unchanged)
+```
+
+**Hipótese, sem prova.** A origem do caractere combinante literal que apareceu durante a escrita do
+arquivo, relatada nas duas versões anteriores desta nota, nunca teve prova em bytes do arquivo
+*original* — só leitura de tela e um teste isolado que reproduzia o mesmo tipo de defeito que
+deveria estar testando, não uma comparação de bytes de antes/depois. A atribuição ao Prettier feita
+nas versões anteriores está retirada: não há evidência de que o caractere tenha chegado ao arquivo
+por ação do Prettier, nem de qualquer outra causa específica. O que os fatos acima sustentam é só o
+estado atual: o arquivo usa o escape ASCII correto, e o Prettier o preserva.
+
+### Correção antes da revisão (2026-09-16)
+
+**Passo 1 — nenhum caractere combinante no arquivo inteiro, nos dois arquivos do plano:**
+
+```
+$ LC_ALL=en_US.UTF-8 grep -nP '[\x{0300}-\x{036f}]' src/lib/publications.ts tests/lib/publications.test.ts; echo "exit=$?"
+exit=1
+```
+
+(Sem `LC_ALL=en_US.UTF-8` o `grep` desta máquina recusa `\x{}` com "character value ... too large" —
+`exit=2` — por isso o locale explícito; confirmado com uma sonda em `café` antes de aplicar ao
+arquivo real.)
+
+**Passo 2 — `npx prettier --write` preserva o escape (arquivo já corrigido):**
+
+```
+$ npx prettier --write src/lib/publications.ts
+src/lib/publications.ts 98ms (unchanged)
+
+$ grep -n "u0300" src/lib/publications.ts
+77:    .replace(/[\u0300-\u036f]/g, '')
+```
+
+"(unchanged)" e o grep mostram só o estado atual: o Prettier preserva o escape no arquivo atual. Nada
+disso diz qual era o conteúdo do arquivo antes desta correção (ver a nota **Fato** / **Hipótese, sem
+prova**, acima).
+
+**Passo 3 — suíte completa sobre o arquivo corrigido:**
+
+`npx vitest run tests/lib/publications.test.ts`:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  19:42:12
+   Duration  202ms (transform 29ms, setup 0ms, import 64ms, tests 16ms, environment 0ms)
+```
+
+`npm run lint`:
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+`npm run format:check`:
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+`npm run test:coverage`:
+
+```
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  13 passed (13)
+      Tests  206 passed (206)
+   Start at  19:42:23
+   Duration  1.10s (transform 2.53s, setup 0ms, import 4.31s, tests 166ms, environment 2ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |       98 |     100 |     100 |
+ src/lib           |     100 |    97.82 |     100 |     100 |
+  navigation.ts    |     100 |    83.33 |     100 |     100 | 51
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 124/124 )
+Branches     : 98% ( 49/50 )
+Functions    : 100% ( 42/42 )
+Lines        : 100% ( 110/110 )
+================================================================================
+```
+
+Mesmo resultado de antes (206/206, 100% statements/lines/functions, a única lacuna de branch
+continua em `navigation.ts:51`, plano 037, fora do escopo deste plano) — a correção do escape não
+mudou comportamento algum, só a legibilidade do código-fonte.
+
+### Ciclo 1 de correção da revisão (2026-09-16)
+
+Cinco bloqueantes do revisor, todos em `tests/lib/publications.test.ts`; `src/lib/publications.ts`
+não muda (fora dos canários, revertidos). Itens 1-4 abaixo: teste novo, canario vermelho, reversao,
+com a saida literal e completa do vitest para cada canario. Item 5 (nota da Evidencia) ja esta
+corrigido nas secoes acima.
+
+**Item 1 — `isProfessorAuthor` sem nenhuma entrada acentuada.** Acrescentado
+`'LIMA JÚNIOR, HAROLDO C. D.'` → `true` (acento agudo, diferente do `citationName` sem acento).
+Canário: removidas as linhas `.normalize('NFD')` e a linha seguinte de `replace` (faixa de
+diacríticos) de `normalizeAuthorName`:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/publications.test.ts (26 tests | 1 failed) 19ms
+     × casa com acento diferente (JÚNIOR com acento agudo, sem normalize) 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/publications.test.ts > isProfessorAuthor > casa com acento diferente (JÚNIOR com acento agudo, sem normalize)
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/lib/publications.test.ts:101:75
+     99|
+    100|   it('casa com acento diferente (JÚNIOR com acento agudo, sem normaliz…
+    101|     expect(isProfessorAuthor('LIMA JÚNIOR, HAROLDO C. D.', citationNam…
+       |                                                                           ^
+    102|   });
+    103|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 passed (26)
+   Start at  19:49:45
+   Duration  205ms (transform 30ms, setup 0ms, import 66ms, tests 19ms, environment 0ms)
+```
+
+Revertido (as duas linhas voltaram).
+
+**Item 2 — `isProfessorAuthor` sem caso próprio para `trim`.** Acrescentado
+`'  LIMA JUNIOR, HAROLDO C. D. '` (espaço só nas pontas, sem espaço duplicado no meio) → `true`.
+Canário: removida a chamada `.trim()` de `normalizeAuthorName`:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/publications.test.ts (26 tests | 1 failed) 20ms
+     × casa só com espaço nas pontas (trim) 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/publications.test.ts > isProfessorAuthor > casa só com espaço nas pontas (trim)
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/lib/publications.test.ts:93:78
+     91|
+     92|   it('casa só com espaço nas pontas (trim)', () => {
+     93|     expect(isProfessorAuthor('  LIMA JUNIOR, HAROLDO C. D. ', citation…
+       |                                                                              ^
+     94|   });
+     95|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 passed (26)
+   Start at  19:50:03
+   Duration  210ms (transform 29ms, setup 0ms, import 65ms, tests 20ms, environment 0ms)
+```
+
+Revertido (a chamada `.trim()` voltou).
+
+**Item 3 — `doiUrl`/`arxivUrl` sem cobrir o prefixo `http://arxiv.org/abs/` nem os dois `trim`
+iniciais.** Acrescentados: `arxivUrl('http://arxiv.org/abs/2401.01234')`, um DOI com espaços em
+volta (`'  10.0000/exemplo.2025.001  '`) e um arXiv com espaços em volta (`'  2401.01234  '`). Três
+canários, um por ramo.
+
+Canário 3a — removido `'http://arxiv.org/abs/'` de `ARXIV_PREFIXES`:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/publications.test.ts (26 tests | 1 failed) 19ms
+     × http://arxiv.org/abs/2401.01234 → https://arxiv.org/abs/2401.01234 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/publications.test.ts > arxivUrl > http://arxiv.org/abs/2401.01234 → https://arxiv.org/abs/2401.01234
+AssertionError: expected 'https://arxiv.org/abs/http://arxiv.or…' to be 'https://arxiv.org/abs/2401.01234' // Object.is equality
+
+Expected: "https://arxiv.org/abs/2401.01234"
+Received: "https://arxiv.org/abs/http://arxiv.org/abs/2401.01234"
+
+ ❯ tests/lib/publications.test.ts:139:29
+    137|     ['  2401.01234  ', expected],
+    138|   ])('%s → %s', (input, output) => {
+    139|     expect(arxivUrl(input)).toBe(output);
+       |                             ^
+    140|   });
+    141| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 passed (26)
+   Start at  19:50:24
+   Duration  213ms (transform 37ms, setup 0ms, import 73ms, tests 19ms, environment 0ms)
+```
+
+Revertido (`ARXIV_PREFIXES` voltou a ter os três prefixos).
+
+Canário 3b — removido o `.trim()` inicial de `doiUrl` (`let value = doi;` em vez de
+`let value = doi.trim();`):
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/publications.test.ts (26 tests | 1 failed) 20ms
+     ×   10.0000/exemplo.2025.001   → https://doi.org/10.0000/exemplo.2025.001 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/publications.test.ts > doiUrl >   10.0000/exemplo.2025.001   → https://doi.org/10.0000/exemplo.2025.001
+AssertionError: expected 'https://doi.org/  10.0000/exemplo.202…' to be 'https://doi.org/10.0000/exemplo.2025.…' // Object.is equality
+
+Expected: "https://doi.org/10.0000/exemplo.2025.001"
+Received: "https://doi.org/  10.0000/exemplo.2025.001  "
+
+ ❯ tests/lib/publications.test.ts:125:27
+    123|     ['  10.0000/exemplo.2025.001  ', expected],
+    124|   ])('%s → %s', (input, output) => {
+    125|     expect(doiUrl(input)).toBe(output);
+       |                           ^
+    126|   });
+    127| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 passed (26)
+   Start at  19:50:46
+   Duration  208ms (transform 29ms, setup 0ms, import 67ms, tests 20ms, environment 0ms)
+```
+
+Revertido (`let value = doi.trim();` voltou).
+
+Canário 3c — removido o `.trim()` inicial de `arxivUrl` (`let value = id;` em vez de
+`let value = id.trim();`):
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/publications.test.ts (26 tests | 1 failed) 20ms
+     ×   2401.01234   → https://arxiv.org/abs/2401.01234 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/publications.test.ts > arxivUrl >   2401.01234   → https://arxiv.org/abs/2401.01234
+AssertionError: expected 'https://arxiv.org/abs/  2401.01234  ' to be 'https://arxiv.org/abs/2401.01234' // Object.is equality
+
+Expected: "https://arxiv.org/abs/2401.01234"
+Received: "https://arxiv.org/abs/  2401.01234  "
+
+ ❯ tests/lib/publications.test.ts:139:29
+    137|     ['  2401.01234  ', expected],
+    138|   ])('%s → %s', (input, output) => {
+    139|     expect(arxivUrl(input)).toBe(output);
+       |                             ^
+    140|   });
+    141| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 passed (26)
+   Start at  19:51:02
+   Duration  210ms (transform 31ms, setup 0ms, import 68ms, tests 20ms, environment 0ms)
+```
+
+Revertido (`let value = id.trim();` voltou).
+
+**Item 4 — fixture de "destaque não altera a ordem" com `destaque` fora de `data`.** Corrigida para
+`{ data: { ano: 2025, titulo: 'Zebra', destaque: true } }` e `{ data: { ano: 2025, titulo: 'Abelha' } }`
+(a outra entrada sem `destaque`), com o título destacado ("Zebra") vindo depois na ordem alfabética.
+Canário: `compareWithinYear` reescrito para priorizar `destaque` antes do `titulo`:
+
+```
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/publications.test.ts (26 tests | 1 failed) 21ms
+     × destaque não altera a ordem (§6.6: só visual) 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/publications.test.ts > compareWithinYear > destaque não altera a ordem (§6.6: só visual)
+AssertionError: expected [ 'Zebra', 'Abelha' ] to deeply equal [ 'Abelha', 'Zebra' ]
+
+- Expected
++ Received
+
+  [
+-   "Abelha",
+    "Zebra",
++   "Abelha",
+  ]
+
+ ❯ tests/lib/publications.test.ts:74:76
+     72|       { data: { ano: 2025, titulo: 'Abelha' } },
+     73|     ];
+     74|     expect([...entries].sort(compareWithinYear).map((e) => e.data.titu…
+       |                                                                            ^
+     75|       'Abelha',
+     76|       'Zebra',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 passed (26)
+   Start at  19:51:28
+   Duration  220ms (transform 31ms, setup 0ms, import 69ms, tests 21ms, environment 0ms)
+```
+
+Revertido (`compareWithinYear` voltou a comparar só por `titulo`).
+
+**Confirmação de que `src/lib/publications.ts` está de volta ao estado aprovado**, depois dos seis
+canários acima (1, 2, 3a, 3b, 3c, 4) revertidos: comparado byte a byte com a cópia feita antes do
+primeiro canário deste ciclo —
+
+```
+$ diff publications.ts.bak src/lib/publications.ts && echo "IDENTICAL"
+IDENTICAL
+```
+
+**Suíte completa, depois de todos os canários revertidos:**
+
+```
+$ npx vitest run tests/lib/publications.test.ts
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  26 passed (26)
+   Start at  19:51:40
+   Duration  199ms (transform 30ms, setup 0ms, import 67ms, tests 16ms, environment 0ms)
+```
+
+**Atenção à ferramenta de escrita (o mesmo mecanismo que decodifica escapes Unicode nos parâmetros,
+relatado no ciclo anterior).** Depois de escrever os testes com `Ú`, e depois de todos os canários
+revertidos:
+
+```
+$ grep -c "JÚNIOR" tests/lib/publications.test.ts
+2
+
+$ grep -n "u0300" src/lib/publications.ts
+77:    .replace(/[\u0300-\u036f]/g, '')
+
+$ sed -n '77p' src/lib/publications.ts | od -c
+0000000                   .   r   e   p   l   a   c   e   (   /   [   \
+0000020   u   0   3   0   0   -   \   u   0   3   6   f   ]   /   g   ,
+0000040       '   '   )  \n
+0000045
+```
+
+`JÚNIOR` presente 2 vezes (nome do teste + valor asserido), sem corrupção; o regex de
+`normalizeAuthorName` continua em escape ASCII (backslash, `u`, `0`, `3`, `0`, `0` — não caractere
+combinante), depois de seis ciclos de canário/reversão nesta sessão.
+
+**Portão:**
+
+`npm run lint`:
+
+```
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+`npm run format:check`:
+
+```
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+`npm run test:coverage`:
+
+```
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  13 passed (13)
+      Tests  211 passed (211)
+   Start at  19:51:56
+   Duration  1.23s (transform 2.90s, setup 0ms, import 4.82s, tests 179ms, environment 2ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |       98 |     100 |     100 |
+ src/lib           |     100 |    97.82 |     100 |     100 |
+  navigation.ts    |     100 |    83.33 |     100 |     100 | 51
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 124/124 )
+Branches     : 98% ( 49/50 )
+Functions    : 100% ( 42/42 )
+Lines        : 100% ( 110/110 )
+================================================================================
+```
+
+211 testes (206 do ciclo anterior + 5 novos deste ciclo), 100% statements/lines/functions em
+`src/lib`, `publications.ts` incluído; a única lacuna de branch continua em `navigation.ts:51`
+(plano 037, fora do escopo). Nenhuma mudança de comportamento em `src/lib/publications.ts` — só
+testes novos e a correção de fixture do item 4.
