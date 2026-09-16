@@ -163,6 +163,7 @@ Da seção "O que a fase 2 empurra adiante" do [README da fase 2](../fase-2-pipe
 | Imprecisão no cabeçalho de `tests/content/conteudo-valido.test.ts` (atribui a 7(c) ao arquivo errado) | **053** | Correção de uma frase, feita de propósito no fechamento — nenhum plano de rota toca o arquivo |
 | "Verificação autoritativa" do README da fase 2 parada antes do 030 | **Substituída, para esta fase, pela seção abaixo** | O README da fase 2 não é reescrito aqui (fase fechada); a dívida lá continua registrada |
 | Demais dívidas sem fase (caminho `schedule` do vigia, moderadas `qs`/`body-parser`/`express`, duplicação de `normalizeLinhaRelacionadaId`, §11 do PRD, "portão pré-push", §7.4) | **Nenhum plano desta fase** | Não tocam o site público. Ficam onde estão |
+| Painel `/admin` (TinaCMS) requisita a Inter em `fonts.googleapis.com` | **Nenhum plano desta fase (código de terceiro, fora do site público)** | Aceita em 2026-09-16 na revisão do 036. **Fecha quando:** o TinaCMS permitir desligar a fonte remota do painel, ou um plano da fase 5 auto-hospedá-la |
 
 ## Questão para o stakeholder
 

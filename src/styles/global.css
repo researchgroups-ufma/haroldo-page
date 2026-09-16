@@ -1,1 +1,182 @@
+/* Sistema visual do site público — tokens, tipografia, grade e movimento.
+   Especificação: docs/identidade-visual.md §2 (Cor), §3 (Tipografia),
+   §4 (Grade e espaçamento) e §7 (Movimento). */
+
 @import 'tailwindcss';
+
+/* Archivo auto-hospedada (RNF-01, RNF-03) — só os dois pesos usados pela
+   escala (200 e 300), só latin. Nunca importar index.css: traria todos os
+   subsets e o peso 400 que a identidade não usa. */
+@import '@fontsource/archivo/latin-200.css';
+@import '@fontsource/archivo/latin-300.css';
+
+@theme {
+  /* Breakpoints da identidade (§4) — os defaults do Tailwind são removidos
+     antes de declarar os dois que o projeto usa. */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem;
+  --breakpoint-lg: 64rem;
+
+  /* Cor (§2) */
+  --color-papel: #efedea;
+  --color-bloco: #f7f6f4;
+  --color-tinta: #111112;
+  --color-secundario: #5a5754;
+  --color-regua: #d6d3cf;
+  --color-tracejado: #9a9691;
+  --color-comentario: #6e6a66;
+
+  /* Tipografia (§3) */
+  --font-texto: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-codigo: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+/* Escala tipográfica fluida (§3) — um @utility por token da tabela. */
+@utility text-display-1 {
+  font-size: clamp(2.625rem, 1.9rem + 3.2vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-family: var(--font-display);
+  font-weight: 300;
+}
+
+@utility text-display-2 {
+  font-size: clamp(1.875rem, 1.5rem + 1.7vw, 2.875rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+  font-weight: 300;
+}
+
+@utility text-numeral {
+  font-size: clamp(3.5rem, 2.8rem + 3vw, 5.5rem);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  font-family: var(--font-display);
+  font-weight: 200;
+}
+
+@utility text-numeral-sm {
+  font-size: clamp(2.25rem, 2rem + 1vw, 2.75rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-family: var(--font-display);
+  font-weight: 200;
+}
+
+@utility text-ano {
+  font-size: clamp(3rem, 2.4rem + 2.6vw, 4.75rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  font-family: var(--font-display);
+  font-weight: 200;
+}
+
+@utility text-titulo-item {
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  font-family: var(--font-texto);
+  font-weight: 400;
+}
+
+@utility text-corpo {
+  font-size: 1rem;
+  line-height: 1.7;
+  letter-spacing: 0;
+  font-family: var(--font-texto);
+  font-weight: 400;
+}
+
+@utility text-pequeno {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  letter-spacing: 0;
+  font-family: var(--font-texto);
+  font-weight: 400;
+}
+
+@utility text-rotulo {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: var(--font-texto);
+  font-weight: 400;
+}
+
+/* Grade e espaçamento (§4) */
+@utility px-margem {
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+@utility max-w-medida {
+  max-width: 38rem;
+}
+
+@layer base {
+  html {
+    background: var(--color-papel);
+    color: var(--color-tinta);
+    font-family: var(--font-texto);
+    font-size: 100%;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-tinta);
+    outline-offset: 3px;
+  }
+}
+
+/* Movimento (§7) — um único momento orquestrado ao carregar a página: a
+   régua forte se desenha enquanto o <h1> sobe e aparece. O estado inicial
+   oculto e os keyframes só existem quando o usuário não pediu movimento
+   reduzido — se o CSS falhar ou a preferência for "reduce", o texto já
+   nasce no estado final visível. */
+.regua-entrada {
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .regua-entrada {
+    transform: scaleX(0);
+    animation: regua-entrada 500ms ease-out forwards;
+  }
+
+  .titulo-entrada {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: titulo-entrada 400ms ease-out 100ms forwards;
+  }
+
+  @keyframes regua-entrada {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes titulo-entrada {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -111,10 +111,304 @@ linha. **Não** importe `index.css` (traz todos os subsets e o peso 400).
 - [ ] Breakpoints `sm` = 40rem e `lg` = 64rem, sem os defaults do Tailwind
 - [ ] Keyframes e estado inicial oculto só dentro de `prefers-reduced-motion: no-preference`; bloco `reduce` zera animações e transições
 - [ ] `dist/` contém os `.woff2` da Archivo 200/300 e nenhuma referência a `fonts.googleapis`/`fonts.gstatic`
+
+> **Emenda 2026-09-16 (decisão do stakeholder, revisão do 036):** o critério vale para o site
+> público — `dist/` excluindo `dist/admin/`. O bundle do painel TinaCMS em `dist/admin/` carrega a
+> Inter de `fonts.googleapis.com`; é código de terceiro, anterior a este plano, e o passo 4 e a
+> regra do README da fase ("no HTML/CSS") já tinham esse recorte. Dívida registrada no README da
+> fase.
+
 - [ ] Canário do passo 5 mostrou o `clamp` compilado e foi revertido
 - [ ] `lint`, `format:check`, `test:coverage` e `build:pipeline` verdes, com saída colada
 - [ ] `.gitkeep` da pasta da fase removido
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir. Declare também o que NÃO rodou.>
+### Passo 1 — `.gitkeep` removido
+
+```
+$ git rm plans/fase-3-site-publico/.gitkeep
+rm 'plans/fase-3-site-publico/.gitkeep'
+$ git status --short plans/fase-3-site-publico
+D  plans/fase-3-site-publico/.gitkeep
+```
+
+### Passo 2 — `@fontsource/archivo` instalada, versão exata
+
+```
+$ grep -n "fontsource" package.json
+23:    "@fontsource/archivo": "5.3.0",
+```
+
+```
+$ git diff --stat package-lock.json
+ package-lock.json | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+```
+
+```
+$ git diff package-lock.json
+diff --git a/package-lock.json b/package-lock.json
+index 8aed6da..e07a6c7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -8,6 +8,7 @@
+       "name": "haroldo-page",
+       "version": "0.1.0",
+       "dependencies": {
++        "@fontsource/archivo": "5.3.0",
+         "@tailwindcss/vite": "4.3.3",
+         "@tinacms/astro": "0.6.1",
+         "astro": "7.2.10",
+@@ -1960,6 +1961,15 @@
+       "integrity": "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==",
+       "license": "MIT"
+     },
++    "node_modules/@fontsource/archivo": {
++      "version": "5.3.0",
++      "resolved": "https://registry.npmjs.org/@fontsource/archivo/-/archivo-5.3.0.tgz",
++      "integrity": "sha512-5DIMgPVJRi62OqdOVoogCFxP73EkNM/E0YVTSDIQlDEJfDbxqZduwM/YoNZwC9Sx1CDgpKinqf8ckRY1QNIecw==",
++      "license": "OFL-1.1",
++      "funding": {
++        "url": "https://github.com/sponsors/ayuhito"
++      }
++    },
+     "node_modules/@graphiql/plugin-doc-explorer": {
+       "version": "0.2.2",
+       "resolved": "https://registry.npmjs.org/@graphiql/plugin-doc-explorer/-/plugin-doc-explorer-0.2.2.tgz",
+```
+
+Só inserções: um pacote novo acrescentado ao `dependencies` de `haroldo-page` e um novo nó
+`node_modules/@fontsource/archivo`. Nenhuma linha de versão de pacote pré-existente foi tocada.
+
+```
+$ ls node_modules/@fontsource/archivo/latin-200.css node_modules/@fontsource/archivo/latin-300.css
+node_modules/@fontsource/archivo/latin-200.css
+node_modules/@fontsource/archivo/latin-300.css
+```
+
+`font-display: swap` confirmado em `node_modules/@fontsource/archivo/latin-200.css:5` (e igualmente
+em `latin-300.css:5`):
+
+```
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200;
+  src: url(./files/archivo-latin-200-normal.woff2) format('woff2'), url(./files/archivo-latin-200-normal.woff) format('woff');
+}
+```
+
+### Passo 3 — `global.css` reescrito
+
+```
+$ npx prettier --check src/styles/global.css
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+### Passo 4 — Build
+
+```
+$ npm run build:pipeline
+
+> haroldo-page@0.1.0 build:pipeline
+> vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ Test Files  4 passed (4)
+      Tests  108 passed (108)
+   Start at  18:05:23
+   Duration  1.57s (transform 1.49s, setup 0ms, import 2.93s, tests 60ms, environment 0ms)
+
+Starting Tina build
+│
+○  Tina build complete ─────────────────────────────────────────────────────╮
+│  🦙 Tina Config                                                            │
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main │
+│  🤖 Auto-generated files                                                   │
+│     GraphQL Client:     tina/__generated__/client.ts                       │
+│     Typescript Types:   tina/__generated__/types.ts                        │
+│     Static HTML file:   public/admin/index.html                           │
+╰─────────────────────────────────────────────────────────────────────────────╯
+18:06:31 [vite] Re-optimizing dependencies because lockfile has changed
+18:06:33 [content] Syncing content
+18:06:33 [content] Synced content
+18:06:33 [types] Generated 1.48s
+18:06:33 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (19 files):
+- 0 errors
+- 0 warnings
+- 0 hints
+
+18:06:40 [content] Syncing content
+18:06:40 [content] Synced content
+18:06:40 [types] Generated 425ms
+18:06:40 [build] output: "static"
+18:06:40 [build] mode: "static"
+18:06:40 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+18:06:40 [build] Collecting build info...
+18:06:40 [build] ✓ Completed in 462ms.
+18:06:40 [build] Building static entrypoints...
+18:06:40 [vite] ✓ built in 396ms
+18:06:40 [vite] ✓ built in 47ms
+18:06:40 [build] Rearranging server assets...
+
+ generating static routes
+18:06:40   ├─ /index.html (+9ms)
+18:06:40 ✓ Completed in 21ms.
+18:06:40 [build] ✓ Completed in 511ms.
+18:06:40 [build] 1 page(s) built in 998ms
+18:06:40 [build] Complete!
+```
+
+```
+$ ls dist/_astro/*.woff2
+dist/_astro/archivo-latin-200-normal.-8LHm73D.woff2
+dist/_astro/archivo-latin-300-normal.AMs-pvbP.woff2
+
+$ grep -rl "fonts.googleapis\|fonts.gstatic" dist/ --include=*.css --include=*.html
+(vazio, exit 1)
+```
+
+**Emenda 2026-09-16 (ciclo 1 de correção):** o grep acima é restrito a `.css`/`.html`, recorte do
+passo 4 e da regra "no HTML/CSS" do README da fase. Sem esse recorte, `dist/` inteiro (que inclui o
+painel `/admin` gerado pelo `tinacms build`, código de terceiro) tem uma ocorrência:
+
+```
+$ grep -rlE "fonts.googleapis|fonts.gstatic" dist/; echo "exit=$?"
+dist/admin/assets/index-xGzT6BsI.js
+exit=0
+```
+
+```
+$ grep -rlE "fonts.googleapis|fonts.gstatic" dist/ --exclude-dir=admin; echo "exit=$?"
+exit=1
+```
+
+Ver a emenda ao critério de aceitação da linha 113 acima e a dívida acrescentada em
+`plans/fase-3-site-publico/README.md`.
+
+### Passo 5 — Canário do utilitário `text-display-1` (revertido)
+
+```
+$ git status --short src/pages/index.astro
+(vazio)
+```
+
+Editado temporariamente `src/pages/index.astro`: `<h1 class="text-3xl font-semibold">` →
+`<h1 class="text-display-1 bg-papel">`.
+
+```
+$ npx astro build
+18:06:55 [content] Syncing content
+18:06:55 [content] Synced content
+18:06:55 [types] Generated 432ms
+18:06:55 [build] output: "static"
+18:06:55 [build] mode: "static"
+18:06:55 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+18:06:55 [build] Collecting build info...
+18:06:55 [build] ✓ Completed in 467ms.
+18:06:55 [build] Building static entrypoints...
+18:06:55 [vite] ✓ built in 227ms
+18:06:55 [vite] ✓ built in 45ms
+18:06:55 [build] Rearranging server assets...
+
+ generating static routes
+18:06:55   ├─ /index.html (+9ms)
+18:06:55 ✓ Completed in 20ms.
+18:06:55 [build] ✓ Completed in 365ms.
+18:06:55 [build] 1 page(s) built in 852ms
+18:06:55 [build] Complete!
+```
+
+```
+$ grep -o "text-display-1" dist/_astro/*.css
+text-display-1
+
+$ grep -o "clamp(2.625rem[^;]*" dist/_astro/*.css
+clamp(2.625rem,1.9rem + 3.2vw,5rem)
+```
+
+Revertido:
+
+```
+$ git checkout -- src/pages/index.astro
+$ git status --short src/pages
+(vazio)
+```
+
+### Passo 6 — Portão completo
+
+```
+$ npm run lint
+
+> haroldo-page@0.1.0 lint
+> eslint .
+
+(exit 0, sem saída)
+```
+
+```
+$ npm run format:check
+
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+```
+$ npm run test:coverage
+
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+ Test Files  6 passed (6)
+      Tests  122 passed (122)
+   Start at  18:07:31
+   Duration  1.04s (transform 1.61s, setup 0ms, import 2.71s, tests 84ms, environment 1ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 32/32 )
+Branches     : 100% ( 4/4 )
+Functions    : 100% ( 2/2 )
+Lines        : 100% ( 31/31 )
+================================================================================
+```
+
+### `git status --short` final (arquivos deste plano)
+
+```
+ M package-lock.json
+ M package.json
+D  plans/fase-3-site-publico/.gitkeep
+ M src/styles/global.css
+```
+
+### O que NÃO rodou
+
+- Verificação no navegador (`astro preview`, DevTools, larguras 360/768/1440, Tab) — este plano não
+  cria rota nova nem componente visível; a identidade visual é conferida rota a rota nos planos 042
+  em diante e transversalmente no 053, conforme a tabela "Onde cada item do §12 fecha" do README da
+  fase.
+- `npm ci` e `npm audit --audit-level=high` — não fazem parte dos passos deste plano; ficam para a
+  verificação autoritativa do orquestrador/CI.
+- Nenhum plano nem teste novo de `src/lib/` ou `tests/` foi criado — o plano 036 é só tokens de CSS
+  e a fonte; não há lógica em TypeScript para testar, logo não há canário de teste unitário a
+  reverter (o "canário" deste plano é o utilitário CSS do passo 5, coberto acima).
+- Não commitei nada (`Status:` permanece `TODO`; checkboxes não marcadas — ficam para a promoção do
+  orquestrador).
