@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-14 (fase fatiada em 18 planos, 036–053)
+Última atualização: 2026-09-16 (plano 036 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -22,7 +22,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 
 | Plano | Título | Status | Executável por | Agente | Commits |
 |---|---|---|---|---|---|
-| 036 | Tokens de cor, escala tipográfica e Archivo auto-hospedada | ⬜ TODO | agente | implementer (sonnet) | — |
+| 036 | Tokens de cor, escala tipográfica e Archivo auto-hospedada | ✅ DONE | agente | implementer (sonnet) | `fb117b6` |
 | 037 | Dicionário de interface em PT e mapa de navegação | ⬜ TODO | agente | implementer (sonnet) | — |
 | 038 | Texto corrido em parágrafos, contagem com dois dígitos e data pt-BR | ⬜ TODO | agente | implementer (sonnet) | — |
 | 039 | Filtro de rascunho (RN-01), singleton e ordenação de pesquisa | ⬜ TODO | agente | implementer (sonnet) | — |

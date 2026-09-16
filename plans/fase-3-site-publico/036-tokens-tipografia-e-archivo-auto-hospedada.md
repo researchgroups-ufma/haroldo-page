@@ -1,6 +1,6 @@
 # Plano 036 — Tokens de cor, escala tipográfica e Archivo auto-hospedada
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RNF-01, RNF-03, RNF-15, RF-32 (base do movimento); pré-requisito do item
 "Identidade visual aplicada" do §12 da fase 3
 **Depende de:** nenhum
@@ -105,12 +105,12 @@ linha. **Não** importe `index.css` (traz todos os subsets e o peso 400).
 
 ## Critérios de aceitação
 
-- [ ] `@fontsource/archivo` em `dependencies` com versão exata; nenhum outro pacote mudou de versão no lock
-- [ ] `global.css` importa apenas `latin-200.css` e `latin-300.css` do Fontsource
-- [ ] Os seis tokens de cor, o cinza de comentário, as três famílias e os nove utilitários da escala existem com os valores literais do §2/§3 da identidade
-- [ ] Breakpoints `sm` = 40rem e `lg` = 64rem, sem os defaults do Tailwind
-- [ ] Keyframes e estado inicial oculto só dentro de `prefers-reduced-motion: no-preference`; bloco `reduce` zera animações e transições
-- [ ] `dist/` contém os `.woff2` da Archivo 200/300 e nenhuma referência a `fonts.googleapis`/`fonts.gstatic`
+- [x] `@fontsource/archivo` em `dependencies` com versão exata; nenhum outro pacote mudou de versão no lock
+- [x] `global.css` importa apenas `latin-200.css` e `latin-300.css` do Fontsource
+- [x] Os seis tokens de cor, o cinza de comentário, as três famílias e os nove utilitários da escala existem com os valores literais do §2/§3 da identidade
+- [x] Breakpoints `sm` = 40rem e `lg` = 64rem, sem os defaults do Tailwind
+- [x] Keyframes e estado inicial oculto só dentro de `prefers-reduced-motion: no-preference`; bloco `reduce` zera animações e transições
+- [x] `dist/` contém os `.woff2` da Archivo 200/300 e nenhuma referência a `fonts.googleapis`/`fonts.gstatic`
 
 > **Emenda 2026-09-16 (decisão do stakeholder, revisão do 036):** o critério vale para o site
 > público — `dist/` excluindo `dist/admin/`. O bundle do painel TinaCMS em `dist/admin/` carrega a
@@ -118,9 +118,9 @@ linha. **Não** importe `index.css` (traz todos os subsets e o peso 400).
 > regra do README da fase ("no HTML/CSS") já tinham esse recorte. Dívida registrada no README da
 > fase.
 
-- [ ] Canário do passo 5 mostrou o `clamp` compilado e foi revertido
-- [ ] `lint`, `format:check`, `test:coverage` e `build:pipeline` verdes, com saída colada
-- [ ] `.gitkeep` da pasta da fase removido
+- [x] Canário do passo 5 mostrou o `clamp` compilado e foi revertido
+- [x] `lint`, `format:check`, `test:coverage` e `build:pipeline` verdes, com saída colada
+- [x] `.gitkeep` da pasta da fase removido
 
 ## Evidência
 
@@ -412,3 +412,30 @@ D  plans/fase-3-site-publico/.gitkeep
   reverter (o "canário" deste plano é o utilitário CSS do passo 5, coberto acima).
 - Não commitei nada (`Status:` permanece `TODO`; checkboxes não marcadas — ficam para a promoção do
   orquestrador).
+
+### Verificação autoritativa e promoção (orquestrador, 2026-09-16)
+
+**Verificação independente** (`triage-runner`, sobre o working tree revisado, antes do commit;
+o relatório veio parcialmente resumido pelo agente — os números abaixo são os que ele transcreveu):
+`npm ci` exit 0 sem reescrever o lock; `npm audit --audit-level=high` exit 0 (8 moderadas
+pré-existentes); `npm run lint` exit 0; `npm run format:check` → `All matched files use Prettier
+code style!`; `npm run test:coverage` → 6 arquivos, 122 testes, cobertura 100% (32/32 statements,
+4/4 branches, 2/2 functions, 31/31 lines); `npm run build:pipeline` → `tests/content` 108 testes,
+`astro check` `0 errors, 0 warnings, 0 hints`, `Complete!`, nenhuma linha `[ERROR]`.
+
+**Revisão:** reprovada em um ciclo, só por redação do critério de Google Fonts (ver a emenda
+acima); CSS conferido linha a linha contra `docs/identidade-visual.md` §2–§4 e §7. A correção
+tocou só este plano e o README da fase; o diff de código ficou idêntico ao revisado.
+Observações não bloqueantes do revisor, para os planos seguintes: (1) o Tailwind 4 varre os `.md`
+versionados de `plans/` e `docs/`, que citam `text-display-1` — o canário do passo 5 cumpre o
+critério ao pé da letra, mas "a classe só aparece se alguma página usar" é falso, e canário de CSS
+por "a classe está no bundle" não discrimina; (2) o CSS de movimento fica fora de `@layer` e vence
+utilitários em cascata (sem conflito hoje; conferir no 043).
+
+**CI sobre o commit empurrado `fb117b6`:**
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/fb117b6/check-runs --jq '.check_runs[] | "\(.name)\t\(.conclusion)\t\(.details_url)"'
+Workers Builds: haroldo-page	success	https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/b65c0a26-2ce7-440c-92aa-8930c033ab29
+qualidade	success	https://github.com/researchgroups-ufma/haroldo-page/actions/runs/35151738105/job/104981447246
+```
