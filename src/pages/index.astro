@@ -3,15 +3,16 @@
  * ============================================================================
  *  Arquivo      : index.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Página inicial. Placeholder temporário do scaffolding —
- *                 confirma que Astro, TypeScript strict e Tailwind 4 estão
- *                 ativos (plano 002); conteúdo real chega na fase 3.
+ *  Descrição    : Página inicial. Placeholder temporário do scaffolding,
+ *                 agora envolvido no `BaseLayout` (plano 042) — confirma que
+ *                 o layout base, cabeçalho e rodapé funcionam na rota `/`;
+ *                 conteúdo real da Home (RF-20) chega no plano 044.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
- *  Atualizado em: 2026-09-01
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-17
+ *  Versão       : 0.2.0
  *
- *  Dependências : src/styles/global.css
+ *  Dependências : src/layouts/BaseLayout.astro
  *  Entradas     : nenhuma
  *  Saídas       : HTML estático da rota `/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/index.astro`
@@ -19,20 +20,13 @@
  *  Notas        : conteúdo hardcoded é temporário — TODO(fase 3) abaixo.
  * ============================================================================
  */
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
 // TODO(fase 3): substituir pelo conteúdo real da Home (RF-20), vindo de
 // content/perfil/index.md via o schema Zod (D-06), não hardcoded.
 const professorName = 'Prof. Haroldo C. D. Lima Junior';
 ---
 
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{professorName}</title>
-  </head>
-  <body>
-    <h1 class="text-3xl font-semibold">{professorName}</h1>
-  </body>
-</html>
+<BaseLayout title={undefined}>
+  <h1 class="text-3xl font-semibold">{professorName}</h1>
+</BaseLayout>

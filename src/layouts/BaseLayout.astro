@@ -1,0 +1,76 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : BaseLayout.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Layout que toda rota pública usa — casca HTML (`lang`,
+ *                 `<title>` pelo dicionário, meta description), link "Pular
+ *                 para o conteúdo" (§8.3), cabeçalho e rodapé com os dados do
+ *                 singleton `perfil` (plano 039).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-17
+ *  Atualizado em: 2026-09-17
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : astro:content (getCollection), src/lib/published.ts
+ *                 (requireSingleton), src/lib/config.ts (siteConfig),
+ *                 src/i18n/pt.ts, src/components/SiteHeader.astro,
+ *                 src/components/SiteFooter.astro, src/styles/global.css
+ *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`; conteúdo via `<slot />`
+ *  Saídas       : documento HTML completo da rota
+ *  Uso          : import BaseLayout from '../layouts/BaseLayout.astro'
+ *
+ *  Notas        : canonical, Open Graph e favicon ficam para a fase 5
+ *                 (RF-30) — não pertencem a este plano.
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import { pt } from '../i18n/pt';
+import { siteConfig } from '../lib/config';
+import { requireSingleton } from '../lib/published';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import '../styles/global.css';
+
+export interface Props {
+  /**
+   * Nome da página, usado em `pt.site.pageTitle`. Obrigatória (mas pode ser `undefined`): toda
+   * rota decide explicitamente se tem nome de página, em vez de esquecer a prop e herdar em
+   * silêncio o `<title>` da Home. Na Home, `undefined` — o `<title>` vira só `siteConfig.title`.
+   */
+  title: string | undefined;
+  /** Meta description da rota. Ausente: usa `siteConfig.description`. */
+  description?: string;
+}
+
+const { title, description = siteConfig.description } = Astro.props;
+
+// Home (sem `title`) não passa por `pt.site.pageTitle` — o <title> é só o nome completo do site.
+const pageTitle =
+  title !== undefined ? pt.site.pageTitle(title, siteConfig.shortTitle) : siteConfig.title;
+
+// `perfil` é singleton (plano 039): `requireSingleton` estoura se o painel não tiver exatamente 1 item.
+const perfilEntry = requireSingleton(await getCollection('perfil'), 'perfil');
+---
+
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <a
+      href="#conteudo"
+      class="focus:bg-papel focus:text-tinta sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2"
+    >
+      {pt.site.skipToContent}
+    </a>
+    <SiteHeader perfil={perfilEntry.data} />
+    <main id="conteudo">
+      <slot />
+    </main>
+    <SiteFooter perfil={perfilEntry.data} />
+  </body>
+</html>

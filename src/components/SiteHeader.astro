@@ -1,0 +1,149 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : SiteHeader.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Cabeçalho do site (§5.1): nome com link para `/`, navegação
+ *                 com a rota ativa marcada, e o menu do celular como melhoria
+ *                 progressiva (RNF-02) — sem JS a lista abre e o botão some.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-17
+ *  Atualizado em: 2026-09-17
+ *  Versão       : 0.2.0
+ *
+ *  Dependências : src/i18n/pt.ts, src/lib/config.ts (siteConfig),
+ *                 src/lib/navigation.ts (NAV_ITEMS, isActivePath),
+ *                 astro:content (tipo `CollectionEntry<'perfil'>`)
+ *  Entradas     : prop `perfil` (dados do singleton `perfil`, plano 039)
+ *  Saídas       : `<header>` com nome, navegação e menu do celular
+ *  Uso          : import SiteHeader from '../components/SiteHeader.astro'
+ *
+ *  Notas        : espaço do seletor de idioma (RF-29) não renderiza nada — só o comentário no HTML.
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import { pt } from '../i18n/pt';
+import { siteConfig } from '../lib/config';
+import { NAV_ITEMS, isActivePath } from '../lib/navigation';
+
+export interface Props {
+  /** Dados do perfil (singleton `perfil`); usados para a segunda linha do nome (`departamento`). */
+  perfil: CollectionEntry<'perfil'>['data'];
+}
+
+const { perfil } = Astro.props;
+---
+
+<header class="border-regua border-b">
+  <div class="px-margem mx-auto max-w-[90rem]">
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 py-4">
+      <a href="/" class="flex flex-col">
+        <span class="text-titulo-item">{siteConfig.shortTitle}</span>
+        {
+          perfil.departamento && (
+            <span class="text-pequeno text-secundario hidden sm:block">{perfil.departamento}</span>
+          )
+        }
+      </a>
+
+      <!-- fase 4: seletor de idioma (RF-29) -->
+
+      <button
+        type="button"
+        id="menu-botao"
+        hidden
+        aria-expanded="false"
+        aria-controls="menu-lista"
+        class="inline-flex min-h-11 items-center px-2 text-[0.9375rem] lg:hidden"
+      >
+        {pt.site.menu}
+      </button>
+
+      <nav aria-label={pt.site.mainNavLabel} class="order-last w-full lg:order-none lg:w-auto">
+        <div id="menu-caixa">
+          <ul
+            id="menu-lista"
+            class="divide-regua divide-y lg:flex lg:items-center lg:gap-6 lg:divide-y-0"
+          >
+            {
+              NAV_ITEMS.map((item) => {
+                const active = isActivePath(item.href, Astro.url.pathname);
+                return (
+                  <li>
+                    <a
+                      href={item.href}
+                      aria-current={active ? 'page' : undefined}
+                      class:list={[
+                        'flex min-h-11 items-center justify-between gap-2 text-[0.9375rem] lg:inline-flex lg:min-h-0',
+                        active && 'underline decoration-1 underline-offset-[6px]',
+                      ]}
+                    >
+                      {pt.nav[item.key]}
+                      <span aria-hidden="true" class="lg:hidden">
+                        ›
+                      </span>
+                    </a>
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Abaixo de `lg`: grade `1fr`/`0fr` anima a altura em 150ms; `visibility`
+     tira a lista do Tab/leitor de tela quando fechada, com atraso ao fechar
+     (a altura termina de recolher primeiro) e sem atraso ao abrir. */
+  @media (max-width: 63.9375rem) {
+    #menu-caixa {
+      display: grid;
+      grid-template-rows: 1fr;
+      visibility: visible;
+      transition:
+        grid-template-rows 150ms ease-out,
+        visibility 0s linear 0s;
+    }
+
+    #menu-caixa > ul {
+      overflow: hidden;
+    }
+    #menu-caixa[data-open='false'] {
+      grid-template-rows: 0fr;
+      visibility: hidden;
+      transition:
+        grid-template-rows 150ms ease-out,
+        visibility 0s linear 150ms;
+    }
+  }
+</style>
+
+<script>
+  // Melhoria progressiva (§1 regra 3, RNF-02): sem este script o botão fica
+  // `hidden` e a lista fica aberta (estado do HTML).
+  const button = document.getElementById('menu-botao');
+  const caixa = document.getElementById('menu-caixa');
+
+  if (button instanceof HTMLButtonElement && caixa) {
+    button.hidden = false;
+    caixa.dataset.open = 'false';
+    button.setAttribute('aria-expanded', 'false');
+
+    button.addEventListener('click', () => {
+      const isOpen = caixa.dataset.open === 'true';
+      caixa.dataset.open = isOpen ? 'false' : 'true';
+      button.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && caixa.dataset.open === 'true') {
+        caixa.dataset.open = 'false';
+        button.setAttribute('aria-expanded', 'false');
+        button.focus();
+      }
+    });
+  }
+</script>
