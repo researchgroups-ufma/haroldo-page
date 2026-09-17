@@ -1,6 +1,6 @@
 # Plano 041 — Disciplinas: slug da URL, atuais × anteriores, contagens e scripts por aula (F-13)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-23, RF-24, RF-37, F-13, RN-03, RN-04; §11 (ordenação de aulas, geração de slug)
 **Depende de:** nenhum
 **Modelo recomendado:** sonnet
@@ -127,13 +127,13 @@ na ordem fixa das seções do §6.5 da identidade:
 
 ## Critérios de aceitação
 
-- [ ] Seis funções exportadas com as regras acima; `lessons` nunca reordenado
-- [ ] Slug `2026-2-relatividade-geral` para o arquivo real; duplicado lança nomeando os dois caminhos
-- [ ] Nenhum script some em `groupScriptsByLesson` (invariante testado)
-- [ ] Canários (a), (b) e (c) mostrados vermelhos e revertidos
-- [ ] Id real do Astro registrado na Evidência
-- [ ] `astro check`, `lint`, `format:check`, `test:coverage` (≥ 80%) verdes, com saída colada
-- [ ] Cabeçalho §10.1, TSDoc e comentários `// RN-04`, `// F-13`
+- [x] Seis funções exportadas com as regras acima; `lessons` nunca reordenado
+- [x] Slug `2026-2-relatividade-geral` para o arquivo real; duplicado lança nomeando os dois caminhos
+- [x] Nenhum script some em `groupScriptsByLesson` (invariante testado)
+- [x] Canários (a), (b) e (c) mostrados vermelhos e revertidos
+- [x] Id real do Astro registrado na Evidência
+- [x] `astro check`, `lint`, `format:check`, `test:coverage` (≥ 80%) verdes, com saída colada
+- [x] Cabeçalho §10.1, TSDoc e comentários `// RN-04`, `// F-13`
 
 ## Evidência
 
@@ -728,3 +728,60 @@ Os 15 blocos de saída de comando da Evidência (excluindo o próprio bloco de `
 - **Verificação no navegador** (largura 360/768/1440, Tab, `scrollWidth`/`clientWidth`): não se aplica a este plano — `src/lib/courses.ts` é lógica pura sem página nem componente; a verificação visual é dos planos 047/048/049, que consomem estas funções.
 - `npm ci`, `npm audit --audit-level=high`, `npm run build:pipeline` completo e o CI do GitHub Actions: não rodados nesta sessão — ficam para a verificação independente do orquestrador (README da fase, "Verificação autoritativa").
 - `git add` / commit: não feito — `Status:` continua `TODO`, promoção é do orquestrador.
+
+### Verificação autoritativa e promoção (orquestrador, 2026-09-17)
+
+**Ciclos de revisão.** Ciclo 1 e ciclo 2 REPROVADOS (resumos acima). No ciclo 2, o revisor também
+não encontrou o arquivo do triage: o `triage-runner` o tinha gravado numa pasta com underscore
+(`S--Projetos-academic_page-haroldo`), não por falta de execução. O orquestrador copiou o arquivo
+para o scratchpad certo. **Ciclo 3: APROVADO.** O revisor reproduziu por mutação, numa cópia fora
+do repositório, os seis canários (a:4, b:4, c:1, d:1, e:1, f:1 falhas de 25) e mais quatro mutações
+extras (sem comparação numérica, sem desempate por nome, `findLastIndex`, sem `trim` da ementa), todas
+vermelhas. Extraiu os 17 blocos de código desta Evidência e achou arquivo capturado idêntico para
+cada um, inclusive o bloco de `format:check`. Confirmou o id `20262-relatividade-geral` com `cmp`
+contra `.astro/data-store.json`.
+
+**Verificação independente, ciclo 3** (`triage-runner`, arquivo `triage-041-c3.txt` gravado às
+13:27:50, depois da última edição: `courses.ts` 13:21:35, teste 13:17:29, plano 13:25:13). Trecho
+literal do arquivo:
+
+```
+$ grep -E "^=====|exit=|Test Files|Tests |Statements|Branches|Functions|Lines  |errors|warnings|hints|All matched" triage-041-c3.txt
+===== $ git status --short
+exit=0
+===== $ npx astro check
+- 0 errors
+- 0 warnings
+- 0 hints
+exit=0
+===== $ npm run lint
+exit=0
+===== $ npm run format:check
+All matched files use Prettier code style!
+exit=0
+===== $ npm run test:coverage
+ Test Files  14 passed (14)
+      Tests  236 passed (236)
+=============================== Coverage summary ===============================
+Statements   : 100% ( 179/179 )
+Branches     : 98.88% ( 89/90 )
+Functions    : 100% ( 53/53 )
+Lines        : 100% ( 162/162 )
+================================================================================
+exit=0
+===== $ npx vitest run tests/lib/courses.test.ts
+ Test Files  1 passed (1)
+      Tests  25 passed (25)
+exit=0
+```
+
+Nota não bloqueante da revisão: `src/lib/.gitkeep`, que o plano manda não remover, já não existia;
+foi removido pelo plano 037 (`23d1aa0`). A instrução do plano estava desatualizada.
+
+**CI sobre o commit empurrado `a2e28b7`:**
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/a2e28b7/check-runs --jq '.check_runs[] | "\(.name)\t\(.conclusion)\t\(.details_url)"'
+Workers Builds: haroldo-page	success	https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/0640bf55-049f-4666-acca-d581c7769591
+qualidade	success	https://github.com/researchgroups-ufma/haroldo-page/actions/runs/35247024594/job/105289716197
+```
