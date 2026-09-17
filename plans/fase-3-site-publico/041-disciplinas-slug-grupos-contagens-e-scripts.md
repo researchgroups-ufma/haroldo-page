@@ -137,4 +137,594 @@ na ordem fixa das seções do §6.5 da identidade:
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir. Declare também o que NÃO rodou.>
+Status permanece `TODO` e nenhum checkbox foi marcado, conforme regra do despacho — esta seção documenta os três ciclos desta sessão: execução original (ciclo 1), primeira correção depois do REPROVADO (ciclo 2) e esta segunda correção (ciclo 3). Nada commitado nos três ciclos.
+
+### Ciclo 1 — revisão REPROVADO (resumo)
+
+1. Testes de erro de `courseSlug` (`undefined`, `'.md'`) aceitavam qualquer exceção — corrigido conferindo a mensagem do `Error` por regex.
+2. `current` de `splitCourses` nunca era verificado — corrigido com dois testes novos.
+3. Blocos de canário sem o comando exato — refeitos com o comando explícito acima de cada saída.
+
+### Ciclo 2 — revisão REPROVADO (resumo)
+
+As três correções do ciclo 1 foram confirmadas por mutação. Dois problemas novos, ambos corrigidos nesta seção (ciclo 3):
+
+1. **Evidência reescrita à mão** — o bloco do `npx astro build` e o `grep` de contexto do id estavam digitados como string dentro de `scratchpad/build_evidence.py`, e divergiam do arquivo capturado de fato (horário trocado, caracteres `✓`/`├─` removidos). Corrigido: esta versão da Evidência é montada por um script que só faz `open(arquivo).read()` — nenhuma saída de comando é digitada. O script e o manifesto usados estão em `scratchpad/build_evidence2.py` e `scratchpad/verify_evidence.py` (fora do repositório, na pasta de scratch da sessão).
+2. **Ordenação de `current` sem teste que a exercitasse** — remover `.sort(compareCourseGroup)` de `current` continuava verde, porque a fixture do teste de status mistos já trazia as disciplinas atuais na ordem certa. Corrigido: a fixture agora tem a atual mais antiga ANTES da mais recente na entrada, então só o `.sort()` reordena para o resultado esperado; canário (f) novo comprova.
+
+### Passo 1 — `npx astro check`
+
+```
+13:21:54 [content] Syncing content
+13:21:54 [content] Synced content
+13:21:54 [types] Generated 394ms
+13:21:54 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (35 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+```
+
+### Passo 2 — `npx vitest run tests/lib/courses.test.ts` (25 testes)
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  25 passed (25)
+   Start at  13:22:00
+   Duration  226ms (transform 44ms, setup 0ms, import 85ms, tests 19ms, environment 0ms)
+```
+
+### Passo 3 — Canários
+
+**Canário (a)** — comando `npx vitest run tests/lib/courses.test.ts`, com `slugify(withoutExtension)` trocado por `withoutExtension.replace('.', '')` em `courseSlug` (simula `githubSlug`, que remove o ponto em vez de gerar hífen). Vermelho:
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/courses.test.ts (25 tests | 4 failed) 23ms
+     × deriva o slug do nome do arquivo real, preservando o ponto do semestre como hífen 5ms
+     × aceita separador de caminho \ (Windows) 0ms
+     × constrói o mapa de slug para filePath para caminhos distintos 1ms
+     × lança nomeando os dois caminhos quando dois arquivos geram o mesmo slug 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/courses.test.ts > courseSlug > deriva o slug do nome do arquivo real, preservando o ponto do semestre como hífen
+AssertionError: expected '20262-relatividade-geral' to be '2026-2-relatividade-geral' // Object.is equality
+
+Expected: "2026-2-relatividade-geral"
+Received: "20262-relatividade-geral"
+
+ ❯ tests/lib/courses.test.ts:16:76
+     14| describe('courseSlug', () => {
+     15|   it('deriva o slug do nome do arquivo real, preservando o ponto do se…
+     16|     expect(courseSlug('content/disciplinas/2026.2-relatividade-geral.m…
+       |                                                                            ^
+     17|       '2026-2-relatividade-geral',
+     18|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/lib/courses.test.ts > courseSlug > aceita separador de caminho \ (Windows)
+AssertionError: expected '20262-relatividade-geral' to be '2026-2-relatividade-geral' // Object.is equality
+
+Expected: "2026-2-relatividade-geral"
+Received: "20262-relatividade-geral"
+
+ ❯ tests/lib/courses.test.ts:22:78
+     20|
+     21|   it('aceita separador de caminho \\ (Windows)', () => {
+     22|     expect(courseSlug('content\\disciplinas\\2026.2-relatividade-geral…
+       |                                                                              ^
+     23|       '2026-2-relatividade-geral',
+     24|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/lib/courses.test.ts > buildCourseSlugs > constrói o mapa de slug para filePath para caminhos distintos
+AssertionError: expected undefined to be 'content/disciplinas/2026.2-relativida…' // Object.is equality
+
+- Expected:
+"content/disciplinas/2026.2-relatividade-geral.md"
+
++ Received:
+undefined
+
+ ❯ tests/lib/courses.test.ts:43:50
+     41|     ]);
+     42|     expect(map.size).toBe(2);
+     43|     expect(map.get('2026-2-relatividade-geral')).toBe(
+       |                                                  ^
+     44|       'content/disciplinas/2026.2-relatividade-geral.md',
+     45|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/lib/courses.test.ts > buildCourseSlugs > lança nomeando os dois caminhos quando dois arquivos geram o mesmo slug
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/lib/courses.test.ts:54:80
+     52|     const pathA = 'content/disciplinas/2026.2-x.md';
+     53|     const pathB = 'content/disciplinas/2026-2-x.md';
+     54|     expect(() => buildCourseSlugs([{ filePath: pathA }, { filePath: pa…
+       |                                                                                ^
+     55|       /2026\.2-x\.md.*2026-2-x\.md|2026-2-x\.md.*2026\.2-x\.md/,
+     56|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 21 passed (25)
+   Start at  13:20:08
+   Duration  239ms (transform 51ms, setup 0ms, import 91ms, tests 23ms, environment 0ms)
+```
+
+Revertido de volta a `slugify(withoutExtension)`.
+
+**Canário (b)** — comando `npx vitest run tests/lib/courses.test.ts`, com o `else` de `groupScriptsByLesson` removido (`if (index !== -1) { byLesson[index].push(script); }`, sem o `general.push(script)` do ramo `-1`). Vermelho:
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/courses.test.ts (25 tests | 4 failed) 24ms
+     × script com aula inexistente vai para general (F-13) 5ms
+     × script sem aula vai para general 1ms
+     × invariante: byLesson.flat().length + general.length === scripts.length 1ms
+     × preserva a ordem relativa dos scripts em cada grupo 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/courses.test.ts > groupScriptsByLesson > script com aula inexistente vai para general (F-13)
+AssertionError: expected [] to deeply equal [ { id: 'orfao', aula: 99 } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "aula": 99,
+-     "id": "orfao",
+-   },
+- ]
++ []
+
+ ❯ tests/lib/courses.test.ts:145:21
+    143|     const { byLesson, general } = groupScriptsByLesson(lessons, script…
+    144|     expect(byLesson).toEqual([[], []]);
+    145|     expect(general).toEqual([{ id: 'orfao', aula: 99 }]);
+       |                     ^
+    146|   });
+    147|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/lib/courses.test.ts > groupScriptsByLesson > script sem aula vai para general
+AssertionError: expected [] to deeply equal [ { id: 'sem-aula' } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "id": "sem-aula",
+-   },
+- ]
++ []
+
+ ❯ tests/lib/courses.test.ts:153:21
+    151|     const { byLesson, general } = groupScriptsByLesson(lessons, script…
+    152|     expect(byLesson).toEqual([[]]);
+    153|     expect(general).toEqual([{ id: 'sem-aula' }]);
+       |                     ^
+    154|   });
+    155|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/lib/courses.test.ts > groupScriptsByLesson > invariante: byLesson.flat().length + general.length === scripts.length
+AssertionError: expected 3 to be 5 // Object.is equality
+
+- Expected
++ Received
+
+- 5
++ 3
+
+ ❯ tests/lib/courses.test.ts:174:53
+    172|     ];
+    173|     const { byLesson, general } = groupScriptsByLesson(lessons, script…
+    174|     expect(byLesson.flat().length + general.length).toBe(scripts.lengt…
+       |                                                     ^
+    175|   });
+    176|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/lib/courses.test.ts > groupScriptsByLesson > preserva a ordem relativa dos scripts em cada grupo
+AssertionError: expected [] to deeply equal [ 'geral-1', 'geral-2' ]
+
+- Expected
++ Received
+
+- [
+-   "geral-1",
+-   "geral-2",
+- ]
++ []
+
+ ❯ tests/lib/courses.test.ts:187:38
+    185|     const { byLesson, general } = groupScriptsByLesson(lessons, script…
+    186|     expect(byLesson[0].map((s) => s.id)).toEqual(['aula-1', 'aula-2']);
+    187|     expect(general.map((s) => s.id)).toEqual(['geral-1', 'geral-2']);
+       |                                      ^
+    188|   });
+    189|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 21 passed (25)
+   Start at  13:20:25
+   Duration  241ms (transform 54ms, setup 0ms, import 94ms, tests 24ms, environment 0ms)
+```
+
+Revertido de volta ao `if (index === -1) { general.push(script); } else { byLesson[index].push(script); }`.
+
+**Canário (c)** — comando `npx vitest run tests/lib/courses.test.ts`, com a checagem `if (existing !== undefined) throw ...` removida de `buildCourseSlugs` (o segundo arquivo sobrescreve o slug do primeiro em silêncio). Vermelho:
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/courses.test.ts (25 tests | 1 failed) 21ms
+     × lança nomeando os dois caminhos quando dois arquivos geram o mesmo slug 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/courses.test.ts > buildCourseSlugs > lança nomeando os dois caminhos quando dois arquivos geram o mesmo slug
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/lib/courses.test.ts:54:80
+     52|     const pathA = 'content/disciplinas/2026.2-x.md';
+     53|     const pathB = 'content/disciplinas/2026-2-x.md';
+     54|     expect(() => buildCourseSlugs([{ filePath: pathA }, { filePath: pa…
+       |                                                                                ^
+     55|       /2026\.2-x\.md.*2026-2-x\.md|2026-2-x\.md.*2026\.2-x\.md/,
+     56|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 passed (25)
+   Start at  13:20:42
+   Duration  235ms (transform 51ms, setup 0ms, import 90ms, tests 21ms, environment 0ms)
+```
+
+Revertido de volta à checagem de duplicado com `throw`.
+
+**Canário (d)** — comando `npx vitest run tests/lib/courses.test.ts`, com a guarda `if (filePath === undefined)` trocada por `if (false)` em `courseSlug` — sem a guarda, `filePath.replace(...)` lança `TypeError: Cannot read properties of undefined (reading 'replace')`, que não casa com a regex `/courseSlug: filePath ausente/` do teste. Vermelho:
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/courses.test.ts (25 tests | 1 failed) 21ms
+     × lança com a mensagem "filePath ausente" se filePath for undefined 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/courses.test.ts > courseSlug > lança com a mensagem "filePath ausente" se filePath for undefined
+AssertionError: expected [Function] to throw error matching /courseSlug: filePath ausente/ but got 'Cannot read properties of undefined (…'
+
+- Expected:
+/courseSlug: filePath ausente/
+
++ Received:
+"Cannot read properties of undefined (reading 'replace')"
+
+ ❯ tests/lib/courses.test.ts:28:41
+     26|
+     27|   it('lança com a mensagem "filePath ausente" se filePath for undefine…
+     28|     expect(() => courseSlug(undefined)).toThrow(/courseSlug: filePath …
+       |                                         ^
+     29|   });
+     30|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 passed (25)
+   Start at  13:20:59
+   Duration  234ms (transform 52ms, setup 0ms, import 93ms, tests 21ms, environment 0ms)
+```
+
+Revertido de volta a `if (filePath === undefined)`.
+
+**Canário (e)** — comando `npx vitest run tests/lib/courses.test.ts`, com `current` de `splitCourses` hardcoded para `[]`. Vermelho:
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/courses.test.ts (25 tests | 1 failed) 23ms
+     × separa status mistos, com toEqual exato em current e em previous 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/courses.test.ts > splitCourses > separa status mistos, com toEqual exato em current e em previous
+AssertionError: expected [] to deeply equal [ { data: { …(3) } }, …(1) ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "data": {
+-       "nome": "Relatividade Geral",
+-       "semestre": "2026.2",
+-       "status": "atual",
+-     },
+-   },
+-   {
+-     "data": {
+-       "nome": "Mecânica Quântica",
+-       "semestre": "2026.1",
+-       "status": "atual",
+-     },
+-   },
+- ]
++ []
+
+ ❯ tests/lib/courses.test.ts:86:21
+     84|     const entries = [anteriorAntigo, atualAntigo, anteriorRecente, atu…
+     85|     const { current, previous } = splitCourses(entries);
+     86|     expect(current).toEqual([atualRecente, atualAntigo]);
+       |                     ^
+     87|     expect(previous).toEqual([anteriorRecente, anteriorAntigo]);
+     88|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 passed (25)
+   Start at  13:21:16
+   Duration  237ms (transform 53ms, setup 0ms, import 95ms, tests 23ms, environment 0ms)
+```
+
+Revertido de volta ao `filter` + `sort` original.
+
+**Canário (f)** (novo, pedido do revisor no ciclo 2) — comando `npx vitest run tests/lib/courses.test.ts`, com `current` de `splitCourses` sem `.sort(compareCourseGroup)` (só o `filter`). A fixture do teste de status mistos tem a disciplina atual mais antiga (`atualAntigo`, `2026.1`) ANTES da mais recente (`atualRecente`, `2026.2`) na entrada, então sem `.sort()` o resultado sai na ordem de entrada — errado. Vermelho:
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/lib/courses.test.ts (25 tests | 1 failed) 23ms
+     × separa status mistos, com toEqual exato em current e em previous 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/lib/courses.test.ts > splitCourses > separa status mistos, com toEqual exato em current e em previous
+AssertionError: expected [ { data: { …(3) } }, …(1) ] to deeply equal [ { data: { …(3) } }, …(1) ]
+
+- Expected
++ Received
+
+  [
+    {
+      "data": {
+-       "nome": "Relatividade Geral",
+-       "semestre": "2026.2",
++       "nome": "Mecânica Quântica",
++       "semestre": "2026.1",
+        "status": "atual",
+      },
+    },
+    {
+      "data": {
+-       "nome": "Mecânica Quântica",
+-       "semestre": "2026.1",
++       "nome": "Relatividade Geral",
++       "semestre": "2026.2",
+        "status": "atual",
+      },
+    },
+  ]
+
+ ❯ tests/lib/courses.test.ts:86:21
+     84|     const entries = [anteriorAntigo, atualAntigo, anteriorRecente, atu…
+     85|     const { current, previous } = splitCourses(entries);
+     86|     expect(current).toEqual([atualRecente, atualAntigo]);
+       |                     ^
+     87|     expect(previous).toEqual([anteriorRecente, anteriorAntigo]);
+     88|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 passed (25)
+   Start at  13:21:29
+   Duration  241ms (transform 51ms, setup 0ms, import 93ms, tests 23ms, environment 0ms)
+```
+
+Revertido de volta ao `.sort(compareCourseGroup)` em `current`.
+
+**Prova da reversão dos seis canários** — comando `npx vitest run tests/lib/courses.test.ts` depois de revertido o canário (f) (o último aplicado), verde:
+
+```
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  25 passed (25)
+   Start at  13:21:44
+   Duration  224ms (transform 50ms, setup 0ms, import 90ms, tests 18ms, environment 0ms)
+```
+
+O arquivo é novo/untracked (sem base para `git diff`); `git status --short` confirma que só os três arquivos deste plano mudaram, nada residual de canário:
+
+```
+ M plans/fase-3-site-publico/041-disciplinas-slug-grupos-contagens-e-scripts.md
+?? src/lib/courses.ts
+?? tests/lib/courses.test.ts
+```
+
+### Passo 4 — Id real do Astro (`npx astro build` + `.astro/data-store.json`)
+
+Saída do build, rodado nesta sessão (ciclo 3), capturada em arquivo:
+
+```
+13:22:23 [content] Syncing content
+13:22:23 [content] Synced content
+13:22:23 [types] Generated 400ms
+13:22:23 [build] output: "static"
+13:22:23 [build] mode: "static"
+13:22:23 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+13:22:23 [build] Collecting build info...
+13:22:23 [build] ✓ Completed in 436ms.
+13:22:23 [build] Building static entrypoints...
+13:22:23 [vite] ✓ built in 231ms
+13:22:23 [vite] ✓ built in 43ms
+13:22:23 [build] Rearranging server assets...
+
+ generating static routes 
+13:22:23   ├─ /index.html (+8ms) 
+13:22:23 ✓ Completed in 17ms.
+
+13:22:23 [build] ✓ Completed in 365ms.
+13:22:23 [build] 1 page(s) built in 857ms
+13:22:23 [build] Complete!
+```
+
+`grep -o '"id":"[^"]*relatividade-geral[^"]*"' .astro/data-store.json` (capturado em arquivo, com o código de saída):
+
+```
+exit=1
+```
+
+Não casou nada — o `data-store.json` do Astro 7 é serializado no formato `devalue` (array indexado), não como JSON `{"id": "..."}` plano. Localizei com `grep -o '.\{60\}relatividade-geral.\{60\}' .astro/data-store.json` (também capturado em arquivo):
+
+```
+0,"nome":6,"semestre":7,"status":8,"descricao":9},[],"20262-relatividade-geral",{"id":21,"data":23,"filePath":96,"digest":97,"rendered":98
+026-2/script-horizonte-kerr.py","content/disciplinas/2026.2-relatividade-geral.md","aa908d1bf87562b5",{"html":14,"metadata":99},{"headings
+:56,"url":95},[],"linhas-pesquisa",["Map",126,127,144,145],"relatividade-geral-e-teorias-alternativas-de-gravitacao",{"id":126,"data":128,
+d alternative theories of gravity","content/linhas-pesquisa/relatividade-geral-e-teorias-alternativas-de-gravitacao.md","fc7db77647a431c1"
+```
+
+**Id real observado: `20262-relatividade-geral`** — a string aparece associada ao objeto de entrada cujo `filePath` (mesma linha, mais à frente) é `"content/disciplinas/2026.2-relatividade-geral.md"`. Confirma a previsão do plano (o loader `glob()` aplica `githubSlug`, que remove o ponto) — **nenhuma divergência**.
+
+### Passo 5 — Portão de qualidade
+
+`npm run lint`:
+
+```
+
+> haroldo-page@0.1.0 lint
+> eslint .
+
+exit=0
+```
+
+`npm run test:coverage`:
+
+```
+
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  14 passed (14)
+      Tests  236 passed (236)
+   Start at  13:22:04
+   Duration  1.12s (transform 2.77s, setup 0ms, import 4.62s, tests 203ms, environment 2ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |    98.88 |     100 |     100 |                   
+ src/lib           |     100 |    98.83 |     100 |     100 |                   
+  navigation.ts    |     100 |    83.33 |     100 |     100 | 51                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 179/179 )
+Branches     : 98.88% ( 89/90 )
+Functions    : 100% ( 53/53 )
+Lines        : 100% ( 162/162 )
+================================================================================
+exit=0
+```
+
+`npm run format:check` — rodado por último, depois de preencher esta seção de Evidência, sobre o repositório inteiro (plano incluído), capturado em arquivo:
+
+```
+
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+### Verificação de literalidade dos blocos
+
+Script `scratchpad/verify_evidence.py` (fora do repositório, pasta de scratch da sessão) lê o manifesto gravado por `scratchpad/build_evidence2.py` — pares `(âncora de texto, arquivo de origem)` — localiza cada âncora neste `.md`, extrai o bloco cercado por ``` ` ``` que vem logo depois e compara com `open(arquivo_de_origem).read()`, byte a byte (depois de normalizar só quebras de linha finais). Saída, rodada depois da inserção do bloco de `format:check` acima, lida do arquivo `scratchpad/ciclo4/verify_output.txt` (também gerado por redirecionamento de comando, nunca digitado):
+
+```
+OK         | ancora='### Passo 1 — `npx astro check`' arquivo=astro_check
+OK         | ancora='### Passo 2 — `npx vitest run tests/lib/courses.test.ts` (25 testes)' arquivo=vitest_final
+OK         | ancora='**Canário (a)**' arquivo=a_red
+OK         | ancora='**Canário (b)**' arquivo=b_red
+OK         | ancora='**Canário (c)**' arquivo=c_red
+OK         | ancora='**Canário (d)**' arquivo=d_red
+OK         | ancora='**Canário (e)**' arquivo=e_red
+OK         | ancora='**Canário (f)**' arquivo=f_red
+OK         | ancora='**Prova da reversão dos seis canários**' arquivo=f_revertido_verde
+OK         | ancora='`git status --short` confirma' arquivo=git_status
+OK         | ancora='### Passo 4 — Id real do Astro' arquivo=astro_build
+OK         | ancora='`grep -o \'"id":"[^"]*relatividade-geral' arquivo=id_grep
+OK         | ancora='Localizei com' arquivo=id_context
+OK         | ancora='`npm run lint`:' arquivo=lint
+OK         | ancora='`npm run test:coverage`:' arquivo=coverage
+
+RESULTADO GERAL: TODOS OS BLOCOS IDENTICOS AO ARQUIVO (OK)
+```
+
+Os 15 blocos de saída de comando da Evidência (excluindo o próprio bloco de `format:check`, que não tinha como entrar no manifesto antes de existir) batem byte a byte com o arquivo que os gerou.
+
+
+### O que NÃO rodou
+
+- **Verificação no navegador** (largura 360/768/1440, Tab, `scrollWidth`/`clientWidth`): não se aplica a este plano — `src/lib/courses.ts` é lógica pura sem página nem componente; a verificação visual é dos planos 047/048/049, que consomem estas funções.
+- `npm ci`, `npm audit --audit-level=high`, `npm run build:pipeline` completo e o CI do GitHub Actions: não rodados nesta sessão — ficam para a verificação independente do orquestrador (README da fase, "Verificação autoritativa").
+- `git add` / commit: não feito — `Status:` continua `TODO`, promoção é do orquestrador.
