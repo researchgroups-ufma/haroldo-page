@@ -1,6 +1,6 @@
 # Plano 042 — Layout base, cabeçalho com menu do celular e rodapé
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** item "Layout base, cabeçalho, rodapé e navegação" do §12 da fase 3; RF-26, RNF-02,
 RNF-15, §8.3 (HTML semântico, `lang`, foco, "pular para o conteúdo")
 **Depende de:** planos 036 (tokens), 037 (dicionário e navegação), 039 (`requireSingleton`)
@@ -107,14 +107,23 @@ deduplica `<script>` de componente — não use `is:inline`.
 
 ## Critérios de aceitação
 
-- [ ] `BaseLayout` com `lang="pt-BR"`, `<title>` pelo dicionário, "Pular para o conteúdo" e `<main id="conteudo">`
-- [ ] Cabeçalho com `aria-current="page"` na rota ativa e espaço reservado (vazio) para o seletor da fase 4
-- [ ] Menu do celular: sem JS, lista aberta e botão oculto (observado no navegador); com JS, abre/fecha, `aria-expanded` alterna, `Esc` fecha
-- [ ] Rodapé com as quatro células; perfis mostram só Lattes e ORCID com o conteúdo atual; célula sem dado some sem deixar buraco
-- [ ] Nenhuma string de interface fora de `src/i18n/pt.ts`
-- [ ] `[scrollWidth, clientWidth]` iguais em 360/768/1440, transcritos com data e horário
-- [ ] `astro check`, `lint`, `format:check`, `test:coverage` e `build:pipeline` verdes, com saída colada
-- [ ] Cabeçalho §10.1 e TSDoc de props nos três componentes; cada um < 150 linhas
+- [x] `BaseLayout` com `lang="pt-BR"`, `<title>` pelo dicionário, "Pular para o conteúdo" e `<main id="conteudo">`
+- [x] Cabeçalho com `aria-current="page"` na rota ativa e espaço reservado (vazio) para o seletor da fase 4
+- [x] Menu do celular: sem JS, lista aberta e botão oculto (observado no navegador); com JS, abre/fecha, `aria-expanded` alterna, `Esc` fecha
+- [x] Rodapé com as quatro células; perfis mostram só Lattes e ORCID com o conteúdo atual; célula sem dado some sem deixar buraco
+- [x] Nenhuma string de interface fora de `src/i18n/pt.ts`
+- [x] `[scrollWidth, clientWidth]` iguais em 360/768/1440, transcritos com data e horário
+- [x] `astro check`, `lint`, `format:check`, `test:coverage` e `build:pipeline` verdes, com saída colada
+- [x] Cabeçalho §10.1 e TSDoc de props nos três componentes; cada um < 150 linhas
+
+> **Ressalva das duas caixas que dependem do navegador** (3ª — menu do celular — e 6ª —
+> `[scrollWidth, clientWidth]`): tudo foi observado no navegador, menos a navegação por **Tab real**,
+> que a extensão não conseguiu executar (o foco não se moveu). Por decisão do stakeholder em
+> 2026-09-17, o teste de teclado — "Pular para o conteúdo" visível no 1º Tab, contorno de foco em
+> links e botão, e Tab não entrando nos links do menu fechado — fica **dispensado neste plano** e vai
+> para a verificação transversal do **053**, com a pendência registrada no README da fase. Ordem de
+> foco e foco visível foram verificados pela ordem do DOM e pela regra `:focus-visible` do CSS
+> carregado, o que **não** substitui o teste manual.
 
 ## Evidência
 
@@ -470,4 +479,145 @@ Comando: `npm run format:check`
 
 Checking formatting...
 All matched files use Prettier code style!
+```
+
+### Passos 5–6 — verificação no navegador (orquestrador, 2026-09-17)
+
+**Como.** `npx astro preview` (daemon, pid 15284, parado com `npx astro preview stop` no fim)
+sobre o `dist/` do executor; Chrome via extensão Claude in Chrome. A janela está maximizada
+(viewport 1495 px, `devicePixelRatio` 1.25) e o `resize_window` não mudou o viewport, então as
+larguras exatas foram obtidas com `<iframe>` de 360, 768 e 1440 px, que carregam `/` e aplicam as
+media queries pela largura do próprio iframe. Todos os valores abaixo foram lidos por
+`javascript_tool` no documento de dentro do iframe.
+
+**Limitação declarada.** A tecla Tab enviada pela extensão não moveu o foco nesta página (nem no
+documento de topo): o `focusin` ficou vazio depois de três tentativas. Por isso, a ordem de Tab foi
+verificada pela ordem do DOM e pela ausência de `tabindex` positivo, e o foco visível foi verificado
+pela regra `:focus-visible` do CSS carregado, não por navegação real com teclado. Um teste manual
+com teclado continua recomendado no 053.
+
+**Primeira rodada (13:53–13:56), sobre a primeira entrega — dois defeitos devolvidos ao executor:**
+1. Menu fechado abaixo de `lg`: `grid-template-rows: 0fr` + `overflow:hidden` só recortava; os links
+   continuavam `visibility: visible`, `tabIndex 0` (focáveis e invisíveis).
+2. Rodapé a 768 px com `auto-fit, minmax(14rem, 1fr)`: três colunas, e "Site" sozinha na segunda
+   linha com recuo diferente — buraco.
+Depois da correção, uma terceira observação (14:17): o `p-6` uniforme afastava o texto do rodapé
+24 px da margem da grade (§4) — devolvida e corrigida.
+
+**Passo 5 — sem JS (14:25:23).** Iframe 360 px com `sandbox="allow-same-origin"` (sem
+`allow-scripts`: o script do menu não roda de fato): `data-open` ausente (JS não rodou);
+botão `hidden=true`, `display:none`; lista com 223 px de altura e links `visibility: visible`
+(aberta); `[scrollWidth, clientWidth]` = `[345, 345]` (barra de rolagem vertical de 15 px).
+
+**Passo 6 — com JS.**
+
+| Largura | `[scrollWidth, clientWidth]` | elementos além da borda | botão Menu | menu fechado (estado inicial) | rota ativa "Início" |
+|---|---|---|---|---|---|
+| 360 | `[345, 345]` | 0 | `flex`, 44 px | `aria-expanded=false`, `data-open=false`, lista 0 px, links `visibility: hidden` | `aria-current="page"`, `underline 1px 6px` |
+| 768 | `[768, 768]` | 0 | `flex`, 44 px | idem | idem |
+| 1440 | `[1440, 1440]` | 0 | `display:none` | lista em linha, 24 px, visível | idem |
+
+(14:25:23, `dist/` final.)
+
+Interação (14:17:31–14:18:03; o `SiteHeader.astro` final tem mtime 14:03:31, anterior a estes testes):
+- 360: clique real no "Menu" → `aria-expanded="true"`, lista 223 px, links `visible`, transição
+  `grid-template-rows 0.15s ease-out, visibility linear`. Foco num link do menu (`/pesquisa/`) e
+  `keydown` Escape → `aria-expanded="false"`, `data-open="false"`, foco em `menu-botao`.
+- Primeira rodada, 13:54:41–13:54:52: clique real abre (`true`) e **tecla Escape real** fecha
+  (`false`), com o foco no botão.
+- 768: clique real → `aria-expanded="true"`, lista 223 px, `visible`; segundo clique real →
+  `"false"`, 0 px, `hidden`.
+- Ordem de foco: primeiro elemento focável do DOM é `a[href="#conteudo"]` (`sr-only
+  focus:not-sr-only …`); elementos com `tabindex` positivo: 0.
+- Foco visível: regra carregada `:focus-visible { outline: 2px solid var(--color-tinta);
+  outline-offset: 3px; }`.
+- `prefers-reduced-motion`: regra carregada `@media (prefers-reduced-motion: reduce) { *, ::before,
+  ::after { transition-duration: 0.01ms !important; … } }`, que zera a transição do menu. A
+  emulação de *Rendering* do DevTools não está disponível pela extensão; não foi observada em
+  emulação.
+
+**Rodapé (14:25:23)** — posição x do texto da primeira linha de cada célula × x do nome no cabeçalho:
+
+| Largura | nome no cabeçalho | 4 células (conteúdo real: Lattes + ORCID) | 3 células (célula de perfis removida pelo DOM) |
+|---|---|---|---|
+| 360 | 20 | coluna única; texto em 20/20/20/20; régua no topo das células 2–4 | — |
+| 768 | 31 | 2×2; texto em 31/409/31/409; régua à esquerda na coluna direita, régua no topo da 2ª linha | 2 + 1; a terceira com `grid-column: 1 / -1`, 707 px, texto em 31; `[768, 768]` |
+| 1440 | 56 | uma linha, 4×332 px; texto em 56/413/745/1077; padding `0/24`, `24/24`, `24/24`, `24/0` | uma linha, 3×443 px; texto em 56/523/966; `[1440, 1440]` |
+
+**Dispensa do stakeholder (2026-09-17).** A revisão do ciclo 1 exigiu teste de Tab real a 360 e
+1440 px: "Pular para o conteúdo" aparecendo, contorno de foco em links e botão, e Tab sem entrar nos
+links do menu fechado. Perguntado, o stakeholder escolheu **dispensar esse teste neste plano e levá-lo
+para a verificação transversal do 053**. Com isso, as duas caixas que dependem dele ficam marcadas com
+a ressalva, e a pendência foi registrada no README da fase.
+
+**Reconferência depois do ciclo 1 da revisão (14:41:28, `dist/` com `↗` em `aria-hidden`).** Na
+árvore de acessibilidade do Chrome (`read_page`, filtro de interativos), os links de perfil aparecem
+como `link "Currículo Lattes"` e `link "ORCID"`, sem o `↗` no nome. Viewport de 1495 px:
+`[scrollWidth, clientWidth]` = `[1495, 1495]`, quatro células de 332 px no rodapé, título
+"Prof. Haroldo C. D. Lima Junior".
+
+### Verificação autoritativa e promoção (orquestrador, 2026-09-17)
+
+**Ciclos.** Antes da revisão, o orquestrador devolveu três defeitos achados no navegador (menu
+fechado focável, buraco no rodapé a 768 px, recuo do rodapé fora da margem). **Revisão, ciclo 1:
+REPROVADO** — `↗` lido por leitor de tela, `title` opcional deixando rota futura sem título em
+silêncio, três trechos da Evidência que não saíram de comando, e a exigência do Tab real (resolvida
+pela dispensa acima). **Ciclo 2: APROVADO.** O revisor reproduziu por conta própria: `sed` do
+`<style>` e `passo4.sh` com `diff` vazio contra os arquivos colados; canário próprio do `title`
+(página temporária fora do escopo, apagada no mesmo comando, `md5sum` dos arquivos inalterado)
+devolvendo `ts(2322) Property 'title' is missing`; `verify_evidence4.py` com 13 blocos OK; e
+confirmou como falso positivo o aviso "ATENCAO - possível resquício" do heurístico do executor.
+
+**Verificação independente** (`triage-runner`, arquivo `triage-042-c2.txt` gravado às 14:42, depois
+das últimas edições: `SiteFooter.astro` 14:34, `BaseLayout.astro` 14:34, `index.astro` 14:35, plano
+14:40). Trecho literal do arquivo:
+
+```
+$ grep -E "^=====|exit=|Test Files|Tests |Statements|Branches|Functions|Lines  |errors|warnings|hints|All matched|Complete|^ +[0-9]+ src" triage-042-c2.txt
+===== $ git status --short
+exit=0
+===== $ npx astro check
+- 0 errors
+- 0 warnings
+- 0 hints
+exit=0
+===== $ npm run lint
+exit=0
+===== $ npm run format:check
+All matched files use Prettier code style!
+exit=0
+===== $ npm run test:coverage
+ Test Files  14 passed (14)
+      Tests  236 passed (236)
+=============================== Coverage summary ===============================
+Statements   : 100% ( 179/179 )
+Branches     : 98.88% ( 89/90 )
+Functions    : 100% ( 53/53 )
+Lines        : 100% ( 162/162 )
+================================================================================
+exit=0
+===== $ npm run build:pipeline
+ Test Files  4 passed (4)
+      Tests  108 passed (108)
+- 0 errors
+- 0 warnings
+- 0 hints
+[2m14:42:41[22m [34m[build][39m [32m✓ Completed in 432ms.[39m
+[2m14:42:41[22m [32m✓ Completed in 22ms.
+[2m14:42:41[22m [34m[build][39m [32m✓ Completed in 362ms.[39m
+[2m14:42:41[22m [34m[build][39m [1mComplete![22m
+exit=0
+===== $ wc -l src/layouts/BaseLayout.astro src/components/SiteHeader.astro src/components/SiteFooter.astro
+   76 src/layouts/BaseLayout.astro
+  149 src/components/SiteHeader.astro
+  149 src/components/SiteFooter.astro
+exit=0
+```
+
+**CI sobre o commit empurrado `db96df3`:**
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/db96df3/check-runs --jq '.check_runs[] | "\(.name)\t\(.conclusion)\t\(.details_url)"'
+Workers Builds: haroldo-page	success	https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/6e82b263-ccbb-437b-8100-cdd5ea50f956
+qualidade	success	https://github.com/researchgroups-ufma/haroldo-page/actions/runs/35254730157/job/105315433334
 ```

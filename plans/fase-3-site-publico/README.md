@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-17 (planos 036 a 041 DONE)
+Última atualização: 2026-09-17 (planos 036 a 042 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -28,7 +28,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | 039 | Filtro de rascunho (RN-01), singleton e ordenação de pesquisa | ✅ DONE | agente | implementer (sonnet) | `5705e73` |
 | 040 | Publicações agrupadas por ano (RN-02), autor destacado e links DOI/arXiv | ✅ DONE | agente | implementer (sonnet) | `6bf5aa4` |
 | 041 | Disciplinas: slug da URL, atuais × anteriores, contagens e scripts por aula (F-13) | ✅ DONE | agente | implementer (sonnet) | `a2e28b7` |
-| 042 | Layout base, cabeçalho com menu do celular e rodapé | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
+| 042 | Layout base, cabeçalho com menu do celular e rodapé | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `db96df3` |
 | 043 | Componentes de base: cabeçalho de página, pílula, tag e link externo | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 044 | Home (RF-20) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 045 | Sobre (RF-21) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
@@ -164,6 +164,7 @@ Da seção "O que a fase 2 empurra adiante" do [README da fase 2](../fase-2-pipe
 | "Verificação autoritativa" do README da fase 2 parada antes do 030 | **Substituída, para esta fase, pela seção abaixo** | O README da fase 2 não é reescrito aqui (fase fechada); a dívida lá continua registrada |
 | Demais dívidas sem fase (caminho `schedule` do vigia, moderadas `qs`/`body-parser`/`express`, duplicação de `normalizeLinhaRelacionadaId`, §11 do PRD, "portão pré-push", §7.4) | **Nenhum plano desta fase** | Não tocam o site público. Ficam onde estão |
 | Painel `/admin` (TinaCMS) requisita a Inter em `fonts.googleapis.com` | **Nenhum plano desta fase (código de terceiro, fora do site público)** | Aceita em 2026-09-16 na revisão do 036. **Fecha quando:** o TinaCMS permitir desligar a fonte remota do painel, ou um plano da fase 5 auto-hospedá-la |
+| **Teste de teclado do layout base (Tab real)** — a tecla Tab enviada pela extensão do Chrome não move o foco, então o 042 não observou: "Pular para o conteúdo" visível no 1º Tab, contorno de foco em cada link e no botão, e Tab não entrando nos links do menu fechado | **053** (verificação transversal) | Dispensado no 042 por decisão do stakeholder em 2026-09-17, depois de a revisão exigir o teste. A ordem de foco foi verificada pela ordem do DOM e pela ausência de `tabindex` positivo, e o foco visível pela regra `:focus-visible` carregada — nenhum dos dois substitui o teste manual. **Fecha quando:** o 053 transcrever a navegação por Tab a 360 e 1440 px, feita à mão ou por ferramenta que mova o foco de verdade |
 | Tailwind 4 varre `plans/` e `docs/` (detecção automática, `base` = raiz do projeto, `**/*`): classe citada em `.md` versionado entra no CSS publicado — `text-display-1` está em `dist/_astro/*.css` sem nenhum uso em `src/`. Canário "a classe aparece no bundle" não discrimina | **Nenhum plano ainda** — candidato a passo do **043** ou plano próprio antes dele | Achado da revisão do 036, anotado em 2026-09-16 por decisão do stakeholder (seguir para o 037). Correção provável: `@import 'tailwindcss' source('../');` em `src/styles/global.css` (ou `@source not` para `plans/` e `docs/`), depois de confirmar que nada fora de `src/` usa classe. **Fecha quando:** o CSS gerado deixar de conter classe citada só em `.md`. Até lá, nenhum canário de CSS desta fase pode usar "a classe está no bundle" como prova |
 
 ## Questão para o stakeholder
