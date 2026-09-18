@@ -1,0 +1,94 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : ProjectCard.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Cartão de projeto de pesquisa (§6.3 da identidade visual,
+ *                 RF-13): tag de status, título, período e financiador entre
+ *                 réguas, descrição, colaboradores e link para a linha de
+ *                 pesquisa relacionada — cada item só aparece se houver dado
+ *                 (F-08). Extraído de src/pages/pesquisa.astro para manter a
+ *                 página abaixo de 150 linhas (§10.4 do PRD).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-18
+ *  Atualizado em: 2026-09-18
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/components/Tag.astro, src/i18n/pt.ts,
+ *                 src/lib/text.ts (toParagraphs), astro:content (CollectionEntry)
+ *  Entradas     : props `project` (entrada de `projetos`, já validada pelo
+ *                 Zod), `lineHref`/`lineTitle` (opcionais, calculados pela página)
+ *  Saídas       : `<article>` com os campos preenchidos do projeto
+ *  Uso          : import ProjectCard from '../components/ProjectCard.astro'
+ *
+ *  Notas        : não decide sozinho se a linha relacionada pode ser linkada
+ *                 (RN-01) — recebe `lineHref` já resolvido por
+ *                 `relatedLineAnchor` (src/lib/research.ts), chamado pela página.
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import Tag from './Tag.astro';
+import { pt } from '../i18n/pt';
+import { toParagraphs } from '../lib/text';
+
+export interface Props {
+  /** Entrada da coleção `projetos`, já filtrada e ordenada pela página. */
+  project: CollectionEntry<'projetos'>;
+  /**
+   * Âncora da linha de pesquisa relacionada (`#<id>`), já resolvida por
+   * `relatedLineAnchor` (RN-01). Ausente = sem link.
+   */
+  lineHref?: string;
+  /** Título da linha relacionada, mostrado junto do link. Só usado com `lineHref`. */
+  lineTitle?: string;
+}
+
+const { project, lineHref, lineTitle } = Astro.props;
+const { titulo, status, periodo, financiador, descricao, colaboradores } = project.data;
+
+const descriptionParagraphs = toParagraphs(descricao);
+---
+
+<article class="projeto-card border-regua flex h-full flex-col gap-3 border p-6">
+  {
+    status && (
+      <Tag
+        variant={status === 'em andamento' ? 'strong' : 'neutral'}
+        dot={status === 'em andamento'}
+        dashed={status === 'concluído'}
+      >
+        {pt.research.status[status]}
+      </Tag>
+    )
+  }
+  <h3 class="text-titulo-item">{titulo}</h3>
+  {
+    (periodo || financiador) && (
+      <div class="border-regua text-pequeno text-secundario flex flex-col gap-1 border-y py-3">
+        {periodo && (
+          <p>
+            {periodo.inicio}
+            {periodo.fim ? `–${periodo.fim}` : ''}
+          </p>
+        )}
+        {financiador && <p>{financiador}</p>}
+      </div>
+    )
+  }
+  {descriptionParagraphs.map((paragraph) => <p class="text-corpo">{paragraph}</p>)}
+  {
+    colaboradores && colaboradores.length > 0 && (
+      <div>
+        <span class="text-rotulo text-secundario">{pt.research.collaborators}</span>
+        <p class="text-pequeno mt-1">{colaboradores.join(', ')}</p>
+      </div>
+    )
+  }
+  {
+    lineHref && (
+      <a href={lineHref} class="text-pequeno mt-auto underline">
+        {pt.research.relatedLine}: {lineTitle}
+      </a>
+    )
+  }
+</article>

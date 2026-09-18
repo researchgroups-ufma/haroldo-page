@@ -1,0 +1,134 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : pesquisa.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página Pesquisa do site público (RF-22, RF-13, §6.3 da
+ *                 identidade visual): linhas de pesquisa publicadas, na ordem
+ *                 do professor, com resumo, corpo e imagem quando houver, e
+ *                 os projetos publicados (em andamento antes de concluídos)
+ *                 com status, período, financiador, descrição, colaboradores
+ *                 e link para a linha relacionada, sem revelar linha não
+ *                 publicada (RN-01).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-18
+ *  Atualizado em: 2026-09-18
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
+ *                 src/components/Tag.astro, src/components/ProjectCard.astro,
+ *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs, padCount),
+ *                 src/lib/published.ts (filterPublished),
+ *                 src/lib/research.ts (sortResearchLines, sortProjects,
+ *                 countActiveProjectsByLine, relatedLineAnchor), astro:content
+ *                 (getCollection)
+ *  Entradas     : coleções `linhas-pesquisa` e `projetos`, já validadas pelo Zod
+ *  Saídas       : HTML estático da rota `/pesquisa/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/pesquisa.astro`
+ *
+ *  Notas        : nenhum texto de interface hardcoded — tudo vem de `pt`
+ *                 (§10.4 do PRD); os dados vêm do conteúdo.
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Tag from '../components/Tag.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { pt } from '../i18n/pt';
+import { padCount, toParagraphs } from '../lib/text';
+import { filterPublished } from '../lib/published';
+import {
+  countActiveProjectsByLine,
+  relatedLineAnchor,
+  sortProjects,
+  sortResearchLines,
+} from '../lib/research';
+
+// RN-01: só linhas e projetos publicados entram na página.
+const lines = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')));
+const projects = sortProjects(filterPublished(await getCollection('projetos')));
+
+const activeCountsByLine = countActiveProjectsByLine(projects);
+// RN-01: um projeto só linka a âncora de uma linha publicada, presente nesta página.
+const publishedLineIds = new Set(lines.map((line) => line.id));
+---
+
+<BaseLayout title={pt.nav.research}>
+  <PageHeader
+    eyebrow={pt.research.summary(lines.length, projects.length)}
+    title={pt.research.title}
+  />
+
+  <div class="px-margem mx-auto max-w-[90rem]">
+    {
+      lines.map((line, index) => {
+        const activeCount = activeCountsByLine.get(line.id) ?? 0;
+        const paragraphs = [...toParagraphs(line.data.resumo), ...toParagraphs(line.data.corpo)];
+        return (
+          <section
+            id={line.id}
+            class:list={[
+              'linha-pesquisa grid grid-cols-1 gap-4 py-10 sm:grid-cols-[7rem_1fr] sm:gap-8',
+              index === 0 && 'linha-pesquisa-primeira',
+            ]}
+          >
+            <span aria-hidden="true" class="text-numeral">
+              {padCount(index + 1)}
+            </span>
+            <div>
+              <div class="flex flex-wrap items-baseline gap-3">
+                <h2 class="text-display-2">{line.data.titulo}</h2>
+                {activeCount > 0 && (
+                  <Tag variant="strong" dot>
+                    {pt.research.activeProjects(activeCount)}
+                  </Tag>
+                )}
+              </div>
+              {paragraphs.map((paragraph) => (
+                <p class="text-corpo max-w-medida mt-3">{paragraph}</p>
+              ))}
+              {line.data.imagem && (
+                <img
+                  src={line.data.imagem}
+                  alt={line.data.titulo}
+                  loading="lazy"
+                  decoding="async"
+                  class="mt-4 w-full max-w-md object-cover"
+                />
+              )}
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+
+  {
+    projects.length > 0 && (
+      <div class="px-margem mx-auto max-w-[90rem] py-10">
+        <h2 class="text-rotulo text-secundario">{pt.research.projects}</h2>
+        <div class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-6">
+          {projects.map((project) => {
+            const lineHref = relatedLineAnchor(project, publishedLineIds);
+            const lineTitle = lineHref
+              ? lines.find((line) => line.id === project.data.linha_relacionada?.id)?.data.titulo
+              : undefined;
+            return <ProjectCard project={project} lineHref={lineHref} lineTitle={lineTitle} />;
+          })}
+        </div>
+      </div>
+    )
+  }
+</BaseLayout>
+
+<style>
+  /* §5.5: grade com régua no topo, régua forte só na primeira linha — aplicado à lista de
+     linhas de pesquisa do §6.3, mesmo padrão de .formacao-linha em sobre.astro. */
+  .linha-pesquisa {
+    border-top: 1px solid var(--color-regua);
+  }
+  .linha-pesquisa-primeira {
+    border-top: 1px solid var(--color-tinta);
+  }
+</style>
