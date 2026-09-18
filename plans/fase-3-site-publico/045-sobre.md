@@ -1,6 +1,6 @@
 # Plano 045 — Sobre (RF-21)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-21**, F-08, RF-26
 **Depende de:** planos 038 (`toParagraphs`), 039 (`requireSingleton`), 042 (layout), 043 (componentes)
 **Modelo recomendado:** sonnet
@@ -440,6 +440,27 @@ Lines        : 100% ( 162/162 )
 ================================================================================
 EXIT:0
 ```
+
+### CI e Workers Builds sobre o commit empurrado
+
+Commit de trabalho `369637a085ceed85a71608df18db093bf3107f73` (`369637a`), empurrado para a `main`
+em 2026-09-18. Comando local verde não é evidência de DONE neste projeto — o CI já ficou vermelho
+14 commits seguidos sem ninguém ver. Saída de
+`gh api repos/researchgroups-ufma/haroldo-page/commits/<SHA-completo>/check-runs`:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+```
+
+E `gh run list --commit <SHA-completo>`:
+
+```
+run 35348534672 — CI: completed/success
+```
+
+O SHA usado é o **completo**: o hash curto devolve `[]` em silêncio neste repositório. O Workers
+Builds não é um run do Actions e por isso só aparece na consulta de *check-runs*.
 
 ### O que NÃO rodou
 
