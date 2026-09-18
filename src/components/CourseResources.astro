@@ -1,0 +1,148 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : CourseResources.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Listas de exercícios, materiais complementares,
+ *                 bibliografia e links de uma disciplina (§6.5 da identidade
+ *                 visual, RF-24). Cada seção só aparece se o array
+ *                 correspondente tiver ao menos um item (§6.5 da identidade:
+ *                 "Toda seção exceto Aulas some quando vazia"); nenhuma
+ *                 delas é obrigatória (diferente de Aulas, que fica em
+ *                 `src/pages/ensino/[slug].astro`). Extraído dessa página
+ *                 para manter as duas abaixo de 150 linhas (§10.4 do PRD).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-18
+ *  Atualizado em: 2026-09-18
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/components/ExternalLink.astro, src/i18n/pt.ts,
+ *                 src/lib/date.ts (formatDate),
+ *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
+ *  Entradas     : prop `data` (dados de uma disciplina, já validados pelo Zod)
+ *  Saídas       : até quatro `<section>` (listas, materiais, bibliografia, links)
+ *  Uso          : import CourseResources from '../components/CourseResources.astro'
+ *
+ *  Notas        : link externo só por `ExternalLink.astro` (regra da fase) —
+ *                 mesmo os links de `links[]`, estilizados como tag neutra
+ *                 (§5.4) por classe, nunca pelo componente `Tag.astro`
+ *                 (que renderiza `<span>`, não `<a>`).
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import ExternalLink from './ExternalLink.astro';
+import { pt } from '../i18n/pt';
+import { formatDate } from '../lib/date';
+
+export interface Props {
+  /**
+   * Dados de uma disciplina, já validados pelo Zod. Prop obrigatória: sem ela não há o que
+   * renderizar (nenhum comportamento de prop ausente definido, §10.2).
+   */
+  data: CollectionEntry<'disciplinas'>['data'];
+}
+
+const { data } = Astro.props;
+const listas = data.listas ?? [];
+const materiais = data.materiais ?? [];
+const bibliografia = data.bibliografia ?? [];
+const links = data.links ?? [];
+
+// §5.4/§5.5: mesma classe visual da tag neutra de Tag.astro, aplicada ao ExternalLink porque
+// link externo só pode ser emitido por ExternalLink.astro (regra da fase), não por Tag (<span>).
+const linkTagClass =
+  'inline-flex items-center gap-1.5 border px-[0.7rem] py-[0.4rem] text-rotulo border-regua text-secundario';
+---
+
+{
+  listas.length > 0 && (
+    <section id="listas" class="px-margem mx-auto max-w-[90rem] py-10">
+      <h2 class="text-rotulo text-secundario">{pt.course.problemSets}</h2>
+      <ul class="mt-4">
+        {listas.map((lista, index) => (
+          <li
+            class:list={[
+              'recurso-linha grid grid-cols-1 gap-1 py-4 sm:grid-cols-[1fr_auto] sm:items-baseline sm:gap-4',
+              index === 0 && 'recurso-linha-primeira',
+            ]}
+          >
+            <span class="text-titulo-item">{lista.titulo}</span>
+            <div class="flex items-center gap-4">
+              {lista.data_entrega && (
+                <span class="text-pequeno text-secundario">
+                  {pt.course.dueDate(formatDate(lista.data_entrega))}
+                </span>
+              )}
+              <ExternalLink href={lista.url} class="text-pequeno underline">
+                {pt.course.open}
+              </ExternalLink>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+{
+  materiais.length > 0 && (
+    <section id="materiais" class="px-margem mx-auto max-w-[90rem] py-10">
+      <h2 class="text-rotulo text-secundario">{pt.course.materials}</h2>
+      <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {materiais.map((material) => (
+          <div class="border-regua border p-6">
+            <p class="text-rotulo text-secundario">{pt.course.materialType[material.tipo]}</p>
+            <h3 class="text-titulo-item mt-1">{material.titulo}</h3>
+            {material.descricao && <p class="text-corpo mt-2">{material.descricao}</p>}
+            <ExternalLink href={material.url} class="text-pequeno mt-3 inline-block underline">
+              {pt.course.open}
+            </ExternalLink>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+{
+  bibliografia.length > 0 && (
+    <section id="bibliografia" class="px-margem mx-auto max-w-[90rem] py-10">
+      <h2 class="text-rotulo text-secundario">{pt.course.bibliography}</h2>
+      <ol class="mt-4 flex list-decimal flex-col gap-3 pl-5">
+        {bibliografia.map((referencia) => (
+          <li class="text-corpo">
+            {referencia.referencia}{' '}
+            {referencia.url && (
+              <ExternalLink href={referencia.url} class="text-pequeno underline">
+                {pt.course.access}
+              </ExternalLink>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+{
+  links.length > 0 && (
+    <section id="links" class="px-margem mx-auto max-w-[90rem] py-10">
+      <h2 class="text-rotulo text-secundario">{pt.course.links}</h2>
+      <div class="mt-4 flex flex-wrap gap-3">
+        {links.map((link) => (
+          <ExternalLink href={link.url} class={linkTagClass}>
+            {link.titulo}
+          </ExternalLink>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /* §5.5: grade com régua no topo, régua forte só na primeira linha — mesmo padrão de
+     .aula-item em LessonList.astro. */
+  .recurso-linha {
+    border-top: 1px solid var(--color-regua);
+  }
+  .recurso-linha-primeira {
+    border-top: 1px solid var(--color-tinta);
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : [slug].astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página de disciplina do site público (RF-24, F-06, RN-04,
+ *                 §6.5 da identidade visual): trilha de navegação, cabeçalho
+ *                 com tags e "Nesta página", ementa, aulas na ordem do
+ *                 professor (com estado vazio explícito quando não há
+ *                 nenhuma) e os recursos da disciplina (listas, materiais,
+ *                 bibliografia, links). Rascunho não gera página (RN-01).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-18
+ *  Atualizado em: 2026-09-18
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
+ *                 src/components/Tag.astro, src/components/LessonList.astro,
+ *                 src/components/CourseResources.astro, src/i18n/pt.ts,
+ *                 src/lib/text.ts (toParagraphs), src/lib/published.ts
+ *                 (filterPublished), src/lib/courses.ts (courseSlug,
+ *                 buildCourseSlugs, groupScriptsByLesson, presentSections),
+ *                 astro:content (getCollection, `CollectionEntry`)
+ *  Entradas     : coleção `disciplinas`, já validada pelo Zod; `params.slug`
+ *                 (gerado por `getStaticPaths`, não lido diretamente)
+ *  Saídas       : HTML estático de uma rota `/ensino/<slug>/` por disciplina publicada
+ *  Uso          : servido automaticamente pelo Astro para cada caminho de `getStaticPaths`
+ *
+ *  Notas        : os scripts (RF-37) não são renderizados neste plano — ver o
+ *                 comentário junto de `groupScriptsByLesson` abaixo; o plano
+ *                 049 acrescenta a seção "Scripts da disciplina" e os
+ *                 scripts por aula dentro de `LessonList`.
+ * ============================================================================
+ */
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Tag from '../../components/Tag.astro';
+import LessonList from '../../components/LessonList.astro';
+import CourseResources from '../../components/CourseResources.astro';
+import { pt } from '../../i18n/pt';
+import { toParagraphs } from '../../lib/text';
+import { filterPublished } from '../../lib/published';
+import {
+  buildCourseSlugs,
+  courseSlug,
+  groupScriptsByLesson,
+  presentSections,
+} from '../../lib/courses';
+
+export async function getStaticPaths() {
+  // RN-01: rascunho (`publicado: false`) não gera página.
+  const courses = filterPublished(await getCollection('disciplinas'));
+  // Reprova o build, nomeando os dois caminhos, se duas disciplinas publicadas colidirem no slug.
+  buildCourseSlugs(courses);
+  return courses.map((course) => ({
+    params: { slug: courseSlug(course.filePath) },
+    props: { course },
+  }));
+}
+
+interface Props {
+  /** Entrada de `disciplinas` correspondente ao slug da rota, resolvida por `getStaticPaths`. */
+  course: CollectionEntry<'disciplinas'>;
+}
+
+const { course } = Astro.props;
+const data = course.data;
+
+// plano 049: <section id="scripts"> com ScriptPanel para cada script de general, e byLesson no LessonList
+const { general } = groupScriptsByLesson(data.aulas ?? [], data.scripts ?? []);
+const sections = presentSections(data, general.length);
+
+const descriptionParagraphs = toParagraphs(data.descricao);
+const syllabusParagraphs = toParagraphs(data.ementa);
+const lessons = data.aulas ?? [];
+---
+
+<BaseLayout title={data.nome}>
+  <nav aria-label={pt.course.breadcrumbLabel} class="px-margem mx-auto max-w-[90rem] pt-6">
+    <a href="/ensino/" class="text-pequeno text-secundario underline">
+      {pt.course.breadcrumb}
+    </a>
+    <span aria-hidden="true" class="text-pequeno text-secundario">
+      {' '}
+      /{' '}
+    </span>
+    <span class="text-pequeno text-secundario">{data.codigo ?? data.nome}</span>
+  </nav>
+
+  <PageHeader eyebrow={pt.course.breadcrumb} title={data.nome}>
+    <Fragment slot="aside">
+      <div class="flex flex-wrap gap-2">
+        {data.codigo && <Tag variant="strong">{data.codigo}</Tag>}
+        <Tag variant="neutral">{data.semestre}</Tag>
+        <Tag variant="neutral">{pt.course.status[data.status]}</Tag>
+      </div>
+      {descriptionParagraphs.map((paragraph) => <p class="text-corpo mt-3">{paragraph}</p>)}
+      {
+        sections.length > 0 && (
+          <div class="mt-4">
+            <p class="text-rotulo text-secundario">{pt.course.onThisPage}</p>
+            <ul class="mt-2 flex flex-col gap-1">
+              {sections.map((section) => (
+                <li>
+                  <a href={`#${section.id}`} class="text-pequeno underline">
+                    {pt.course[section.key]} ({section.count})
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </Fragment>
+  </PageHeader>
+
+  {
+    data.ementa?.trim() && (
+      <section id="ementa" class="px-margem mx-auto max-w-[90rem] py-10">
+        <h2 class="text-rotulo text-secundario">{pt.course.syllabus}</h2>
+        {syllabusParagraphs.map((paragraph) => (
+          <p class="text-corpo max-w-medida mt-3">{paragraph}</p>
+        ))}
+      </section>
+    )
+  }
+
+  <section id="aulas" class="px-margem mx-auto max-w-[90rem] py-10">
+    <h2 class="text-rotulo text-secundario">{pt.course.lessons}</h2>
+    {
+      lessons.length === 0 ? (
+        // F-06: estado vazio explícito — a disciplina existe, mas nenhuma aula foi cadastrada.
+        <div class="border-tracejado mt-4 border border-dashed p-6">
+          <p class="text-secundario text-corpo">{pt.course.noLessons}</p>
+        </div>
+      ) : (
+        <div class="mt-4">
+          <LessonList lessons={lessons} />
+        </div>
+      )
+    }
+  </section>
+
+  <CourseResources data={data} />
+</BaseLayout>

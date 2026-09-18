@@ -1,0 +1,88 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : LessonList.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Lista de aulas de uma disciplina (§6.5 da identidade
+ *                 visual, RF-24, RN-04): número, título, descrição, data
+ *                 pt-BR quando houver e link "Abrir" para o arquivo da aula.
+ *                 Extraído de `src/pages/ensino/[slug].astro` para manter a
+ *                 página abaixo de 150 linhas (§10.4 do PRD). Não renderiza
+ *                 script algum — fica para o plano 049.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-18
+ *  Atualizado em: 2026-09-18
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/components/ExternalLink.astro, src/i18n/pt.ts,
+ *                 src/lib/date.ts (formatDate), src/lib/text.ts (toParagraphs),
+ *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
+ *  Entradas     : prop `lessons` (array de aulas, já validado pelo Zod)
+ *  Saídas       : `<ol>` com um `<li>` por aula, na ordem recebida
+ *  Uso          : import LessonList from '../components/LessonList.astro'
+ *
+ *  Notas        : a página só chama este componente quando `lessons.length >
+ *                 0` — o estado vazio ("Nenhuma aula publicada ainda.", F-06)
+ *                 é responsabilidade de `src/pages/ensino/[slug].astro`.
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import ExternalLink from './ExternalLink.astro';
+import { pt } from '../i18n/pt';
+import { formatDate } from '../lib/date';
+import { toParagraphs } from '../lib/text';
+
+export interface Props {
+  /**
+   * Aulas da disciplina, na ordem do professor. Prop obrigatória: com o array vazio a página
+   * mostra o estado vazio em vez de chamar este componente (nenhum comportamento próprio para
+   * prop ausente, §10.2).
+   */
+  lessons: NonNullable<CollectionEntry<'disciplinas'>['data']['aulas']>;
+}
+
+const { lessons } = Astro.props;
+---
+
+<ol class="flex list-none flex-col">
+  {
+    lessons.map((aula, index) => {
+      const paragraphs = toParagraphs(aula.descricao);
+      return (
+        // RN-04: ordem do professor, não por número nem data — `lessons` nunca é reordenado aqui.
+        <li
+          class:list={[
+            'aula-item grid grid-cols-1 gap-2 py-6 sm:grid-cols-[4rem_1fr] sm:gap-6',
+            index === 0 && 'aula-item-primeira',
+          ]}
+        >
+          <span aria-hidden="true" class="text-numeral-sm">
+            {aula.numero}
+          </span>
+          <div>
+            <span class="sr-only">{pt.course.lessonNumber(aula.numero)}</span>
+            <h3 class="text-titulo-item">{aula.titulo}</h3>
+            {paragraphs.map((paragraph) => (
+              <p class="text-corpo max-w-medida mt-2">{paragraph}</p>
+            ))}
+            {aula.data && <p class="text-pequeno text-secundario mt-2">{formatDate(aula.data)}</p>}
+            <ExternalLink href={aula.url} class="text-pequeno mt-2 inline-block underline">
+              {pt.course.open}
+            </ExternalLink>
+          </div>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  /* §5.5: grade com régua no topo, régua forte só na primeira linha — mesmo padrão de
+     .formacao-linha em sobre.astro e .linha-pesquisa em pesquisa.astro. */
+  .aula-item {
+    border-top: 1px solid var(--color-regua);
+  }
+  .aula-item-primeira {
+    border-top: 1px solid var(--color-tinta);
+  }
+</style>
