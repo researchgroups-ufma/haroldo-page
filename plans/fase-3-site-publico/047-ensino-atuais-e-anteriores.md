@@ -83,8 +83,6 @@ e link `/ensino/2025-1-mecanica-classica/`.
 
 ## Evidência
 
-<Preenchido pelo executor (1–4, 6) e pelo orquestrador (5). Declare o que NÃO rodou.>
-
 ### 1. `npx astro check`
 
 Rodado sobre o arquivo final (antes de qualquer build) — mesmo código dos blocos abaixo.

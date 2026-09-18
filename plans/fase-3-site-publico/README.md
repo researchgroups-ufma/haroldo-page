@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-18 (planos 036 a 048 DONE)
+Última atualização: 2026-09-18 (planos 036 a 048 DONE; 054 acrescentado à fase)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -40,6 +40,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | 051 | Página 404 e a prova do `not_found_handling` (RF-27) | ⬜ TODO | agente + orquestrador (produção) | implementer (sonnet) | — |
 | 052 | Testes de integração sobre o `dist/` e peso de JS (§11, RN-01, RNF-02) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 053 | Verificação transversal 360/768/1440 e fechamento da fase 3 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
+| 054 | Teste de citações do PRD no código | ⬜ TODO | agente | implementer (sonnet) | — |
 
 **Numeração é global e contínua e não é ordem de execução.** A ordem está abaixo.
 
@@ -60,7 +61,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | Responsividade 360–1440 (RF-26) | 053 (com medição em cada plano de rota) |
 | Animações com `prefers-reduced-motion` (RF-32); testes da fase passando | 053 (com 036, 043 e 052) |
 
-Os planos 036–041 e 052 **não** fecham item sozinhos: são pré-requisitos, como o 023/030/031 na
+Os planos 036–041, 052 e 054 **não** fecham item sozinhos: são pré-requisitos, como o 023/030/031 na
 fase 2. **A marcação do §12 e o §0 do PRD são feitos pelo orquestrador na promoção de cada plano**
 (o commit de DONE toca o plano, este README, `plans/README.md` e o `PRD.md`); o 053 fecha a fase.
 
@@ -247,6 +248,16 @@ evidência de DONE.
 
 ## Portão de qualidade
 
+**Os blocos que todo despacho carrega estão em [`plans/DESPACHO.md`](../DESPACHO.md)** — escritos uma
+vez, lidos pelos próprios agentes, em vez de redigitados a cada plano. O orquestrador referencia o
+arquivo pelo caminho absoluto e escreve no prompt só o que é específico do plano. Lá também está a
+lista do que é do orquestrador, que ninguém mais confere.
+
+**Antes do commit de promoção**, rode `node scripts/verificar-promocao.mjs <caminho do plano>`: ele
+reprova critério de aceitação em branco, plano que se contradiz declarando "NÃO rodei" um passo cuja
+seção existe na Evidência, `Status:` fora do vocabulário e texto de preenchimento do fatiamento
+esquecido. Plano ainda sem Evidência executada é pulado, não reprovado.
+
 Vale integralmente o da fase 0: um plano só vira `DONE` com **verificação independente com saída
 real** *e* **revisão de código aprovada**. As "Instruções que todo despacho de executor deve
 conter" do [README da fase 0](../fase-0-setup-e-provisionamento/README.md) (seção de mesmo nome)
@@ -279,6 +290,14 @@ valem aqui. As que mais importam nesta fase:
 - **Nenhum `any`** (`eslint.config.js` força `error`).
 - **Nenhuma requisição a terceiro** no HTML/CSS: sem Google Fonts, sem CDN.
 - **Nenhum `set:html`** com conteúdo do professor.
+- **Canário que toca `content/` é pré-autorizado**, e o executor pode fazê-lo sem perguntar,
+  desde que: seja temporário, sirva para provar um critério que de outro modo só se sustentaria por
+  leitura de código, seja revertido com `git checkout -- <arquivo>` (seguro aqui, porque os arquivos
+  de `content/` **estão** commitados) e a reversão seja **provada** na Evidência com
+  `git status --short` sem `content/` e `git diff -- content/` vazio. Depois de reverter, rode o build
+  de novo e recapture os blocos que descrevem o `dist/`. Decidido em 2026-09-18, depois que o 048
+  gastou um ciclo inteiro esperando essa autorização para provar que rascunho não gera página.
+  **O schema continua intocável** — isto vale só para o valor de campos em arquivos de conteúdo.
 - **O schema não muda.** `src/content.config.ts`, `tina/config.ts` e `tina/tina-lock.json` são
   intocáveis nesta fase. Se um plano precisar, **para e reporta** (e a ordem de fechamento de plano
   que mude schema da fase 2 volta a valer).
