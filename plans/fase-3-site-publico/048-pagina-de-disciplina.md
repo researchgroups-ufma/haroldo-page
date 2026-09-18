@@ -1,6 +1,6 @@
 # Plano 048 — Página de disciplina (RF-24, F-06, RN-04)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-24**, RF-07, RF-08, RN-04, F-06, RN-01, §8.3 (data pt-BR, links externos),
 RF-26. Scripts (RF-37) ficam para o plano 049
 **Depende de:** planos 038 (`toParagraphs`, `formatDate`, `padCount`), 039 (`filterPublished`),
@@ -789,3 +789,20 @@ EXIT:0
 - `npm ci`, `npm audit --audit-level=high` e o CI do GitHub Actions (verificação autoritativa da fase, não deste despacho).
 - Não commitei nada; `Status:` permanece `TODO`.
 
+### 9. CI e Workers Builds sobre o commit empurrado
+
+Commit de trabalho `5eaf30ebf9bd80159914c0e67814af5c6e4dae66` (`5eaf30e`), empurrado para a `main` em
+2026-09-18. O README da fase é explícito: **"os comandos locais passam" não é o mesmo que "o CI passa"**
+— só o `conclusion` do run é evidência de DONE.
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/5eaf30ebf9bd80159914c0e67814af5c6e4dae66/check-runs
+Workers Builds: haroldo-page | completed | success
+qualidade | completed | success
+
+$ gh run list --commit 5eaf30ebf9bd80159914c0e67814af5c6e4dae66
+35402865607 | CI | completed | success
+```
+
+Os dois `success`: o CI (`qualidade`, run 35402865607) e o build de deploy da Cloudflare
+(`Workers Builds: haroldo-page`), que publica o site.
