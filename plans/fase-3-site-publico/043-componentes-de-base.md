@@ -1,6 +1,6 @@
 # Plano 043 — Componentes de base: cabeçalho de página, pílula, tag e link externo
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** item "Identidade visual aplicada" do §12 (com o 036); RF-32 (movimento de
 entrada), RNF-15, §8.3 (links externos identificados)
 **Depende de:** planos 036 (tokens e classes de movimento), 037 (dicionário)
@@ -96,8 +96,8 @@ reversão é `git checkout`, **este passo só roda com o trabalho do 042 já com
 
 ## Evidência
 
-**Status:** `TODO` — revisão aprovada no ciclo 2 (suíte autoritativa verde). A promoção a `DONE`,
-o `PRD.md` (§0, §12) e os dois índices de plano são do orquestrador, no commit de promoção.
+**Status:** `DONE` — revisão aprovada no ciclo 2 (suíte autoritativa verde). Trabalho no commit
+`dfdc0a3`; promovido pelo orquestrador, que atualiza `PRD.md` (§0, §12) e os dois índices de plano.
 
 ### Passos 1 e 2 — substituídos pela execução autoritativa
 
