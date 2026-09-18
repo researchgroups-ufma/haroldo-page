@@ -1,0 +1,52 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : PillButton.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Botão pílula (§5.3 da identidade visual): navega como
+ *                 `<a>`, nunca `<button>`. Disco de 32 px com `›` à direita,
+ *                 texto do destino à esquerda. Variante `solid` é exclusiva
+ *                 da página 404 (plano 051).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-17
+ *  Atualizado em: 2026-09-17
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : nenhuma
+ *  Entradas     : props `href`, `label`, `variant` (opcional)
+ *  Saídas       : `<a>` com o disco (`›` oculto do leitor de tela)
+ *  Uso          : import PillButton from '../components/PillButton.astro'
+ *
+ *  Notas        : transição de fundo em 120ms (§7 da identidade).
+ * ============================================================================
+ */
+export interface Props {
+  /** Destino do link — é sempre `<a>`, nunca `<button>` (navega). */
+  href: string;
+  /** Texto à esquerda do disco; diz o destino ("Ver pesquisa", "Voltar ao início"). */
+  label: string;
+  /** Variante visual (§5.3). Ausente = `'outline'`. `'solid'` é exclusiva da 404. */
+  variant?: 'outline' | 'solid';
+}
+
+const { href, label, variant = 'outline' } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'border-tinta inline-flex min-h-12 items-center justify-between gap-3 rounded-full border py-1 pr-1 pl-5 transition-colors duration-[120ms]',
+    variant === 'solid' ? 'bg-tinta text-papel' : 'hover:bg-bloco bg-transparent',
+  ]}
+>
+  <span class="text-[0.9375rem]">{label}</span>
+  <span
+    aria-hidden="true"
+    class:list={[
+      'flex h-8 w-8 items-center justify-center rounded-full',
+      variant === 'solid' ? 'bg-papel text-tinta' : 'bg-tinta text-papel',
+    ]}
+  >
+    ›
+  </span>
+</a>

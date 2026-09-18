@@ -1,0 +1,54 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : PageHeader.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Cabeçalho de página reutilizado por toda rota (§5, item
+ *                 "Identidade visual aplicada" do §12): rubrica, `<h1>` e a
+ *                 régua forte que carrega o único movimento orquestrado do
+ *                 site (RF-32, §7). Slot `aside` opcional compõe a coluna
+ *                 direita a partir de `lg`.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-17
+ *  Atualizado em: 2026-09-17
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/styles/global.css (classes `regua-entrada`/`titulo-entrada`
+ *                 do plano 036, tokens `--color-tinta`/`--color-secundario`)
+ *  Entradas     : props `eyebrow`, `title`; slot nomeado `aside` (opcional)
+ *  Saídas       : `<div>` com rubrica + título (+ coluna `aside`) e a régua forte
+ *  Uso          : import PageHeader from '../components/PageHeader.astro'
+ *
+ *  Notas        : não declara animação própria — usa as classes de entrada do
+ *                 `global.css`, que só animam dentro de
+ *                 `prefers-reduced-motion: no-preference` (§7 da identidade / §8.2 do PRD).
+ * ============================================================================
+ */
+export interface Props {
+  /** Rubrica de seção acima do título (`text-rotulo text-secundario`). */
+  eyebrow: string;
+  /** Título `<h1>` da página (`text-display-1`). */
+  title: string;
+}
+
+const { eyebrow, title } = Astro.props;
+// Sem slot `aside`, o <h1> ocupa a largura inteira — sem grade nem coluna vazia.
+const hasAside = Astro.slots.has('aside');
+---
+
+<div class="px-margem mx-auto max-w-[90rem] pt-10 pb-8 lg:pt-14">
+  <p class="text-rotulo text-secundario">{eyebrow}</p>
+  {
+    hasAside ? (
+      <div class="mt-4 grid gap-x-8 gap-y-6 lg:grid-cols-12 lg:items-end">
+        <h1 class="text-display-1 titulo-entrada lg:col-span-7">{title}</h1>
+        <div class="lg:col-span-5">
+          <slot name="aside" />
+        </div>
+      </div>
+    ) : (
+      <h1 class="text-display-1 titulo-entrada mt-4">{title}</h1>
+    )
+  }
+</div>
+<div aria-hidden="true" class="regua-entrada bg-tinta h-px"></div>

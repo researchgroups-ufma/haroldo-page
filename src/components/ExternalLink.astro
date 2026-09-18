@@ -1,0 +1,40 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : ExternalLink.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Link externo acessível (§5.5 da identidade, §8.3 do PRD): sempre abre em
+ *                 nova aba com `rel="noopener noreferrer"`, marca `↗` oculto
+ *                 do leitor de tela e anuncia "(abre em nova aba)" por texto
+ *                 visualmente oculto. Todo link externo das rotas (planos
+ *                 044–050) usa este componente.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-17
+ *  Atualizado em: 2026-09-17
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/i18n/pt.ts (`pt.site.opensInNewTab`)
+ *  Entradas     : props `href`, `class` (opcional); conteúdo por slot padrão
+ *  Saídas       : `<a target="_blank" rel="noopener noreferrer">` com o slot e o aviso oculto
+ *  Uso          : import ExternalLink from '../components/ExternalLink.astro'
+ *
+ *  Notas        : o rodapé (plano 042) foi escrito antes deste componente e
+ *                 mantém o link inline, com as mesmas regras — não é trocado aqui.
+ * ============================================================================
+ */
+import { pt } from '../i18n/pt';
+
+export interface Props {
+  /** Destino do link externo. */
+  href: string;
+  /** Classes extras aplicadas ao `<a>`. Ausente = nenhuma classe extra. */
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+---
+
+<a href={href} class={className} target="_blank" rel="noopener noreferrer">
+  <slot />
+  <span aria-hidden="true">↗</span>{' '}<span class="sr-only">{pt.site.opensInNewTab}</span>
+</a>
