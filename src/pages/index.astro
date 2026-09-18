@@ -3,30 +3,179 @@
  * ============================================================================
  *  Arquivo      : index.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Página inicial. Placeholder temporário do scaffolding,
- *                 agora envolvido no `BaseLayout` (plano 042) — confirma que
- *                 o layout base, cabeçalho e rodapé funcionam na rota `/`;
- *                 conteúdo real da Home (RF-20) chega no plano 044.
+ *  Descrição    : Home do site público (RF-20, §6.1 da identidade visual):
+ *                 nome, cargo, departamento, instituição e `resumo_home` do
+ *                 perfil, seguidos da faixa de três células-caminho —
+ *                 Pesquisa, Ensino, Publicações — com a contagem real de
+ *                 itens publicados (RN-01) e, quando o perfil tiver `foto`,
+ *                 uma quarta célula com o retrato em p&b (F-08).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
  *  Atualizado em: 2026-09-17
- *  Versão       : 0.2.0
+ *  Versão       : 0.3.0
  *
- *  Dependências : src/layouts/BaseLayout.astro
- *  Entradas     : nenhuma
+ *  Dependências : src/layouts/BaseLayout.astro, src/components/PillButton.astro,
+ *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs, padCount),
+ *                 src/lib/published.ts (filterPublished, requireSingleton),
+ *                 src/lib/courses.ts (splitCourses), astro:content (getCollection)
+ *  Entradas     : coleções `perfil` (singleton), `linhas-pesquisa`, `disciplinas`
+ *                 e `publicacoes`, já validadas pelo Zod
  *  Saídas       : HTML estático da rota `/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/index.astro`
  *
- *  Notas        : conteúdo hardcoded é temporário — TODO(fase 3) abaixo.
+ *  Notas        : nenhum texto de interface hardcoded — tudo vem de `pt`
+ *                 (§10.4 do PRD); os dados do perfil vêm do conteúdo.
  * ============================================================================
  */
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PillButton from '../components/PillButton.astro';
+import { pt } from '../i18n/pt';
+import { padCount, toParagraphs } from '../lib/text';
+import { filterPublished, requireSingleton } from '../lib/published';
+import { splitCourses } from '../lib/courses';
 
-// TODO(fase 3): substituir pelo conteúdo real da Home (RF-20), vindo de
-// content/perfil/index.md via o schema Zod (D-06), não hardcoded.
-const professorName = 'Prof. Haroldo C. D. Lima Junior';
+// `perfil` é singleton (plano 039): `requireSingleton` estoura se o painel não tiver exatamente 1 item.
+const perfilEntry = requireSingleton(await getCollection('perfil'), 'perfil');
+const perfil = perfilEntry.data;
+
+// RN-01: as três contagens da faixa de caminhos só contam itens publicados.
+const researchCount = filterPublished(await getCollection('linhas-pesquisa')).length;
+const currentCoursesCount = splitCourses(filterPublished(await getCollection('disciplinas')))
+  .current.length;
+const publicationsCount = filterPublished(await getCollection('publicacoes')).length;
+
+/** Uma célula-caminho da faixa abaixo da régua forte (§6.1). */
+interface PathCell {
+  /** Contagem real de itens publicados (numeral real, usado no texto acessível). */
+  count: number;
+  /** Rótulo visual sob o numeral — `pt.home.noneYet` quando `count` é zero. */
+  label: string;
+  /** Destino da célula, sempre com barra final. */
+  href: string;
+  /** Nome da seção de destino, mostrado com `›`. */
+  section: string;
+}
+
+// Contagem zero mostra `00` e, no lugar do rótulo com o valor, `pt.home.noneYet` — a
+// célula não some, porque é caminho de navegação (§6.1).
+const pathCells: PathCell[] = [
+  {
+    count: researchCount,
+    label: researchCount === 0 ? pt.home.noneYet : pt.home.countResearchLines(researchCount),
+    href: '/pesquisa/',
+    section: pt.nav.research,
+  },
+  {
+    count: currentCoursesCount,
+    label:
+      currentCoursesCount === 0
+        ? pt.home.noneYet
+        : pt.home.countCurrentCourses(currentCoursesCount),
+    href: '/ensino/',
+    section: pt.nav.teaching,
+  },
+  {
+    count: publicationsCount,
+    label: publicationsCount === 0 ? pt.home.noneYet : pt.home.countPublications(publicationsCount),
+    href: '/publicacoes/',
+    section: pt.nav.publications,
+  },
+];
+
+const resumoParagraphs = toParagraphs(perfil.resumo_home);
+// F-08: sem foto a faixa vira três colunas — sem espaço reservado, sem ícone.
+const hasFoto = Boolean(perfil.foto);
 ---
 
 <BaseLayout title={undefined}>
-  <h1 class="text-3xl font-semibold">{professorName}</h1>
+  <div class="px-margem mx-auto max-w-[90rem] pt-10 pb-8 lg:pt-14">
+    <div class="grid gap-x-8 gap-y-8 lg:grid-cols-12">
+      <h1 class="text-display-1 titulo-entrada lg:col-span-7">{perfil.nome}</h1>
+      <div class="space-y-4 lg:col-span-5">
+        <div class="text-corpo space-y-1">
+          <p>
+            {perfil.departamento ? `${perfil.cargo} — ${perfil.departamento}` : perfil.cargo}
+          </p>
+          <p>{perfil.instituicao}</p>
+        </div>
+        {resumoParagraphs.map((paragraph) => <p class="text-corpo max-w-medida">{paragraph}</p>)}
+        <PillButton href="/pesquisa/" label={pt.home.seeResearch} />
+      </div>
+    </div>
+  </div>
+  <div aria-hidden="true" class="regua-entrada bg-tinta h-px"></div>
+
+  <div class="px-margem mx-auto max-w-[90rem]">
+    <div
+      id="caminhos-grade"
+      class:list={[
+        'grid grid-cols-1 sm:grid-cols-2',
+        hasFoto ? 'lg:grid-cols-4' : 'lg:grid-cols-3',
+      ]}
+    >
+      {
+        pathCells.map((cell) => (
+          <a
+            href={cell.href}
+            class="caminho-celula hover:bg-bloco block py-8 transition-colors duration-[120ms]"
+          >
+            <span aria-hidden="true" class="text-numeral block">
+              {padCount(cell.count)}
+            </span>
+            <span aria-hidden="true" class="text-pequeno text-secundario mt-2 block">
+              {cell.label}
+            </span>
+            <span aria-hidden="true" class="mt-4 flex items-center gap-1 text-[0.9375rem]">
+              {cell.section} <span aria-hidden="true">›</span>
+            </span>
+            <span class="sr-only">
+              {cell.count} {cell.label} — {cell.section}
+            </span>
+          </a>
+        ))
+      }
+      {
+        perfil.foto && (
+          <div class="caminho-celula py-8">
+            <img
+              src={perfil.foto}
+              alt={perfil.nome}
+              loading="lazy"
+              decoding="async"
+              class="aspect-[4/5] w-full object-cover grayscale"
+            />
+          </div>
+        )
+      }
+    </div>
+  </div>
 </BaseLayout>
+
+<style>
+  /* Faixa de células-caminho (§6.1): réguas finas entre células e linhas
+     (§4), com o mesmo padrão de 3 faixas do rodapé (SiteFooter.astro) —
+     célula sem borda externa, só interna. */
+  @media (max-width: 39.9375rem) {
+    .caminho-celula:not(:first-child) {
+      border-top: 1px solid var(--color-regua);
+    }
+  }
+
+  @media (min-width: 40rem) and (max-width: 63.9375rem) {
+    .caminho-celula:nth-child(n + 3) {
+      border-top: 1px solid var(--color-regua);
+    }
+    .caminho-celula:nth-child(even) {
+      border-left: 1px solid var(--color-regua);
+      padding-left: 1.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .caminho-celula:not(:first-child) {
+      border-left: 1px solid var(--color-regua);
+      padding-left: 1.5rem;
+    }
+  }
+</style>
