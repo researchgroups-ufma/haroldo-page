@@ -1,6 +1,6 @@
 # Plano 046 — Pesquisa: linhas e projetos (RF-22, RF-13)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-22**, RF-13, RF-09 (ordem), RN-01, F-08, RF-26
 **Depende de:** planos 038 (`toParagraphs`, `padCount`), 039 (`filterPublished`, `sortResearchLines`,
 `sortProjects`, `countActiveProjectsByLine`, `relatedLineAnchor`), 042, 043
@@ -871,6 +871,27 @@ verificação no navegador foi feita. Os invariantes (2 `<article>`, 1 `<h1>`, �
 **Portanto as medições do passo 5 continuam descrevendo os bytes entregues**, e não foi preciso
 refazer a verificação no navegador. Se o hash ou o tamanho tivessem mudado, ela teria de ser
 refeita.
+
+### CI e Workers Builds sobre o commit empurrado
+
+Commit de trabalho `97e006d1fe2fb8408946e2c96e4b57576e4606b3` (`97e006d`), empurrado para a `main`
+em 2026-09-18. Comando local verde não é evidência de DONE neste projeto — o CI já ficou vermelho 14
+commits seguidos sem ninguém ver. Saída de
+`gh api repos/researchgroups-ufma/haroldo-page/commits/<SHA-completo>/check-runs`:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+```
+
+E `gh run list --commit <SHA-completo>`:
+
+```
+run 35375989371 — CI: completed/success
+```
+
+SHA **completo**: o hash curto devolve `[]` em silêncio neste repositório. O Workers Builds não é
+um run do Actions e só aparece na consulta de *check-runs*.
 
 ### Divergências e observações
 
