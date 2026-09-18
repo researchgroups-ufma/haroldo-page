@@ -1,6 +1,6 @@
 # Plano 044 — Home (RF-20)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-20**, RN-01 (contagens só de publicados), F-08 (sem foto), RF-26
 **Depende de:** planos 038 (`padCount`, `toParagraphs`), 039 (`filterPublished`, `requireSingleton`),
 041 (`splitCourses`), 042 (layout), 043 (componentes)
@@ -380,7 +380,7 @@ bloqueou a aprovação, mas é a tensão que devia ter sido nomeada nesta execu�
 
 ### Estado final
 
-`Status:` mantido em `TODO` pelo executor; a promoção a `DONE` é do orquestrador, no commit de promoção.
+`Status:` promovido a `DONE` pelo orquestrador após revisão aprovada e suíte autoritativa verde. Trabalho no commit `4e48ce5`.
 Nada commitado por este executor — o orquestrador commita em seguida, e o hash do commit entra
 no `PRD.md` e nos índices da fase (`plans/README.md`, `plans/fase-3-site-publico/README.md`),
 que são responsabilidade dele, não deste plano.
