@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-18 (planos 036 a 046 DONE)
+Última atualização: 2026-09-18 (planos 036 a 047 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -33,7 +33,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | 044 | Home (RF-20) | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `4e48ce5` |
 | 045 | Sobre (RF-21) | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `369637a` |
 | 046 | Pesquisa: linhas e projetos (RF-22, RF-13) | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `97e006d` |
-| 047 | Ensino: atuais e anteriores (RF-23) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
+| 047 | Ensino: atuais e anteriores (RF-23) | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `4d90d92` |
 | 048 | Página de disciplina (RF-24, F-06, RN-04) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 049 | Painel de script: Shiki monocromático e botão copiar (RF-37, F-13) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 050 | Publicações (RF-25, RN-02, F-05) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
@@ -52,7 +52,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | Home (RF-20) | ✅ 044 — marcado no §12 em 2026-09-17 |
 | Sobre (RF-21) | ✅ 045 — marcado no §12 em 2026-09-18 |
 | Pesquisa (RF-22) | ✅ 046 — marcado no §12 em 2026-09-18 |
-| Ensino (RF-23) | 047 |
+| Ensino (RF-23) | ✅ 047 — marcado no §12 em 2026-09-18 |
 | Página de disciplina (RF-24) | 048 |
 | Scripts com destaque e botão copiar, por aula (RF-37, F-13) | 049 |
 | Publicações agrupadas por ano (RF-25) | 050 |

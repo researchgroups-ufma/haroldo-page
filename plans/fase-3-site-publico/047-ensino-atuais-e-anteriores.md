@@ -1,6 +1,6 @@
 # Plano 047 — Ensino: atuais e anteriores (RF-23)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-23**, RN-03, RN-01, RF-06 (disciplina aparece na listagem), RF-26
 **Depende de:** planos 038 (`toParagraphs`), 039 (`filterPublished`), 041 (`splitCourses`, `countCourseItems`,
 `buildCourseSlugs`, `courseSlug`), 042, 043
@@ -580,3 +580,18 @@ To address issues that do not require attention, run:
 To address all issues (including breaking changes), run:
   npm audit fix --force
 ```
+
+### 8. CI e Workers Builds sobre o commit empurrado
+
+Commit de trabalho `4d90d924397de6cbcdfd1bad173822c29c9509c3` (`4d90d92`), empurrado para a `main` em 2026-09-18. O README da fase é explícito: **"os comandos locais passam" não é o mesmo que "o CI passa"** — só o `conclusion` do run é evidência de DONE.
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/4d90d924397de6cbcdfd1bad173822c29c9509c3/check-runs --jq ".check_runs[] | \"\(.name) | \(.status) | \(.conclusion)\""
+Workers Builds: haroldo-page | completed | success
+qualidade | completed | success
+
+$ gh run list --commit 4d90d924397de6cbcdfd1bad173822c29c9509c3 --json databaseId,name,conclusion,status
+35394287388 | CI | completed | success
+```
+
+Os dois `success`: o CI (`qualidade`, run 35394287388) e o build de deploy da Cloudflare (`Workers Builds: haroldo-page`), que publica o site.
