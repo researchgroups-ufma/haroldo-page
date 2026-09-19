@@ -79,9 +79,12 @@ Nenhum agente herda o contexto do orquestrador; todos leem arquivo barato.
 Estão em `plans/fase-3-site-publico/README.md`, seção "Regras de código que todo plano desta fase
 herda". Leia-a também. Em resumo: cabeçalho §10.1 do PRD em todo arquivo novo; TSDoc com o
 comportamento de prop ausente; comentário com o identificador do PRD em toda regra de negócio —
-**citando a cláusula que de fato descreve a regra**, defeito já reincidente aqui; identificadores em
+**citando a cláusula que de fato descreve a regra** (a exigência está no **§10.3**,
+"Comentários no Código", não no §10.4 — defeito já reincidente aqui, quatro vezes); identificadores em
 inglês; sem `any`, `process.env` sob `src/`, `set:html` ou requisição a terceiro; strings de
-interface só em `src/i18n/pt.ts`; links internos com barra final; arquivos < 150 linhas.
+interface só em `src/i18n/pt.ts`; links internos com barra final; **componentes** < 150 linhas
+(é o que o §10.4 legisla, e como "Alvo", não invariante — arquivo de teste não entra:
+`tests/lib/courses.test.ts` tem 256 linhas e `tests/content/schemas.test.ts` 503, os dois aprovados).
 
 ---
 
