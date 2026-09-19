@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-18 (planos 036 a 048 DONE; 054 acrescentado à fase)
+Última atualização: 2026-09-18 (planos 036 a 048 e 054 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -40,7 +40,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | 051 | Página 404 e a prova do `not_found_handling` (RF-27) | ⬜ TODO | agente + orquestrador (produção) | implementer (sonnet) | — |
 | 052 | Testes de integração sobre o `dist/` e peso de JS (§11, RN-01, RNF-02) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 053 | Verificação transversal 360/768/1440 e fechamento da fase 3 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
-| 054 | Teste de citações do PRD no código | ⬜ TODO | agente | implementer (sonnet) | — |
+| 054 | Teste de citações do PRD no código | ✅ DONE | agente | implementer (sonnet) | `23a003d` |
 
 **Numeração é global e contínua e não é ordem de execução.** A ordem está abaixo.
 

@@ -43,12 +43,17 @@ const ARQUIVOS_DA_PROMOCAO = ['PRD.md', 'plans/README.md'];
  * Executa um comando git e devolve a saída, ou `null` se o comando falhar (ex.: fora de um
  * repositório). Nunca lança: a ausência de git degrada o conferidor, não o impede.
  *
+ * Apara **só o fim** da saída. Aparar o início também corromperia a primeira linha do
+ * `git status --porcelain`, cujo campo de estado tem dois caracteres e pode começar por espaço
+ * (` M arquivo`): o `trim()` comia esse espaço e, com ele, a primeira letra do caminho — defeito
+ * observado em 2026-09-18, com `PRD.md` virando `RD.md` e só na primeira entrada da lista.
+ *
  * @param {string[]} args Argumentos do `git`.
- * @returns {string|null} Saída sem espaços nas pontas, ou `null`.
+ * @returns {string|null} Saída sem espaços no fim, ou `null`.
  */
 function git(args) {
   try {
-    return execFileSync('git', args, { encoding: 'utf8' }).trim();
+    return execFileSync('git', args, { encoding: 'utf8' }).replace(/\s+$/, '');
   } catch {
     return null;
   }
@@ -125,10 +130,15 @@ function conferir(caminho) {
   //    guarda o conferidor acusa qualquer árvore suja, que foi o falso positivo da primeira versão.
   const arquivosSujos = git(['status', '--porcelain']);
   if (arquivosSujos !== null && status === 'DONE') {
+    // O campo de estado do `--porcelain` tem dois caracteres e um separador; extrair por regex em
+    // vez de `slice(3)` deixa o parser imune a variações de espaçamento. `R ` (rename) traz
+    // `antigo -> novo`; interessa o novo.
     const tocados = arquivosSujos
       .split('\n')
       .filter(Boolean)
-      .map((l) => l.slice(3).trim().replace(/\\/g, '/'));
+      .map((l) => l.replace(/^..\s+/, '').trim())
+      .map((l) => (l.includes(' -> ') ? l.slice(l.indexOf(' -> ') + 4) : l))
+      .map((l) => l.replace(/^"|"$/g, '').replace(/\\/g, '/'));
     const planoNormalizado = caminho.replace(/\\/g, '/').replace(/^\.\//, '');
     const promocaoEmCurso = tocados.some((t) => t.endsWith(planoNormalizado));
     const faltando = ARQUIVOS_DA_PROMOCAO.filter((a) => !tocados.includes(a));

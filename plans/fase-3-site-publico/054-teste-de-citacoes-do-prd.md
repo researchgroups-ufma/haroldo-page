@@ -1,6 +1,6 @@
 # Plano 054 — Teste de citações do PRD no código (protege o §10.3)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** nenhum — é portão de qualidade, como o 052. Protege a regra do **§10.3** do PRD
 ("Comentários no Código": *toda regra de negócio implementada referencia o identificador do PRD*)
 contra citação trocada. **Correção de 2026-09-18:** este cabeçalho dizia §10.4, que é "Convenções
@@ -953,3 +953,32 @@ To address issues that do not require attention, run:
 To address all issues (including breaking changes), run:
   npm audit fix --force
 ```
+
+### CI e Workers Builds sobre o commit empurrado
+
+Commit de trabalho `23a003dc22cc5c3161f477dce54bfc03f953cb20` (`23a003d`), empurrado para a `main`
+em 2026-09-18.
+
+```
+$ gh api .../commits/23a003dc.../check-runs
+Workers Builds: haroldo-page | completed | success
+qualidade | completed | success
+
+$ gh run list --commit 23a003dc...
+35410116740 | CI | completed | success
+```
+
+CI `qualidade` (run 35410116740) e o build de deploy da Cloudflare, os dois `success`.
+
+### Defeito no `verificar-promocao.mjs`, achado e corrigido na própria promoção
+
+O conferidor criado nesta sessão acusou `PRD.md` como não tocado no commit de promoção deste plano,
+com o arquivo **de fato** modificado. Causa: o helper `git()` aplicava `.trim()` na saída inteira do
+`git status --porcelain`, removendo o espaço inicial da **primeira** linha (` M PRD.md`); com isso o
+`slice(3)` comia uma letra a mais e `PRD.md` virava `RD.md`. Só a primeira entrada da lista se
+corrompia, e foi por isso que a matriz de canários não pegou — nenhum canário tinha promoção em curso.
+
+**Correção:** `git()` passa a aparar só o fim (`replace(/\s+$/, "")`), e o parser extrai o caminho por
+regex (`/^..\s+/`) em vez de posição fixa, tratando também rename (`antigo -> novo`) e caminho entre
+aspas. **Provado nos dois sentidos:** com `PRD.md` tocado o aviso não aparece; escondendo-o com
+`git stash push PRD.md` o aviso volta; com `git stash pop` ele some de novo.
