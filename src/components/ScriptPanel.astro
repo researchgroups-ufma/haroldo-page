@@ -1,0 +1,132 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : ScriptPanel.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Painel de um script de disciplina (§5.6 da identidade
+ *                 visual, RF-37): destaque de sintaxe gerado no build pelo
+ *                 Shiki (tema monocromático, RNF-15), botão "Copiar código"
+ *                 como melhoria progressiva (§1 regra 3, RNF-02) que anuncia
+ *                 "Copiado" por `aria-live`, e "Abrir arquivo ↗" só com `url`.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-21
+ *  Atualizado em: 2026-09-21
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : astro:components (Code), astro:content (tipo
+ *                 CollectionEntry<'disciplinas'>), src/components/ExternalLink.astro,
+ *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
+ *                 src/lib/code-theme.ts (monochromeTheme, shikiLanguage)
+ *  Entradas     : prop `script` (um item de `data.scripts`, já validado pelo Zod)
+ *  Saídas       : `<article data-script>` com o painel e o `<script>` do botão copiar
+ *  Uso          : import ScriptPanel from '../components/ScriptPanel.astro'
+ *
+ *  Notas        : o `<script>` é empacotado pelo Astro (sem `is:inline`) e
+ *                 deduplicado entre painéis — um único módulo, que inicializa
+ *                 cada `article[data-script]` da página.
+ * ============================================================================
+ */
+import { Code } from 'astro:components';
+import type { CollectionEntry } from 'astro:content';
+import ExternalLink from './ExternalLink.astro';
+import { pt } from '../i18n/pt';
+import { toParagraphs } from '../lib/text';
+import { monochromeTheme, shikiLanguage } from '../lib/code-theme';
+
+export interface Props {
+  /**
+   * Um script da disciplina (`data.scripts[i]`), já validado pelo Zod. Prop obrigatória: sem ela
+   * não há o que renderizar (nenhum comportamento de prop ausente definido, §10.2).
+   */
+  script: NonNullable<CollectionEntry<'disciplinas'>['data']['scripts']>[number];
+}
+
+const { script } = Astro.props;
+const paragraphs = toParagraphs(script.descricao);
+---
+
+<article
+  data-script
+  class="bg-bloco border-regua grid grid-cols-1 gap-6 border p-6 lg:grid-cols-2 lg:items-start"
+>
+  <div>
+    <p class="text-rotulo text-secundario">
+      {pt.script.eyebrow(pt.script.language[script.linguagem])}
+    </p>
+    <h3 class="text-titulo-item mt-2">{script.titulo}</h3>
+    {paragraphs.map((paragraph) => <p class="text-corpo mt-2">{paragraph}</p>)}
+    <div class="mt-4 flex flex-wrap items-center gap-4">
+      {
+        /* RF-37/§5.6: nasce hidden — melhoria progressiva, só aparece se a Clipboard API existir. */
+      }
+      <button
+        type="button"
+        hidden
+        data-copy-label={pt.script.copy}
+        data-copied-label={pt.script.copied}
+        class="bg-tinta text-papel border-tinta inline-flex min-h-11 items-center justify-center rounded-full border px-6 text-[0.9375rem] transition-colors duration-[120ms]"
+      >
+        {pt.script.copy}
+      </button>
+      {
+        script.url && (
+          <ExternalLink href={script.url} class="text-pequeno underline">
+            {pt.script.openFile}
+          </ExternalLink>
+        )
+      }
+    </div>
+    <span aria-live="polite" class="sr-only" data-status></span>
+  </div>
+  <div class="[&_code]:font-codigo [&_pre]:font-codigo overflow-x-auto text-[0.875rem]">
+    <Code code={script.codigo} lang={shikiLanguage(script.linguagem)} theme={monochromeTheme} />
+  </div>
+</article>
+
+<script>
+  // Melhoria progressiva (§1 regra 3, RNF-02): sem este script o botão fica `hidden` e o
+  // código continua visível e selecionável no bloco à direita.
+  const CODE_STATUS_RESET_MS = 2000;
+
+  function initScriptPanel(article: Element): void {
+    const button = article.querySelector('button[data-copy-label]');
+    const status = article.querySelector('[data-status]');
+    const codeElement = article.querySelector('pre > code');
+    if (
+      !(button instanceof HTMLButtonElement) ||
+      !(status instanceof HTMLElement) ||
+      !codeElement
+    ) {
+      return;
+    }
+    if (!navigator.clipboard?.writeText) return;
+
+    button.hidden = false;
+    const copyLabel = button.dataset.copyLabel ?? '';
+    const copiedLabel = button.dataset.copiedLabel ?? '';
+    let resetTimeout: number | undefined;
+
+    button.addEventListener('click', async () => {
+      try {
+        // RF-37: copia o código exato do bloco gerado pelo <Code> — pre > code .textContent
+        // reproduz o texto byte a byte (conferido no HTML gerado, ver Evidência do plano 049).
+        await navigator.clipboard.writeText(codeElement.textContent ?? '');
+      } catch {
+        return; // permissão negada: o texto do botão não muda, sem alert.
+      }
+      button.textContent = copiedLabel;
+      status.textContent = copiedLabel;
+      window.clearTimeout(resetTimeout);
+      // §5.6/plano 049: "vira 'Copiado' por 2 s" — os dois voltam ao estado original, não só o botão.
+      // `as unknown as number`: `window.setTimeout` devolve `number` no navegador, mas o ambiente
+      // de checagem do Astro também enxerga o `setTimeout` ambiente do @types/node (que devolve
+      // `NodeJS.Timeout`) — a dupla conversão fixa o tipo no que o navegador realmente devolve.
+      resetTimeout = window.setTimeout(() => {
+        button.textContent = copyLabel;
+        status.textContent = '';
+      }, CODE_STATUS_RESET_MS) as unknown as number;
+    });
+  }
+
+  document.querySelectorAll('article[data-script]').forEach(initScriptPanel);
+</script>

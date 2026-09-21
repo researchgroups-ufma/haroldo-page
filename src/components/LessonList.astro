@@ -5,20 +5,23 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Lista de aulas de uma disciplina (§6.5 da identidade
  *                 visual, RF-24, RN-04): número, título, descrição, data
- *                 pt-BR quando houver e link "Abrir" para o arquivo da aula.
- *                 Extraído de `src/pages/ensino/[slug].astro` para manter a
- *                 página abaixo de 150 linhas (§10.4 do PRD). Não renderiza
- *                 script algum — fica para o plano 049.
+ *                 pt-BR quando houver, link "Abrir" para o arquivo da aula e
+ *                 os painéis de script agrupados sob a aula correspondente
+ *                 (F-13, RF-37, plano 049).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-18
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-21
+ *  Versão       : 0.2.0
  *
- *  Dependências : src/components/ExternalLink.astro, src/i18n/pt.ts,
- *                 src/lib/date.ts (formatDate), src/lib/text.ts (toParagraphs),
+ *  Dependências : src/components/ExternalLink.astro, src/components/ScriptPanel.astro,
+ *                 src/i18n/pt.ts, src/lib/date.ts (formatDate),
+ *                 src/lib/text.ts (toParagraphs),
  *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
- *  Entradas     : prop `lessons` (array de aulas, já validado pelo Zod)
- *  Saídas       : `<ol>` com um `<li>` por aula, na ordem recebida
+ *  Entradas     : props `lessons` (array de aulas, já validado pelo Zod) e
+ *                 `byLesson` (scripts de cada aula, mesmo índice de `lessons`,
+ *                 de `groupScriptsByLesson`)
+ *  Saídas       : `<ol>` com um `<li>` por aula, na ordem recebida, com os
+ *                 painéis de script de `byLesson[i]` sob cada aula
  *  Uso          : import LessonList from '../components/LessonList.astro'
  *
  *  Notas        : a página só chama este componente quando `lessons.length >
@@ -28,6 +31,7 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
+import ScriptPanel from './ScriptPanel.astro';
 import { pt } from '../i18n/pt';
 import { formatDate } from '../lib/date';
 import { toParagraphs } from '../lib/text';
@@ -39,15 +43,22 @@ export interface Props {
    * prop ausente, §10.2).
    */
   lessons: NonNullable<CollectionEntry<'disciplinas'>['data']['aulas']>;
+  /**
+   * Scripts de cada aula, na posição `i` alinhada a `lessons[i]` (`groupScriptsByLesson`, F-13).
+   * Prop obrigatória, mesmo padrão de `lessons`: a página sempre agrupa antes de chamar.
+   */
+  byLesson: NonNullable<CollectionEntry<'disciplinas'>['data']['scripts']>[number][][];
 }
 
-const { lessons } = Astro.props;
+const { lessons, byLesson } = Astro.props;
 ---
 
 <ol class="flex list-none flex-col">
   {
     lessons.map((aula, index) => {
       const paragraphs = toParagraphs(aula.descricao);
+      // byLesson tem o mesmo tamanho de lessons (groupScriptsByLesson) — sempre o mesmo array.
+      const scripts = byLesson[index];
       return (
         // RN-04: ordem do professor, não por número nem data — `lessons` nunca é reordenado aqui.
         <li
@@ -69,6 +80,13 @@ const { lessons } = Astro.props;
             <ExternalLink href={aula.url} class="text-pequeno mt-2 inline-block underline">
               {pt.course.open}
             </ExternalLink>
+            {scripts.length > 0 && (
+              <div class="mt-4 flex flex-col gap-4">
+                {scripts.map((script) => (
+                  <ScriptPanel script={script} />
+                ))}
+              </div>
+            )}
           </div>
         </li>
       );

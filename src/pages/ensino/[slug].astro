@@ -4,20 +4,22 @@
  *  Arquivo      : [slug].astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Página de disciplina do site público (RF-24, F-06, RN-04,
- *                 §6.5 da identidade visual): trilha de navegação, cabeçalho
- *                 com tags e "Nesta página", ementa, aulas na ordem do
- *                 professor (com estado vazio explícito quando não há
- *                 nenhuma) e os recursos da disciplina (listas, materiais,
+ *                 RF-37, F-13, §6.5 da identidade visual): trilha de
+ *                 navegação, cabeçalho com tags e "Nesta página", ementa,
+ *                 aulas na ordem do professor (com estado vazio explícito
+ *                 quando não há nenhuma, e os scripts por aula), a seção
+ *                 "Scripts da disciplina" (scripts sem aula correspondente)
+ *                 e os recursos da disciplina (listas, materiais,
  *                 bibliografia, links). Rascunho não gera página (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-18
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-21
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
  *                 src/components/Tag.astro, src/components/LessonList.astro,
- *                 src/components/CourseResources.astro, src/i18n/pt.ts,
- *                 src/lib/text.ts (toParagraphs), src/lib/published.ts
+ *                 src/components/ScriptPanel.astro, src/components/CourseResources.astro,
+ *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs), src/lib/published.ts
  *                 (filterPublished), src/lib/courses.ts (courseSlug,
  *                 buildCourseSlugs, groupScriptsByLesson, presentSections),
  *                 astro:content (getCollection, `CollectionEntry`)
@@ -26,10 +28,10 @@
  *  Saídas       : HTML estático de uma rota `/ensino/<slug>/` por disciplina publicada
  *  Uso          : servido automaticamente pelo Astro para cada caminho de `getStaticPaths`
  *
- *  Notas        : os scripts (RF-37) não são renderizados neste plano — ver o
- *                 comentário junto de `groupScriptsByLesson` abaixo; o plano
- *                 049 acrescenta a seção "Scripts da disciplina" e os
- *                 scripts por aula dentro de `LessonList`.
+ *  Notas        : scripts com `aula` correspondente aparecem dentro de
+ *                 `LessonList` (F-13); os de `general` (sem aula) aparecem na
+ *                 seção "Scripts da disciplina" abaixo, só se houver algum
+ *                 (plano 049).
  * ============================================================================
  */
 import { getCollection, type CollectionEntry } from 'astro:content';
@@ -37,6 +39,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Tag from '../../components/Tag.astro';
 import LessonList from '../../components/LessonList.astro';
+import ScriptPanel from '../../components/ScriptPanel.astro';
 import CourseResources from '../../components/CourseResources.astro';
 import { pt } from '../../i18n/pt';
 import { toParagraphs } from '../../lib/text';
@@ -67,8 +70,8 @@ interface Props {
 const { course } = Astro.props;
 const data = course.data;
 
-// plano 049: <section id="scripts"> com ScriptPanel para cada script de general, e byLesson no LessonList
-const { general } = groupScriptsByLesson(data.aulas ?? [], data.scripts ?? []);
+// F-13/RF-37: agrupa os scripts sob a aula correspondente; general vai para a seção abaixo.
+const { byLesson, general } = groupScriptsByLesson(data.aulas ?? [], data.scripts ?? []);
 const sections = presentSections(data, general.length);
 
 const descriptionParagraphs = toParagraphs(data.descricao);
@@ -136,11 +139,25 @@ const lessons = data.aulas ?? [];
         </div>
       ) : (
         <div class="mt-4">
-          <LessonList lessons={lessons} />
+          <LessonList lessons={lessons} byLesson={byLesson} />
         </div>
       )
     }
   </section>
+
+  {
+    // F-13: só os scripts sem aula correspondente — os demais já apareceram em LessonList.
+    general.length > 0 && (
+      <section id="scripts" class="px-margem mx-auto max-w-[90rem] py-10">
+        <h2 class="text-rotulo text-secundario">{pt.course.courseScripts}</h2>
+        <div class="mt-4 flex flex-col gap-4">
+          {general.map((script) => (
+            <ScriptPanel script={script} />
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   <CourseResources data={data} />
 </BaseLayout>
