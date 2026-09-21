@@ -1,6 +1,6 @@
 # Plano 049 — Painel de script: Shiki monocromático e botão copiar (RF-37, F-13)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-37**, **F-13**, RN-05 (código no próprio conteúdo), RNF-02, RNF-15, RF-26
 **Depende de:** planos 041 (`groupScriptsByLesson`), 048 (página de disciplina e `LessonList`)
 **Modelo recomendado:** sonnet
