@@ -1,0 +1,149 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : PublicationItem.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Item de uma publicação na página `/publicacoes/` (§6.6 da
+ *                 identidade visual, RF-25, F-05): tags de destaque e tipo,
+ *                 título, autores com o professor destacado por cor e
+ *                 `<strong>`, veículo em itálico, links de DOI/arXiv/PDF só
+ *                 quando preenchidos e, recolhidos por padrão, resumo e
+ *                 palavras-chave.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-22
+ *  Atualizado em: 2026-09-22
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/components/Tag.astro, src/components/ExternalLink.astro,
+ *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
+ *                 src/lib/config.ts (siteConfig),
+ *                 src/lib/publications.ts (isProfessorAuthor, doiUrl, arxivUrl),
+ *                 astro:content (tipo `CollectionEntry<'publicacoes'>`)
+ *  Entradas     : prop `publication` (entrada de `publicacoes`, já validada pelo Zod)
+ *  Saídas       : `<article>` com o item de publicação
+ *  Uso          : import PublicationItem from '../components/PublicationItem.astro'
+ *
+ *  Notas        : link externo só por `ExternalLink.astro` (regra da fase);
+ *                 nenhum texto de interface hardcoded — tudo vem de `pt` (§10.4 do PRD).
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import Tag from './Tag.astro';
+import ExternalLink from './ExternalLink.astro';
+import { pt } from '../i18n/pt';
+import { toParagraphs } from '../lib/text';
+import { siteConfig } from '../lib/config';
+import { arxivUrl, doiUrl, isProfessorAuthor } from '../lib/publications';
+
+export interface Props {
+  /**
+   * Entrada da coleção `publicacoes`, já filtrada (RN-01) e agrupada por ano pela página. Prop
+   * obrigatória: sem ela não há o que renderizar (nenhum comportamento de prop ausente, §10.2).
+   */
+  publication: CollectionEntry<'publicacoes'>;
+}
+
+const { publication } = Astro.props;
+const { titulo, autores, tipo, veiculo, doi, arxiv, pdf_url, resumo, palavras_chave, destaque } =
+  publication.data;
+
+const paragraphs = toParagraphs(resumo);
+const keywords = palavras_chave ?? [];
+// §6.6: <details> só existe com ao menos resumo ou palavras-chave — nunca vazio.
+const hasDetails = paragraphs.length > 0 || keywords.length > 0;
+
+const doiHref = doi ? doiUrl(doi) : undefined;
+const arxivHref = arxiv ? arxivUrl(arxiv) : undefined;
+// F-05: nenhum botão de link vazio — o contêiner de links some inteiro sem nenhum dos três.
+const hasLinks = Boolean(doiHref || arxivHref || pdf_url);
+---
+
+<article class="grid gap-3">
+  <div class="flex flex-wrap items-center gap-2">
+    {destaque && <Tag variant="solid">{pt.publications.featured}</Tag>}
+    <Tag variant="neutral">{pt.publications.type[tipo]}</Tag>
+  </div>
+  {
+    destaque ? (
+      <h3 class="text-display-2 bg-bloco p-4">{titulo}</h3>
+    ) : (
+      <h3 class="text-titulo-item">{titulo}</h3>
+    )
+  }
+  <p class="text-pequeno">
+    {
+      autores.map((autor, index) => {
+        const isProfessor = isProfessorAuthor(autor, siteConfig.author.citationName);
+        return (
+          <>
+            {index > 0 && '; '}
+            {/* RNF-15: cor sozinha não é informação acessível — o professor também leva <strong>. */}
+            <span class={isProfessor ? 'text-tinta' : 'text-secundario'}>
+              {isProfessor ? <strong class="font-normal">{autor}</strong> : autor}
+            </span>
+          </>
+        );
+      })
+    }
+  </p>
+  {veiculo && <p class="text-pequeno text-secundario italic">{veiculo}</p>}
+  {
+    hasLinks && (
+      <div class="flex flex-wrap gap-4">
+        {doiHref && (
+          <ExternalLink href={doiHref} class="text-pequeno underline">
+            {pt.publications.doi}
+          </ExternalLink>
+        )}
+        {arxivHref && (
+          <ExternalLink href={arxivHref} class="text-pequeno underline">
+            {pt.publications.arxiv}
+          </ExternalLink>
+        )}
+        {pdf_url && (
+          <ExternalLink href={pdf_url} class="text-pequeno underline">
+            {pt.publications.pdf}
+          </ExternalLink>
+        )}
+      </div>
+    )
+  }
+  {
+    hasDetails && (
+      <details>
+        <summary class="text-pequeno cursor-pointer">{pt.publications.abstractAndKeywords}</summary>
+        <div class="detalhes-conteudo mt-2 flex flex-col gap-2">
+          {paragraphs.map((paragraph) => (
+            <p class="text-corpo">{paragraph}</p>
+          ))}
+          {keywords.length > 0 && (
+            <p class="text-pequeno text-secundario">
+              <span class="text-rotulo">{pt.publications.keywords}</span> {keywords.join(' · ')}
+            </p>
+          )}
+        </div>
+      </details>
+    )
+  }
+</article>
+
+<style>
+  /* §7 da identidade: a abertura do <details> aparece em 150 ms. O estado inicial oculto (opacity:
+     0 no "from" do keyframe) só existe dentro de "no-preference" (§8.2 do PRD): nenhuma animação
+     pode começar com conteúdo invisível sem CSS. Fora deste bloco, o navegador ainda mostra/esconde
+     o conteúdo pelo atributo nativo `open`, sem depender de CSS nenhum. */
+  @media (prefers-reduced-motion: no-preference) {
+    details[open] > .detalhes-conteudo {
+      animation: detalhes-abre 150ms ease-out;
+    }
+
+    @keyframes detalhes-abre {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  }
+</style>

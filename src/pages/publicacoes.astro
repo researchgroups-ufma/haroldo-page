@@ -1,0 +1,95 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : publicacoes.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página Publicações do site público (RF-25, RN-02, F-05,
+ *                 §6.6 da identidade visual): publicações publicadas
+ *                 agrupadas por ano, do mais recente ao mais antigo, cada uma
+ *                 com tipo, título, autores (com o professor destacado),
+ *                 veículo, só os links preenchidos e, recolhidos por padrão,
+ *                 resumo e palavras-chave.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-22
+ *  Atualizado em: 2026-09-22
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
+ *                 src/components/PublicationItem.astro, src/i18n/pt.ts,
+ *                 src/lib/published.ts (filterPublished),
+ *                 src/lib/publications.ts (groupByYear), astro:content (getCollection)
+ *  Entradas     : coleção `publicacoes`, já validada pelo Zod
+ *  Saídas       : HTML estático da rota `/publicacoes/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/publicacoes.astro`
+ *
+ *  Notas        : nenhum texto de interface hardcoded — tudo vem de `pt`
+ *                 (§10.4 do PRD); sem publicações publicadas, a página mostra
+ *                 só o cabeçalho com "0 itens" (decisão do plano 050 — o §6.6
+ *                 não legisla estado vazio) — nenhum estado vazio dedicado,
+ *                 porque o dicionário não tem texto para isso.
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import { pt } from '../i18n/pt';
+import { filterPublished } from '../lib/published';
+import { groupByYear } from '../lib/publications';
+
+// RN-01: rascunhos (`publicado: false`) nunca aparecem na página pública.
+const published = filterPublished(await getCollection('publicacoes'));
+// RN-02: `groupByYear` já aplica a ordem inteira (ano decrescente; dentro do ano,
+// `compareWithinYear`, título alfabético pt-BR) — regra provisória que vale até existir um campo
+// de data de cadastro (Q-RN02, opção (c), decidida pelo stakeholder em 2026-09-14, README da
+// fase). Esta página não reordena nada por conta própria.
+const groups = groupByYear(published);
+---
+
+<BaseLayout title={pt.publications.title}>
+  <PageHeader eyebrow={pt.publications.eyebrow(published.length)} title={pt.publications.title} />
+
+  <div class="px-margem mx-auto max-w-[90rem]">
+    {
+      groups.map((group) => {
+        const headingId = `ano-${group.year}`;
+        return (
+          // Coluna do ano com largura fixa: `auto` dava a cada <section> a própria grade, e a
+          // coluna variava de bloco a bloco, desalinhando as réguas entre os anos (medido no
+          // navegador, 1024–1440 px). 11rem (176px) cobre um ano de 4 dígitos em `text-ano` (teto
+          // 4,75rem ≈ 76px de fonte, medido ~159px de largura) com folga, e é igual em todo bloco
+          // — não é regra da identidade, que não fixa essa largura.
+          <section
+            aria-labelledby={headingId}
+            class="grid grid-cols-1 gap-x-8 gap-y-4 py-10 lg:grid-cols-[11rem_1fr]"
+          >
+            <h2 id={headingId} class="text-ano">
+              {group.year}
+            </h2>
+            <div>
+              {group.items.map((item, index) => (
+                <div
+                  class:list={['item-publicacao py-6', index === 0 && 'item-publicacao-primeira']}
+                >
+                  <PublicationItem publication={item} />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  /* §6.6: um bloco por ano, itens à direita separados por régua. §5.5: grade com régua no topo,
+     régua forte só na primeira linha — mesmo padrão de .disciplina-anterior em ensino.astro e
+     .linha-pesquisa em pesquisa.astro. */
+  .item-publicacao {
+    border-top: 1px solid var(--color-regua);
+  }
+  .item-publicacao-primeira {
+    border-top: 1px solid var(--color-tinta);
+  }
+</style>
