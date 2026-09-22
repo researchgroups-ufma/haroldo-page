@@ -1,0 +1,74 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : 404.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página de erro 404 (RF-27, §6.7 da identidade visual):
+ *                 rubrica "Erro 404", pílula sólida de volta ao início e a
+ *                 lista "Todas as páginas" com as cinco rotas de `NAV_ITEMS`.
+ *                 Gerada como `dist/404.html`, o corpo que o
+ *                 `not_found_handling = "404-page"` do `wrangler.toml`
+ *                 devolve para qualquer rota inexistente.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-22
+ *  Atualizado em: 2026-09-22
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
+ *                 src/components/PillButton.astro, src/i18n/pt.ts,
+ *                 src/lib/navigation.ts (NAV_ITEMS)
+ *  Entradas     : nenhuma (página estática, sem props nem conteúdo)
+ *  Saídas       : HTML estático da rota `/404` — o Astro grava `dist/404.html`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/404.astro`
+ *
+ *  Notas        : nenhum `<script>` (o caminho digitado não é exibido, §6.7 —
+ *                 exigiria JS); nenhum texto de interface hardcoded, tudo vem
+ *                 de `pt` (§10.4 do PRD).
+ * ============================================================================
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PillButton from '../components/PillButton.astro';
+import { pt } from '../i18n/pt';
+import { NAV_ITEMS } from '../lib/navigation';
+---
+
+<BaseLayout title={pt.notFound.title}>
+  <PageHeader eyebrow={pt.notFound.eyebrow} title={pt.notFound.title} />
+
+  <div class="px-margem mx-auto max-w-[90rem] pb-16">
+    <p class="text-corpo max-w-medida">{pt.notFound.body}</p>
+
+    <div class="mt-6">
+      <PillButton href="/" variant="solid" label={pt.notFound.backHome} />
+    </div>
+
+    <h2 class="text-rotulo text-secundario mt-12">{pt.notFound.allPages}</h2>
+    <ul class="mt-4">
+      {
+        // RF-27 / Decisão 3 (§6.7): as cinco rotas de NAV_ITEMS, sem CV.
+        NAV_ITEMS.map((item, index) => (
+          <li class:list={['pagina-linha', index === 0 && 'pagina-linha-primeira']}>
+            <a
+              href={item.href}
+              class="hover:bg-bloco flex items-center justify-between py-4 transition-colors duration-[120ms]"
+            >
+              <span class="text-corpo">{pt.nav[item.key]}</span>
+              <span aria-hidden="true">›</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  /* §5.5: grade com régua no topo, régua forte só na primeira linha da lista. */
+  .pagina-linha {
+    border-top: 1px solid var(--color-regua);
+  }
+  .pagina-linha-primeira {
+    border-top: 1px solid var(--color-tinta);
+  }
+</style>
