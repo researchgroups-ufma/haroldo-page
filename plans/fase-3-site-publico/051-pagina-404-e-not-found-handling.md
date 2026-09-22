@@ -1,6 +1,6 @@
 # Plano 051 — Página 404 e a prova do `not_found_handling` (RF-27)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-27**, RNF-03; quita a dívida da fase 2 "`not_found_handling` ainda não provado"
 **Depende de:** planos 037 (dicionário e `NAV_ITEMS`), 042 (layout), 043 (`PageHeader`, `PillButton`)
 **Modelo recomendado:** sonnet
@@ -97,7 +97,7 @@ entre o commit e o `curl` (README da fase, tabela de paralelismo).
     rota — byte a byte igual ao de `dist/index.html` e `dist/sobre/index.html` (mesmo SHA-256, bloco novo
     no Passo 2).*
 - [x] Local: `wrangler dev` responde `404` com a página no corpo; `/sobre/` responde `200`; canário do passo 4 mostra corpo vazio sem o arquivo
-- [ ] Produção: `curl.exe -si` na URL do Worker mostra `404` e a página, com SHA e versão registrados — **quita a dívida da fase 2**
+- [x] Produção: `curl.exe -si` na URL do Worker mostra `404` e a página, com SHA e versão registrados — **quita a dívida da fase 2**
 - [x] Nenhuma string de interface fora de `src/i18n/pt.ts`
 - [x] `astro check`, `lint`, `format:check`, `test:coverage`, `build:pipeline` verdes, com saída colada
 
@@ -595,4 +595,83 @@ Result (58 files):
 
 ### Passo 7 — Orquestrador (produção)
 
-NÃO rodei — reservado ao orquestrador (prova em produção depois do push e do check `Workers Builds: haroldo-page` `success`; `curl.exe -si` na URL do Worker com data, horário, SHA do commit e id da versão publicada).
+Rodado pelo **orquestrador** em 2026-09-22, depois do push do commit de trabalho
+`8c6821c6d2fb7c278de067bfcc25030141498406` para a `main`. Nenhum outro push entre esse commit e os `curl`.
+
+**Linha de base, antes do push** (`prod-antes.txt`): a dívida da fase 2 como ela era — `404` com
+`Content-Length: 0`.
+
+```
+data local: 2026-09-22 20:11:49 -03:00
+HTTP/1.1 404 Not Found
+Date: Tue, 22 Sep 2026 23:12:08 GMT
+Content-Length: 0
+Connection: keep-alive
+x-robots-tag: noindex
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=3FzuH4X2o6Mnv8KHmb8oFF341MoN2j2pFj%2FydN83UJrv%2B3HyJN%2BuvRHe%2B06qivzOaTUYPFH9kz7moI5MSVJgvq2VsDJ8MXCMFiu99I%2B1LiMUyQueQXYuFSHmqWG3oQkp44UzyR1%2BLtO4DATqdYTTIg%2FsKyI%3D"}]}
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+Server: cloudflare
+CF-RAY: a3f4fe242f5ddaa8-GIG
+alt-svc: h3=":443"; ma=86400
+```
+
+**Checks do commit** (`checks.txt`, `gh api .../commits/<SHA>/check-runs`): `qualidade` e
+`Workers Builds: haroldo-page` em `success`; versão publicada **`19c88528-bff3-4ec4-913b-213278224d0f`**.
+
+```
+data local: 2026-09-22 20:18:24 -03:00
+commit: 8c6821c6d2fb7c278de067bfcc25030141498406
+Workers Builds: haroldo-page: completed / success (concluido 2026-09-22T23:14:04Z)
+
+Build ID: [68da86ab-35b7-40be-a5b5-cacd7f8c5485](https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/68da86ab-35b7-40be-a5b5-cacd7f8c5485)
+Script: [haroldo-page](https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production)
+Version ID: 19c88528-bff3-4ec4-913b-213278224d0f
+
+qualidade: completed / success (concluido 2026-09-22T23:13:46Z)
+```
+
+**Depois do deploy** (`prod-depois.txt`, `curl.exe -sSi`): status `404`, agora com `Content-Type: text/html` e
+corpo. O bloco abaixo para nos cabeçalhos: o corpo sai minificado numa linha de ~8,9 kB, que o arquivo
+capturado contém inteira. O corpo começa por
+`<title>Página não encontrada — Haroldo Lima Junior</title>` e traz `<p class="text-rotulo text-secundario">Erro 404</p>`.
+
+```
+data local: 2026-09-22 20:18:05 -03:00
+HTTP/1.1 404 Not Found
+Date: Tue, 22 Sep 2026 23:18:12 GMT
+Content-Type: text/html
+Transfer-Encoding: chunked
+Connection: keep-alive
+CF-Cache-Status: HIT
+Cache-Control: public, max-age=0, must-revalidate
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+x-robots-tag: noindex
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=pqmd0cYowb7Cgp8pxC%2Bp6%2BHkGlU%2Bgy1cAJVIn344GEGhXQu2x7N2mOiUFM7Yd%2FDqTiMAxU8vHnx6%2BDV%2B8GGHZviqsWQoIbEDmdTdo4emSlwVXoqqw9acJmSAsXKdpKcEPqXVtx42ZbQI7LOG4zwyXDK8MXQ%3D"}]}
+Server: cloudflare
+CF-RAY: a3f507091a720a7a-GIG
+alt-svc: h3=":443"; ma=86400
+```
+
+**Identidade do corpo** (`prod-depois-corpo.txt`): o SHA-256 do corpo servido em produção é **igual** ao do
+`dist/404.html` verificado localmente e no navegador (passos 2 a 5). O Worker serve byte a byte o artefato
+revisado. Os cinco `href` aparecem no `<main>` e também no cabeçalho e no rodapé, por isso as contagens são
+5 (`/`: logotipo, cabeçalho, pílula, lista e rodapé) e 3 (as outras rotas: cabeçalho, lista e rodapé).
+`/sobre/` segue em `200`.
+
+```
+--- corpo de producao ---
+SHA-256 do corpo: 713D9CE4C6B7128B82FABF1C2099AE31A6F817BD0451CDD3A5EBA56F01547390
+SHA-256 de dist/404.html: 713D9CE4C6B7128B82FABF1C2099AE31A6F817BD0451CDD3A5EBA56F01547390
+ocorrencias de 'Erro 404': 1
+href="/" : 5
+href="/sobre/" : 3
+href="/pesquisa/" : 3
+href="/ensino/" : 3
+href="/publicacoes/" : 3
+--- /sobre/ ---
+200
+```
+
+Uma primeira tentativa às 20:16:44 devolveu saída vazia do `curl` junto com uma falha de conexão com a API do
+GitHub no mesmo minuto. A repetição logo em seguida (sem carimbo de hora próprio, entre 20:16:44 e 20:18:05) respondeu `code=404 size=8930`, e a captura acima, das 20:18:05, é
+a que vale. Foi falha transitória de rede local, não do Worker; não há bloco dela porque ela não produziu saída.
