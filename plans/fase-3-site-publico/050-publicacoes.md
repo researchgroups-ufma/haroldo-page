@@ -1,6 +1,6 @@
 # Plano 050 — Publicações (RF-25, RN-02, F-05)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-25**, RN-02 (ano decrescente; dentro do ano, regra provisória), **F-05**, RN-01,
 RF-05, RF-26
 **Depende de:** planos 038 (`toParagraphs`), 039 (`filterPublished`), 040 (`groupByYear`,
