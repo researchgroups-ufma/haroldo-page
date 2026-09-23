@@ -1,6 +1,6 @@
 # Plano 052 — Testes de integração sobre o `dist/` e peso de JS (§11, RN-01, RNF-02)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** §11 (nível "Integração": rotas geradas, nenhum rascunho publicado), **RN-01**,
 **RNF-02**, RF-10, RF-27 (existência de `404.html`), §8.3 (um `<h1>`, `lang`)
 **Depende de:** planos 041 (`courseSlug`) e **044–051** (todas as rotas prontas)
@@ -103,12 +103,10 @@ ausência, limite) — nenhuma contagem exata de conteúdo (README da fase, deci
 - [x] Os seis canários do passo 3 mostrados vermelhos e o estado final verde (+ g e h pedidos pela orquestração)
 - [x] Tabela de JS gzip por rota colada, todas < 50 KB
 - [x] Passo novo no CI depois do `build:pipeline`, sem `continue-on-error`; `build:pipeline` inalterado
-- [ ] CI do commit com `test:dist` visível no log e `conclusion: success`
+- [x] CI do commit com `test:dist` visível no log e `conclusion: success`
 - [x] `lint` e `format:check` verdes, com saída colada; cabeçalho §10.1 e TSDoc nos arquivos novos
 
 ## Evidência
-
-<Preenchido pelo executor (1–5) e pelo orquestrador (6). Declare o que NÃO rodou.>
 
 ### Passo 1 — `vitest.config.ts` exclui `tests/dist/**`; `vitest.dist.config.ts` e `package.json` novos/editados
 
@@ -1196,4 +1194,25 @@ TODOS OS BLOCOS OK
 - O mesmo do ciclo 1: CI do commit (não existe commit), `npm ci`, `npm audit`, navegador — fora do
   escopo deste plano.
 
+## Passo 6 — orquestrador (CI do commit `9af755e`)
 
+Trabalho empurrado em `9af755e` em 2026-09-23. Bloco gerado por comando: `gh run view` e `check-runs` do SHA completo, mais as linhas do passo `Run npm run test:dist` do log (`gh run view 35892107311 --log`), com os códigos de cor ANSI removidos por `sed`. No CI o reporter padrão do Vitest imprime a tabela sem `--reporter=verbose`, como a revisão previu.
+
+```
+run 35892107311 headSha 9af755e5a16c4cd0ad01bcb08b4a595fa8acb0f9 status: completed conclusion: success
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+qualidade	Run npm run test:dist	﻿2026-09-23T16:56:58.8064714Z ##[group]Run npm run test:dist
+qualidade	Run npm run test:dist	2026-09-23T16:56:58.9107795Z > vitest run -c vitest.dist.config.ts
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0802740Z Rota → bytes gzip de JS:
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0803092Z   /404.html → 259 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0803550Z   /ensino/2025-1-mecanica-classica/index.html → 259 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0804130Z   /ensino/2026-2-relatividade-geral/index.html → 606 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0804807Z   /ensino/index.html → 259 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0805282Z   /index.html → 259 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0805691Z   /pesquisa/index.html → 259 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0806270Z   /publicacoes/index.html → 259 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0806827Z   /sobre/index.html → 259 bytes
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0858410Z  Test Files  1 passed (1)
+qualidade	Run npm run test:dist	2026-09-23T16:57:00.0859377Z       Tests  9 passed (9)
+```

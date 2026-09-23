@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-22 (planos 036 a 051 e 054 DONE)
+Última atualização: 2026-09-23 (planos 036 a 052 e 054 DONE)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -38,7 +38,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | 049 | Painel de script: Shiki monocromático e botão copiar (RF-37, F-13) | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `1a028ce` |
 | 050 | Publicações (RF-25, RN-02, F-05) | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `5b97655` |
 | 051 | Página 404 e a prova do `not_found_handling` (RF-27) | ✅ DONE | agente + orquestrador (produção) | implementer (sonnet) | `8c6821c` |
-| 052 | Testes de integração sobre o `dist/` e peso de JS (§11, RN-01, RNF-02) | ⬜ TODO | agente | implementer (sonnet) | — |
+| 052 | Testes de integração sobre o `dist/` e peso de JS (§11, RN-01, RNF-02) | ✅ DONE | agente | implementer (sonnet) | `9af755e` |
 | 053 | Verificação transversal 360/768/1440 e fechamento da fase 3 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
 | 054 | Teste de citações do PRD no código | ✅ DONE | agente | implementer (sonnet) | `23a003d` |
 
