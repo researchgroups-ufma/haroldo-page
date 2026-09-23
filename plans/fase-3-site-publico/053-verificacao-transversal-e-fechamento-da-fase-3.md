@@ -1,6 +1,6 @@
 # Plano 053 — Verificação transversal 360/768/1440 e fechamento da fase 3
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-26**, **RF-32**, RNF-15 (teclado e foco), critério de conclusão da fase 3 no
 §6.2; itens 2, 11 e 12 do §12 da fase 3; fechamento do checklist (12/12) e do §0 do PRD
 **Depende de:** **todos os planos 036–052 em `DONE`** (a Q-RN02 foi respondida em 2026-09-14 — opção (c); ver README da
@@ -113,7 +113,7 @@ quando".
 - [x] Comentários de 7(b) e 7(c) corrigidos, sem mudança de lógica (mesma contagem de testes)
 - [x] §12 da fase 3 em 12/12, §0 e §0.1 atualizados; `plans/README.md` com a fase 3 concluída
 - [x] README da fase com o que ela empurra adiante e as dívidas criadas, cada uma com "fecha quando"
-- [ ] Portão local completo, CI e Workers Builds verdes no commit de fechamento, com saída colada
+- [x] Portão local completo, CI e Workers Builds verdes no commit de fechamento, com saída colada
 
 ## Evidência
 
@@ -803,3 +803,31 @@ si acrescentou linhas ao plano desde a captura anterior; o que não muda é a co
  6 files changed, 799 insertions(+), 31 deletions(-)
 ```
 
+## Promoção — orquestrador (portão local do ciclo 3, CI e Workers Builds do commit `876d89c`)
+
+**Portão local** — rodado pelo `triage-runner` em 2026-09-23, 19:39–19:41, depois da última edição do
+ciclo 3 (19:38), e lido nos `.txt` pelo orquestrador e pela revisão do ciclo 3 (APROVADO, sem
+obrigatório): `lint` exit 0; `format:check` "All matched files use Prettier code style!";
+`test:coverage` 16 arquivos / 263 testes, cobertura 100% statements/lines/funções e 99,12% branches;
+`build:pipeline` 108 testes de conteúdo, `astro check` 0 erros/0 avisos/0 dicas, 8 páginas;
+`test:dist -- --reporter=verbose` 9/9; `npm audit --audit-level=high` exit 0 (8 moderadas, já
+registradas nas dívidas).
+
+Trabalho empurrado em `876d89c` em 2026-09-23. Bloco gerado por comando: `gh run view` e `check-runs`
+do SHA completo, o `Version ID` do `output.summary` do Workers Builds e as linhas de contagem do log
+(`gh run view 35930022341 --log`), com os códigos de cor ANSI removidos por `sed`.
+
+```
+run 35930022341 headSha 876d89c72ca42402925c52aa9711f9b23956a305 status: completed conclusion: success
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+Build ID: 06e97446-f40b-43cd-b2ba-03ec85b77b9b
+Version ID: 24da15df-3f4f-4b78-b8ab-e86919fcd6f3
+qualidade	Run npm run test:coverage	2026-09-23T22:45:32.2836959Z  Test Files  16 passed (16)
+qualidade	Run npm run test:coverage	2026-09-23T22:45:32.2840456Z       Tests  263 passed (263)
+qualidade	Run npm run build:pipeline	2026-09-23T22:45:34.0392442Z  Test Files  4 passed (4)
+qualidade	Run npm run build:pipeline	2026-09-23T22:45:34.0393418Z       Tests  108 passed (108)
+qualidade	Run npm run build:pipeline	2026-09-23T22:46:03.6261676Z - 0 errors
+qualidade	Run npm run test:dist	2026-09-23T22:46:06.2591781Z  Test Files  1 passed (1)
+qualidade	Run npm run test:dist	2026-09-23T22:46:06.2592509Z       Tests  9 passed (9)
+```

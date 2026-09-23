@@ -5,9 +5,8 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-23 (planos 036 a 052 e 054 DONE; 053 com a verificação transversal
-feita e os documentos escritos — fase 3 concluída no texto, 12/12; promoção do 053 é do
-orquestrador)
+Última atualização: 2026-09-23 (planos 036 a 054 todos DONE — o 053 em `876d89c`, com CI e
+Workers Builds verdes; **fase 3 concluída, 12/12**)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -41,7 +40,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | 050 | Publicações (RF-25, RN-02, F-05) | ✅ DONE | agente + orquestrador (navegador) | implementer (sonnet) | `5b97655` |
 | 051 | Página 404 e a prova do `not_found_handling` (RF-27) | ✅ DONE | agente + orquestrador (produção) | implementer (sonnet) | `8c6821c` |
 | 052 | Testes de integração sobre o `dist/` e peso de JS (§11, RN-01, RNF-02) | ✅ DONE | agente | implementer (sonnet) | `9af755e` |
-| 053 | Verificação transversal 360/768/1440 e fechamento da fase 3 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
+| 053 | Verificação transversal 360/768/1440 e fechamento da fase 3 | ✅ DONE | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | `876d89c` |
 | 054 | Teste de citações do PRD no código | ✅ DONE | agente | implementer (sonnet) | `23a003d` |
 
 **Numeração é global e contínua e não é ordem de execução.** A ordem está abaixo.
