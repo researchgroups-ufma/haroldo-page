@@ -20,6 +20,14 @@ describe('isActivePath', () => {
   it('"/ensino/" inativo em "/ensinox/"', () => {
     expect(isActivePath('/ensino/', '/ensinox/')).toBe(false);
   });
+
+  it('"/ensino" (sem barra) ativo em "/ensino/algo/"', () => {
+    expect(isActivePath('/ensino', '/ensino/algo/')).toBe(true);
+  });
+
+  it('"/ensino" (sem barra) inativo em "/ensinox/" (sem falso positivo de prefixo)', () => {
+    expect(isActivePath('/ensino', '/ensinox/')).toBe(false);
+  });
 });
 
 describe('NAV_ITEMS', () => {
