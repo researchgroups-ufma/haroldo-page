@@ -1,8 +1,9 @@
 # Dependências — geradas pelo npm ci / npm install, não precisam ir para o repositório
 node_modules/
 
-# Build do Astro — gerado pelo astro build
-dist/
+# Build do Astro — gerado pelo astro build. Ancorado na raiz (`/dist/`) porque `dist/` sem barra
+# inicial também casava `tests/dist/` (plano 052).
+/dist/
 
 # Cache e tipos gerados pelo Astro
 .astro/

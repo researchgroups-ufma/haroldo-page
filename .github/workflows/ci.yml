@@ -52,3 +52,5 @@ jobs:
         env:
           TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+      # tests/dist/**: le o dist/ recem-gerado pelo build:pipeline acima (plano 052, §11)
+      - run: npm run test:dist
