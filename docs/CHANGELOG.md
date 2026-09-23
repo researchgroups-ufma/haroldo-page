@@ -8,6 +8,66 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+Fase 3 — site público em português (planos 036 a 054; critério de conclusão da fase — todas as
+rotas navegáveis com o conteúdo, responsivas de 360 px a 1440 px — demonstrado pelo plano 053: 8
+rotas × 3 larguras, `scrollWidth = clientWidth` nas 24 medições; checklist do §12 em 12/12):
+
+- Sistema visual de `docs/identidade-visual.md` em `src/styles/global.css`: tokens de cor, escala
+  tipográfica, classes de movimento e a Archivo auto-hospedada, sem fonte de terceiro (plano 036,
+  `fb117b6`).
+- Dicionário de interface `src/i18n/pt.ts` (objeto `pt`, tipo `UiStrings`, plurais como funções) e
+  mapa de navegação `NAV_ITEMS` com `isActivePath` (plano 037, `23d1aa0`).
+- Utilitários de apresentação em `src/lib/`: `toParagraphs` e `padCount` (plano 038, `1d0d3a5`);
+  `filterPublished` (RN-01) e `requireSingleton`, ordenação de linhas de pesquisa por `ordem` e
+  título e de projetos (plano 039, `5705e73`); `groupByYear`, `compareWithinYear` (regra provisória
+  da Q-RN02), destaque do autor e links DOI/arXiv (plano 040, `6bf5aa4`); `courseSlug` derivando a
+  URL do nome do arquivo (`2026.2-relatividade-geral.md` → `2026-2-relatividade-geral`), atuais ×
+  anteriores, contagens e scripts por aula (plano 041, `a2e28b7`).
+- Layout base, cabeçalho com menu do celular e rodapé com os perfis acadêmicos (plano 042,
+  `db96df3`); componentes `PageHeader`, `PillButton`, `Tag` e `ExternalLink` (plano 043, `dfdc0a3`).
+- As rotas do site público: Home com as células-caminho contando só publicados (plano 044,
+  `4e48ce5`); Sobre (plano 045, `369637a`); Pesquisa com `ProjectCard` e âncora da linha relacionada
+  que não revela rascunho (plano 046, `97e006d`); Ensino com os grupos "Atuais" e "Anteriores" sempre
+  rotulados (plano 047, `4d90d92`); página de disciplina gerada por `getStaticPaths`, com
+  `LessonList` e `CourseResources` (plano 048, `5eaf30e`); painel de script com tema Shiki
+  monocromático e botão "Copiar código" em melhoria progressiva (plano 049, `1a028ce`); Publicações
+  em blocos por ano (plano 050, `5b97655`); página 404 (plano 051, `8c6821c`).
+- Teste de citações do PRD (`tests/lib/citacoes-do-prd.test.ts`): toda citação de identificador do
+  PRD em `src/**` existe na fonte — camada de existência apenas; a de pertinência foi refutada por
+  medição (plano 054, `23a003d`).
+- Testes de integração sobre o `dist/` gerado, `npm run test:dist`, no CI depois do
+  `build:pipeline`: rotas geradas, nenhum rascunho no HTML, um `<h1>` e `lang="pt-BR"` por página,
+  nenhuma fonte de terceiro, JS < 50 KB gzip por rota (medido: 259 a 606 bytes) e nenhum React fora
+  do painel (plano 052, `9af755e`).
+- Verificação transversal (plano 053, `876d89c`): responsividade 360/768/1440 nas 8 rotas; o 404
+  do `wrangler dev` com SHA-256 igual ao `dist/404.html`; movimento em `no-preference` e texto
+  visível sem CSS observados pelo orquestrador; estado `reduce` e navegação por teclado verificados
+  à mão pelo stakeholder em 2026-09-23.
+- Suíte ao fechar a fase (2026-09-23): 265 testes em 16 arquivos (`tests/lib/` × 11, `tests/i18n/`
+  × 1, `tests/content/` × 4), cobertura 100% em statements, branches, funções e linhas de
+  `src/lib/`, `src/i18n/` e `src/content.config.ts`; mais 9 testes em `tests/dist/`. Os 2 testes do
+  ramo `href` sem barra final de `isActivePath` entraram no fechamento (`bc17746`).
+
+**Corrigido na fase 3:**
+
+- A rota inexistente em produção respondia `404` com corpo vazio (`Content-Length: 0`), dívida da
+  fase 2 no `not_found_handling`; passa a servir a página 404, com o corpo igual byte a byte ao
+  `dist/404.html` (plano 051).
+- O `.gitignore` tinha `dist/` sem âncora e ignorava também `tests/dist/`; virou `/dist/` (plano 052).
+- Comentários das dívidas 7(b) (`tests/content/paridade-schema.test.ts`) e 7(c)
+  (`tests/content/conteudo-valido.test.ts`) corrigidos, sem mudança de lógica (plano 053).
+
+**Pendências deliberadamente abertas da fase 3** — cada uma com destino e "fecha quando" na seção
+"O que a fase 3 empurra adiante, e as dívidas que ela criou" de
+`plans/fase-3-site-publico/README.md`. As principais: `F-08` com duas definições incompatíveis
+(PRD §5.4 × `docs/identidade-visual.md` §1), decisão do dono do produto; ordem dentro do ano em
+Publicações provisória até existir campo de data de cadastro (Q-RN02, opção c); a faixa de células
+em três cópias e sem o `padding-right` uniformizado com o rodapé; páginas acima do alvo de 150
+linhas (`index.astro` 181, `sobre.astro` 217, `ensino/[slug].astro` 163, `ensino.astro` 155); e as
+seis observações da revisão de integração do fechamento (token `--color-comentario` sem uso, rodapé
+sem `ExternalLink`, ordem dos perfis por dois caminhos, `<title>` de chaves heterogêneas, rotas
+fora de `NAV_ITEMS` sem teste, citação de NG-01 anterior à fase).
+
 Fase 2 — pipeline de publicação ponta a ponta (planos 023, 024, 025, 026, 028, 030, 031, 032, 033,
 034, 035; planos 027 e 029 migrados para a fase 5 em 2026-09-12 — ver
 `docs/sabatinas/CHANGELOG_sabatina_recorte-sem-professor.md`; critério de conclusão da fase — um

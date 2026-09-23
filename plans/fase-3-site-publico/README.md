@@ -5,8 +5,9 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-23 (planos 036 a 054 todos DONE — o 053 em `876d89c`, com CI e
-Workers Builds verdes; **fase 3 concluída, 12/12**)
+Última atualização: 2026-09-23 — /fechar-fase concluído: revisão de integração aprovada, CHANGELOG
+escrito, documentação atualizada (planos 036–054 todos DONE; o 053 em `876d89c`; **fase 3 concluída,
+12/12** com 265 testes em 16 arquivos, cobertura 100%)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -200,18 +201,15 @@ tocado por este plano — o 053 não edita `src/`.
 Evidência do plano que o registrou, não contra o resumo dela:**
 
 - **`F-08` tem duas definições que não concordam** — "Imagem ausente (perfil sem foto, notícia sem
-  imagem)" no §5.4 do PRD ("Casos de Borda e Cenários de Falha", linha F-08 — conferido na fonte:
-  **não** é o §14, que é "Dependências e Premissas"; a citação `PRD.md:298` usada em README
-  anteriores **estava certa** no commit `23a003d` (`git show 23a003d:PRD.md | sed -n '298p'` mostra
-  a linha da tabela `F-08`) e ficou desatualizada porque o §0.1 do PRD ganhou linhas depois desse
-  commit, deslocando F-08 para baixo — hoje `grep -n "^| F-08\|^| F-04" PRD.md` dá F-04 em 300 e
-  F-08 em 304; por isso a âncora estável é "§5.4, linha F-08", não um número de linha), e "Campo
-  vazio não deixa rastro" em `docs/identidade-visual.md:32`. Achado da revisão do 048 (comentário de
-  `CourseResources.astro`
-  citava `F-08` para uma regra que está no §6.5) e medido de novo pelo 054, que **refutou por
-  medição** a tentativa de discriminar citação certa de citação trocada por sobreposição de
-  vocabulário — 32 das 236 citações legítimas pontuam zero, empatando com a citação errada
-  conhecida. **Contagem atual, medida em 2026-09-23** (`grep -rn "F-08" src`): **5 ocorrências** —
+  imagem)" no §5.4 do PRD ("Casos de Borda e Cenários de Falha") e "Campo vazio não deixa rastro"
+  em `docs/identidade-visual.md`. Achado da revisão do 048 (comentário de `CourseResources.astro`
+  citava `F-08` para uma regra do §6.5) e medido novamente pelo 054, que **refutou por medição**
+  a tentativa de discriminar citação certa de citação trocada por sobreposição de vocabulário — 32
+  das 236 citações legítimas pontuam zero, empatando com a citação errada conhecida. **Histórico de
+  referência:** a citação do §5.4 `PRD.md:298` estava certa no commit `23a003d`; ficou desatualizada
+  quando o §0.1 do PRD ganhou linhas depois, deslocando F-08 — por isso a âncora estável é "§5.4,
+  linha F-08" em vez de número de linha (que se desloca a cada entrada nova do §0.1). **Contagem
+  atual, medida em 2026-09-23** (`grep -rn "F-08" src`): **5 ocorrências** —
   `src/components/ProjectCard.astro:10`, `src/pages/index.astro:11`, `src/pages/index.astro:87`,
   `src/pages/sobre.astro:10` e `src/pages/sobre.astro:180`. **Fecha quando:** o dono do produto
   emendar um dos dois documentos para que `F-08` signifique uma coisa só, e as 5 citações acima
@@ -245,6 +243,45 @@ Evidência do plano que o registrou, não contra o resumo dela:**
 - **Tag-link duplica a composição visual de `Tag.astro`** — ver a tabela "Dívidas herdadas" acima,
   achado da revisão do 048. **Fecha quando:** um plano der a `Tag.astro` a variante de link e
   `CourseResources.astro` passar a usá-la;
+- **(a) Token `--color-comentario` sem uso (revisão de integração, 2026-09-23).** Definido em
+  `src/styles/global.css:27` (`#6e6a66`) e sem nenhuma outra ocorrência em `src/`. As quatro cores do
+  tema de código (`#F7F6F4`, `#111112`, `#5A5754`, `#6E6A66`) estão fixas em hex em
+  `src/lib/code-theme.ts:54-69`, repetidas em `tests/lib/code-theme.test.ts`, e nada as liga a
+  `global.css`. **Risco:** uma mudança de paleta em `global.css` não chega ao painel de script, e
+  nenhum teste acusa. **Nenhum plano.** **Fecha quando:** o token for removido ou o tema passar a
+  derivar dele.
+- **(b) `SiteFooter.astro:68-78` repete a marcação de `ExternalLink` sem usar o componente
+  (revisão de integração, 2026-09-23).** Exceção declarada nos dois cabeçalhos
+  (`SiteFooter.astro:20`; `ExternalLink.astro:19-20`: o rodapé do 042 foi escrito antes do
+  componente e "não é trocado aqui"). Mesma classe de risco da tag-link de `CourseResources` (item
+  acima); a saída é equivalente hoje — medido no `dist/index.html`: `↗` e "(abre em nova aba)".
+  **Nenhum plano.** **Fecha quando:** o rodapé passar a usar `ExternalLink`.
+- **(c) Ordem de perfis acadêmicos por dois caminhos (revisão de integração, 2026-09-23).**
+  `src/pages/sobre.astro:54-62` define a ordem via constante `LINK_ORDER` (Lattes, ORCID);
+  `src/components/SiteFooter.astro:41-43` **não explicitamente**, usa `Object.keys(perfil.links)` na
+  ordem do shape do Zod (`src/content.config.ts`). Hoje **coincidem por dedução**, não medição — o
+  conteúdo só tem Lattes e ORCID. **Risco:** novo tipo de perfil (GitHub, site pessoal) deixaria as
+  duas páginas com ordens diferentes sem aviso. **Nenhum plano.** **Fecha quando:** a ordem for
+  extraída para `src/lib/` e as duas páginas usarem a mesma fonte.
+- **(d) `<title>` das páginas sai de chaves heterogêneas (revisão de integração, 2026-09-23).**
+  `sobre.astro` usa `pt.about.eyebrow`, `publicacoes.astro` usa `pt.publications.title`, e
+  `pesquisa`/`ensino` usam `pt.nav.*`. **Corretos hoje** (medido nos `<title>` do `dist/`). **Risco
+  de fase 4:** com o `en.ts`, cada rota precisa de uma chave de título previsível. **Nenhum plano.**
+  **Fecha quando:** a fase 4 definir a chave de título por rota.
+- **(e) Rotas escritas à mão fora de `NAV_ITEMS` (revisão de integração, 2026-09-23).** `NAV_ITEMS`
+  em `src/lib/navigation.ts` é a fonte de navegação no cabeçalho e rodapé. Mas as rotas aparecem
+  hardcoded em cinco lugares: `src/pages/index.astro:65,76,82,105` (as três células e o link de
+  pílula), `src/pages/ensino/[slug].astro:84` (link de volta), `src/pages/404.astro:41` (link para
+  Home), e `tests/dist/site-gerado.test.ts:102-109` (`rotasFixas` esperadas). **Coincidem hoje**
+  — 8 rotas públicas. **Risco:** novo plano que mude uma rota em `NAV_ITEMS` sem tocar os cinco
+  lugares deixaria inconsistência silenciosa. **Nenhum plano.** **Fecha quando:** um teste de dist
+  cruzar `NAV_ITEMS` com as rotas geradas em `dist/`.
+- **(f) Citação de `NG-01` anterior à fase (revisão de integração, 2026-09-23).**
+  `src/content.config.ts:39,431` e `tests/content/schemas.test.ts:493` citam NG-01 ("não haverá
+  backend próprio…") para justificar "notícias fica para a v1.1". A fonte certa é a tabela de escopo
+  do PRD que marca Notícias/postagens como v1.1, ou a Q-09. O teste do 054 só confere existência, e
+  NG-01 existe — por isso passou. Introduzida na fase 1 (`462ffb4`), fora do diff da fase 3.
+  **Nenhum plano.** **Fecha quando:** um commit de docs trocar a citação.
 - **Grade de projetos usa `auto-fill`, deixando trilhas vazias com poucos cards** — a 1440 px, com
   dois cards, a grade `repeat(auto-fill, minmax(17rem, 1fr))` ocupa ~43% da largura e o resto fica
   vazio (medido na Evidência do 046, ~425-430). **O código está certo** — o §6.3 de
