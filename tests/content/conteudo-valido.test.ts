@@ -6,8 +6,9 @@
  *                 `content/` passa pelo Zod — bloqueia merge"). Varre os arquivos reais das
  *                 cinco pastas de `content/`, lê o frontmatter com `gray-matter` — o mesmo
  *                 parser que o painel TinaCMS usa para gravar — e valida cada um contra o
- *                 schema Zod correspondente de `src/content.config.ts`. Fecha a dívida 5 e a
- *                 dívida 7(c) da fase 1: até este plano, `npm run build` podia encerrar com
+ *                 schema Zod correspondente de `src/content.config.ts`. Fecha a dívida 5 da
+ *                 fase 1 (a dívida 7(c) fecha em `paridade-schema.test.ts`): até este plano,
+ *                 `npm run build` podia encerrar com
  *                 `exit 0` mesmo com uma referência inválida em `content/` (`astro check`
  *                 reporta `[ERROR] [content]`, mas não falha o processo) — ver Contexto do
  *                 plano 030.

@@ -77,8 +77,9 @@
  *                 Dívida 7(b) — detecção de enum do lado Tina depois do ramo `campo.list` em
  *                 `classifyTina` (abaixo) — permanece deliberadamente não resolvida: não existe
  *                 campo com `list: true` **e** `options: [...]` hoje, e mudar `classifyTina` sem
- *                 um campo real para testar contra seria alteração não verificável. Fica como
- *                 guarda para a fase 3, quando campo novo nascer.
+ *                 um campo real para testar contra seria alteração não verificável. Continua
+ *                 aberta depois da fase 3, que não mudou schema. Fecha quando existir campo com
+ *                 `list: true` e `options`.
  * ============================================================================
  */
 import { readFileSync } from 'node:fs';

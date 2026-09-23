@@ -5,7 +5,9 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo, as decisões de fatiamento e as armadilhas.
 
-Última atualização: 2026-09-23 (planos 036 a 052 e 054 DONE)
+Última atualização: 2026-09-23 (planos 036 a 052 e 054 DONE; 053 com a verificação transversal
+feita e os documentos escritos — fase 3 concluída no texto, 12/12; promoção do 053 é do
+orquestrador)
 
 **Critério de conclusão da fase** (§6.2 do PRD): *todas as rotas navegáveis com o conteúdo
 placeholder, responsivas de 360 px a 1440 px.* Como nas fases anteriores, o critério não é "os
@@ -49,7 +51,7 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | Item do §12 (fase 3) | Plano |
 |---|---|
 | Layout base, cabeçalho, rodapé e navegação | 042 |
-| Identidade visual aplicada | ✅ 036 + 043 (tokens e componentes) — marcado no §12 em 2026-09-17; conferido rota a rota em 053 |
+| Identidade visual aplicada | ✅ 036 + 043 (tokens e componentes) — marcado no §12 em 2026-09-17; conferido rota a rota em 053 sobre o `dist/` do triage (2026-09-23 14:38): 8/8 rotas com um `<h1>`, a assinatura do `PageHeader` (`titulo-entrada`/`regua-entrada` — a Home replica a marcação sem importar o componente), CSS auto-hospedado em `/_astro/` e zero `fonts.googleapis` — ver tabela na Evidência |
 | Home (RF-20) | ✅ 044 — marcado no §12 em 2026-09-17 |
 | Sobre (RF-21) | ✅ 045 — marcado no §12 em 2026-09-18 |
 | Pesquisa (RF-22) | ✅ 046 — marcado no §12 em 2026-09-18 |
@@ -58,8 +60,8 @@ revisão pode depender dela. Executores, revisores e o CI não a têm.
 | Scripts com destaque e botão copiar, por aula (RF-37, F-13) | ✅ 049 — marcado no §12 em 2026-09-21 |
 | Publicações agrupadas por ano (RF-25) | ✅ 050 — marcado no §12 em 2026-09-22 |
 | Página 404 (RF-27) | ✅ 051 — marcado no §12 em 2026-09-22 |
-| Responsividade 360–1440 (RF-26) | 053 (com medição em cada plano de rota) |
-| Animações com `prefers-reduced-motion` (RF-32); testes da fase passando | 053 (com 036, 043 e 052) |
+| Responsividade 360–1440 (RF-26) | ✅ 053 — 8 rotas × 3 larguras, `scrollWidth = clientWidth` nas 24 linhas, medido em 2026-09-23 |
+| Animações com `prefers-reduced-motion` (RF-32); testes da fase passando | ✅ 053 (com 036, 043 e 052) — `no-preference` e "sem CSS" observados pelo orquestrador em 2026-09-23; `reduce` e a navegação por teclado (RNF-15), verificação manual do stakeholder na mesma data |
 
 Os planos 036–041, 052 e 054 **não** fecham item sozinhos: são pré-requisitos, como o 023/030/031 na
 fase 2. **A marcação do §12 e o §0 do PRD são feitos pelo orquestrador na promoção de cada plano**
@@ -165,14 +167,123 @@ Da seção "O que a fase 2 empurra adiante" do [README da fase 2](../fase-2-pipe
 | "Verificação autoritativa" do README da fase 2 parada antes do 030 | **Substituída, para esta fase, pela seção abaixo** | O README da fase 2 não é reescrito aqui (fase fechada); a dívida lá continua registrada |
 | Demais dívidas sem fase (caminho `schedule` do vigia, moderadas `qs`/`body-parser`/`express`, duplicação de `normalizeLinhaRelacionadaId`, §11 do PRD, "portão pré-push", §7.4) | **Nenhum plano desta fase** | Não tocam o site público. Ficam onde estão |
 | Painel `/admin` (TinaCMS) requisita a Inter em `fonts.googleapis.com` | **Nenhum plano desta fase (código de terceiro, fora do site público)** | Aceita em 2026-09-16 na revisão do 036. **Fecha quando:** o TinaCMS permitir desligar a fonte remota do painel, ou um plano da fase 5 auto-hospedá-la |
-| **Teste de teclado do layout base (Tab real)** — a tecla Tab enviada pela extensão do Chrome não move o foco, então o 042 não observou: "Pular para o conteúdo" visível no 1º Tab, contorno de foco em cada link e no botão, e Tab não entrando nos links do menu fechado | **053** (verificação transversal) | **Acumulada em três planos seguidos: 042, 043 e 044** — e depois em 045–051. No 049, o botão "Copiar código" foi acionado por **Enter real** com o foco posto por script, mas não alcançado por Tab. Dispensado no 042 por decisão do stakeholder em 2026-09-17, depois de a revisão exigir o teste. A ordem de foco foi verificada pela ordem do DOM e pela ausência de `tabindex` positivo, e o foco visível pela regra `:focus-visible` carregada — nenhum dos dois substitui o teste manual. **Fecha quando:** o 053 transcrever a navegação por Tab a 360 e 1440 px, feita à mão ou por ferramenta que mova o foco de verdade |
-| **Emulação de `prefers-reduced-motion: reduce` pelo DevTools** — a extensão do Chrome não a expõe nesta máquina, então o 043 não observou o estado `reduce` como o navegador o produz | **053** (verificação transversal) | O que foi feito no 043, e consta da Evidência: auditoria por CSSOM do CSS entregue mostrando que `opacity: 0`, `scaleX(0)` e `translateY(8px)` estão todos dentro do bloco `@media (prefers-reduced-motion: no-preference)`, mais o desligamento em runtime desse bloco com observação do estado resultante (tudo visível, sem animação). O revisor confirmou por leitura do `global.css` entregue e acrescentou que `global.css:174-182` zera duração de animação e transição sob `reduce`. **Fecha quando:** o 053 observar o estado `reduce` por emulação de verdade, ou por máquina/ferramenta que a permita. O 049 acrescenta o painel de script, também sem observação no estado `reduce`: a troca "Copiar código" → "Copiado" é instantânea e o `transition-colors` do botão não tem estado que o dispare |
+| **Teste de teclado do layout base (Tab real)** — a tecla Tab enviada pela extensão do Chrome não move o foco, então o 042 não observou: "Pular para o conteúdo" visível no 1º Tab, contorno de foco em cada link e no botão, e Tab não entrando nos links do menu fechado | ✅ **053** — fechada por **verificação manual do stakeholder em 2026-09-23**, declarada ao orquestrador: "Pular para o conteúdo" como primeiro foco, foco visível em todo elemento interativo, menu do celular, botão copiar e `<details>`, em todas as rotas. **O orquestrador não observou** (a extensão continua sem mover o foco nesta máquina) | **Acumulada em três planos seguidos: 042, 043 e 044** — e depois em 045–051. No 049, o botão "Copiar código" foi acionado por **Enter real** com o foco posto por script, mas não alcançado por Tab. Dispensado no 042 por decisão do stakeholder em 2026-09-17, depois de a revisão exigir o teste. A ordem de foco foi verificada pela ordem do DOM e pela ausência de `tabindex` positivo, e o foco visível pela regra `:focus-visible` carregada — nenhum dos dois substitui o teste manual |
+| **Emulação de `prefers-reduced-motion: reduce` pelo DevTools** — a extensão do Chrome não a expõe nesta máquina, então o 043 não observou o estado `reduce` como o navegador o produz | ✅ **053** — fechada por **verificação manual do stakeholder em 2026-09-23**, declarada ao orquestrador: nada anima, e o `<h1>` e a régua do cabeçalho já aparecem no estado final. **O orquestrador não observou** (a extensão nesta máquina continua sem expor a emulação); ele observou `no-preference` (as duas animações tocando) e o texto visível sem CSS | O que foi feito no 043, e consta da Evidência: auditoria por CSSOM do CSS entregue mostrando que `opacity: 0`, `scaleX(0)` e `translateY(8px)` estão todos dentro do bloco `@media (prefers-reduced-motion: no-preference)`, mais o desligamento em runtime desse bloco com observação do estado resultante (tudo visível, sem animação). O revisor confirmou por leitura do `global.css` entregue e acrescentou que `global.css:174-182` zera duração de animação e transição sob `reduce`. O 049 acrescenta o painel de script, também sem observação no estado `reduce`: a troca "Copiar código" → "Copiado" é instantânea e o `transition-colors` do botão não tem estado que o dispare |
 | **`pt.home.noneYet` é semanticamente errado para a célula de Ensino** — com zero disciplinas **atuais**, a Home diz "00 / nenhuma publicada ainda", quando pode haver várias publicadas, todas `anterior`. O dicionário já tem a frase certa (`pt.teaching.noCurrent`) | **Nenhum plano — decisão do dono do produto** | Achado da revisão do 044 em 2026-09-17. **Não é defeito de código:** o §6.1 da identidade prescreve literalmente "Contagem zero mostra `00` e o texto 'nenhuma publicada ainda'", sem distinguir célula, e o plano repete. O defeito está na **fonte única**, e emendá-la é decisão de produto, não de execução. Caminho não exercitado hoje (há 1 disciplina atual publicada). **Fecha quando:** o §6.1 for emendado para distinguir a célula de Ensino, e o plano da rota seguir a emenda |
-| **Faixa de células não uniformizada com o rodapé** — falta o `padding-right: 1.5rem` em `:not(:last-child)` a partir de `lg`, então o texto pode encostar na régua seguinte. Em `index.astro` a célula ímpar também não estica pela linha inteira a 768 px (o `SiteFooter.astro:130-132` estica) | **053** (verificação transversal) | Achado da revisão do 044; **reincidente no 045**, e a revisão dele pediu que `sobre.astro` fosse citado aqui. O 045 **corrigiu** o esticamento a 768 px (`sobre.astro:205-207`, `:last-child:nth-child(odd) { grid-column: 1 / -1 }` — observado no navegador: célula 3 em `[31, 691]`), mas **não** o `padding-right`, que segue faltando nas duas rotas. Não viola o §6.1, que não legisla essa faixa. **Fecha quando:** o 053 uniformizar `index.astro` e `sobre.astro` com o rodapé como referência |
-| **Páginas acima do "alvo < 150" linhas do §10.4 do PRD:** `src/pages/index.astro` com 181, `src/pages/sobre.astro` com 217 e, desde o 049, `src/pages/ensino/[slug].astro` com 163 (era 146; a seção "Scripts da disciplina" e o cabeçalho atualizado somaram 17) | **Nenhum plano ainda** — candidato a plano próprio de extração | Julgado nas revisões do 044 e do 045 como **alvo excedido, não invariante violado**: o §10.4 escreve "Alvo", única linha daquela tabela com hedge (as demais dizem "proibido"). No 044, 29 das 181 linhas são o cabeçalho §10.1 obrigatório e 27 o `<style>`; no 045, 27 são o cabeçalho e 48 o `<style>`, restando ~142 de marcação e lógica. **Correção de numeração feita em 2026-09-18:** esta linha dizia que a faixa de células "reaparece no §6.2 (plano 046)" — o §6.2 é o **045**, já executado, e a faixa agora existe em **três cópias** (`SiteFooter.astro`, `index.astro`, `sobre.astro`). **Fecha quando:** um plano próprio extrair a faixa de células das três |
+| **Faixa de células não uniformizada com o rodapé** — falta o `padding-right: 1.5rem` em `:not(:last-child)` a partir de `lg`, então o texto pode encostar na régua seguinte. Em `index.astro` a célula ímpar também não estica pela linha inteira a 768 px (o `SiteFooter.astro:130-132` estica) | **Redirecionada, por decisão do stakeholder em 2026-09-23** — ver "O que a fase 3 empurra adiante, e as dívidas que ela criou", abaixo. O 053 não toca `src/`, então não uniformiza nada; a dívida junta-se à extração da faixa de células das três cópias | Achado da revisão do 044; **reincidente no 045**, e a revisão dele pediu que `sobre.astro` fosse citado aqui. O 045 **corrigiu** o esticamento a 768 px (`sobre.astro:205-207`, `:last-child:nth-child(odd) { grid-column: 1 / -1 }` — observado no navegador: célula 3 em `[31, 691]`), mas **não** o `padding-right`, que segue faltando nas duas rotas. Não viola o §6.1, que não legisla essa faixa |
+| **Páginas acima do "alvo < 150" linhas do §10.4 do PRD:** `src/pages/index.astro` com 181, `src/pages/sobre.astro` com 217, `src/pages/ensino/[slug].astro` com 163 (era 146; a seção "Scripts da disciplina" e o cabeçalho atualizado somaram 17, desde o 049) e **`src/pages/ensino.astro` com 155, desde o 047** (medição completa das quatro feita pelo 053 em 2026-09-23, `wc -l`) | **Nenhum plano ainda** — candidato a plano próprio de extração | Julgado nas revisões do 044 e do 045 como **alvo excedido, não invariante violado**: o §10.4 escreve "Alvo", única linha daquela tabela com hedge (as demais dizem "proibido"). No 044, 29 das 181 linhas são o cabeçalho §10.1 obrigatório e 27 o `<style>`; no 045, 27 são o cabeçalho e 48 o `<style>`, restando ~142 de marcação e lógica. **Correção de numeração feita em 2026-09-18:** esta linha dizia que a faixa de células "reaparece no §6.2 (plano 046)" — o §6.2 é o **045**, já executado, e a faixa agora existe em **três cópias** (`SiteFooter.astro`, `index.astro`, `sobre.astro`). **Fecha quando:** um plano próprio extrair a faixa de células e os demais trechos repetidos das quatro rotas |
 | Tailwind 4 varre `plans/` e `docs/` (detecção automática, `base` = raiz do projeto, `**/*`): classe citada em `.md` versionado entra no CSS publicado — `text-display-1` está em `dist/_astro/*.css` sem nenhum uso em `src/`. Canário "a classe aparece no bundle" não discrimina | **Nenhum plano ainda.** O 043 era o candidato e **não** a levou — o plano não listava `src/styles/global.css` em "Arquivos afetados", e ampliar o escopo em execução não é decisão de executor. Continua sem plano; candidato natural a plano próprio antes do 044 | Achado da revisão do 036, anotado em 2026-09-16 por decisão do stakeholder (seguir para o 037). Correção provável: `@import 'tailwindcss' source('../');` em `src/styles/global.css` (ou `@source not` para `plans/` e `docs/`), depois de confirmar que nada fora de `src/` usa classe. **Fecha quando:** o CSS gerado deixar de conter classe citada só em `.md`. Até lá, nenhum canário de CSS desta fase pode usar "a classe está no bundle" como prova |
 | **Tag-link duplica a composição visual de `Tag.astro`** — `CourseResources.astro:52-53` monta à mão a string de classes da tag neutra (`inline-flex items-center gap-1.5 border px-[0.7rem] py-[0.4rem]` + `text-rotulo` + `border-regua` + `text-secundario`), em vez de usar o componente | **Nenhum plano ainda** | Achado da revisão do 048 e **julgado legítimo**: o §5.4 pede a aparência de tag neutra, mas `Tag.astro` renderiza `<span>` e a regra da fase exige que todo link externo saia por `ExternalLink.astro` (`<a>`). A alternativa correta — dar a `Tag.astro` uma variante de link — exigiria editar arquivo fora da lista de "Arquivos afetados" do 048, o que o plano proíbe. A cópia **bate byte a byte** com o que `Tag.astro:53-59` compõe hoje, e é isso que pode derivar. **Fecha quando:** um plano der a `Tag.astro` a variante de link e `CourseResources.astro` passar a usá-la |
 | **O script que regenera a Evidência apaga inserções do orquestrador** | **Nenhum plano — é regra de processo, aplicada a partir do 049** | O padrão de executor em uso nesta fase monta a Evidência com um script que localiza o marcador `## Evidência`, **trunca o plano ali** e reescreve a seção inteira a partir dos `.txt` do scratchpad (`build_evidence2.py:149-154`, no 048), incluindo um bloco "Passo N — NÃO rodei" hardcoded. Qualquer seção que o orquestrador insira **antes** do último ciclo do executor é apagada sem aviso e sem erro. **Risco identificado por leitura do script, não incidente observado:** no 048 ele não chegou a ocorrer, porque a inserção da verificação no navegador nunca foi pedida — o despacho de correção tratou só dos obrigatórios, e a seção foi inserida depois, à mão, sobre a Evidência final. **Regra que decorre:** a seção do orquestrador entra **depois** do último ciclo do executor, ou é delegada a ele por mensagem explícita, para o script escrevê-la junto do resto (padrão do 047: um script que insere a seção lida de `navegadorNNN.md`, marca o checkbox e ajusta "O que NÃO rodei", os três de uma vez). Nunca antes. **Como detectar:** ao fim do ciclo, `grep -c '^- \[ \]' <plano>` tem de dar `0`, e `grep -n 'NÃO rodei' <plano>` não pode casar um passo que foi rodado |
+
+## O que a fase 3 empurra adiante, e as dívidas que ela criou
+
+Igual ao README da fase 2: destino nomeado, não conserto de passagem. Nenhum item abaixo foi
+tocado por este plano — o 053 não edita `src/`.
+
+**Para a fase 4 (Internacionalização):**
+
+- as rotas `/en`, com `en.ts` implementando o tipo `UiStrings` que `src/i18n/pt.ts` já exporta
+  (decisão do fatiamento, ver "Decisões tomadas no fatiamento" acima);
+- o seletor de idioma, no espaço reservado do cabeçalho desde o 042;
+- `lang` por árvore de conteúdo (RN-06), incluindo o utilitário de fallback por campo.
+
+**Para a fase 5 (Polimento e entrega):**
+
+- imagens sem dimensões e sem otimização — `foto` (perfil) e `imagem` (onde existir) são
+  renderizadas com `<img>` cru, sem `width`/`height` nem `astro:assets`;
+- SEO completo: canonical, Open Graph, favicon (RF-30), e a remoção do `noindex` que mantém o site
+  fora de indexação enquanto está em construção;
+- auditoria de acessibilidade com axe-core (zero violações críticas) e Lighthouse mobile (M-04,
+  M-05) — nenhuma rodada nesta fase.
+
+**Dívidas sem fase, criadas ou herdadas por este plano — cada achado abaixo foi conferido contra a
+Evidência do plano que o registrou, não contra o resumo dela:**
+
+- **`F-08` tem duas definições que não concordam** — "Imagem ausente (perfil sem foto, notícia sem
+  imagem)" no §5.4 do PRD ("Casos de Borda e Cenários de Falha", linha F-08 — conferido na fonte:
+  **não** é o §14, que é "Dependências e Premissas"; a citação `PRD.md:298` usada em README
+  anteriores **estava certa** no commit `23a003d` (`git show 23a003d:PRD.md | sed -n '298p'` mostra
+  a linha da tabela `F-08`) e ficou desatualizada porque o §0.1 do PRD ganhou linhas depois desse
+  commit, deslocando F-08 para baixo — hoje `grep -n "^| F-08\|^| F-04" PRD.md` dá F-04 em 300 e
+  F-08 em 304; por isso a âncora estável é "§5.4, linha F-08", não um número de linha), e "Campo
+  vazio não deixa rastro" em `docs/identidade-visual.md:32`. Achado da revisão do 048 (comentário de
+  `CourseResources.astro`
+  citava `F-08` para uma regra que está no §6.5) e medido de novo pelo 054, que **refutou por
+  medição** a tentativa de discriminar citação certa de citação trocada por sobreposição de
+  vocabulário — 32 das 236 citações legítimas pontuam zero, empatando com a citação errada
+  conhecida. **Contagem atual, medida em 2026-09-23** (`grep -rn "F-08" src`): **5 ocorrências** —
+  `src/components/ProjectCard.astro:10`, `src/pages/index.astro:11`, `src/pages/index.astro:87`,
+  `src/pages/sobre.astro:10` e `src/pages/sobre.astro:180`. **Fecha quando:** o dono do produto
+  emendar um dos dois documentos para que `F-08` signifique uma coisa só, e as 5 citações acima
+  forem revisadas contra a definição emendada;
+- **Ausência de teste automatizado que prove `F-08` em cada uso** — o 054 entrega a camada de
+  *existência* das citações (o identificador citado existe no PRD), não a de *pertinência* (a
+  citação é a certa para aquele trecho); essa segunda camada foi tentada e **abandonada por
+  resultado negativo**, não por falta de esforço. **Fecha quando:** existir um jeito de testar
+  pertinência que não dependa de limiar de vocabulário, ou a ambiguidade do `F-08` acima for
+  emendada e sobrar só uma regra por citação a conferir manualmente na revisão;
+- **`pt.home.noneYet` é semanticamente errado para a célula de Ensino** — ver a tabela "Dívidas
+  herdadas" acima, achado da revisão do 044. **Fecha quando:** o §6.1 da identidade for emendado
+  para distinguir a célula de Ensino, e o plano da rota seguir a emenda;
+- **Páginas acima do "alvo < 150" linhas do §10.4** — **quatro, não três, medidas em 2026-09-23**
+  (`wc -l`): `index.astro` 181, `sobre.astro` 217, `ensino/[slug].astro` 163 e **`ensino.astro`
+  155**, esta última desde o 047 (a tabela "Dívidas herdadas" acima ainda listava só as três
+  primeiras). **Fecha quando:** um plano próprio extrair a faixa de células e outros trechos
+  repetidos das quatro rotas;
+- **Faixa de células não uniformizada com o rodapé** (`padding-right` faltando em `index.astro` e
+  `sobre.astro`) — redirecionada por decisão do stakeholder em 2026-09-23 para o mesmo destino do
+  item acima: **fecha quando** um plano próprio extrair a faixa de células das três cópias
+  (`SiteFooter.astro`, `index.astro`, `sobre.astro`) e uniformizar o `padding-right` com o rodapé;
+- **Tailwind 4 varre `plans/` e `docs/`** e publica classe citada só em Markdown — ver a tabela
+  "Dívidas herdadas" acima, achado da revisão do 036. **Fecha quando:** o CSS gerado deixar de
+  conter classe citada só em `.md`;
+- **`pt.research.eyebrow` está no dicionário (`src/i18n/pt.ts:108`) e não é usado por rota
+  nenhuma** — `pesquisa.astro` passa `pt.research.summary(lines.length, projects.length)` para a
+  prop `eyebrow` do `PageHeader` (plano 046), não `pt.research.eyebrow`. Confirmado por `grep`:
+  zero ocorrências de `research.eyebrow` fora de `src/i18n/pt.ts`. **Fecha quando:** um plano
+  decidir entre remover a chave do dicionário ou usá-la (por exemplo, como `aria-label`);
+- **Tag-link duplica a composição visual de `Tag.astro`** — ver a tabela "Dívidas herdadas" acima,
+  achado da revisão do 048. **Fecha quando:** um plano der a `Tag.astro` a variante de link e
+  `CourseResources.astro` passar a usá-la;
+- **Grade de projetos usa `auto-fill`, deixando trilhas vazias com poucos cards** — a 1440 px, com
+  dois cards, a grade `repeat(auto-fill, minmax(17rem, 1fr))` ocupa ~43% da largura e o resto fica
+  vazio (medido na Evidência do 046, ~425-430). **O código está certo** — o §6.3 de
+  `docs/identidade-visual.md` prescreve `auto-fill` literalmente, conferido na fonte, não inferido —
+  e o que falta é o dono do produto confirmar essa leitura ou emendar o §6.3 para `auto-fit` (que
+  esticaria os cards em vez de deixar trilha vazia). **Fecha quando:** o dono do produto confirmar o
+  `auto-fill` como decisão final ou emendar o §6.3 para `auto-fit`, e o código acompanhar a emenda;
+- **Ramo `noPrevious` da página Ensino sem canário** — achado da revisão do 047: o passo 4 do plano
+  pedia canário de estado vazio no singular, e só o ramo `current = []` ("Nenhuma disciplina neste
+  semestre.") foi exercitado; o ramo `previous = []` ("Nenhuma disciplina anterior.") nunca foi
+  provado por falsificação, só por leitura do componente. Não é critério afrouxado — o critério
+  pedia um canário, no singular, e foi cumprido; é lacuna de cobertura registrada como dívida.
+  **Fecha quando:** um teste ou canário exercitar `previous = []` e mostrar a caixa tracejada de
+  "Nenhuma disciplina anterior." aparecendo, com o `<h2>` "Anteriores" preservado;
+- **Dívida 7(b)** (`tests/content/paridade-schema.test.ts`) — o comentário foi corrigido neste
+  plano (053) para não citar mais "fase 3" como o guarda. **Fecha quando:** nascer um campo com
+  `list: true` **e** `options`;
+- **Q-RN02, opção (c)** — o stakeholder decidiu, em 2026-09-14, criar um campo de data de cadastro
+  numa fase que possa mudar o schema; até lá vale a ordenação alfabética provisória de
+  `compareWithinYear` (plano 040). Nota registrada na RN-02 do §5.3 do PRD por este plano. **Fecha
+  quando:** um plano de schema criar o campo e `compareWithinYear` passar a usá-lo;
+- **Workers Builds não disparou para o commit `db719f4`** (docs-only, promoção do 052) — o único
+  *check run* do commit é `qualidade` (CI), `success`; não existe *check run* de Workers Builds
+  para ele (confirmado via `gh api .../commits/db719f4.../check-runs`). **A hipótese óbvia — a
+  Cloudflare pula o build quando o diff é só documentação — está refutada:** o commit seguinte,
+  `c1ca1c1` (também docs-only, só `README.md`), **disparou** o Workers Builds normalmente, com
+  `success` (mesmo `gh api`, conferido em 2026-09-23). Fato: dois commits docs-only consecutivos, um
+  disparou e o outro não. Causa **desconhecida** — não é filtro por caminho, e não foi investigada
+  além disso. **Fecha quando:** a causa for identificada (por exemplo, lendo a documentação da
+  Cloudflare sobre concorrência ou *debounce* de builds) ou o fenômeno se repetir e alguém
+  investigar na hora.
+
+**Achado do 053 que não é dívida** — a 360 px, na página de disciplina, o código do painel de
+script (`<pre>` do `<Code>` do Shiki) rola **dentro de si mesmo** (`overflow-x: auto`,
+`tabindex="0"`), não a página: `document.documentElement.scrollWidth` continua igual ao
+`clientWidth`. É o comportamento medido também no 049 ("a 360 px quem rola é o bloco de código, não
+a página") e é o que o RF-26 exige — registrado aqui só para não parecer que a tabela do passo 2
+escondeu um caso de rolagem horizontal.
 
 ## Armadilha de canário achada no 045 — `grep -c` não conta ocorrências
 
