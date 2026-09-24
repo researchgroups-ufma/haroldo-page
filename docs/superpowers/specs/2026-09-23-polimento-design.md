@@ -98,3 +98,34 @@ Cada achado é **reproduzido antes de corrigido** (a auditoria indicou onde olha
   - Tab em Publicações não entra em ano fechado; skip link leva o teclado para dentro do cartão.
   - Rede: nenhum `/favicon.ico` 404; GSAP ausente a 360 px.
 - Pendência documental a registrar no fim: PRD (RF-20, RF-21, RF-23, RF-24, RF-25, §7.3) e `docs/identidade-visual.md` (§5, §6) ainda descrevem o layout anterior.
+
+## Resultado (2026-09-24)
+
+Executado na branch `design`, a partir de `e167646`, em modo nativo (`superpowers:executing-plans`).
+
+| Task | Commit | O quê |
+|---|---|---|
+| 1 | `ffb5304` | Fundação: `--coluna-rotulo`, `text-nav`, `link-sublinhado`, `PageHeader` compacto; Sobre compactada |
+| 2 | `f66d076` | `groupProjectsByLine` (TDD, canário RN-01) |
+| 3 | `355f34d` | Pesquisa com projetos dentro de cada linha e "Outros projetos"; saem `ProjectCard`, `Tag`, `text-numeral` |
+| 4 | `a758012` | 404 na linguagem nova; sai `PillButton` |
+| 5 | `407ef82` | View Transitions entre documentos (nome, menu, conteúdo) |
+| 6 | `f41556a` | Acessibilidade: anos fechados `inert`, `<main tabindex="-1">`, níveis de título, `alt` do retrato, movimento reduzido no trilho |
+| 7 | `2c4d179` | GSAP por `import()`, preload do Archivo 300, cache imutável de `/_astro/*`, favicon, `theme-color`, dimensões da foto |
+| 8 | `6605226` | Remoção de textos, funções e testes órfãos |
+
+**Suíte (2026-09-24):** `npm run test:coverage` → 258 testes, 100% de statements, branches, funções e linhas; `npm run test:dist` → 12 testes; `npm run lint` sem erro; `npm run build:pipeline` → `astro check` 0 erros e 0 avisos, 8 páginas.
+
+**Navegador (Vivaldi):** as 8 rotas a 1440×800, 1366×650 e 360×700 sem rolagem horizontal; Home e Sobre sem rolagem vertical a 1440×800 e 1366×650. Percurso por cliques reais Home → Sobre → Ensino → Relatividade Geral → Publicações → Início: 7 de 9 navegações com transição; as outras 2 caíram no fallback (navegação comum com a animação de entrada). O navegador também pula a transição quando a aba está em segundo plano. Skip link + PageDown rolam o conteúdo; em Publicações, só os links do ano aberto são focáveis; a 360 px o GSAP não é baixado; nenhuma requisição a `/favicon.ico`.
+
+**Decisões tomadas na execução:**
+
+- Sobre a 1366×650 ganhou 46 px de rolagem com o cabeçalho novo. Por decisão do stakeholder, a página foi compactada (grade 6/6, timelines mais juntas), mantendo `PageHeader` e `--coluna-rotulo`.
+- `pt.publications.type` fica sem uso na interface, com o teste de paridade, por decisão do stakeholder.
+- O teste "GSAP sob demanda" do plano procurava a palavra `ScrollTrigger`, que aparece no caminho do `import()` do próprio script da página. Passou a procurar o código da biblioteca (`scrollerProxy`) nos scripts do HTML e nos imports estáticos deles. O canário com o import estático antigo reprova.
+
+**Pendente:**
+
+- PRD (RF-20, RF-21, RF-23, RF-24, RF-25, §7.3) e `docs/identidade-visual.md` (§5, §6) ainda descrevem o layout anterior.
+- Open Graph e canonical: fase 5 (RF-30).
+- Migração da mídia para `astro:assets`: fora do escopo.
