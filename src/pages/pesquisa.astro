@@ -16,7 +16,7 @@
  *  Versão       : 0.3.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
- *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs, padCount),
+ *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
  *                 src/lib/published.ts (filterPublished),
  *                 src/lib/research.ts (sortResearchLines, sortProjects,
  *                 groupProjectsByLine), astro:content
@@ -33,7 +33,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { pt } from '../i18n/pt';
-import { padCount, toParagraphs } from '../lib/text';
+import { toParagraphs } from '../lib/text';
 import { filterPublished } from '../lib/published';
 import { groupProjectsByLine, sortProjects, sortResearchLines } from '../lib/research';
 
@@ -52,16 +52,13 @@ const period = (p: (typeof projects)[number]) =>
 
   <div class="px-margem pb-10">
     {
-      lines.map((line, index) => {
+      lines.map((line) => {
         const paragraphs = [...toParagraphs(line.data.resumo), ...toParagraphs(line.data.corpo)];
         const lineProjects = byLine.get(line.id) ?? [];
         return (
           <section id={line.id} aria-labelledby={`${line.id}-titulo`} class="linha-pesquisa py-8">
             <div class="grid gap-x-8 gap-y-2 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
-              <span aria-hidden="true" class="text-pequeno text-secundario lg:pt-3">
-                {padCount(index + 1)}
-              </span>
-              <div>
+              <div class="lg:col-start-2">
                 <h2 id={`${line.id}-titulo`} class="text-display-2">
                   {line.data.titulo}
                 </h2>

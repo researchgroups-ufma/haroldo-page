@@ -30,11 +30,6 @@
 import type { disciplinasSchema, projetosSchema, publicacoesSchema } from '../content.config';
 import type { z } from 'astro/zod';
 
-/** Devolve `singular` quando `n === 1`, senão `plural` — inclui `n === 0`. */
-function plural(n: number, singular: string, plural_: string): string {
-  return n === 1 ? singular : plural_;
-}
-
 /** Rótulo de `research.status`, chaves iguais a `projetosSchema.shape.status` (§10.4). */
 type ProjetoStatus = NonNullable<z.infer<typeof projetosSchema>['status']>;
 
@@ -147,7 +142,6 @@ export const pt = {
     openFile: 'Abrir arquivo',
   },
   publications: {
-    eyebrow: (n: number) => `${n} ${plural(n, 'item', 'itens')}`,
     title: 'Publicações',
     type: {
       artigo: 'Artigo',

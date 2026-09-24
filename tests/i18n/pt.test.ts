@@ -38,14 +38,6 @@ describe('pt.script', () => {
   });
 });
 
-describe('pt.publications — função de plural', () => {
-  it('eyebrow com 0, 1 e 2', () => {
-    expect(pt.publications.eyebrow(0)).toBe('0 itens');
-    expect(pt.publications.eyebrow(1)).toBe('1 item');
-    expect(pt.publications.eyebrow(2)).toBe('2 itens');
-  });
-});
-
 describe('pt — nenhuma string folha vazia', () => {
   it('percorre o dicionário inteiro sem achar string vazia', () => {
     const leaves = collectLeafStrings(pt);
