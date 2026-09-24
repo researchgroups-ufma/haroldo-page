@@ -433,3 +433,28 @@ describe('cabeçalho de página fora da área que rola', () => {
     }
   });
 });
+
+describe('sublinhado que segue o cursor (link-traco) no menu e no contato', () => {
+  /** Tags <a> de um trecho de HTML. */
+  const anchors = (trecho: string) => trecho.match(/<a [^>]*>[\s\S]*?<\/a>/g) ?? [];
+
+  it('todo link do menu principal usa link-traco', () => {
+    for (const file of listSiteHtmlFiles()) {
+      const html = readFileSync(file, 'utf-8');
+      const nav = html.match(/<nav aria-label="Navegação principal"[\s\S]*?<\/nav>/)?.[0] ?? '';
+      const links = anchors(nav);
+      expect(links.length, file).toBeGreaterThan(0);
+      for (const link of links) expect(link, file).toContain('link-traco');
+    }
+  });
+
+  it('todo link do contato (Home e Sobre) usa link-traco', () => {
+    for (const rota of ['', 'sobre']) {
+      const html = readFileSync(join(distDir, rota, 'index.html'), 'utf-8');
+      const bloco = html.match(/<p[^>]*>(?:(?!<\/p>)[\s\S])*?mailto:[\s\S]*?<\/p>/)?.[0] ?? '';
+      const links = anchors(bloco);
+      expect(links.length, rota).toBeGreaterThan(1);
+      for (const link of links) expect(link, rota).toContain('link-traco');
+    }
+  });
+});

@@ -67,12 +67,10 @@ const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
                     <a
                       href={item.href}
                       aria-current={active ? 'page' : undefined}
-                      class:list={[
-                        'link-sublinhado text-nav flex min-h-11 items-center justify-between gap-2 lg:inline-flex lg:min-h-0',
-                        active && 'underline decoration-1 underline-offset-[6px]',
-                      ]}
+                      class="text-nav flex min-h-11 items-center justify-between gap-2 lg:inline-flex lg:min-h-0"
                     >
-                      {pt.nav[item.key]}
+                      {/* O traço fica no rótulo, não na linha inteira do menu do celular. */}
+                      <span class="link-traco">{pt.nav[item.key]}</span>
                       <span aria-hidden="true" class="lg:hidden">
                         ›
                       </span>

@@ -132,8 +132,10 @@ Todos em `src/components/`. Não existem mais botão pílula, tag nem rodapé: `
 - Nome de exibição (`siteConfig.displayName`, "Haroldo Lima") em `display-2`, link para `/`; à
   direita a navegação em `text-nav` (Sobre, Pesquisa, Ensino, Publicações — `NAV_ITEMS` sem
   "Início", como na Home: a volta para `/` é sempre o nome).
-- Página ativa: sublinhado de 1 px deslocado 6 px e `aria-current="page"`; o hover faz o mesmo
-  sublinhado (`link-sublinhado`). A página de disciplina marca "Ensino".
+- Página ativa: traço de 1 px sob o rótulo e `aria-current="page"`. No hover, o traço **segue o
+  cursor** (`link-traco`): nasce no ponto por onde o ponteiro entrou e recolhe em direção ao ponto
+  por onde saiu. O mesmo vale para o menu da Home e para os links de contato (Home e Sobre), que
+  não têm sublinhado em repouso. A página de disciplina marca "Ensino".
 - Abaixo de `lg`: botão "Menu" (alvo ≥ 44 px, `aria-expanded`/`aria-controls`) que abre a lista
   com réguas; sem JS, a lista aparece aberta.
 - **Fase 4:** o lugar do seletor de idioma (RF-29) está marcado por um comentário entre o nome e o
@@ -273,7 +275,12 @@ páginas" com as cinco rotas de `NAV_ITEMS`, "Início" primeiro. Gerado como `40
   rolagem percorre os itens do ano aberto; ao fim, o ano fecha e o seguinte abre. O GSAP é baixado
   por `import()` **só** quando `(min-width: 64rem) and (prefers-reduced-motion: no-preference)`
   vale. Ano fechado recebe `inert`: sai do Tab e do leitor de tela.
-- **Resposta a ação:** sublinhado no hover, troca de aba e menu do celular (150 ms), "Copiado".
+- **Sublinhado que segue o cursor** (`.link-traco`, menu e contato): `::after` de 1 px com
+  `scaleX` — entra em 300 ms desacelerando e sai em 250 ms acelerando, com `transform-origin` em
+  `--origem`, que um script curto do `BaseLayout` grava no `pointerenter`/`pointerleave`. Sem JS, o
+  traço cresce a partir do centro. Recriado do bloco `gsap-fillable-button` (variante `link`) da
+  PaceUI, sem React e sem GSAP.
+- **Resposta a ação:** sublinhado no hover dos demais links, troca de aba e menu do celular (150 ms), "Copiado".
 - `@media (prefers-reduced-motion: reduce)`: animações, transições e `::view-transition-*`
   zeradas; o clique no trilho da barra de rolagem vai direto, sem rolagem suave.
 

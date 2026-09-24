@@ -9,6 +9,8 @@
  *                 tamanho da tela, com o cabeçalho do site e o da página
  *                 (slot `cabecalho`) parados, e só o conteúdo (`#conteudo`)
  *                 rolando por dentro a partir de `lg` — a página nunca rola.
+ *                 Um script curto dá ao `.link-traco` (menu e contato) o ponto
+ *                 de onde o sublinhado nasce e para onde recolhe.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
  *  Atualizado em: 2026-09-24
@@ -101,3 +103,20 @@ const pageTitle =
     </div>
   </body>
 </html>
+
+<script>
+  // Sublinhado que segue o cursor (`.link-traco`, global.css): grava em `--origem` o ponto, em %,
+  // por onde o ponteiro entrou ou saiu do link, para o traço nascer e recolher dali.
+  for (const link of document.querySelectorAll<HTMLElement>('a.link-traco, a:has(> .link-traco)')) {
+    const traco = link.matches('.link-traco')
+      ? link
+      : (link.querySelector(':scope > .link-traco') as HTMLElement);
+    const marcar = (event: PointerEvent) => {
+      const { left, width } = traco.getBoundingClientRect();
+      const x = Math.min(100, Math.max(0, ((event.clientX - left) / width) * 100));
+      link.style.setProperty('--origem', `${x}%`);
+    };
+    link.addEventListener('pointerenter', marcar);
+    link.addEventListener('pointerleave', marcar);
+  }
+</script>

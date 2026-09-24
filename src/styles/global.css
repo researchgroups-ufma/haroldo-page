@@ -191,6 +191,35 @@
   }
 }
 
+/* Sublinhado que segue o cursor (menu e links de contato): um traço de 1px que nasce no ponto por
+   onde o ponteiro entrou e recolhe em direção ao ponto por onde saiu. O ponto vem em `--origem`,
+   gravado pelo script do BaseLayout; sem JS, o traço cresce e recolhe a partir do centro. Com
+   movimento reduzido, a regra global zera a transição e o traço só aparece e some. */
+.link-traco {
+  position: relative;
+  text-decoration: none;
+}
+.link-traco::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: var(--origem, 50%) center;
+  /* Saída: 250ms acelerando (power2.in). */
+  transition: transform 250ms cubic-bezier(0.32, 0, 0.67, 0);
+}
+a.link-traco:is(:hover, :focus-visible)::after,
+a:is(:hover, :focus-visible) > .link-traco::after,
+[aria-current='page'] > .link-traco::after {
+  transform: scaleX(1);
+  /* Entrada: 300ms desacelerando (power2.out). */
+  transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
 /* Transições entre páginas (View Transitions entre documentos, só CSS). O cartão fica parado, o
    nome e o menu migram entre a Home e o cabeçalho, e o conteúdo troca com um fade curto.
    Navegador sem suporte navega normalmente. */

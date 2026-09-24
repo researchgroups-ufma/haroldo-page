@@ -104,10 +104,10 @@ const timelines: Timeline[] = [
       <div class="text-pequeno">
         <h2 class="text-rotulo text-secundario">{pt.about.contact}</h2>
         <p class="mt-2 flex flex-wrap gap-x-5 gap-y-1">
-          <a href={`mailto:${perfil.email}`} class="underline">{perfil.email}</a>
+          <a href={`mailto:${perfil.email}`} class="link-traco">{perfil.email}</a>
           {
             links.map((link) => (
-              <ExternalLink href={link.href} class="underline">
+              <ExternalLink href={link.href} class="link-traco">
                 {link.label}
               </ExternalLink>
             ))
