@@ -4,7 +4,7 @@
  *  Arquivo      : [slug].astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Página de disciplina do site público (RF-24, F-06, RN-04,
- *                 RF-37, F-13): trilha de navegação, cabeçalho com código,
+ *                 RF-37, F-13): seta de volta para Ensino, cabeçalho com código,
  *                 semestre, status, descrição e ementa, e as seções da
  *                 disciplina em abas — aulas na ordem do professor (estado
  *                 vazio explícito, scripts por aula), "Scripts da
@@ -84,15 +84,7 @@ const lessons = data.aulas ?? [];
 ---
 
 <BaseLayout title={data.nome}>
-  <nav aria-label={pt.course.breadcrumbLabel} class="px-margem pt-6">
-    <a href="/ensino/" class="text-pequeno text-secundario underline">
-      {pt.course.breadcrumb}
-    </a>
-    <span aria-hidden="true" class="text-pequeno text-secundario"> / </span>
-    <span class="text-pequeno text-secundario">{data.codigo ?? data.nome}</span>
-  </nav>
-
-  <PageHeader title={data.nome} meta={meta}>
+  <PageHeader title={data.nome} meta={meta} back={{ href: '/ensino/', label: pt.course.back }}>
     <Fragment slot="aside">
       {descriptionParagraphs.map((paragraph) => <p class="text-corpo">{paragraph}</p>)}
       {

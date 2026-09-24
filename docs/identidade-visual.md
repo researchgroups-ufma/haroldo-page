@@ -142,7 +142,10 @@ Todos em `src/components/`. Não existem mais botão pílula, tag nem rodapé: `
 
 `<h1>` em `display-2`, linha opcional `meta` em `pequeno`/`--secundario` **abaixo** do título
 (disciplina: "FIS0000 · 2026.2 · Atual"; 404: "Erro 404") e a régua forte. Sem rubrica e sem
-contagem. O slot `aside` ocupa a coluna direita a partir de `lg` (usado pela disciplina).
+contagem. O slot `aside` ocupa a coluna direita a partir de `lg`, alinhado pelo topo (usado pela
+disciplina). A prop `back` põe uma **seta de volta** à esquerda do título: traço de 1 px (a espessura
+das réguas) com altura de meio `em` do título, em `--secundario`; no hover fica `--tinta` e recua
+4 px. É um link com nome acessível ("Voltar para Ensino") e alvo de toque ≥ 44 px.
 
 ### 5.3 Linha de lista
 
@@ -215,8 +218,9 @@ nativa, fina, nas cores do site.
 
 ### 6.5 Disciplina `/ensino/[slug]` (RF-24, RF-37, F-06, F-13)
 
-- Trilha "Ensino / **codigo** (ou **nome**)"; `PageHeader` com **nome** e meta "**codigo** ·
-  **semestre** · Atual/Anterior"; à direita **descricao** e **ementa**.
+- `PageHeader` com a seta de volta para `/ensino/`, o **nome** na mesma posição do título das outras
+  páginas e meta "**codigo** · **semestre** · Atual/Anterior"; à direita **descricao** e **ementa**.
+  Sem trilha de navegação.
 - As seções viram **abas** (melhoria progressiva: sem JS ficam empilhadas com os títulos; o `#id`
   da URL escolhe a aba): Aulas, Scripts da disciplina, Listas de exercícios, Materiais
   complementares, Bibliografia, Links — só as presentes, **sem contagem** no rótulo.

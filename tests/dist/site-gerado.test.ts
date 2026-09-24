@@ -385,3 +385,23 @@ describe('navegação principal sem "Início"', () => {
     }
   });
 });
+
+describe('página de disciplina: seta de volta no lugar da trilha', () => {
+  it('sem "Trilha de navegação"; um link "Voltar para Ensino" para /ensino/ antes do <h1>', () => {
+    const ensinoDir = join(distDir, 'ensino');
+    const pages = readdirSync(ensinoDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => join(ensinoDir, entry.name, 'index.html'));
+    expect(pages.length).toBeGreaterThan(0);
+    for (const file of pages) {
+      const html = readFileSync(file, 'utf-8');
+      expect(html.includes('Trilha de navegação'), `${file} ainda tem a trilha`).toBe(false);
+      const backTag = html.match(/<a [^>]*aria-label="Voltar para Ensino"[^>]*>/)?.[0];
+      expect(backTag, `${file} sem a seta de volta`).toBeDefined();
+      expect(backTag, file).toContain('href="/ensino/"');
+      expect(html.indexOf(backTag as string), `${file}: a seta vem antes do <h1>`).toBeLessThan(
+        html.indexOf('<h1'),
+      );
+    }
+  });
+});

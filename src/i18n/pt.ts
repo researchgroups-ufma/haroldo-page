@@ -104,8 +104,7 @@ export const pt = {
     latestLesson: 'Última aula',
   },
   course: {
-    breadcrumb: 'Ensino',
-    breadcrumbLabel: 'Trilha de navegação',
+    back: 'Voltar para Ensino',
     status: {
       atual: 'Atual',
       anterior: 'Anterior',

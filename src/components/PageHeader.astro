@@ -7,21 +7,25 @@
  *                 `text-display-2`, linha opcional de identificação abaixo
  *                 (`meta`) e a régua forte que carrega o único movimento
  *                 orquestrado do site (RF-32, §7). Sem rubrica e sem contagens.
- *                 Slot `aside` opcional compõe a coluna direita a partir de `lg`.
+ *                 Seta opcional de volta (`back`) à esquerda do título, e slot
+ *                 `aside` opcional que compõe a coluna direita a partir de `lg`.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
  *  Atualizado em: 2026-09-24
- *  Versão       : 0.3.0
+ *  Versão       : 0.4.0
  *
  *  Dependências : src/styles/global.css (classes `regua-entrada`/`titulo-entrada`
  *                 do plano 036, tokens `--color-tinta`/`--color-secundario`)
- *  Entradas     : props `title`, `meta` (opcional); slot nomeado `aside` (opcional)
- *  Saídas       : `<div>` com título (+ meta, + coluna `aside`) e a régua forte
+ *  Entradas     : props `title`, `meta` (opcional), `back` (opcional); slot
+ *                 nomeado `aside` (opcional)
+ *  Saídas       : `<div>` com título (+ seta, + meta, + coluna `aside`) e a régua forte
  *  Uso          : import PageHeader from '../components/PageHeader.astro'
  *
- *  Notas        : não declara animação própria — usa as classes de entrada do
+ *  Notas        : não declara animação de entrada própria — usa as classes do
  *                 `global.css`, que só animam dentro de
  *                 `prefers-reduced-motion: no-preference` (§7 da identidade / §8.2 do PRD).
+ *                 A seta é um traço de 1 px, a espessura das réguas, medido em
+ *                 `em` para acompanhar o tamanho fluido do título.
  * ============================================================================
  */
 export interface Props {
@@ -29,18 +33,41 @@ export interface Props {
   title: string;
   /** Linha pequena de identificação abaixo do título (ex.: "FIS0000 · 2026.2 · Atual"). Ausente = nada. */
   meta?: string;
+  /** Seta de volta à esquerda do título: destino e nome acessível (ex.: "Voltar para Ensino"). Ausente = nada. */
+  back?: { href: string; label: string };
 }
 
-const { title, meta } = Astro.props;
+const { title, meta, back } = Astro.props;
 // Sem slot `aside`, o título ocupa a largura inteira — sem grade nem coluna vazia.
 const hasAside = Astro.slots.has('aside');
 ---
 
 {/* `shrink-0`: dentro do <main> flex que rola, o cabeçalho não pode ser encolhido. */}
 <div class="px-margem shrink-0 pt-6 lg:pt-8">
-  <div class:list={['grid gap-x-8 gap-y-4 pb-6', hasAside && 'lg:grid-cols-12 lg:items-end']}>
+  <div class:list={['grid gap-x-8 gap-y-4 pb-6', hasAside && 'lg:grid-cols-12 lg:items-start']}>
     <div class:list={[hasAside && 'lg:col-span-7']}>
-      <h1 class="text-display-2 titulo-entrada">{title}</h1>
+      <div class="flex items-center gap-3 sm:gap-4">
+        {
+          back && (
+            <a
+              href={back.href}
+              aria-label={back.label}
+              class="seta-voltar text-display-2 text-secundario titulo-entrada -mx-3 -my-4 shrink-0 px-3 py-4"
+            >
+              <svg aria-hidden="true" viewBox="0 0 28 16" class="h-[0.5em] w-auto">
+                <path
+                  d="M27 8H1.5M8.5 1 1.5 8l7 7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1"
+                  vector-effect="non-scaling-stroke"
+                />
+              </svg>
+            </a>
+          )
+        }
+        <h1 class="text-display-2 titulo-entrada">{title}</h1>
+      </div>
       {meta && <p class="text-pequeno text-secundario mt-2">{meta}</p>}
     </div>
     {
@@ -53,3 +80,17 @@ const hasAside = Astro.slots.has('aside');
   </div>
   <div aria-hidden="true" class="regua-entrada bg-tinta h-px"></div>
 </div>
+
+<style>
+  /* Hover: a seta escurece para a tinta e recua 4px, apontando o caminho. Com movimento
+     reduzido, a regra global zera a transição e só a cor muda. */
+  .seta-voltar svg {
+    transition: transform 150ms ease-out;
+  }
+  .seta-voltar:hover {
+    color: var(--color-tinta);
+  }
+  .seta-voltar:hover svg {
+    transform: translateX(-4px);
+  }
+</style>
