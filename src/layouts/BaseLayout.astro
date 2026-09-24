@@ -6,8 +6,9 @@
  *  Descrição    : Layout que toda rota pública usa — casca HTML (`lang`,
  *                 `<title>` pelo dicionário, meta description), link "Pular
  *                 para o conteúdo" (§8.3) e a moldura do site: um cartão do
- *                 tamanho da tela, com o cabeçalho dentro e o `<main>` rolando
- *                 por dentro a partir de `lg` — a página em si nunca rola.
+ *                 tamanho da tela, com o cabeçalho do site e o da página
+ *                 (slot `cabecalho`) parados, e só o conteúdo (`#conteudo`)
+ *                 rolando por dentro a partir de `lg` — a página nunca rola.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
  *  Atualizado em: 2026-09-24
@@ -16,7 +17,7 @@
  *  Dependências : src/lib/config.ts (siteConfig), src/i18n/pt.ts,
  *                 src/components/SiteHeader.astro, src/components/ScrollBar.astro,
  *                 src/styles/global.css, @fontsource/archivo (preload do peso 300)
- *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`, `bare?`; conteúdo via `<slot />`
+ *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`, `bare?`; conteúdo via `<slot />`; cabeçalho da página via `<slot name="cabecalho" />`
  *  Saídas       : documento HTML completo da rota
  *  Uso          : import BaseLayout from '../layouts/BaseLayout.astro'
  *
@@ -77,19 +78,25 @@ const pageTitle =
     <div class="px-margem mx-auto max-w-[90rem] py-4 lg:h-svh lg:py-6">
       <div class="vt-cartao bg-bloco flex flex-col rounded-2xl lg:h-full lg:overflow-hidden">
         {!bare && <SiteHeader />}
-        {
-          /* `relative`: sem ele, os `sr-only` (absolutos) escapam do `<main>` que rola e fazem a página rolar. */
-        }
-        <div class="relative flex flex-col lg:min-h-0 lg:flex-1">
-          <main
-            id="conteudo"
-            tabindex="-1"
-            class="vt-conteudo relative flex flex-col outline-none lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
-          >
-            <slot />
-          </main>
-          <ScrollBar />
-        </div>
+        <main class="vt-conteudo flex flex-col lg:min-h-0 lg:flex-1">
+          {
+            /* Cabeçalho da página (título e régua) fica parado; só o que vem depois da régua rola. */
+          }
+          <slot name="cabecalho" />
+          <div class="relative flex flex-col lg:min-h-0 lg:flex-1">
+            {
+              /* `relative`: sem ele, os `sr-only` (absolutos) escapam da área que rola e fazem a página rolar. */
+            }
+            <div
+              id="conteudo"
+              tabindex="-1"
+              class="relative flex flex-col outline-none lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+            >
+              <slot />
+            </div>
+            <ScrollBar />
+          </div>
+        </main>
       </div>
     </div>
   </body>

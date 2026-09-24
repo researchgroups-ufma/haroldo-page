@@ -47,10 +47,10 @@ const groups = groupByYear(published);
 ---
 
 <BaseLayout title={pt.publications.title}>
-  <PageHeader title={pt.publications.title} />
+  <PageHeader slot="cabecalho" title={pt.publications.title} />
 
   {
-    /* Pai em bloco: o ScrollTrigger desliga o `pinSpacing` quando o pai do pin é flex (o `<main>`). */
+    /* Pai em bloco: o ScrollTrigger desliga o `pinSpacing` quando o pai do pin é flex (o `#conteudo`). */
   }
   <div>
     <div id="pub-anos" class="px-margem">
@@ -88,8 +88,10 @@ const groups = groupByYear(published);
   .pub-ano {
     border-top: 1px solid var(--color-regua);
   }
+  /* O primeiro ano encosta na régua do cabeçalho, que já abre a lista — sem borda, para a linha
+     não dobrar de espessura. */
   .pub-ano:first-child {
-    border-top-color: var(--color-tinta);
+    border-top: 0;
   }
 </style>
 

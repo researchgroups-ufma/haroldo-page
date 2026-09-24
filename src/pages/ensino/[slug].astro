@@ -84,7 +84,12 @@ const lessons = data.aulas ?? [];
 ---
 
 <BaseLayout title={data.nome}>
-  <PageHeader title={data.nome} meta={meta} back={{ href: '/ensino/', label: pt.course.back }}>
+  <PageHeader
+    slot="cabecalho"
+    title={data.nome}
+    meta={meta}
+    back={{ href: '/ensino/', label: pt.course.back }}
+  >
     <Fragment slot="aside">
       {descriptionParagraphs.map((paragraph) => <p class="text-corpo">{paragraph}</p>)}
       {

@@ -53,7 +53,7 @@ const projectMeta = (p: (typeof projects)[number]) =>
 ---
 
 <BaseLayout title={pt.nav.research}>
-  <PageHeader title={pt.research.title} />
+  <PageHeader slot="cabecalho" title={pt.research.title} />
 
   <div class="px-margem pb-10">
     {
@@ -150,6 +150,11 @@ const projectMeta = (p: (typeof projects)[number]) =>
   /* Blocos de linha com régua forte; projetos com régua fina — padrão de lista do site. */
   .linha-pesquisa {
     border-top: 1px solid var(--color-tinta);
+  }
+  /* O primeiro bloco encosta na régua do cabeçalho, que já abre a lista — sem borda, para a linha
+     não dobrar de espessura. */
+  .linha-pesquisa:first-child {
+    border-top: 0;
   }
   .projeto-linha {
     border-top: 1px solid var(--color-regua);

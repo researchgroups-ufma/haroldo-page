@@ -102,8 +102,9 @@ Caixa alta só na **rubrica de seção** ("Atuais", "Formação acadêmica", "Ou
 
 - **Cartão contido.** O site inteiro vive num cartão `--bloco` de cantos arredondados
   (`rounded-2xl`) sobre o `--papel`, com margem `px-margem` em volta e largura máxima de `90rem`
-  (1440 px). A partir de `lg` o cartão tem a altura da janela (`h-svh`), **a página nunca rola** e
-  quem rola é o `<main id="conteudo">` dentro do cartão. Abaixo de `lg` a página rola normalmente.
+  (1440 px). A partir de `lg` o cartão tem a altura da janela (`h-svh`), **a página nunca rola**: o
+  cabeçalho do site e o cabeçalho da página (título e régua) ficam parados, e só o conteúdo depois
+  da régua (`#conteudo`) rola dentro do cartão. Abaixo de `lg` a página rola normalmente.
 - **Margem lateral** (`px-margem`): `clamp(1.25rem, 4vw, 3.5rem)`, fora e dentro do cartão.
 - **Breakpoints:** só `sm` (40rem, 640 px) e `lg` (64rem, 1024 px); os padrões do Tailwind são
   removidos. Home e Sobre usam grade de 12 colunas a partir de `lg`; o resto é coluna única.
@@ -113,7 +114,8 @@ Caixa alta só na **rubrica de seção** ("Atuais", "Formação acadêmica", "Ou
   (`--coluna-rotulo`: 11rem a partir de `sm`, 6,5rem abaixo).
 - **Réguas:** `1px solid var(--regua)` entre linhas de lista; `1px solid var(--tinta)` só para
   **abrir** um bloco (régua do cabeçalho de página, primeira linha de uma lista, topo de cada linha
-  de pesquisa). Sem sombra.
+  de pesquisa). Bloco que encosta na régua do cabeçalho não repete a borda, para a linha não dobrar.
+  Sem sombra.
 - **Ritmo:** topo do conteúdo das páginas internas `pt-6 lg:pt-8`; múltiplos de `0.5rem`.
 - **Faixa verificada:** 360 a 1440 px sem rolagem horizontal (RF-26); Home e Sobre sem rolagem
   vertical a 1440×800 e a 1366×650.
@@ -142,7 +144,7 @@ Todos em `src/components/`. Não existem mais botão pílula, tag nem rodapé: `
 
 `<h1>` em `display-2`, linha opcional `meta` em `pequeno`/`--secundario` **abaixo** do título
 (disciplina: "FIS0000 · 2026.2 · Atual"; 404: "Erro 404") e a régua forte. Sem rubrica e sem
-contagem. O slot `aside` ocupa a coluna direita a partir de `lg`, alinhado pelo topo (usado pela
+contagem. Entra no slot `cabecalho` do `BaseLayout`, fora da área que rola. O slot `aside` ocupa a coluna direita a partir de `lg`, alinhado pelo topo (usado pela
 disciplina). A prop `back` põe uma **seta de volta** à esquerda do título: traço de 1 px (a espessura
 das réguas) com altura de meio `em` do título, em `--secundario`; no hover fica `--tinta` e recua
 4 px. É um link com nome acessível ("Voltar para Ensino") e alvo de toque ≥ 44 px.

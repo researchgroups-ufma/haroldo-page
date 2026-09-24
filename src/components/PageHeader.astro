@@ -42,7 +42,10 @@ const { title, meta, back } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 ---
 
-{/* `shrink-0`: dentro do <main> flex que rola, o cabeçalho não pode ser encolhido. */}
+{
+  /* `shrink-0`: dentro do <main> flex, o cabeçalho não pode ser encolhido. Vai no slot `cabecalho` do
+   BaseLayout, fora da área que rola — o título e a régua ficam parados. */
+}
 <div class="px-margem shrink-0 pt-6 lg:pt-8">
   <div class:list={['grid gap-x-8 gap-y-4 pb-6', hasAside && 'lg:grid-cols-12 lg:items-start']}>
     <div class:list={[hasAside && 'lg:col-span-7']}>

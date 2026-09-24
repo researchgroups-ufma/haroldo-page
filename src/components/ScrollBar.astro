@@ -3,7 +3,7 @@
  * ============================================================================
  *  Arquivo      : ScrollBar.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Barra de rolagem do `<main id="conteudo">` no traço da
+ *  Descrição    : Barra de rolagem da área de conteúdo (`#conteudo`) no traço da
  *                 identidade: trilho de 1px na cor de régua e cursor fino em
  *                 tinta, que se acende e alarga enquanto a página rola ou sob
  *                 o ponteiro, e pode ser arrastado. Some quando não há o que
@@ -15,11 +15,11 @@
  *
  *  Dependências : nenhuma
  *  Entradas     : nenhuma — lê o `#conteudo` do `BaseLayout`
- *  Saídas       : trilho decorativo (`aria-hidden`) ao lado do `<main>`
- *  Uso          : dentro do contêiner `relative` que envolve o `<main>` no BaseLayout
+ *  Saídas       : trilho decorativo (`aria-hidden`) ao lado da área de conteúdo
+ *  Uso          : dentro do contêiner `relative` que envolve o `#conteudo` no BaseLayout
  *
  *  Notas        : melhoria progressiva (RNF-02) — só a partir de `lg`, onde é
- *                 o `<main>` que rola; sem JS, a barra nativa fica, fina e nas
+ *                 o `#conteudo` que rola; sem JS, a barra nativa fica, fina e nas
  *                 cores do site (global.css). Teclado, roda e toque continuam
  *                 sendo a rolagem nativa: a barra só espelha e aceita arrasto.
  * ============================================================================

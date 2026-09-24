@@ -421,3 +421,15 @@ describe('contato da Home igual ao da Sobre', () => {
     expect(contactHrefs('')).toEqual(sobre);
   });
 });
+
+describe('cabeçalho de página fora da área que rola', () => {
+  it('nas páginas internas, o <h1> vem antes do #conteudo (que rola), não dentro dele', () => {
+    for (const file of listSiteHtmlFiles()) {
+      const html = readFileSync(file, 'utf-8');
+      const scroller = html.indexOf('id="conteudo"');
+      expect(scroller, `${file} sem #conteudo`).toBeGreaterThan(-1);
+      if (file === join(distDir, 'index.html')) continue; // a Home não tem cabeçalho de página
+      expect(html.indexOf('<h1'), `${file}: <h1> dentro da área que rola`).toBeLessThan(scroller);
+    }
+  });
+});
