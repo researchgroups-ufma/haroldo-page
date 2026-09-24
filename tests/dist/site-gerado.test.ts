@@ -334,7 +334,7 @@ describe('View Transitions: nomes únicos por página', () => {
     for (const file of htmlFiles) {
       const conteudo = readFileSync(file, 'utf-8');
       for (const nome of ['vt-nome', 'vt-menu']) {
-        const count = (conteudo.match(new RegExp(`class="[^"]*\b${nome}\b`, 'g')) ?? []).length;
+        const count = (conteudo.match(new RegExp(`class="[^"]*\\b${nome}\\b`, 'g')) ?? []).length;
         expect(count, `${file}: ${count} ${nome}`).toBeLessThanOrEqual(1);
       }
       expect(conteudo.includes('vt-nome'), `${file} sem vt-nome`).toBe(true);

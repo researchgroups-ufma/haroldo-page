@@ -129,3 +129,16 @@ Executado na branch `design`, a partir de `e167646`, em modo nativo (`superpower
 - PRD (RF-20, RF-21, RF-23, RF-24, RF-25, §7.3) e `docs/identidade-visual.md` (§5, §6) ainda descrevem o layout anterior.
 - Open Graph e canonical: fase 5 (RF-30).
 - Migração da mídia para `astro:assets`: fora do escopo.
+
+**Revisão final (revisor novo, Opus):** aprovada com correções. As três importantes foram corrigidas, cada uma com RED → GREEN:
+
+1. O teste de nomes únicos de View Transition nunca reprovava: `\b` num template literal vira backspace. Corrigido para `\b`; o canário com três `vt-nome` numa página agora reprova.
+2. As timelines da Sobre usavam a coluna de 11rem também no celular (texto com 88 px a 360 px). Agora usam 6,5rem abaixo de `sm`; a 360 px o texto passa a 150 px.
+3. A descrição do projeto em Pesquisa tinha perdido a divisão em parágrafos. Voltou a usar `toParagraphs`; o canário de conteúdo com dois parágrafos gera dois `<p>`.
+
+Menores adiados:
+
+- a linha de projeto está duplicada em `pesquisa.astro`;
+- ainda há `hover:underline` sem o afastamento único em `CourseResources` e `LessonList`;
+- cabeçalhos desatualizados: `BaseLayout` (favicon e fase 5), `courses.ts` (contagens) e `public/_headers` (o comentário manda remover o arquivo na fase 5, mas ele agora também guarda o cache);
+- o §12 do PRD ainda cita `PillButton` e `Tag`.

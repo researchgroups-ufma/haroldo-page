@@ -93,9 +93,9 @@ const period = (p: (typeof projects)[number]) =>
                     </p>
                     <div>
                       <h3 class="text-titulo-item">{project.data.titulo}</h3>
-                      <p class="text-pequeno text-secundario max-w-medida mt-1">
-                        {project.data.descricao}
-                      </p>
+                      {toParagraphs(project.data.descricao).map((paragraph) => (
+                        <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
+                      ))}
                       {(project.data.financiador || project.data.colaboradores?.length) && (
                         <p class="text-pequeno text-secundario mt-1">
                           {[project.data.financiador, project.data.colaboradores?.join(', ')]
@@ -130,9 +130,9 @@ const period = (p: (typeof projects)[number]) =>
                 </p>
                 <div>
                   <h3 class="text-titulo-item">{project.data.titulo}</h3>
-                  <p class="text-pequeno text-secundario max-w-medida mt-1">
-                    {project.data.descricao}
-                  </p>
+                  {toParagraphs(project.data.descricao).map((paragraph) => (
+                    <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
+                  ))}
                   {(project.data.financiador || project.data.colaboradores?.length) && (
                     <p class="text-pequeno text-secundario mt-1">
                       {[project.data.financiador, project.data.colaboradores?.join(', ')]
