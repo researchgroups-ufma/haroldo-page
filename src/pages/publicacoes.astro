@@ -3,30 +3,30 @@
  * ============================================================================
  *  Arquivo      : publicacoes.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Página Publicações do site público (RF-25, RN-02, F-05,
- *                 §6.6 da identidade visual): publicações publicadas
- *                 agrupadas por ano, do mais recente ao mais antigo, cada uma
- *                 com tipo, título, autores (com o professor destacado),
- *                 veículo, só os links preenchidos e, recolhidos por padrão,
- *                 resumo e palavras-chave.
+ *  Descrição    : Página Publicações do site público (RF-25, RN-02, F-05):
+ *                 publicações publicadas agrupadas por ano, do mais recente
+ *                 ao mais antigo, em lista enxuta. A partir de `lg`, os anos
+ *                 viram uma sanfona guiada pela rolagem: o bloco fica fixo,
+ *                 a rolagem percorre os artigos do ano aberto e, ao fim
+ *                 deles, o ano fecha e o seguinte abre (GSAP ScrollTrigger).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-22
- *  Atualizado em: 2026-09-22
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
  *                 src/components/PublicationItem.astro, src/i18n/pt.ts,
  *                 src/lib/published.ts (filterPublished),
- *                 src/lib/publications.ts (groupByYear), astro:content (getCollection)
+ *                 src/lib/publications.ts (groupByYear), astro:content (getCollection),
+ *                 gsap (núcleo e ScrollTrigger)
  *  Entradas     : coleção `publicacoes`, já validada pelo Zod
  *  Saídas       : HTML estático da rota `/publicacoes/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/publicacoes.astro`
  *
- *  Notas        : nenhum texto de interface hardcoded — tudo vem de `pt`
- *                 (§10.4 do PRD); sem publicações publicadas, a página mostra
- *                 só o cabeçalho com "0 itens" (decisão do plano 050 — o §6.6
- *                 não legisla estado vazio) — nenhum estado vazio dedicado,
- *                 porque o dicionário não tem texto para isso.
+ *  Notas        : melhoria progressiva (RNF-02) — sem JS, abaixo de `lg` ou
+ *                 com `prefers-reduced-motion: reduce`, todos os anos ficam
+ *                 abertos e o link do ano é uma âncora comum. Nenhum texto de
+ *                 interface hardcoded — tudo vem de `pt` (§10.4 do PRD).
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
@@ -49,47 +49,135 @@ const groups = groupByYear(published);
 <BaseLayout title={pt.publications.title}>
   <PageHeader eyebrow={pt.publications.eyebrow(published.length)} title={pt.publications.title} />
 
-  <div class="px-margem mx-auto max-w-[90rem]">
-    {
-      groups.map((group) => {
-        const headingId = `ano-${group.year}`;
-        return (
-          // Coluna do ano com largura fixa: `auto` dava a cada <section> a própria grade, e a
-          // coluna variava de bloco a bloco, desalinhando as réguas entre os anos (medido no
-          // navegador, 1024–1440 px). 11rem (176px) cobre um ano de 4 dígitos em `text-ano` (teto
-          // 4,75rem ≈ 76px de fonte, medido ~159px de largura) com folga, e é igual em todo bloco
-          // — não é regra da identidade, que não fixa essa largura.
-          <section
-            aria-labelledby={headingId}
-            class="grid grid-cols-1 gap-x-8 gap-y-4 py-10 lg:grid-cols-[11rem_1fr]"
-          >
-            <h2 id={headingId} class="text-ano">
-              {group.year}
-            </h2>
-            <div>
-              {group.items.map((item, index) => (
-                <div
-                  class:list={['item-publicacao py-6', index === 0 && 'item-publicacao-primeira']}
-                >
-                  <PublicationItem publication={item} />
-                </div>
-              ))}
-            </div>
-          </section>
-        );
-      })
-    }
+  {
+    /* Pai em bloco: o ScrollTrigger desliga o `pinSpacing` quando o pai do pin é flex (o `<main>`). */
+  }
+  <div>
+    <div id="pub-anos" class="px-margem">
+      {
+        groups.map((group) => {
+          const sectionId = `ano-${group.year}`;
+          const headingId = `${sectionId}-titulo`;
+          return (
+            <section id={sectionId} aria-labelledby={headingId} class="pub-ano">
+              <h2
+                id={headingId}
+                class="flex items-baseline justify-between gap-4 py-4 lg:grid lg:grid-cols-[11rem_1fr]"
+              >
+                <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
+                  {group.year}
+                </a>
+                <span class="text-pequeno text-secundario lg:justify-self-end">
+                  {pt.publications.eyebrow(group.items.length)}
+                </span>
+              </h2>
+              <div class="pub-ano-corpo">
+                <ol class="pub-ano-lista space-y-6 pb-8 lg:pl-[11rem]">
+                  {group.items.map((item) => (
+                    <li>
+                      <PublicationItem publication={item} />
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </section>
+          );
+        })
+      }
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  /* §6.6: um bloco por ano, itens à direita separados por régua. §5.5: grade com régua no topo,
-     régua forte só na primeira linha — mesmo padrão de .disciplina-anterior em ensino.astro e
-     .linha-pesquisa em pesquisa.astro. */
-  .item-publicacao {
+  .pub-ano {
     border-top: 1px solid var(--color-regua);
   }
-  .item-publicacao-primeira {
-    border-top: 1px solid var(--color-tinta);
+  .pub-ano:first-child {
+    border-top-color: var(--color-tinta);
   }
 </style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /** Rolagem (px) gasta para fechar um ano e abrir o seguinte. */
+  const TRANSITION = 400;
+
+  const scroller = document.getElementById('conteudo');
+  const wrapper = document.getElementById('pub-anos');
+  const sections = wrapper ? [...wrapper.querySelectorAll<HTMLElement>('.pub-ano')] : [];
+
+  // Com um ano só não há o que sanfonar — a lista fica como está.
+  if (scroller && wrapper && sections.length > 1) {
+    const headers = sections.map((section) => section.querySelector('h2') as HTMLElement);
+    const bodies = sections.map(
+      (section) => section.querySelector('.pub-ano-corpo') as HTMLElement,
+    );
+    const lists = sections.map((section) => section.querySelector('.pub-ano-lista') as HTMLElement);
+    const links = sections.map(
+      (section) => section.querySelector('.pub-ano-link') as HTMLAnchorElement,
+    );
+
+    // Com o bloco fixo, o corpo aberto ocupa a altura do cartão menos os cabeçalhos dos anos.
+    const available = () =>
+      scroller.clientHeight - headers.reduce((sum, header) => sum + header.offsetHeight, 0);
+    const openHeight = (i: number) => Math.min(lists[i].offsetHeight, available());
+    const overflow = (i: number) => Math.max(0, lists[i].offsetHeight - available());
+
+    gsap.matchMedia().add('(min-width: 64rem) and (prefers-reduced-motion: no-preference)', () => {
+      gsap.set(bodies, { overflow: 'hidden' });
+
+      const timeline = gsap.timeline({ defaults: { ease: 'none' } });
+      sections.forEach((_, i) => {
+        timeline.addLabel(`ano-${i}`);
+        const over = overflow(i);
+        if (over > 0) {
+          timeline.fromTo(lists[i], { y: 0 }, { y: () => -overflow(i), duration: over });
+        }
+        if (i < sections.length - 1) {
+          // `fromTo` com funções: a cada refresh (resize, fonte carregada) as alturas são
+          // medidas de novo, sem herdar o valor animado do momento.
+          timeline
+            .fromTo(
+              bodies[i],
+              { height: () => openHeight(i) },
+              { height: 0, duration: TRANSITION, ease: 'power1.inOut' },
+            )
+            .fromTo(
+              bodies[i + 1],
+              { height: 0 },
+              { height: () => openHeight(i + 1), duration: TRANSITION, ease: 'power1.inOut' },
+              '<',
+            );
+        }
+      });
+
+      const trigger = ScrollTrigger.create({
+        trigger: wrapper,
+        scroller,
+        start: 'top top',
+        end: () => `+=${timeline.duration()}`,
+        pin: true,
+        scrub: 0.4,
+        animation: timeline,
+        invalidateOnRefresh: true,
+      });
+
+      // O link do ano leva a rolagem ao ponto em que aquele ano está aberto.
+      const onClick = (event: MouseEvent) => {
+        const i = links.indexOf(event.currentTarget as HTMLAnchorElement);
+        event.preventDefault();
+        scroller.scrollTo({
+          top: trigger.start + timeline.labels[`ano-${i}`],
+          behavior: 'smooth',
+        });
+      };
+      links.forEach((link) => link.addEventListener('click', onClick));
+
+      return () => links.forEach((link) => link.removeEventListener('click', onClick));
+    });
+  }
+</script>

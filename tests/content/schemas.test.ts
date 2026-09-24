@@ -101,6 +101,23 @@ describe('coleção perfil', () => {
     expect(resultado.success).toBe(true);
   });
 
+  it('aceita `atuacao` com cargo, instituição e período em texto livre', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      atuacao: [{ cargo: 'Professor Adjunto A', instituicao: 'UFMA', periodo: 'atual' }],
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it.each(['cargo', 'instituicao', 'periodo'] as const)(
+    'rejeita item de `atuacao` sem o campo obrigatório `%s`',
+    (campo) => {
+      const item = { cargo: 'Professor Adjunto A', instituicao: 'UFMA', periodo: 'atual' };
+      const resultado = perfilSchema.safeParse({ ...valido, atuacao: [omit(item, campo)] });
+      expect(resultado.success).toBe(false);
+    },
+  );
+
   it('aceita item sem o grupo `en` (RN-09 — português é canônico)', () => {
     expect(perfilSchema.safeParse(valido).success).toBe(true);
   });

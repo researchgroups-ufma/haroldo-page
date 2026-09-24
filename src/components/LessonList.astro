@@ -3,19 +3,18 @@
  * ============================================================================
  *  Arquivo      : LessonList.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Lista de aulas de uma disciplina (§6.5 da identidade
- *                 visual, RF-24, RN-04): número, título, descrição, data
- *                 pt-BR quando houver, link "Abrir" para o arquivo da aula e
- *                 os painéis de script agrupados sob a aula correspondente
- *                 (F-13, RF-37, plano 049).
+ *  Descrição    : Lista de aulas de uma disciplina (RF-24, RN-04), em linhas
+ *                 enxutas: número, título como link para o arquivo da aula,
+ *                 descrição, data pt-BR quando houver e os painéis de script
+ *                 agrupados sob a aula correspondente (F-13, RF-37).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-21
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/ScriptPanel.astro,
  *                 src/i18n/pt.ts, src/lib/date.ts (formatDate),
- *                 src/lib/text.ts (toParagraphs),
+ *                 src/lib/text.ts (padCount, toParagraphs),
  *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
  *  Entradas     : props `lessons` (array de aulas, já validado pelo Zod) e
  *                 `byLesson` (scripts de cada aula, mesmo índice de `lessons`,
@@ -34,7 +33,7 @@ import ExternalLink from './ExternalLink.astro';
 import ScriptPanel from './ScriptPanel.astro';
 import { pt } from '../i18n/pt';
 import { formatDate } from '../lib/date';
-import { toParagraphs } from '../lib/text';
+import { padCount, toParagraphs } from '../lib/text';
 
 export interface Props {
   /**
@@ -61,25 +60,20 @@ const { lessons, byLesson } = Astro.props;
       const scripts = byLesson[index];
       return (
         // RN-04: ordem do professor, não por número nem data — `lessons` nunca é reordenado aqui.
-        <li
-          class:list={[
-            'aula-item grid grid-cols-1 gap-2 py-6 sm:grid-cols-[4rem_1fr] sm:gap-6',
-            index === 0 && 'aula-item-primeira',
-          ]}
-        >
-          <span aria-hidden="true" class="text-numeral-sm">
-            {aula.numero}
+        <li class="aula-item grid grid-cols-[2.5rem_1fr] gap-x-4 py-4 sm:grid-cols-[3rem_1fr_auto]">
+          <span aria-hidden="true" class="text-titulo-item text-secundario">
+            {padCount(aula.numero)}
           </span>
           <div>
             <span class="sr-only">{pt.course.lessonNumber(aula.numero)}</span>
-            <h3 class="text-titulo-item">{aula.titulo}</h3>
+            <h3 class="text-titulo-item">
+              <ExternalLink href={aula.url} class="hover:underline">
+                {aula.titulo}
+              </ExternalLink>
+            </h3>
             {paragraphs.map((paragraph) => (
-              <p class="text-corpo max-w-medida mt-2">{paragraph}</p>
+              <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
             ))}
-            {aula.data && <p class="text-pequeno text-secundario mt-2">{formatDate(aula.data)}</p>}
-            <ExternalLink href={aula.url} class="text-pequeno mt-2 inline-block underline">
-              {pt.course.open}
-            </ExternalLink>
             {scripts.length > 0 && (
               <div class="mt-4 flex flex-col gap-4">
                 {scripts.map((script) => (
@@ -88,6 +82,11 @@ const { lessons, byLesson } = Astro.props;
               </div>
             )}
           </div>
+          {aula.data && (
+            <p class="text-pequeno text-secundario col-start-2 mt-1 sm:col-start-3 sm:mt-0 sm:pt-0.5">
+              {formatDate(aula.data)}
+            </p>
+          )}
         </li>
       );
     })
@@ -95,12 +94,11 @@ const { lessons, byLesson } = Astro.props;
 </ol>
 
 <style>
-  /* §5.5: grade com régua no topo, régua forte só na primeira linha — mesmo padrão de
-     .formacao-linha em sobre.astro e .linha-pesquisa em pesquisa.astro. */
+  /* Linhas com régua fina entre elas, régua forte na primeira — o padrão de lista do site. */
   .aula-item {
     border-top: 1px solid var(--color-regua);
   }
-  .aula-item-primeira {
-    border-top: 1px solid var(--color-tinta);
+  .aula-item:first-child {
+    border-top-color: var(--color-tinta);
   }
 </style>

@@ -3,19 +3,17 @@
  * ============================================================================
  *  Arquivo      : PublicationItem.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Item de uma publicação na página `/publicacoes/` (§6.6 da
- *                 identidade visual, RF-25, F-05): tags de destaque e tipo,
- *                 título, autores com o professor destacado por cor e
- *                 `<strong>`, veículo em itálico, links de DOI/arXiv/PDF só
- *                 quando preenchidos e, recolhidos por padrão, resumo e
- *                 palavras-chave.
+ *  Descrição    : Item de uma publicação na página `/publicacoes/`, no
+ *                 formato enxuto de lista de laboratório (RF-25, F-05):
+ *                 título; numa linha só, autores com o professor destacado
+ *                 por cor e `<strong>`, veículo em itálico e os links de
+ *                 DOI/arXiv/PDF que estiverem preenchidos.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-22
- *  Atualizado em: 2026-09-22
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.2.0
  *
- *  Dependências : src/components/Tag.astro, src/components/ExternalLink.astro,
- *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
+ *  Dependências : src/components/ExternalLink.astro, src/i18n/pt.ts,
  *                 src/lib/config.ts (siteConfig),
  *                 src/lib/publications.ts (isProfessorAuthor, doiUrl, arxivUrl),
  *                 astro:content (tipo `CollectionEntry<'publicacoes'>`)
@@ -28,10 +26,8 @@
  * ============================================================================
  */
 import type { CollectionEntry } from 'astro:content';
-import Tag from './Tag.astro';
 import ExternalLink from './ExternalLink.astro';
 import { pt } from '../i18n/pt';
-import { toParagraphs } from '../lib/text';
 import { siteConfig } from '../lib/config';
 import { arxivUrl, doiUrl, isProfessorAuthor } from '../lib/publications';
 
@@ -44,106 +40,48 @@ export interface Props {
 }
 
 const { publication } = Astro.props;
-const { titulo, autores, tipo, veiculo, doi, arxiv, pdf_url, resumo, palavras_chave, destaque } =
-  publication.data;
+const { titulo, autores, veiculo, doi, arxiv, pdf_url } = publication.data;
 
-const paragraphs = toParagraphs(resumo);
-const keywords = palavras_chave ?? [];
-// §6.6: <details> só existe com ao menos resumo ou palavras-chave — nunca vazio.
-const hasDetails = paragraphs.length > 0 || keywords.length > 0;
-
-const doiHref = doi ? doiUrl(doi) : undefined;
-const arxivHref = arxiv ? arxivUrl(arxiv) : undefined;
-// F-05: nenhum botão de link vazio — o contêiner de links some inteiro sem nenhum dos três.
-const hasLinks = Boolean(doiHref || arxivHref || pdf_url);
+// F-05: só os links preenchidos entram — nenhum link vazio.
+const links = [
+  { href: doi ? doiUrl(doi) : undefined, label: pt.publications.doi },
+  { href: arxiv ? arxivUrl(arxiv) : undefined, label: pt.publications.arxiv },
+  { href: pdf_url, label: pt.publications.pdf },
+].filter((link): link is { href: string; label: string } => Boolean(link.href));
 ---
 
-<article class="grid gap-3">
-  <div class="flex flex-wrap items-center gap-2">
-    {destaque && <Tag variant="solid">{pt.publications.featured}</Tag>}
-    <Tag variant="neutral">{pt.publications.type[tipo]}</Tag>
-  </div>
-  {
-    destaque ? (
-      <h3 class="text-display-2 bg-bloco p-4">{titulo}</h3>
-    ) : (
-      <h3 class="text-titulo-item">{titulo}</h3>
-    )
-  }
-  <p class="text-pequeno">
+<article>
+  <h3 class="text-titulo-item">{titulo}</h3>
+  <p class="text-pequeno text-secundario mt-1">
     {
       autores.map((autor, index) => {
         const isProfessor = isProfessorAuthor(autor, siteConfig.author.citationName);
         return (
           <>
-            {index > 0 && '; '}
+            {index > 0 && ', '}
             {/* RNF-15: cor sozinha não é informação acessível — o professor também leva <strong>. */}
-            <span class={isProfessor ? 'text-tinta' : 'text-secundario'}>
-              {isProfessor ? <strong class="font-normal">{autor}</strong> : autor}
-            </span>
+            {isProfessor ? <strong class="text-tinta font-normal">{autor}</strong> : autor}
           </>
         );
       })
     }
+    {
+      veiculo && (
+        <>
+          {autores.at(-1)?.endsWith('.') ? ' ' : '. '}
+          <em>{veiculo}</em>
+        </>
+      )
+    }
+    {
+      links.map((link) => (
+        <>
+          {' '}
+          <ExternalLink href={link.href} class="text-tinta ml-2 underline">
+            {link.label}
+          </ExternalLink>
+        </>
+      ))
+    }
   </p>
-  {veiculo && <p class="text-pequeno text-secundario italic">{veiculo}</p>}
-  {
-    hasLinks && (
-      <div class="flex flex-wrap gap-4">
-        {doiHref && (
-          <ExternalLink href={doiHref} class="text-pequeno underline">
-            {pt.publications.doi}
-          </ExternalLink>
-        )}
-        {arxivHref && (
-          <ExternalLink href={arxivHref} class="text-pequeno underline">
-            {pt.publications.arxiv}
-          </ExternalLink>
-        )}
-        {pdf_url && (
-          <ExternalLink href={pdf_url} class="text-pequeno underline">
-            {pt.publications.pdf}
-          </ExternalLink>
-        )}
-      </div>
-    )
-  }
-  {
-    hasDetails && (
-      <details>
-        <summary class="text-pequeno cursor-pointer">{pt.publications.abstractAndKeywords}</summary>
-        <div class="detalhes-conteudo mt-2 flex flex-col gap-2">
-          {paragraphs.map((paragraph) => (
-            <p class="text-corpo">{paragraph}</p>
-          ))}
-          {keywords.length > 0 && (
-            <p class="text-pequeno text-secundario">
-              <span class="text-rotulo">{pt.publications.keywords}</span> {keywords.join(' · ')}
-            </p>
-          )}
-        </div>
-      </details>
-    )
-  }
 </article>
-
-<style>
-  /* §7 da identidade: a abertura do <details> aparece em 150 ms. O estado inicial oculto (opacity:
-     0 no "from" do keyframe) só existe dentro de "no-preference" (§8.2 do PRD): nenhuma animação
-     pode começar com conteúdo invisível sem CSS. Fora deste bloco, o navegador ainda mostra/esconde
-     o conteúdo pelo atributo nativo `open`, sem depender de CSS nenhum. */
-  @media (prefers-reduced-motion: no-preference) {
-    details[open] > .detalhes-conteudo {
-      animation: detalhes-abre 150ms ease-out;
-    }
-
-    @keyframes detalhes-abre {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-  }
-</style>

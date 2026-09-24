@@ -99,6 +99,17 @@ const formacaoSchema = z.object({
   ano: z.string(),
 });
 
+/**
+ * Cargo ou posição na atuação profissional do perfil (timeline da página Sobre).
+ *
+ * `periodo` é texto livre, como `formacaoSchema.ano` ("2024–atual", "atual").
+ */
+const atuacaoSchema = z.object({
+  cargo: z.string(),
+  instituicao: z.string(),
+  periodo: z.string(),
+});
+
 /** Links acadêmicos do perfil (§7.3) — todos opcionais e, quando preenchidos, URLs válidas. */
 const linksSchema = z.object({
   lattes: z.url().optional(),
@@ -171,6 +182,7 @@ export const perfilSchema = z.object({
   bio: z.string(),
   resumo_home: z.string(),
   formacao: z.array(formacaoSchema).optional(),
+  atuacao: z.array(atuacaoSchema).optional(),
   areas: z.array(z.string()).optional(),
   email: z.email(),
   links: linksSchema.optional(),

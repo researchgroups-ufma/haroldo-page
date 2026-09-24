@@ -4,20 +4,19 @@
  *  Arquivo      : [slug].astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Página de disciplina do site público (RF-24, F-06, RN-04,
- *                 RF-37, F-13, §6.5 da identidade visual): trilha de
- *                 navegação, cabeçalho com tags e "Nesta página", ementa,
- *                 aulas na ordem do professor (com estado vazio explícito
- *                 quando não há nenhuma, e os scripts por aula), a seção
- *                 "Scripts da disciplina" (scripts sem aula correspondente)
- *                 e os recursos da disciplina (listas, materiais,
- *                 bibliografia, links). Rascunho não gera página (RN-01).
+ *                 RF-37, F-13): trilha de navegação, cabeçalho com código,
+ *                 semestre, status, descrição e ementa, e as seções da
+ *                 disciplina em abas — aulas na ordem do professor (estado
+ *                 vazio explícito, scripts por aula), "Scripts da
+ *                 disciplina" (sem aula correspondente), listas, materiais,
+ *                 bibliografia e links. Rascunho não gera página (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-21
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
- *                 src/components/Tag.astro, src/components/LessonList.astro,
+ *                 src/components/CoursePanel.astro, src/components/LessonList.astro,
  *                 src/components/ScriptPanel.astro, src/components/CourseResources.astro,
  *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs), src/lib/published.ts
  *                 (filterPublished), src/lib/courses.ts (courseSlug,
@@ -28,16 +27,17 @@
  *  Saídas       : HTML estático de uma rota `/ensino/<slug>/` por disciplina publicada
  *  Uso          : servido automaticamente pelo Astro para cada caminho de `getStaticPaths`
  *
- *  Notas        : scripts com `aula` correspondente aparecem dentro de
- *                 `LessonList` (F-13); os de `general` (sem aula) aparecem na
- *                 seção "Scripts da disciplina" abaixo, só se houver algum
- *                 (plano 049).
+ *  Notas        : abas como melhoria progressiva (RNF-02) — sem JS, ou com
+ *                 uma seção só, as seções ficam empilhadas com os títulos;
+ *                 o `#id` da URL escolhe a aba inicial. Scripts com `aula`
+ *                 correspondente aparecem dentro de `LessonList` (F-13); os
+ *                 de `general` (sem aula) têm aba própria, só se houver algum.
  * ============================================================================
  */
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import Tag from '../../components/Tag.astro';
+import CoursePanel from '../../components/CoursePanel.astro';
 import LessonList from '../../components/LessonList.astro';
 import ScriptPanel from '../../components/ScriptPanel.astro';
 import CourseResources from '../../components/CourseResources.astro';
@@ -70,94 +70,194 @@ interface Props {
 const { course } = Astro.props;
 const data = course.data;
 
-// F-13/RF-37: agrupa os scripts sob a aula correspondente; general vai para a seção abaixo.
+// F-13/RF-37: agrupa os scripts sob a aula correspondente; general ganha aba própria.
 const { byLesson, general } = groupScriptsByLesson(data.aulas ?? [], data.scripts ?? []);
-const sections = presentSections(data, general.length);
+// A ementa fica no cabeçalho; as demais seções viram abas, na ordem de `presentSections`.
+const tabs = presentSections(data, general.length).filter((section) => section.key !== 'syllabus');
 
+const meta = [data.codigo, data.semestre, pt.course.status[data.status]]
+  .filter(Boolean)
+  .join(' · ');
 const descriptionParagraphs = toParagraphs(data.descricao);
 const syllabusParagraphs = toParagraphs(data.ementa);
 const lessons = data.aulas ?? [];
 ---
 
 <BaseLayout title={data.nome}>
-  <nav aria-label={pt.course.breadcrumbLabel} class="px-margem mx-auto max-w-[90rem] pt-6">
+  <nav aria-label={pt.course.breadcrumbLabel} class="px-margem pt-6">
     <a href="/ensino/" class="text-pequeno text-secundario underline">
       {pt.course.breadcrumb}
     </a>
-    <span aria-hidden="true" class="text-pequeno text-secundario">
-      {' '}
-      /{' '}
-    </span>
+    <span aria-hidden="true" class="text-pequeno text-secundario"> / </span>
     <span class="text-pequeno text-secundario">{data.codigo ?? data.nome}</span>
   </nav>
 
-  <PageHeader eyebrow={pt.course.breadcrumb} title={data.nome}>
+  <PageHeader eyebrow={meta} title={data.nome}>
     <Fragment slot="aside">
-      <div class="flex flex-wrap gap-2">
-        {data.codigo && <Tag variant="strong">{data.codigo}</Tag>}
-        <Tag variant="neutral">{data.semestre}</Tag>
-        <Tag variant="neutral">{pt.course.status[data.status]}</Tag>
-      </div>
-      {descriptionParagraphs.map((paragraph) => <p class="text-corpo mt-3">{paragraph}</p>)}
+      {descriptionParagraphs.map((paragraph) => <p class="text-corpo">{paragraph}</p>)}
       {
-        sections.length > 0 && (
+        syllabusParagraphs.length > 0 && (
           <div class="mt-4">
-            <p class="text-rotulo text-secundario">{pt.course.onThisPage}</p>
-            <ul class="mt-2 flex flex-col gap-1">
-              {sections.map((section) => (
-                <li>
-                  <a href={`#${section.id}`} class="text-pequeno underline">
-                    {pt.course[section.key]} ({section.count})
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <p class="text-rotulo text-secundario">{pt.course.syllabus}</p>
+            {syllabusParagraphs.map((paragraph) => (
+              <p class="text-pequeno text-secundario mt-1">{paragraph}</p>
+            ))}
           </div>
         )
       }
     </Fragment>
   </PageHeader>
 
-  {
-    data.ementa?.trim() && (
-      <section id="ementa" class="px-margem mx-auto max-w-[90rem] py-10">
-        <h2 class="text-rotulo text-secundario">{pt.course.syllabus}</h2>
-        {syllabusParagraphs.map((paragraph) => (
-          <p class="text-corpo max-w-medida mt-3">{paragraph}</p>
-        ))}
-      </section>
-    )
-  }
+  <div class="px-margem">
+    <div
+      id="curso-abas"
+      role="tablist"
+      aria-label={pt.course.tabsLabel}
+      hidden
+      class="flex [scrollbar-width:none] gap-6 overflow-x-auto overflow-y-hidden pt-6"
+    >
+      {
+        tabs.map((tab) => (
+          <button
+            type="button"
+            role="tab"
+            id={`aba-${tab.id}`}
+            aria-controls={tab.id}
+            aria-selected="false"
+            tabindex="-1"
+            class="aba text-pequeno -mb-px shrink-0 border-b py-3 whitespace-nowrap"
+          >
+            {pt.course[tab.key]} <span class="text-secundario">{tab.count}</span>
+          </button>
+        ))
+      }
+    </div>
 
-  <section id="aulas" class="px-margem mx-auto max-w-[90rem] py-10">
-    <h2 class="text-rotulo text-secundario">{pt.course.lessons}</h2>
-    {
-      lessons.length === 0 ? (
-        // F-06: estado vazio explícito — a disciplina existe, mas nenhuma aula foi cadastrada.
-        <div class="border-tracejado mt-4 border border-dashed p-6">
-          <p class="text-secundario text-corpo">{pt.course.noLessons}</p>
-        </div>
-      ) : (
-        <div class="mt-4">
+    <CoursePanel id="aulas" title={pt.course.lessons}>
+      {
+        lessons.length === 0 ? (
+          // F-06: estado vazio explícito — a disciplina existe, mas nenhuma aula foi cadastrada.
+          <p class="text-corpo text-secundario">{pt.course.noLessons}</p>
+        ) : (
           <LessonList lessons={lessons} byLesson={byLesson} />
-        </div>
+        )
+      }
+    </CoursePanel>
+
+    {
+      // F-13: só os scripts sem aula correspondente — os demais já apareceram em LessonList.
+      general.length > 0 && (
+        <CoursePanel id="scripts" title={pt.course.courseScripts}>
+          <div class="flex flex-col gap-4">
+            {general.map((script) => (
+              <ScriptPanel script={script} />
+            ))}
+          </div>
+        </CoursePanel>
       )
     }
-  </section>
 
-  {
-    // F-13: só os scripts sem aula correspondente — os demais já apareceram em LessonList.
-    general.length > 0 && (
-      <section id="scripts" class="px-margem mx-auto max-w-[90rem] py-10">
-        <h2 class="text-rotulo text-secundario">{pt.course.courseScripts}</h2>
-        <div class="mt-4 flex flex-col gap-4">
-          {general.map((script) => (
-            <ScriptPanel script={script} />
-          ))}
-        </div>
-      </section>
-    )
+    <CourseResources data={data} />
+  </div>
+</BaseLayout>
+
+<style>
+  .aba {
+    border-color: transparent;
+    color: var(--color-secundario);
+  }
+  .aba:hover,
+  .aba[aria-selected='true'] {
+    color: var(--color-tinta);
+  }
+  .aba[aria-selected='true'] {
+    border-color: var(--color-tinta);
   }
 
-  <CourseResources data={data} />
-</BaseLayout>
+  /* Com as abas ativas, a régua forte da primeira linha do painel é a base das abas. */
+  :global([data-abas] .curso-painel) {
+    padding-top: 0;
+  }
+
+  /* Com as abas ativas, a aba mostra o título — o <h2> do painel fica só para leitor de tela. */
+  :global([data-abas] .painel-titulo) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aba {
+      transition:
+        color 150ms ease-out,
+        border-color 150ms ease-out;
+    }
+    :global([data-abas] .curso-painel:not([hidden])) {
+      animation: painel-entra 200ms ease-out;
+    }
+    @keyframes painel-entra {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+    }
+  }
+</style>
+
+<script>
+  const tablist = document.getElementById('curso-abas');
+  const tabs = tablist ? [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')] : [];
+
+  // Com uma seção só não há o que alternar — ficam os títulos e a página empilhada.
+  if (tablist && tabs.length > 1) {
+    const panels = tabs.map(
+      (tab) => document.getElementById(tab.getAttribute('aria-controls') ?? '') as HTMLElement,
+    );
+
+    const select = (index: number, { focus = false, updateHash = false } = {}) => {
+      tabs.forEach((tab, i) => {
+        const selected = i === index;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        panels[i].hidden = !selected;
+      });
+      if (focus) tabs[index].focus();
+      if (updateHash) history.replaceState(null, '', `#${panels[index].id}`);
+    };
+
+    panels.forEach((panel, i) => {
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tabs[i].id);
+      panel.tabIndex = 0;
+    });
+    tablist.hidden = false;
+    tablist.parentElement?.setAttribute('data-abas', '');
+
+    const fromHash = () => panels.findIndex((panel) => `#${panel.id}` === location.hash);
+    select(Math.max(0, fromHash()));
+    window.addEventListener('hashchange', () => {
+      const index = fromHash();
+      if (index >= 0) select(index);
+    });
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i, { updateHash: true }));
+      tab.addEventListener('keydown', (event) => {
+        const last = tabs.length - 1;
+        const targets: Record<string, number> = {
+          ArrowRight: i === last ? 0 : i + 1,
+          ArrowLeft: i === 0 ? last : i - 1,
+          Home: 0,
+          End: last,
+        };
+        const next = targets[event.key];
+        if (next === undefined) return;
+        event.preventDefault();
+        select(next, { focus: true, updateHash: true });
+      });
+    });
+  }
+</script>

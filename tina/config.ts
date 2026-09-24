@@ -177,6 +177,30 @@ export default defineConfig({
             ],
           },
           {
+            type: 'object',
+            name: 'atuacao',
+            label: 'Atuação profissional',
+            list: true,
+            description: 'Cargos e posições, do mais recente ao mais antigo.',
+            ui: {
+              itemProps: (item) => ({
+                label:
+                  [item?.cargo, item?.instituicao].filter(Boolean).join(' — ') || 'Nova atuação',
+              }),
+            },
+            fields: [
+              { type: 'string', name: 'cargo', label: 'Cargo', required: true },
+              { type: 'string', name: 'instituicao', label: 'Instituição', required: true },
+              {
+                type: 'string',
+                name: 'periodo',
+                label: 'Período',
+                required: true,
+                description: 'Formato livre, ex.: 2024–atual.',
+              },
+            ],
+          },
+          {
             type: 'string',
             name: 'areas',
             label: 'Áreas de atuação',

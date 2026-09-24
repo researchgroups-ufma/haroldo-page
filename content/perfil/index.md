@@ -26,12 +26,17 @@ formacao:
     curso: Física
     instituicao: Universidade Federal do Pará (UFPA)
     ano: 2014–2018
+atuacao:
+  - cargo: Professor Adjunto A
+    instituicao: Universidade Federal do Maranhão (UFMA) — Departamento de Física
+    periodo: atual
 areas:
   - Teoria da Relatividade Geral e teorias alternativas de gravitação
   - Perturbações lineares em espaços-tempos curvos
   - Forças de maré
   - Sombras de buracos negros
 email: haroldo.lima@ufma.br
+foto: /uploads/profile.jpg
 links:
   lattes: 'http://lattes.cnpq.br/8115459874963916'
   orcid: 'https://orcid.org/0000-0002-3702-7683'

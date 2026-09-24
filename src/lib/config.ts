@@ -40,6 +40,8 @@ export const siteConfig = {
   siteUrl: (import.meta.env.PUBLIC_SITE_URL as string | undefined) ?? DEFAULT_SITE_URL,
   title: 'Prof. Haroldo C. D. Lima Junior',
   shortTitle: 'Haroldo Lima Junior',
+  /** Nome de exibição do `<h1>` da Home — o nome completo segue em `perfil.nome` e no rodapé. */
+  displayName: 'Haroldo Lima',
   description:
     'Site acadêmico do Prof. Haroldo Cilas Duarte Lima Junior, Professor Adjunto A do Departamento de Física da UFMA.',
   author: {

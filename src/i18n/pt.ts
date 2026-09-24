@@ -73,11 +73,6 @@ export const pt = {
     teaching: 'Ensino',
     publications: 'Publicações',
   },
-  footer: {
-    contact: 'Contato',
-    academicProfiles: 'Perfis acadêmicos',
-    site: 'Site',
-  },
   home: {
     countResearchLines: (n: number) => plural(n, 'linha de pesquisa', 'linhas de pesquisa'),
     countCurrentCourses: (n: number) =>
@@ -90,6 +85,7 @@ export const pt = {
     eyebrow: 'Sobre',
     title: 'Biografia e formação',
     education: 'Formação acadêmica',
+    experience: 'Atuação profissional',
     areas: 'Áreas de atuação',
     contact: 'Contato',
     academicProfiles: 'Perfis acadêmicos',
@@ -129,6 +125,7 @@ export const pt = {
     problemSets: (n: number) => `${n} ${plural(n, 'lista', 'listas')}`,
     scripts: (n: number) => `${n} ${plural(n, 'script', 'scripts')}`,
     open: 'Abrir',
+    latestLesson: 'Última aula',
   },
   course: {
     breadcrumb: 'Ensino',
@@ -138,6 +135,7 @@ export const pt = {
       anterior: 'Anterior',
     } satisfies Record<DisciplinaStatus, string>,
     onThisPage: 'Nesta página',
+    tabsLabel: 'Seções da disciplina',
     syllabus: 'Ementa',
     lessons: 'Aulas',
     courseScripts: 'Scripts da disciplina',

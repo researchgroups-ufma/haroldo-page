@@ -5,18 +5,18 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Layout que toda rota pública usa — casca HTML (`lang`,
  *                 `<title>` pelo dicionário, meta description), link "Pular
- *                 para o conteúdo" (§8.3), cabeçalho e rodapé com os dados do
- *                 singleton `perfil` (plano 039).
+ *                 para o conteúdo" (§8.3) e a moldura do site: um cartão do
+ *                 tamanho da tela, com o cabeçalho dentro e o `<main>` rolando
+ *                 por dentro a partir de `lg` — a página em si nunca rola.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-17
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.3.0
  *
- *  Dependências : astro:content (getCollection), src/lib/published.ts
- *                 (requireSingleton), src/lib/config.ts (siteConfig),
- *                 src/i18n/pt.ts, src/components/SiteHeader.astro,
- *                 src/components/SiteFooter.astro, src/styles/global.css
- *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`; conteúdo via `<slot />`
+ *  Dependências : src/lib/config.ts (siteConfig), src/i18n/pt.ts,
+ *                 src/components/SiteHeader.astro, src/components/ScrollBar.astro,
+ *                 src/styles/global.css
+ *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`, `bare?`; conteúdo via `<slot />`
  *  Saídas       : documento HTML completo da rota
  *  Uso          : import BaseLayout from '../layouts/BaseLayout.astro'
  *
@@ -24,12 +24,10 @@
  *                 (RF-30) — não pertencem a este plano.
  * ============================================================================
  */
-import { getCollection } from 'astro:content';
 import { pt } from '../i18n/pt';
 import { siteConfig } from '../lib/config';
-import { requireSingleton } from '../lib/published';
 import SiteHeader from '../components/SiteHeader.astro';
-import SiteFooter from '../components/SiteFooter.astro';
+import ScrollBar from '../components/ScrollBar.astro';
 import '../styles/global.css';
 
 export interface Props {
@@ -41,16 +39,15 @@ export interface Props {
   title: string | undefined;
   /** Meta description da rota. Ausente: usa `siteConfig.description`. */
   description?: string;
+  /** Sem o cabeçalho — a Home traz o próprio topo (nome grande e menu) dentro do cartão. */
+  bare?: boolean;
 }
 
-const { title, description = siteConfig.description } = Astro.props;
+const { title, description = siteConfig.description, bare = false } = Astro.props;
 
 // Home (sem `title`) não passa por `pt.site.pageTitle` — o <title> é só o nome completo do site.
 const pageTitle =
   title !== undefined ? pt.site.pageTitle(title, siteConfig.shortTitle) : siteConfig.title;
-
-// `perfil` é singleton (plano 039): `requireSingleton` estoura se o painel não tiver exatamente 1 item.
-const perfilEntry = requireSingleton(await getCollection('perfil'), 'perfil');
 ---
 
 <html lang="pt-BR">
@@ -67,10 +64,22 @@ const perfilEntry = requireSingleton(await getCollection('perfil'), 'perfil');
     >
       {pt.site.skipToContent}
     </a>
-    <SiteHeader perfil={perfilEntry.data} />
-    <main id="conteudo">
-      <slot />
-    </main>
-    <SiteFooter perfil={perfilEntry.data} />
+    <div class="px-margem mx-auto max-w-[90rem] py-4 lg:h-svh lg:py-6">
+      <div class="bg-bloco flex flex-col rounded-2xl lg:h-full lg:overflow-hidden">
+        {!bare && <SiteHeader />}
+        {
+          /* `relative`: sem ele, os `sr-only` (absolutos) escapam do `<main>` que rola e fazem a página rolar. */
+        }
+        <div class="relative flex flex-col lg:min-h-0 lg:flex-1">
+          <main
+            id="conteudo"
+            class="relative flex flex-col lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+          >
+            <slot />
+          </main>
+          <ScrollBar />
+        </div>
+      </div>
+    </div>
   </body>
 </html>

@@ -1,0 +1,181 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : ScrollBar.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Barra de rolagem do `<main id="conteudo">` no traço da
+ *                 identidade: trilho de 1px na cor de régua e cursor fino em
+ *                 tinta, que se acende e alarga enquanto a página rola ou sob
+ *                 o ponteiro, e pode ser arrastado. Some quando não há o que
+ *                 rolar.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-23
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : nenhuma
+ *  Entradas     : nenhuma — lê o `#conteudo` do `BaseLayout`
+ *  Saídas       : trilho decorativo (`aria-hidden`) ao lado do `<main>`
+ *  Uso          : dentro do contêiner `relative` que envolve o `<main>` no BaseLayout
+ *
+ *  Notas        : melhoria progressiva (RNF-02) — só a partir de `lg`, onde é
+ *                 o `<main>` que rola; sem JS, a barra nativa fica, fina e nas
+ *                 cores do site (global.css). Teclado, roda e toque continuam
+ *                 sendo a rolagem nativa: a barra só espelha e aceita arrasto.
+ * ============================================================================
+ */
+---
+
+<div id="barra-rolagem" aria-hidden="true" hidden>
+  <div id="barra-rolagem-cursor"></div>
+</div>
+
+<style>
+  #barra-rolagem {
+    position: absolute;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    right: 0.5rem;
+    width: 0.75rem;
+    display: flex;
+    justify-content: center;
+    cursor: default;
+  }
+
+  #barra-rolagem[hidden] {
+    display: none;
+  }
+
+  /* Trilho: a mesma régua fina de 1px do resto do site. */
+  #barra-rolagem::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 1px;
+    background: var(--color-regua);
+  }
+
+  /* O cursor ocupa a largura do trilho (área de arrasto); a linha visível é o ::after. */
+  #barra-rolagem-cursor {
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    display: flex;
+    justify-content: center;
+    will-change: transform;
+  }
+
+  #barra-rolagem-cursor::after {
+    content: '';
+    width: 2px;
+    border-radius: 1px;
+    background: var(--color-tinta);
+    opacity: 0.35;
+  }
+
+  #barra-rolagem[data-ativa='true'] #barra-rolagem-cursor::after,
+  #barra-rolagem:hover #barra-rolagem-cursor::after {
+    width: 4px;
+    border-radius: 2px;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #barra-rolagem-cursor::after {
+      transition:
+        width 150ms ease-out,
+        opacity 300ms ease-out;
+    }
+  }
+</style>
+
+<script>
+  /** Altura mínima do cursor, em px — abaixo disso ele some em páginas longas. */
+  const MIN_THUMB = 32;
+  /** Tempo sem rolar (ms) até o cursor voltar ao estado discreto. */
+  const IDLE_DELAY = 900;
+
+  const scroller = document.getElementById('conteudo');
+  const track = document.getElementById('barra-rolagem');
+  const thumb = document.getElementById('barra-rolagem-cursor');
+  const desktop = window.matchMedia('(min-width: 64rem)');
+
+  if (scroller && track && thumb) {
+    let thumbHeight = 0;
+    let idleTimer: number | undefined;
+    let frame = 0;
+
+    const maxScroll = () => scroller.scrollHeight - scroller.clientHeight;
+    const maxOffset = () => track.clientHeight - thumbHeight;
+
+    const render = () => {
+      frame = 0;
+      const scrollable = desktop.matches && maxScroll() > 1;
+      track.hidden = !scrollable;
+      // A barra nativa só é escondida quando a nossa está no lugar dela.
+      scroller.classList.toggle('rolagem-propria', scrollable);
+      if (!scrollable) return;
+      const trackHeight = track.clientHeight;
+      thumbHeight = Math.max(
+        MIN_THUMB,
+        (scroller.clientHeight / scroller.scrollHeight) * trackHeight,
+      );
+      thumb.style.height = `${thumbHeight}px`;
+      thumb.style.transform = `translateY(${(scroller.scrollTop / maxScroll()) * maxOffset()}px)`;
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(render);
+    };
+
+    const wake = () => {
+      track.dataset.ativa = 'true';
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        if (!dragging) track.dataset.ativa = 'false';
+      }, IDLE_DELAY);
+    };
+
+    scroller.addEventListener(
+      'scroll',
+      () => {
+        schedule();
+        wake();
+      },
+      { passive: true },
+    );
+    desktop.addEventListener('change', schedule);
+    // Conteúdo que muda de altura (fontes, imagens, o pin da sanfona de Publicações) move o cursor.
+    const observer = new ResizeObserver(schedule);
+    observer.observe(scroller);
+    [...scroller.children].forEach((child) => observer.observe(child));
+
+    // Arrasto do cursor; clique no trilho leva o cursor até o ponto clicado.
+    let dragging = false;
+    let startY = 0;
+    let startScroll = 0;
+    thumb.addEventListener('pointerdown', (event) => {
+      dragging = true;
+      startY = event.clientY;
+      startScroll = scroller.scrollTop;
+      thumb.setPointerCapture(event.pointerId);
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    thumb.addEventListener('pointermove', (event) => {
+      if (!dragging) return;
+      scroller.scrollTop = startScroll + ((event.clientY - startY) / maxOffset()) * maxScroll();
+    });
+    const endDrag = () => {
+      dragging = false;
+      wake();
+    };
+    thumb.addEventListener('pointerup', endDrag);
+    thumb.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerdown', (event) => {
+      const y = event.clientY - track.getBoundingClientRect().top - thumbHeight / 2;
+      scroller.scrollTo({ top: (y / maxOffset()) * maxScroll(), behavior: 'smooth' });
+    });
+
+    render();
+  }
+</script>

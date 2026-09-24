@@ -127,6 +127,18 @@
     outline: 2px solid var(--color-tinta);
     outline-offset: 3px;
   }
+
+  /* Barra nativa fina nas cores do site — é a que fica sem JS e no celular. A partir de `lg`,
+     ScrollBar.astro marca o <main> com `.rolagem-propria` e desenha a sua no lugar. */
+  html,
+  #conteudo {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-tracejado) transparent;
+  }
+
+  #conteudo.rolagem-propria {
+    scrollbar-width: none;
+  }
 }
 
 /* Movimento (§7) — um único momento orquestrado ao carregar a página: a

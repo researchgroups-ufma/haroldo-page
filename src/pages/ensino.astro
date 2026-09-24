@@ -3,39 +3,39 @@
  * ============================================================================
  *  Arquivo      : ensino.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Página Ensino do site público (RF-23, §6.4 da identidade
- *                 visual): disciplinas atuais e anteriores, sempre nos dois
- *                 grupos rotulados — "Atuais" antes de "Anteriores" —, cada
- *                 disciplina publicada com link para a própria página, e
- *                 estado vazio explícito quando um grupo não tem disciplina
- *                 (RN-01).
+ *  Descrição    : Página Ensino do site público (RF-23): disciplinas atuais
+ *                 em destaque — nome, descrição e atalho para a última aula —
+ *                 e, abaixo, as anteriores numa lista seca de uma linha por
+ *                 oferta (semestre · código · nome). Os dois grupos são
+ *                 sempre rotulados, com estado vazio explícito (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-18
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
- *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
+ *                 src/components/ExternalLink.astro, src/i18n/pt.ts,
+ *                 src/lib/text.ts (toParagraphs), src/lib/date.ts (formatDate),
  *                 src/lib/published.ts (filterPublished),
- *                 src/lib/courses.ts (splitCourses, countCourseItems,
- *                 buildCourseSlugs, courseSlug), astro:content (getCollection)
+ *                 src/lib/courses.ts (splitCourses, buildCourseSlugs, courseSlug),
+ *                 astro:content (getCollection)
  *  Entradas     : coleção `disciplinas`, já validada pelo Zod
  *  Saídas       : HTML estático da rota `/ensino/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/ensino.astro`
  *
  *  Notas        : nenhum texto de interface hardcoded — tudo vem de `pt`
- *                 (§10.4 do PRD); os dados vêm do conteúdo. A página de
- *                 disciplina (`/ensino/[slug]`) é do plano 048, não deste
- *                 arquivo.
+ *                 (§10.4 do PRD); os dados vêm do conteúdo.
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
+import ExternalLink from '../components/ExternalLink.astro';
 import { pt } from '../i18n/pt';
 import { toParagraphs } from '../lib/text';
+import { formatDate } from '../lib/date';
 import { filterPublished } from '../lib/published';
-import { buildCourseSlugs, countCourseItems, courseSlug, splitCourses } from '../lib/courses';
+import { buildCourseSlugs, courseSlug, splitCourses } from '../lib/courses';
 
 // RN-01: só disciplinas publicadas entram na página.
 const disciplinas = filterPublished(await getCollection('disciplinas'));
@@ -48,108 +48,88 @@ buildCourseSlugs(disciplinas);
 <BaseLayout title={pt.nav.teaching}>
   <PageHeader eyebrow={pt.teaching.eyebrow} title={pt.teaching.title} />
 
-  <div class="px-margem mx-auto max-w-[90rem] py-10">
-    <h2 class="text-rotulo text-secundario">{pt.teaching.current}</h2>
+  <section aria-labelledby="ensino-atuais" class="px-margem pt-8 pb-4">
+    <h2 id="ensino-atuais" class="text-rotulo text-secundario">{pt.teaching.current}</h2>
     {
       current.length === 0 ? (
-        <div class="border-tracejado mt-4 border border-dashed p-6">
-          <p class="text-secundario text-corpo">{pt.teaching.noCurrent}</p>
-        </div>
+        <p class="text-corpo text-secundario mt-4">{pt.teaching.noCurrent}</p>
       ) : (
-        <div id="disciplinas-atuais-grade" class="mt-4 grid grid-cols-1 sm:grid-cols-2">
-          {current.map((course) => {
-            const { codigo, semestre, nome, descricao } = course.data;
-            const paragraph = toParagraphs(descricao)[0];
-            const { lessons, problemSets, scripts } = countCourseItems(course.data);
-            // §6.4: só as contagens não nulas entram no rodapé, separadas por " · ".
-            const countLabels = [
-              lessons > 0 ? pt.teaching.lessons(lessons) : null,
-              problemSets > 0 ? pt.teaching.problemSets(problemSets) : null,
-              scripts > 0 ? pt.teaching.scripts(scripts) : null,
-            ].filter((label): label is string => label !== null);
-            return (
-              <a
-                href={`/ensino/${courseSlug(course.filePath)}/`}
-                class="disciplina-atual hover:bg-bloco block py-6 transition-colors duration-[120ms] sm:py-8"
-              >
-                <p class="text-pequeno text-secundario">
-                  {codigo ? `${codigo} · ${semestre}` : semestre}
-                </p>
-                {/* Sem numeral: disciplinas atuais não são sequência (§8). */}
-                <h3 class="text-display-2 mt-1">{nome}</h3>
-                {paragraph && <p class="text-corpo mt-2">{paragraph}</p>}
-                {countLabels.length > 0 && (
-                  <p class="text-pequeno text-secundario mt-4">{countLabels.join(' · ')}</p>
+        current.map((course) => {
+          const { codigo, semestre, nome, descricao, aulas } = course.data;
+          const paragraph = toParagraphs(descricao)[0];
+          // RN-04: a ordem das aulas é a do professor — a "última" é a última da lista dele.
+          const latest = aulas?.at(-1);
+          return (
+            <article class="grid gap-x-8 gap-y-2 py-6 lg:grid-cols-[11rem_1fr]">
+              <p class="text-pequeno text-secundario lg:pt-3">
+                {codigo ? `${codigo} · ${semestre}` : semestre}
+              </p>
+              <div>
+                <h3 class="text-display-2">
+                  <a href={`/ensino/${courseSlug(course.filePath)}/`} class="hover:underline">
+                    {nome}
+                  </a>
+                </h3>
+                {paragraph && (
+                  <p class="text-corpo text-secundario max-w-medida mt-2">{paragraph}</p>
                 )}
-                <p class="mt-2 flex items-center gap-1 text-[0.9375rem]">
-                  {pt.teaching.open} <span aria-hidden="true">›</span>
-                </p>
-              </a>
-            );
-          })}
-        </div>
+                {latest && (
+                  <p class="text-pequeno mt-4">
+                    <span class="text-secundario">{pt.teaching.latestLesson} ·</span>{' '}
+                    <ExternalLink href={latest.url} class="underline">
+                      {latest.numero}. {latest.titulo}
+                    </ExternalLink>
+                    {latest.data && (
+                      <span class="text-secundario"> · {formatDate(latest.data)}</span>
+                    )}
+                  </p>
+                )}
+              </div>
+            </article>
+          );
+        })
       )
     }
-  </div>
+  </section>
 
-  <div class="px-margem mx-auto max-w-[90rem] py-10">
-    <h2 class="text-rotulo text-secundario">{pt.teaching.previous}</h2>
+  <section aria-labelledby="ensino-anteriores" class="px-margem pt-6 pb-10">
+    <h2 id="ensino-anteriores" class="text-rotulo text-secundario">{pt.teaching.previous}</h2>
     {
       previous.length === 0 ? (
-        <div class="border-tracejado mt-4 border border-dashed p-6">
-          <p class="text-secundario text-corpo">{pt.teaching.noPrevious}</p>
-        </div>
+        <p class="text-corpo text-secundario mt-4">{pt.teaching.noPrevious}</p>
       ) : (
-        <div class="mt-4">
-          {previous.map((course, index) => {
-            const { codigo, semestre, nome, descricao } = course.data;
+        <ul class="mt-4">
+          {previous.map((course) => {
+            const { codigo, semestre, nome } = course.data;
             return (
-              <a
-                href={`/ensino/${courseSlug(course.filePath)}/`}
-                class:list={[
-                  'disciplina-anterior hover:bg-bloco grid grid-cols-1 gap-1 py-4 transition-colors duration-[120ms] sm:grid-cols-[6rem_1fr_1fr_5rem] sm:items-baseline sm:gap-4',
-                  index === 0 && 'disciplina-anterior-primeira',
-                ]}
-              >
-                <span class="text-pequeno text-secundario">{codigo}</span>
-                <span class="text-titulo-item">{nome}</span>
-                <span class="text-pequeno text-secundario">{descricao}</span>
-                <span class="text-pequeno text-secundario flex items-center gap-1 sm:justify-end">
-                  {semestre} <span aria-hidden="true">›</span>
-                </span>
-              </a>
+              <li class="disciplina-anterior">
+                <a
+                  href={`/ensino/${courseSlug(course.filePath)}/`}
+                  class="group grid grid-cols-[1fr_auto] items-baseline gap-x-8 gap-y-1 py-3 lg:grid-cols-[11rem_1fr_auto]"
+                >
+                  {/* Mesma coluna e formato da disciplina atual, para os nomes alinharem. */}
+                  <span class="text-pequeno text-secundario col-span-2 lg:col-span-1">
+                    {codigo ? `${codigo} · ${semestre}` : semestre}
+                  </span>
+                  <span class="text-titulo-item group-hover:underline">{nome}</span>
+                  <span aria-hidden="true" class="text-secundario">
+                    ›
+                  </span>
+                </a>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )
     }
-  </div>
+  </section>
 </BaseLayout>
 
 <style>
-  /* §6.4: faixa de células "Atuais", 2 colunas a partir de `sm`, réguas finas entre elas — mesmo
-     padrão de recomposição de .caminho-celula em index.astro. */
-  @media (max-width: 39.9375rem) {
-    .disciplina-atual:not(:first-child) {
-      border-top: 1px solid var(--color-regua);
-    }
-  }
-  @media (min-width: 40rem) {
-    .disciplina-atual:nth-child(n + 3) {
-      border-top: 1px solid var(--color-regua);
-    }
-    .disciplina-atual:nth-child(even) {
-      border-left: 1px solid var(--color-regua);
-      padding-left: 1.5rem;
-    }
-  }
-
-  /* §5.5: grade de linha com régua no topo, régua forte só na primeira — mesmo padrão de
-     .linha-pesquisa em pesquisa.astro. */
   .disciplina-anterior {
     border-top: 1px solid var(--color-regua);
   }
-  .disciplina-anterior-primeira {
-    border-top: 1px solid var(--color-tinta);
+  .disciplina-anterior:first-child {
+    border-top-color: var(--color-tinta);
   }
 </style>

@@ -1,0 +1,35 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : CoursePanel.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Casca de uma seção da página de disciplina (aulas, scripts,
+ *                 listas, materiais, bibliografia, links). Sem JS, as seções
+ *                 aparecem empilhadas, cada uma com o seu título; com JS, o
+ *                 script de abas de `ensino/[slug].astro` as transforma em
+ *                 painéis de aba e esconde o título (a aba já o mostra).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-23
+ *  Atualizado em: 2026-09-23
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : nenhuma
+ *  Entradas     : props `id` (âncora e alvo da aba) e `title`; conteúdo via `<slot />`
+ *  Saídas       : `<section class="curso-painel">` com `<h2>` e o conteúdo
+ *  Uso          : <CoursePanel id="listas" title={pt.course.problemSets}>…</CoursePanel>
+ * ============================================================================
+ */
+export interface Props {
+  /** Id da seção — o mesmo `id` de `presentSections`, usado pela aba e pela âncora. */
+  id: string;
+  /** Título da seção, mostrado sem JS (com JS, a aba o mostra). */
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<section id={id} aria-labelledby={`${id}-titulo`} class="curso-painel pt-8 pb-10">
+  <h2 id={`${id}-titulo`} class="painel-titulo text-rotulo text-secundario mb-4">{title}</h2>
+  <slot />
+</section>
