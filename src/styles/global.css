@@ -190,3 +190,62 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Transições entre páginas (View Transitions entre documentos, só CSS). O cartão fica parado, o
+   nome e o menu migram entre a Home e o cabeçalho, e o conteúdo troca com um fade curto.
+   Navegador sem suporte navega normalmente. */
+@view-transition {
+  navigation: auto;
+}
+
+.vt-cartao {
+  view-transition-name: cartao;
+}
+.vt-conteudo {
+  view-transition-name: conteudo;
+}
+.vt-nome {
+  view-transition-name: nome;
+}
+.vt-menu {
+  view-transition-name: menu;
+}
+
+::view-transition-group(nome) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-old(conteudo) {
+  animation: vt-sai 120ms ease-out both;
+}
+::view-transition-new(conteudo) {
+  animation: vt-entra 220ms ease-out both;
+}
+
+@keyframes vt-sai {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-entra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* Chegou por transição: a animação de entrada do título/régua não repete o movimento. */
+html[data-vt] .titulo-entrada,
+html[data-vt] .regua-entrada {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

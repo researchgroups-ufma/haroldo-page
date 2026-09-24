@@ -326,3 +326,18 @@ describe('JS < 50 KB gzip por rota e zero framework de UI (RNF-02)', () => {
     }
   });
 });
+
+describe('View Transitions: nomes únicos por página', () => {
+  const htmlFiles = listSiteHtmlFiles();
+
+  it('cada .html tem no máximo um vt-nome e um vt-menu, e ao menos um vt-nome', () => {
+    for (const file of htmlFiles) {
+      const conteudo = readFileSync(file, 'utf-8');
+      for (const nome of ['vt-nome', 'vt-menu']) {
+        const count = (conteudo.match(new RegExp(`class="[^"]*\b${nome}\b`, 'g')) ?? []).length;
+        expect(count, `${file}: ${count} ${nome}`).toBeLessThanOrEqual(1);
+      }
+      expect(conteudo.includes('vt-nome'), `${file} sem vt-nome`).toBe(true);
+    }
+  });
+});

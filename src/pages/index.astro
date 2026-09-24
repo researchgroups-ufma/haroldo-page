@@ -48,10 +48,10 @@ const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
     class="px-margem flex min-h-0 flex-1 flex-col pt-5 pb-6 lg:pt-7 lg:pb-7"
   >
     <div class="grid gap-x-8 gap-y-4 lg:grid-cols-12">
-      <h1 id="home-nome" class="text-display-1 titulo-entrada lg:col-span-6">
+      <h1 id="home-nome" class="vt-nome text-display-1 titulo-entrada lg:col-span-6">
         {siteConfig.displayName}
       </h1>
-      <nav aria-label={pt.site.mainNavLabel} class="lg:col-span-6 lg:col-start-7 lg:pt-3">
+      <nav aria-label={pt.site.mainNavLabel} class="vt-menu lg:col-span-6 lg:col-start-7 lg:pt-3">
         <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
           {
             navItems.map((item) => (

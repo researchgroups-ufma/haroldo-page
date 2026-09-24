@@ -10,8 +10,8 @@
  *                 por dentro a partir de `lg` — a página em si nunca rola.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.4.0
  *
  *  Dependências : src/lib/config.ts (siteConfig), src/i18n/pt.ts,
  *                 src/components/SiteHeader.astro, src/components/ScrollBar.astro,
@@ -56,6 +56,12 @@ const pageTitle =
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <script is:inline>
+      // Página revelada por View Transition: desliga a animação de entrada (ver global.css).
+      addEventListener('pagereveal', (e) => {
+        if (e.viewTransition) document.documentElement.dataset.vt = '';
+      });
+    </script>
   </head>
   <body>
     <a
@@ -65,7 +71,7 @@ const pageTitle =
       {pt.site.skipToContent}
     </a>
     <div class="px-margem mx-auto max-w-[90rem] py-4 lg:h-svh lg:py-6">
-      <div class="bg-bloco flex flex-col rounded-2xl lg:h-full lg:overflow-hidden">
+      <div class="vt-cartao bg-bloco flex flex-col rounded-2xl lg:h-full lg:overflow-hidden">
         {!bare && <SiteHeader />}
         {
           /* `relative`: sem ele, os `sr-only` (absolutos) escapam do `<main>` que rola e fazem a página rolar. */
@@ -73,7 +79,7 @@ const pageTitle =
         <div class="relative flex flex-col lg:min-h-0 lg:flex-1">
           <main
             id="conteudo"
-            class="relative flex flex-col lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+            class="vt-conteudo relative flex flex-col lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
           >
             <slot />
           </main>
