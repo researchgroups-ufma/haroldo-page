@@ -74,6 +74,9 @@ const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
           <img
             src={perfil.foto}
             alt={pt.site.portraitAlt(siteConfig.displayName)}
+            width="960"
+            height="1280"
+            fetchpriority="high"
             decoding="async"
             class="aspect-[3/4] w-36 object-cover grayscale sm:w-44 lg:col-span-3 lg:col-start-7 lg:h-full lg:max-h-[24rem] lg:w-auto"
           />

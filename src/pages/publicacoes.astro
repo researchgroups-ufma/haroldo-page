@@ -18,7 +18,7 @@
  *                 src/components/PublicationItem.astro, src/i18n/pt.ts,
  *                 src/lib/published.ts (filterPublished),
  *                 src/lib/publications.ts (groupByYear), astro:content (getCollection),
- *                 gsap (núcleo e ScrollTrigger)
+ *                 gsap (núcleo e ScrollTrigger, por import() só quando a sanfona roda)
  *  Entradas     : coleção `publicacoes`, já validada pelo Zod
  *  Saídas       : HTML estático da rota `/publicacoes/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/publicacoes.astro`
@@ -97,11 +97,6 @@ const groups = groupByYear(published);
 </style>
 
 <script>
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
-
   /** Rolagem (px) gasta para fechar um ano e abrir o seguinte. */
   const TRANSITION = 400;
 
@@ -109,9 +104,22 @@ const groups = groupByYear(published);
   const wrapper = document.getElementById('pub-anos');
   const sections = wrapper ? [...wrapper.querySelectorAll<HTMLElement>('.pub-ano')] : [];
 
-  // Com um ano só não há o que sanfonar — a lista fica como está.
-  if (scroller && wrapper && sections.length > 1) {
-    // Cabeçalho do ano = primeiro filho da seção (o <h2> com o ano e a contagem ao lado).
+  /** Condição em que a sanfona roda — fora dela o GSAP nem é baixado. */
+  const QUERY = '(min-width: 64rem) and (prefers-reduced-motion: no-preference)';
+  const media = window.matchMedia(QUERY);
+  let started = false;
+
+  /** Baixa o GSAP e monta a sanfona, uma vez só, na primeira vez em que `QUERY` vale. */
+  async function startAccordion(scroller: HTMLElement, wrapper: HTMLElement) {
+    if (started) return;
+    started = true;
+    const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ]);
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Cabeçalho do ano = primeiro filho da seção (o <h2> do ano mais a contagem ao lado).
     const headers = sections.map((section) => section.firstElementChild as HTMLElement);
     const bodies = sections.map(
       (section) => section.querySelector('.pub-ano-corpo') as HTMLElement,
@@ -127,7 +135,7 @@ const groups = groupByYear(published);
     const openHeight = (i: number) => Math.min(lists[i].offsetHeight, available());
     const overflow = (i: number) => Math.max(0, lists[i].offsetHeight - available());
 
-    gsap.matchMedia().add('(min-width: 64rem) and (prefers-reduced-motion: no-preference)', () => {
+    gsap.matchMedia().add(QUERY, () => {
       gsap.set(bodies, { overflow: 'hidden' });
 
       const timeline = gsap.timeline({ defaults: { ease: 'none' } });
@@ -187,6 +195,14 @@ const groups = groupByYear(published);
         links.forEach((link) => link.removeEventListener('click', onClick));
         bodies.forEach((body) => (body.inert = false));
       };
+    });
+  }
+
+  // Com um ano só não há o que sanfonar — a lista fica como está.
+  if (scroller && wrapper && sections.length > 1) {
+    if (media.matches) void startAccordion(scroller, wrapper);
+    media.addEventListener('change', () => {
+      if (media.matches) void startAccordion(scroller, wrapper);
     });
   }
 </script>

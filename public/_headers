@@ -5,3 +5,6 @@
 # linha `Sitemap` no robots.txt, quando o domínio próprio (Q-05) estiver definido.
 /*
   X-Robots-Tag: noindex
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

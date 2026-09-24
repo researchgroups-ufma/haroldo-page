@@ -341,3 +341,34 @@ describe('View Transitions: nomes únicos por página', () => {
     }
   });
 });
+
+describe('desempenho e metadados', () => {
+  const htmlFiles = listSiteHtmlFiles();
+
+  it('HTML de /publicacoes/ não carrega o ScrollTrigger de saída (GSAP sob demanda)', () => {
+    const html = readFileSync(join(distDir, 'publicacoes', 'index.html'), 'utf-8');
+    const pending = [...html.matchAll(/<script[^>]+src="\/([^"]+)"/g)].map((m) => m[1]);
+    const seen = new Set<string>();
+    // Segue os imports estáticos: um chunk importado estaticamente também baixa de saída.
+    // O `import()` dinâmico não entra. `scrollerProxy` identifica o código da biblioteca — o
+    // nome "ScrollTrigger" sozinho aparece no script da página, no caminho do import().
+    while (pending.length > 0) {
+      const file = pending.pop() as string;
+      if (seen.has(file)) continue;
+      seen.add(file);
+      const code = readFileSync(join(distDir, file), 'utf-8');
+      expect(code.includes('scrollerProxy'), `${file} traz o ScrollTrigger`).toBe(false);
+      for (const m of code.matchAll(/(?:from|import)\s*["'`]\.\/([^"'`]+)["'`]/g)) {
+        pending.push(`${dirname(file)}/${m[1]}`);
+      }
+    }
+    expect(seen.size, 'nenhum script lido em /publicacoes/').toBeGreaterThan(0);
+  });
+
+  it('dist/favicon.svg existe e toda página o declara', () => {
+    expect(existsSync(join(distDir, 'favicon.svg'))).toBe(true);
+    for (const file of htmlFiles) {
+      expect(readFileSync(file, 'utf-8'), file).toContain('href="/favicon.svg"');
+    }
+  });
+});

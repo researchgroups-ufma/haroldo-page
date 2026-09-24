@@ -29,6 +29,7 @@ import { siteConfig } from '../lib/config';
 import SiteHeader from '../components/SiteHeader.astro';
 import ScrollBar from '../components/ScrollBar.astro';
 import '../styles/global.css';
+import archivo300 from '@fontsource/archivo/files/archivo-latin-300-normal.woff2?url';
 
 export interface Props {
   /**
@@ -56,6 +57,9 @@ const pageTitle =
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <link rel="preload" href={archivo300} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#efedea" />
     <script is:inline>
       // Página revelada por View Transition: desliga a animação de entrada (ver global.css).
       addEventListener('pagereveal', (e) => {
