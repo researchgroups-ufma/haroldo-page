@@ -60,7 +60,7 @@ const groups = groupByYear(published);
           const headingId = `${sectionId}-titulo`;
           return (
             <section id={sectionId} aria-labelledby={headingId} class="pub-ano">
-              <div class="flex items-baseline justify-between gap-4 py-4 lg:grid lg:grid-cols-[var(--coluna-rotulo)_1fr]">
+              <div class="py-4">
                 <h2 id={headingId}>
                   <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
                     {group.year}
@@ -68,7 +68,7 @@ const groups = groupByYear(published);
                 </h2>
               </div>
               <div class="pub-ano-corpo">
-                <ol class="pub-ano-lista space-y-6 pb-8 lg:pl-[var(--coluna-rotulo)]">
+                <ol class="pub-ano-lista space-y-6 pb-8">
                   {group.items.map((item) => (
                     <li>
                       <PublicationItem publication={item} />

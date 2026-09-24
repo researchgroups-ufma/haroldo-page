@@ -60,13 +60,18 @@ const { lessons, byLesson } = Astro.props;
       const scripts = byLesson[index];
       return (
         // RN-04: ordem do professor, não por número nem data — `lessons` nunca é reordenado aqui.
-        <li class="aula-item grid grid-cols-[2.5rem_1fr] gap-x-4 py-4 sm:grid-cols-[3rem_1fr_auto]">
-          <span aria-hidden="true" class="text-titulo-item text-secundario">
-            {padCount(aula.numero)}
-          </span>
+        <li class="aula-item py-4">
           <div>
-            <span class="sr-only">{pt.course.lessonNumber(aula.numero)}</span>
-            <h3 class="text-titulo-item">
+            {/* Número e data numa linha pequena acima do título; o leitor de tela ouve "Aula N". */}
+            <p class="text-pequeno text-secundario">
+              <span aria-hidden="true">
+                {padCount(aula.numero)}
+                {aula.data && ' · '}
+              </span>
+              <span class="sr-only">{pt.course.lessonNumber(aula.numero)}</span>
+              {aula.data && formatDate(aula.data)}
+            </p>
+            <h3 class="text-titulo-item mt-1">
               <ExternalLink href={aula.url} class="hover:underline">
                 {aula.titulo}
               </ExternalLink>
@@ -82,11 +87,6 @@ const { lessons, byLesson } = Astro.props;
               </div>
             )}
           </div>
-          {aula.data && (
-            <p class="text-pequeno text-secundario col-start-2 mt-1 sm:col-start-3 sm:mt-0 sm:pt-0.5">
-              {formatDate(aula.data)}
-            </p>
-          )}
         </li>
       );
     })

@@ -72,10 +72,8 @@ const links = data.links ?? [];
     <CoursePanel id="materiais" title={pt.course.materials}>
       <ul>
         {materiais.map((material) => (
-          <li class="recurso-linha grid gap-x-4 gap-y-1 py-3 sm:grid-cols-[var(--coluna-rotulo)_1fr]">
-            <span class="text-pequeno text-secundario sm:pt-0.5">
-              {pt.course.materialType[material.tipo]}
-            </span>
+          <li class="recurso-linha py-3">
+            <p class="text-pequeno text-secundario">{pt.course.materialType[material.tipo]}</p>
             <div>
               <ExternalLink href={material.url} class="text-titulo-item hover:underline">
                 {material.titulo}

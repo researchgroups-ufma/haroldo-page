@@ -60,12 +60,12 @@ buildCourseSlugs(disciplinas);
           // RN-04: a ordem das aulas é a do professor — a "última" é a última da lista dele.
           const latest = aulas?.at(-1);
           return (
-            <article class="grid gap-x-8 gap-y-2 py-6 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
-              <p class="text-pequeno text-secundario lg:pt-3">
+            <article class="py-6">
+              <p class="text-pequeno text-secundario">
                 {codigo ? `${codigo} · ${semestre}` : semestre}
               </p>
               <div>
-                <h3 class="text-display-2">
+                <h3 class="text-display-2 mt-1">
                   <a href={`/ensino/${courseSlug(course.filePath)}/`} class="link-sublinhado">
                     {nome}
                   </a>
@@ -105,10 +105,10 @@ buildCourseSlugs(disciplinas);
               <li class="disciplina-anterior">
                 <a
                   href={`/ensino/${courseSlug(course.filePath)}/`}
-                  class="group grid grid-cols-[1fr_auto] items-baseline gap-x-8 gap-y-1 py-3 lg:grid-cols-[var(--coluna-rotulo)_1fr_auto]"
+                  class="group grid grid-cols-[1fr_auto] items-baseline gap-x-8 gap-y-1 py-3"
                 >
-                  {/* Mesma coluna e formato da disciplina atual, para os nomes alinharem. */}
-                  <span class="text-pequeno text-secundario col-span-2 lg:col-span-1">
+                  {/* Mesmo formato da disciplina atual: código e semestre numa linha pequena acima do nome. */}
+                  <span class="text-pequeno text-secundario col-span-2">
                     {codigo ? `${codigo} · ${semestre}` : semestre}
                   </span>
                   <span class="text-titulo-item decoration-1 underline-offset-[6px] group-hover:underline">

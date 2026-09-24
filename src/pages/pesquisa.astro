@@ -42,9 +42,14 @@ const lines = sortResearchLines(filterPublished(await getCollection('linhas-pesq
 const projects = sortProjects(filterPublished(await getCollection('projetos')));
 const { byLine, others } = groupProjectsByLine(new Set(lines.map((line) => line.id)), projects);
 
-/** Período do projeto: "inicio–fim", ou "inicio–" em aberto. */
-const period = (p: (typeof projects)[number]) =>
-  p.data.periodo ? `${p.data.periodo.inicio}–${p.data.periodo.fim ?? ''}` : undefined;
+/** Linha de identificação do projeto: período ("inicio–fim", ou "inicio–" em aberto) · status. */
+const projectMeta = (p: (typeof projects)[number]) =>
+  [
+    p.data.periodo && `${p.data.periodo.inicio}–${p.data.periodo.fim ?? ''}`,
+    p.data.status && pt.research.status[p.data.status],
+  ]
+    .filter(Boolean)
+    .join(' · ');
 ---
 
 <BaseLayout title={pt.nav.research}>
@@ -57,8 +62,8 @@ const period = (p: (typeof projects)[number]) =>
         const lineProjects = byLine.get(line.id) ?? [];
         return (
           <section id={line.id} aria-labelledby={`${line.id}-titulo`} class="linha-pesquisa py-8">
-            <div class="grid gap-x-8 gap-y-2 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
-              <div class="lg:col-start-2">
+            <div>
+              <div>
                 <h2 id={`${line.id}-titulo`} class="text-display-2">
                   {line.data.titulo}
                 </h2>
@@ -81,13 +86,10 @@ const period = (p: (typeof projects)[number]) =>
             {lineProjects.length > 0 && (
               <ol class="mt-6">
                 {lineProjects.map((project) => (
-                  <li class="projeto-linha grid gap-x-8 gap-y-1 py-3 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
-                    <p class="text-pequeno text-secundario">
-                      {period(project)}
-                      {project.data.status && (
-                        <span class="block">{pt.research.status[project.data.status]}</span>
-                      )}
-                    </p>
+                  <li class="projeto-linha py-3">
+                    {projectMeta(project) && (
+                      <p class="text-pequeno text-secundario">{projectMeta(project)}</p>
+                    )}
                     <div>
                       <h3 class="text-titulo-item">{project.data.titulo}</h3>
                       {toParagraphs(project.data.descricao).map((paragraph) => (
@@ -118,13 +120,10 @@ const period = (p: (typeof projects)[number]) =>
           </h2>
           <ol class="mt-4">
             {others.map((project) => (
-              <li class="projeto-linha grid gap-x-8 gap-y-1 py-3 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
-                <p class="text-pequeno text-secundario">
-                  {period(project)}
-                  {project.data.status && (
-                    <span class="block">{pt.research.status[project.data.status]}</span>
-                  )}
-                </p>
+              <li class="projeto-linha py-3">
+                {projectMeta(project) && (
+                  <p class="text-pequeno text-secundario">{projectMeta(project)}</p>
+                )}
                 <div>
                   <h3 class="text-titulo-item">{project.data.titulo}</h3>
                   {toParagraphs(project.data.descricao).map((paragraph) => (
