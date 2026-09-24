@@ -15,13 +15,13 @@
  *
  *  Dependências : src/lib/config.ts (siteConfig), src/i18n/pt.ts,
  *                 src/components/SiteHeader.astro, src/components/ScrollBar.astro,
- *                 src/styles/global.css
+ *                 src/styles/global.css, @fontsource/archivo (preload do peso 300)
  *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`, `bare?`; conteúdo via `<slot />`
  *  Saídas       : documento HTML completo da rota
  *  Uso          : import BaseLayout from '../layouts/BaseLayout.astro'
  *
- *  Notas        : canonical, Open Graph e favicon ficam para a fase 5
- *                 (RF-30) — não pertencem a este plano.
+ *  Notas        : favicon e `theme-color` já estão aqui; canonical, Open
+ *                 Graph e `hreflang` ficam para as fases 4 e 5 (RF-30).
  * ============================================================================
  */
 import { pt } from '../i18n/pt';

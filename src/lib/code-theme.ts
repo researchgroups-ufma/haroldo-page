@@ -2,7 +2,7 @@
  * ============================================================================
  *  Arquivo      : code-theme.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Tema Shiki monocromático do painel de script (§5.6 da
+ *  Descrição    : Tema Shiki monocromático do painel de script (§5.4 da
  *                 identidade visual, RF-37) — só três cores de primeiro
  *                 plano, sem negrito/itálico — e a tradução de `linguagem`
  *                 (schema `scripts[]`) para o identificador de linguagem do
@@ -35,7 +35,7 @@ type ScriptLanguage = NonNullable<
 >[number]['linguagem'];
 
 /**
- * Tema Shiki monocromático do painel de script (§5.6, §2 da identidade visual).
+ * Tema Shiki monocromático do painel de script (§5.4, §2 da identidade visual).
  *
  * Só três cores de primeiro plano, calculadas por contraste na identidade (§2): `#111112`
  * (`--tinta`, 17,47:1 sobre `--bloco`) para o texto padrão; `#5A5754` (`--secundario`, 6,65:1)

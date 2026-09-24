@@ -4,10 +4,9 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Decide a URL de cada disciplina a partir do nome do arquivo
  *                 (README da fase, decisão 3), separa disciplinas atuais de
- *                 anteriores com ordem definida (RN-03, RF-23), conta
- *                 aulas/listas/scripts (§6.4), agrupa scripts sob a aula
- *                 correspondente (F-13, RF-37) e lista as seções presentes
- *                 para o "Nesta página" (§6.5).
+ *                 anteriores com ordem definida (RN-03, RF-23), agrupa
+ *                 scripts sob a aula correspondente (F-13, RF-37) e lista as
+ *                 seções presentes, que viram as abas da disciplina (§6.5).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
  *  Atualizado em: 2026-09-24

@@ -4,8 +4,8 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-23 (fase 3 concluída — 12/12; planos 036 a 054 todos DONE, o 053 em
-`876d89c` com CI e Workers Builds verdes)
+Última atualização: 2026-09-24 (redesenho e polimento do site público na branch `design`, entre a
+fase 3 e a 4 — ver a seção abaixo; fase 4 ainda não fatiada)
 
 ## Fases
 
@@ -36,6 +36,36 @@ descrito abaixo.
 Vale notar, para quem for retomar: **a fase 3 depende formalmente só da fase 1**, não da 2 (ver a
 coluna de dependências do §6.2). Antecipá-la é possível; o custo seria construir o site sem a
 garantia de que o ciclo de publicação fecha. Não foi o caminho escolhido.
+
+## Entre a fase 3 e a 4 — redesenho e polimento (2026-09-23 a 2026-09-24)
+
+Trabalho fora do fluxo de planos numerados, na branch **`design`** (criada de `5c38a28`, só local,
+**ainda não integrada à `main`**), por decisão do stakeholder de aperfeiçoar o frontend antes da
+fase 4:
+
+- **Redesenho** (`f7e7345`): o site num cartão contido que não rola a partir de `lg`; Home, Sobre,
+  Ensino e Publicações novas; `perfil.atuacao[]` no CMS; GSAP na sanfona de Publicações; barra de
+  rolagem própria. Sai o rodapé.
+- **Polimento** (`ffb5304`..`f50f29f`, 10 commits): spec
+  `docs/superpowers/specs/2026-09-23-polimento-design.md` e plano
+  `docs/superpowers/plans/2026-09-23-polimento.md` (9 tarefas), executado em modo nativo com revisão
+  final por um revisor novo. O resultado e as decisões estão no fim do spec.
+- **Depois do polimento, a pedido do stakeholder:** sem contagens nem numeração (`725eca3`) e
+  títulos na margem esquerda com o metadado numa linha acima (`728a580`).
+
+Não fecha nem reabre item do §12: as rotas são as mesmas, com outro visual.
+`docs/identidade-visual.md` foi revisado (§1–§7) para descrever o site atual.
+
+**Para a fase 4:**
+
+1. Integrar a `design` à `main` antes de fatiar — a fase 4 espelha as páginas atuais.
+2. `perfil.atuacao[]` nasceu sem par no grupo `en`; o §12 da fase 4 ganhou um item para isso (9 itens).
+3. O lugar do seletor de idioma (RF-29) está marcado por um comentário no `SiteHeader.astro`.
+4. Cada página nova em `/en` tem de manter **no máximo um `vt-nome` e um `vt-menu`** (teste em
+   `tests/dist/site-gerado.test.ts`), senão a transição entre páginas aborta em silêncio.
+5. Menores adiados do polimento: a linha de projeto duplicada em `pesquisa.astro`;
+   `hover:underline` sem o afastamento único em `CourseResources`/`LessonList`; páginas acima de 150
+   linhas (`sobre`, `pesquisa`, `publicacoes`, `ensino/[slug]`).
 
 ## Recorte de 2026-09-12 — o que anda sem o professor
 

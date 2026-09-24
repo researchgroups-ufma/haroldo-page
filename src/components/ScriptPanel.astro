@@ -3,7 +3,7 @@
  * ============================================================================
  *  Arquivo      : ScriptPanel.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Painel de um script de disciplina (§5.6 da identidade
+ *  Descrição    : Painel de um script de disciplina (§5.4 da identidade
  *                 visual, RF-37): destaque de sintaxe gerado no build pelo
  *                 Shiki (tema monocromático, RNF-15), botão "Copiar código"
  *                 como melhoria progressiva (§1 regra 3, RNF-02) que anuncia
@@ -61,7 +61,7 @@ const paragraphs = toParagraphs(script.descricao);
     {paragraphs.map((paragraph) => <p class="text-corpo mt-2">{paragraph}</p>)}
     <div class="mt-4 flex flex-wrap items-center gap-4">
       {
-        /* RF-37/§5.6: nasce hidden — melhoria progressiva, só aparece se a Clipboard API existir. */
+        /* RF-37/§5.4: nasce hidden — melhoria progressiva, só aparece se a Clipboard API existir. */
       }
       <button
         type="button"
@@ -121,7 +121,7 @@ const paragraphs = toParagraphs(script.descricao);
       button.textContent = copiedLabel;
       status.textContent = copiedLabel;
       window.clearTimeout(resetTimeout);
-      // §5.6/plano 049: "vira 'Copiado' por 2 s" — os dois voltam ao estado original, não só o botão.
+      // §5.4/plano 049: "vira 'Copiado' por 2 s" — os dois voltam ao estado original, não só o botão.
       // `as unknown as number`: `window.setTimeout` devolve `number` no navegador, mas o ambiente
       // de checagem do Astro também enxerga o `setTimeout` ambiente do @types/node (que devolve
       // `NodeJS.Timeout`) — a dupla conversão fixa o tipo no que o navegador realmente devolve.

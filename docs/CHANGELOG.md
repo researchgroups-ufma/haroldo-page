@@ -207,6 +207,25 @@ Fase 0 — setup e provisionamento (planos 001 a 013):
 
 ### Alterado
 
+Redesenho e polimento do site público (branch `design`, 2026-09-23 a 2026-09-24, fora dos planos
+numerados; spec e resultado em `docs/superpowers/specs/2026-09-23-polimento-design.md`):
+
+- O site passa a viver num cartão contido; a partir de `lg` a página não rola e o conteúdo rola
+  dentro do cartão, com barra de rolagem própria. Sai o rodapé (`f7e7345`).
+- Cabeçalho de página compacto em todas as páginas internas, sem rubrica e sem contagem; títulos
+  na margem esquerda com o metadado numa linha pequena acima; um só hover sublinhado
+  (`ffb5304`, `725eca3`, `728a580`).
+- Pesquisa com os projetos dentro de cada linha e "Outros projetos" no fim (`groupProjectsByLine`,
+  RN-01); 404 com a lista de páginas no lugar do botão pílula (`355f34d`, `a758012`).
+- Transições entre páginas por View Transitions, só CSS (`407ef82`).
+- Acessibilidade: anos fechados de Publicações com `inert`, foco do "Pular para o conteúdo" dentro
+  do cartão, níveis de título do painel de script, texto alternativo do retrato (`f41556a`).
+- GSAP baixado só quando a sanfona roda, preload da Archivo 300, cache imutável de `/_astro/*`,
+  favicon e `theme-color` (`2c4d179`).
+- Removidos `PillButton`, `Tag`, `ProjectCard` e os textos e funções que ficaram sem uso
+  (`6605226`, `725eca3`).
+- `docs/identidade-visual.md` §1–§7 reescritas para descrever o site atual.
+
 - **Astro 5.18.2 → 7.2.10**, feito antes de a fase 1 escrever os schemas de conteúdo, porque a
   migração muda a API de coleções e sobe para Zod 4 — fazê-lo depois implicaria reescrevê-los.
   O `npm audit` passa de 1 vulnerabilidade high para zero.

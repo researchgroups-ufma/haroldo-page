@@ -103,16 +103,16 @@ Cada achado é **reproduzido antes de corrigido** (a auditoria indicou onde olha
 
 Executado na branch `design`, a partir de `e167646`, em modo nativo (`superpowers:executing-plans`).
 
-| Task | Commit | O quê |
-|---|---|---|
-| 1 | `ffb5304` | Fundação: `--coluna-rotulo`, `text-nav`, `link-sublinhado`, `PageHeader` compacto; Sobre compactada |
-| 2 | `f66d076` | `groupProjectsByLine` (TDD, canário RN-01) |
-| 3 | `355f34d` | Pesquisa com projetos dentro de cada linha e "Outros projetos"; saem `ProjectCard`, `Tag`, `text-numeral` |
-| 4 | `a758012` | 404 na linguagem nova; sai `PillButton` |
-| 5 | `407ef82` | View Transitions entre documentos (nome, menu, conteúdo) |
-| 6 | `f41556a` | Acessibilidade: anos fechados `inert`, `<main tabindex="-1">`, níveis de título, `alt` do retrato, movimento reduzido no trilho |
-| 7 | `2c4d179` | GSAP por `import()`, preload do Archivo 300, cache imutável de `/_astro/*`, favicon, `theme-color`, dimensões da foto |
-| 8 | `6605226` | Remoção de textos, funções e testes órfãos |
+| Task | Commit    | O quê                                                                                                                           |
+| ---- | --------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | `ffb5304` | Fundação: `--coluna-rotulo`, `text-nav`, `link-sublinhado`, `PageHeader` compacto; Sobre compactada                             |
+| 2    | `f66d076` | `groupProjectsByLine` (TDD, canário RN-01)                                                                                      |
+| 3    | `355f34d` | Pesquisa com projetos dentro de cada linha e "Outros projetos"; saem `ProjectCard`, `Tag`, `text-numeral`                       |
+| 4    | `a758012` | 404 na linguagem nova; sai `PillButton`                                                                                         |
+| 5    | `407ef82` | View Transitions entre documentos (nome, menu, conteúdo)                                                                        |
+| 6    | `f41556a` | Acessibilidade: anos fechados `inert`, `<main tabindex="-1">`, níveis de título, `alt` do retrato, movimento reduzido no trilho |
+| 7    | `2c4d179` | GSAP por `import()`, preload do Archivo 300, cache imutável de `/_astro/*`, favicon, `theme-color`, dimensões da foto           |
+| 8    | `6605226` | Remoção de textos, funções e testes órfãos                                                                                      |
 
 **Suíte (2026-09-24):** `npm run test:coverage` → 258 testes, 100% de statements, branches, funções e linhas; `npm run test:dist` → 12 testes; `npm run lint` sem erro; `npm run build:pipeline` → `astro check` 0 erros e 0 avisos, 8 páginas.
 
