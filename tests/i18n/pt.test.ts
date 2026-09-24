@@ -22,63 +22,6 @@ describe('pt.site', () => {
   });
 });
 
-describe('pt.home — funções de plural', () => {
-  it('countResearchLines com 0, 1 e 2', () => {
-    expect(pt.home.countResearchLines(0)).toBe('linhas de pesquisa');
-    expect(pt.home.countResearchLines(1)).toBe('linha de pesquisa');
-    expect(pt.home.countResearchLines(2)).toBe('linhas de pesquisa');
-  });
-
-  it('countCurrentCourses com 0, 1 e 2', () => {
-    expect(pt.home.countCurrentCourses(0)).toBe('disciplinas neste semestre');
-    expect(pt.home.countCurrentCourses(1)).toBe('disciplina neste semestre');
-    expect(pt.home.countCurrentCourses(2)).toBe('disciplinas neste semestre');
-  });
-
-  it('countPublications com 0, 1 e 2', () => {
-    expect(pt.home.countPublications(0)).toBe('publicações');
-    expect(pt.home.countPublications(1)).toBe('publicação');
-    expect(pt.home.countPublications(2)).toBe('publicações');
-  });
-});
-
-describe('pt.research', () => {
-  it('summary(1, 2) monta "1 linha · 2 projetos"', () => {
-    expect(pt.research.summary(1, 2)).toBe('1 linha · 2 projetos');
-  });
-
-  it('summary pluraliza cada parte independentemente', () => {
-    expect(pt.research.summary(0, 0)).toBe('0 linhas · 0 projetos');
-    expect(pt.research.summary(2, 1)).toBe('2 linhas · 1 projeto');
-  });
-
-  it('activeProjects com 0, 1 e 2', () => {
-    expect(pt.research.activeProjects(0)).toBe('0 projetos em andamento');
-    expect(pt.research.activeProjects(1)).toBe('1 projeto em andamento');
-    expect(pt.research.activeProjects(2)).toBe('2 projetos em andamento');
-  });
-});
-
-describe('pt.teaching — funções de plural', () => {
-  it('lessons com 0, 1 e 2', () => {
-    expect(pt.teaching.lessons(0)).toBe('0 aulas');
-    expect(pt.teaching.lessons(1)).toBe('1 aula');
-    expect(pt.teaching.lessons(2)).toBe('2 aulas');
-  });
-
-  it('problemSets com 0, 1 e 2', () => {
-    expect(pt.teaching.problemSets(0)).toBe('0 listas');
-    expect(pt.teaching.problemSets(1)).toBe('1 lista');
-    expect(pt.teaching.problemSets(2)).toBe('2 listas');
-  });
-
-  it('scripts com 0, 1 e 2', () => {
-    expect(pt.teaching.scripts(0)).toBe('0 scripts');
-    expect(pt.teaching.scripts(1)).toBe('1 script');
-    expect(pt.teaching.scripts(2)).toBe('2 scripts');
-  });
-});
-
 describe('pt.course', () => {
   it('lessonNumber devolve "Aula N"', () => {
     expect(pt.course.lessonNumber(3)).toBe('Aula 3');

@@ -10,8 +10,8 @@
  *                 para o "Nesta página" (§6.5).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-17
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.2.0
  *
  *  Dependências : node:path, src/lib/slug.ts (slugify)
  *  Entradas     : arrays de entradas de coleção, na forma devolvida por
@@ -19,8 +19,7 @@
  *                 tipadas estruturalmente — este módulo não importa
  *                 `astro:content`
  *  Saídas       : slugs (`courseSlug`, `buildCourseSlugs`), grupos
- *                 (`splitCourses`), contagens (`countCourseItems`),
- *                 agrupamento de scripts (`groupScriptsByLesson`) e a lista
+ *                 (`splitCourses`), agrupamento de scripts (`groupScriptsByLesson`) e a lista
  *                 de seções presentes (`presentSections`)
  *  Uso          : const slug = courseSlug(entry.filePath)
  *
@@ -125,28 +124,6 @@ export function splitCourses<T extends CourseGroupLike>(
   return {
     current: entries.filter((entry) => entry.data.status === 'atual').sort(compareCourseGroup),
     previous: entries.filter((entry) => entry.data.status === 'anterior').sort(compareCourseGroup),
-  };
-}
-
-/** Entrada de `disciplinas` com os campos usados em `countCourseItems` (§6.4). */
-type CourseCountsLike = { aulas?: unknown[]; listas?: unknown[]; scripts?: unknown[] };
-
-/**
- * Conta aulas, listas de exercícios e scripts de uma disciplina, para o rodapé de célula (§6.4:
- * "N aulas, N listas, N scripts — só as não nulas").
- *
- * @param data Campos de uma entrada de `disciplinas` (`entry.data`).
- * @returns `{ lessons, problemSets, scripts }`; campo ausente conta como `0`.
- */
-export function countCourseItems(data: CourseCountsLike): {
-  lessons: number;
-  problemSets: number;
-  scripts: number;
-} {
-  return {
-    lessons: data.aulas?.length ?? 0,
-    problemSets: data.listas?.length ?? 0,
-    scripts: data.scripts?.length ?? 0,
   };
 }
 

@@ -4,7 +4,6 @@ import matter from 'gray-matter';
 import { describe, expect, it } from 'vitest';
 import {
   buildCourseSlugs,
-  countCourseItems,
   courseSlug,
   groupScriptsByLesson,
   presentSections,
@@ -107,22 +106,6 @@ describe('splitCourses', () => {
     const original = [...entries];
     splitCourses(entries);
     expect(entries).toEqual(original);
-  });
-});
-
-describe('countCourseItems', () => {
-  it('conta zero quando aulas, listas e scripts estão ausentes', () => {
-    expect(countCourseItems({})).toEqual({ lessons: 0, problemSets: 0, scripts: 0 });
-  });
-
-  it('conta o length de cada lista quando presente', () => {
-    expect(
-      countCourseItems({
-        aulas: [{}, {}],
-        listas: [{}],
-        scripts: [{}, {}, {}],
-      }),
-    ).toEqual({ lessons: 2, problemSets: 1, scripts: 3 });
   });
 });
 

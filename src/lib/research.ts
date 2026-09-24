@@ -3,21 +3,19 @@
  *  Arquivo      : research.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Ordena linhas de pesquisa e projetos (§6.3 da identidade
- *                 visual), agrupa projetos por linha publicada, conta projetos
- *                 em andamento por linha e decide se
- *                 um projeto pode linkar a âncora da linha relacionada sem
- *                 revelar um rascunho (RN-01).
+ *                 visual) e agrupa projetos por linha publicada, sem revelar
+ *                 linha em rascunho (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
  *  Atualizado em: 2026-09-24
- *  Versão       : 0.2.0
+ *  Versão       : 0.3.0
  *
  *  Dependências : nenhuma
  *  Entradas     : arrays de entradas de coleção, na forma devolvida por
  *                 `getCollection` (`{ data: {...} }`), tipadas estruturalmente
  *                 — este módulo não importa `astro:content`
- *  Saídas       : arrays ordenados (cópias, sem mutar a entrada), `Map` de
- *                 contagens e âncora opcional (`string | undefined`)
+ *  Saídas       : arrays ordenados (cópias, sem mutar a entrada) e o
+ *                 agrupamento `{ byLine, others }`
  *  Uso          : const linhas = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')))
  *
  *  Notas        : funções puras, sem efeitos colaterais, testáveis sem a content layer do Astro
@@ -27,7 +25,7 @@
 /** Entrada de `linhas-pesquisa` com os campos usados na ordenação (§6.3). */
 type ResearchLineLike = { data: { ordem?: number; titulo: string } };
 
-/** Entrada de `projetos` com os campos usados em ordenação, contagem e âncora (§6.3). */
+/** Entrada de `projetos` com os campos usados em ordenação e agrupamento (§6.3). */
 type ProjectLike = {
   data: {
     titulo: string;
@@ -116,45 +114,4 @@ export function groupProjectsByLine<P extends ProjectLike>(
     byLine.set(lineId, [...(byLine.get(lineId) ?? []), project]);
   }
   return { byLine, others };
-}
-
-/**
- * Conta, por id de `linha_relacionada`, os projetos com `status === 'em andamento'`.
- *
- * Projetos sem `linha_relacionada` não entram na contagem. Recebe projetos **já filtrados** por
- * `filterPublished` — este módulo não filtra por `publicado`. A página usa o valor para a tag "N
- * projetos em andamento" de cada linha (§6.3), que some se zero.
- *
- * @param projects Projetos já publicados.
- * @returns Mapa de id de linha de pesquisa para quantidade de projetos em andamento.
- */
-export function countActiveProjectsByLine(projects: ProjectLike[]): Map<string, number> {
-  const counts = new Map<string, number>();
-  for (const project of projects) {
-    if (project.data.status !== 'em andamento') continue;
-    const lineId = project.data.linha_relacionada?.id;
-    if (lineId === undefined) continue;
-    counts.set(lineId, (counts.get(lineId) ?? 0) + 1);
-  }
-  return counts;
-}
-
-/**
- * Decide a âncora da linha de pesquisa relacionada a um projeto, sem revelar linhas não publicadas.
- *
- * // RN-01: um projeto pode apontar para uma linha com `publicado: false`; linkar a âncora dela
- * seria um link para algo ausente da página, revelando a existência do rascunho.
- *
- * @param project Projeto cujo `linha_relacionada` (se houver) se quer linkar.
- * @param publishedLineIds Ids das linhas de pesquisa publicadas, presentes na página.
- * @returns `#<id>` se o projeto tem `linha_relacionada` e o id está entre as publicadas; senão `undefined`.
- */
-export function relatedLineAnchor(
-  project: ProjectLike,
-  publishedLineIds: ReadonlySet<string>,
-): string | undefined {
-  // RN-01
-  const lineId = project.data.linha_relacionada?.id;
-  if (lineId === undefined || !publishedLineIds.has(lineId)) return undefined;
-  return `#${lineId}`;
 }

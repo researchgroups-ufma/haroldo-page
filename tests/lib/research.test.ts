@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  countActiveProjectsByLine,
-  groupProjectsByLine,
-  relatedLineAnchor,
-  sortProjects,
-  sortResearchLines,
-} from '../../src/lib/research';
+import { groupProjectsByLine, sortProjects, sortResearchLines } from '../../src/lib/research';
 
 describe('sortResearchLines', () => {
   it('ordena por ordem crescente, sem ordem ao fim', () => {
@@ -86,65 +80,6 @@ describe('sortProjects', () => {
     const original = [...entries];
     sortProjects(entries);
     expect(entries).toEqual(original);
-  });
-});
-
-describe('countActiveProjectsByLine', () => {
-  it('conta só os projetos em andamento, ignorando concluídos e sem linha', () => {
-    const projects = [
-      {
-        data: {
-          titulo: 'A',
-          status: 'em andamento' as const,
-          linha_relacionada: { id: 'linha-1' },
-        },
-      },
-      {
-        data: {
-          titulo: 'B',
-          status: 'em andamento' as const,
-          linha_relacionada: { id: 'linha-1' },
-        },
-      },
-      { data: { titulo: 'C', status: 'concluído' as const, linha_relacionada: { id: 'linha-1' } } },
-      {
-        data: {
-          titulo: 'D',
-          status: 'em andamento' as const,
-          linha_relacionada: { id: 'linha-2' },
-        },
-      },
-      { data: { titulo: 'E', status: 'em andamento' as const } },
-    ];
-    expect(countActiveProjectsByLine(projects)).toEqual(
-      new Map([
-        ['linha-1', 2],
-        ['linha-2', 1],
-      ]),
-    );
-  });
-
-  it('lista vazia devolve mapa vazio', () => {
-    expect(countActiveProjectsByLine([])).toEqual(new Map());
-  });
-});
-
-describe('relatedLineAnchor', () => {
-  it('devolve undefined quando o projeto não tem linha_relacionada', () => {
-    const project = { data: { titulo: 'Sem linha' } };
-    expect(relatedLineAnchor(project, new Set(['linha-1']))).toBeUndefined();
-  });
-
-  it('devolve a âncora quando a linha está publicada', () => {
-    const project = { data: { titulo: 'Com linha', linha_relacionada: { id: 'linha-1' } } };
-    expect(relatedLineAnchor(project, new Set(['linha-1']))).toBe('#linha-1');
-  });
-
-  it('devolve undefined quando a linha não está entre as publicadas (RN-01)', () => {
-    const project = {
-      data: { titulo: 'Linha rascunho', linha_relacionada: { id: 'linha-oculta' } },
-    };
-    expect(relatedLineAnchor(project, new Set(['linha-1']))).toBeUndefined();
   });
 });
 

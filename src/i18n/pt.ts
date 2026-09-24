@@ -74,14 +74,6 @@ export const pt = {
     teaching: 'Ensino',
     publications: 'Publicações',
   },
-  home: {
-    countResearchLines: (n: number) => plural(n, 'linha de pesquisa', 'linhas de pesquisa'),
-    countCurrentCourses: (n: number) =>
-      plural(n, 'disciplina neste semestre', 'disciplinas neste semestre'),
-    countPublications: (n: number) => plural(n, 'publicação', 'publicações'),
-    noneYet: 'nenhuma publicada ainda',
-    seeResearch: 'Ver pesquisa',
-  },
   about: {
     eyebrow: 'Sobre',
     title: 'Biografia e formação',
@@ -89,7 +81,6 @@ export const pt = {
     experience: 'Atuação profissional',
     areas: 'Áreas de atuação',
     contact: 'Contato',
-    academicProfiles: 'Perfis acadêmicos',
     links: {
       lattes: 'Currículo Lattes',
       orcid: 'ORCID',
@@ -102,14 +93,7 @@ export const pt = {
     },
   },
   research: {
-    eyebrow: 'Pesquisa',
     title: 'Linhas e projetos',
-    summary: (lines: number, projects: number) =>
-      `${lines} ${plural(lines, 'linha', 'linhas')} · ${projects} ${plural(projects, 'projeto', 'projetos')}`,
-    activeProjects: (n: number) => `${n} ${plural(n, 'projeto', 'projetos')} em andamento`,
-    projects: 'Projetos',
-    collaborators: 'Colaboradores',
-    relatedLine: 'Linha relacionada',
     otherProjects: 'Outros projetos',
     status: {
       'em andamento': 'Em andamento',
@@ -117,16 +101,11 @@ export const pt = {
     } satisfies Record<ProjetoStatus, string>,
   },
   teaching: {
-    eyebrow: 'Ensino',
     title: 'Disciplinas',
     current: 'Atuais',
     previous: 'Anteriores',
     noCurrent: 'Nenhuma disciplina neste semestre.',
     noPrevious: 'Nenhuma disciplina anterior.',
-    lessons: (n: number) => `${n} ${plural(n, 'aula', 'aulas')}`,
-    problemSets: (n: number) => `${n} ${plural(n, 'lista', 'listas')}`,
-    scripts: (n: number) => `${n} ${plural(n, 'script', 'scripts')}`,
-    open: 'Abrir',
     latestLesson: 'Última aula',
   },
   course: {
@@ -136,7 +115,6 @@ export const pt = {
       atual: 'Atual',
       anterior: 'Anterior',
     } satisfies Record<DisciplinaStatus, string>,
-    onThisPage: 'Nesta página',
     tabsLabel: 'Seções da disciplina',
     syllabus: 'Ementa',
     lessons: 'Aulas',
@@ -147,7 +125,6 @@ export const pt = {
     links: 'Links',
     noLessons: 'Nenhuma aula publicada ainda.',
     lessonNumber: (n: number) => `Aula ${n}`,
-    open: 'Abrir',
     access: 'Acessar',
     dueDate: (d: string) => `Entrega ${d}`,
     materialType: {
@@ -172,7 +149,6 @@ export const pt = {
   publications: {
     eyebrow: (n: number) => `${n} ${plural(n, 'item', 'itens')}`,
     title: 'Publicações',
-    featured: 'Destaque',
     type: {
       artigo: 'Artigo',
       preprint: 'Preprint',
@@ -185,14 +161,11 @@ export const pt = {
     doi: 'DOI',
     arxiv: 'arXiv',
     pdf: 'PDF',
-    abstractAndKeywords: 'Resumo e palavras-chave',
-    keywords: 'Palavras-chave',
   },
   notFound: {
     eyebrow: 'Erro 404',
     title: 'Página não encontrada',
     body: 'O endereço pode ter mudado de semestre. Materiais de disciplinas anteriores continuam na página de Ensino.',
-    backHome: 'Voltar ao início',
     allPages: 'Todas as páginas',
   },
 };
