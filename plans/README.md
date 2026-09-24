@@ -4,8 +4,8 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-24 (redesenho e polimento do site público na branch `design`, entre a
-fase 3 e a 4 — ver a seção abaixo; fase 4 ainda não fatiada)
+Última atualização: 2026-09-24 (redesenho e polimento do site público, entre a fase 3 e a 4,
+integrados à `main` em `00fdef9` — ver a seção abaixo; fase 4 ainda não fatiada)
 
 ## Fases
 
@@ -39,9 +39,10 @@ garantia de que o ciclo de publicação fecha. Não foi o caminho escolhido.
 
 ## Entre a fase 3 e a 4 — redesenho e polimento (2026-09-23 a 2026-09-24)
 
-Trabalho fora do fluxo de planos numerados, na branch **`design`** (criada de `5c38a28`, só local,
-**ainda não integrada à `main`**), por decisão do stakeholder de aperfeiçoar o frontend antes da
-fase 4:
+Trabalho fora do fluxo de planos numerados, feito na branch **`design`** (criada de `5c38a28`) por
+decisão do stakeholder de aperfeiçoar o frontend antes da fase 4, e **integrado à `main` em
+`00fdef9`** (fast-forward, 2026-09-24; CI `qualidade` e Workers Builds verdes, produção na versão
+`44a1c293`). O trabalho volta para a `main`:
 
 - **Redesenho** (`f7e7345`): o site num cartão contido que não rola a partir de `lg`; Home, Sobre,
   Ensino e Publicações novas; `perfil.atuacao[]` no CMS; GSAP na sanfona de Publicações; barra de
@@ -51,14 +52,18 @@ fase 4:
   `docs/superpowers/plans/2026-09-23-polimento.md` (9 tarefas), executado em modo nativo com revisão
   final por um revisor novo. O resultado e as decisões estão no fim do spec.
 - **Depois do polimento, a pedido do stakeholder:** sem contagens nem numeração (`725eca3`) e
-  títulos na margem esquerda com o metadado numa linha acima (`728a580`).
+  títulos na margem esquerda com o metadado numa linha acima (`728a580`); menu sem "Início", a volta
+  à Home é o nome (`3029ccc`); seta de volta no lugar da trilha da disciplina (`408477d`); contato
+  da Sobre também na Home (`b6e8a7f`); título e régua parados, só o conteúdo rola (`d601180`);
+  sublinhado que segue o cursor no menu e no contato (`00fdef9`).
 
 Não fecha nem reabre item do §12: as rotas são as mesmas, com outro visual.
 `docs/identidade-visual.md` foi revisado (§1–§7) para descrever o site atual.
 
 **Para a fase 4:**
 
-1. Integrar a `design` à `main` antes de fatiar — a fase 4 espelha as páginas atuais.
+1. ~~Integrar a `design` à `main`~~ — feito em `00fdef9`. A fase 4 espelha as páginas atuais da
+   `main` e parte dela.
 2. `perfil.atuacao[]` nasceu sem par no grupo `en`; o §12 da fase 4 ganhou um item para isso (9 itens).
 3. O lugar do seletor de idioma (RF-29) está marcado por um comentário no `SiteHeader.astro`.
 4. Cada página nova em `/en` tem de manter **no máximo um `vt-nome` e um `vt-menu`** (teste em

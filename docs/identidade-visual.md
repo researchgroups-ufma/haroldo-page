@@ -16,7 +16,8 @@ restrições do §8.2 e da RNF-02. As decisões de recorte estão em
 
 Criado em 2026-09-14. **Revisado em 2026-09-24** para descrever o site depois do redesenho em
 cartão contido (`f7e7345`) e do polimento (`ffb5304`..`728a580`, spec em
-`docs/superpowers/specs/2026-09-23-polimento-design.md`), ambos na branch `design`. As seções 1 a 7
+`docs/superpowers/specs/2026-09-23-polimento-design.md`), feitos na branch `design` e integrados à
+`main` em `00fdef9`. As seções 1 a 7
 descrevem o código atual; as seções 8 e 9 são o registro da tradução do mock e ficaram como estavam.
 
 ---

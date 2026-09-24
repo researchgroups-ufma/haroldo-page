@@ -207,8 +207,9 @@ Fase 0 — setup e provisionamento (planos 001 a 013):
 
 ### Alterado
 
-Redesenho e polimento do site público (branch `design`, 2026-09-23 a 2026-09-24, fora dos planos
-numerados; spec e resultado em `docs/superpowers/specs/2026-09-23-polimento-design.md`):
+Redesenho e polimento do site público (2026-09-23 a 2026-09-24, fora dos planos numerados, feito na
+branch `design` e integrado à `main` em `00fdef9`; spec e resultado em
+`docs/superpowers/specs/2026-09-23-polimento-design.md`):
 
 - O site passa a viver num cartão contido; a partir de `lg` a página não rola e o conteúdo rola
   dentro do cartão, com barra de rolagem própria. Sai o rodapé (`f7e7345`).
@@ -224,6 +225,15 @@ numerados; spec e resultado em `docs/superpowers/specs/2026-09-23-polimento-desi
   favicon e `theme-color` (`2c4d179`).
 - Removidos `PillButton`, `Tag`, `ProjectCard` e os textos e funções que ficaram sem uso
   (`6605226`, `725eca3`).
+- Menu das páginas internas sem "Início": a volta à Home é o nome (`3029ccc`).
+- Página de disciplina com uma seta de volta para Ensino no lugar da trilha "Ensino / código"
+  (`408477d`).
+- Contato da Sobre (e-mail e perfis acadêmicos, na mesma ordem) também na Home, com a lista
+  montada por `profileLinks` em `src/lib/profile.ts` (`b6e8a7f`).
+- Título e régua das páginas internas parados; só o conteúdo depois da régua rola. O primeiro
+  bloco de Pesquisa e Publicações perde a borda que dobrava a régua (`d601180`).
+- Sublinhado que segue o cursor no menu e nos links de contato, recriado da variante `link` do
+  `gsap-fillable-button` da PaceUI sem React nem GSAP (`00fdef9`).
 - `docs/identidade-visual.md` §1–§7 reescritas para descrever o site atual.
 
 - **Astro 5.18.2 → 7.2.10**, feito antes de a fase 1 escrever os schemas de conteúdo, porque a
