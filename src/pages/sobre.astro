@@ -4,17 +4,18 @@
  *  Arquivo      : sobre.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Página Sobre do site público (RF-21), contida no cartão sem
- *                 rolagem a partir de `lg`, como a Home: à esquerda, o título,
- *                 a foto com a biografia e o contato (e-mail e perfis
+ *                 rolagem a partir de `lg`, como a Home: cabeçalho compacto
+ *                 (PageHeader); à esquerda, a foto com a biografia e o contato (e-mail e perfis
  *                 acadêmicos); à direita, as timelines de formação acadêmica
  *                 e de atuação profissional — apenas os campos preenchidos,
  *                 sem rótulo órfão (F-08). As áreas de atuação ficam na Home.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/ExternalLink.astro,
+ *                 src/components/PageHeader.astro,
  *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
  *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
  *  Entradas     : coleção `perfil` (singleton), já validada pelo Zod
@@ -28,6 +29,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
+import PageHeader from '../components/PageHeader.astro';
 import { pt } from '../i18n/pt';
 import { toParagraphs } from '../lib/text';
 import { requireSingleton } from '../lib/published';
@@ -84,12 +86,12 @@ const timelines: Timeline[] = [
 ---
 
 <BaseLayout title={pt.about.eyebrow}>
-  <div
-    class="px-margem grid min-h-0 flex-1 gap-x-8 gap-y-10 pt-6 pb-8 lg:grid-cols-12 lg:grid-rows-[minmax(0,1fr)] lg:pt-8"
-  >
-    <div class="flex min-h-0 flex-col gap-8 lg:col-span-7 lg:gap-6">
-      <h1 class="text-display-2 titulo-entrada">{pt.about.title}</h1>
+  <PageHeader title={pt.about.title} />
 
+  <div
+    class="px-margem grid min-h-0 flex-1 gap-x-8 gap-y-10 pt-6 pb-8 lg:grid-cols-12 lg:grid-rows-[minmax(0,1fr)]"
+  >
+    <div class="flex min-h-0 flex-col gap-8 lg:col-span-6 lg:gap-6">
       <div
         class="flex min-h-0 flex-1 flex-col justify-end gap-6 sm:flex-row sm:items-end sm:justify-start"
       >
@@ -123,16 +125,16 @@ const timelines: Timeline[] = [
       </div>
     </div>
 
-    <div class="flex flex-col gap-6 lg:col-span-5 lg:pt-3">
+    <div class="flex flex-col gap-4 lg:col-span-6">
       {
         timelines.map((timeline) => (
           <section aria-labelledby={timeline.id}>
             <h2 id={timeline.id} class="text-rotulo text-secundario">
               {timeline.label}
             </h2>
-            <ol class="text-pequeno mt-3 space-y-2">
+            <ol class="text-pequeno mt-2 space-y-1">
               {timeline.items.map((item) => (
-                <li class="grid grid-cols-[6.5rem_1fr] gap-x-4">
+                <li class="grid grid-cols-[var(--coluna-rotulo)_1fr] gap-x-4">
                   <span class="text-secundario">{item.period}</span>
                   <div>
                     <p>{item.title}</p>

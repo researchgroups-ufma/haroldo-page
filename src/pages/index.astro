@@ -11,8 +11,8 @@
  *                 link do currículo, formação e áreas.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.5.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.6.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/lib/config.ts (siteConfig),
  *                 src/lib/navigation.ts (NAV_ITEMS), src/i18n/pt.ts,
@@ -52,11 +52,11 @@ const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
         {siteConfig.displayName}
       </h1>
       <nav aria-label={pt.site.mainNavLabel} class="lg:col-span-6 lg:col-start-7 lg:pt-3">
-        <ul class="text-pequeno flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
+        <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
           {
             navItems.map((item) => (
               <li>
-                <a href={item.href} class="hover:underline">
+                <a href={item.href} class="link-sublinhado">
                   {pt.nav[item.key]}
                 </a>
               </li>

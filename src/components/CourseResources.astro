@@ -12,8 +12,8 @@
  *                 para manter os dois abaixo de 150 linhas (§10.4 do PRD).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/CoursePanel.astro,
  *                 src/i18n/pt.ts,
@@ -72,7 +72,7 @@ const links = data.links ?? [];
     <CoursePanel id="materiais" title={pt.course.materials}>
       <ul>
         {materiais.map((material) => (
-          <li class="recurso-linha grid gap-x-4 gap-y-1 py-3 sm:grid-cols-[7rem_1fr]">
+          <li class="recurso-linha grid gap-x-4 gap-y-1 py-3 sm:grid-cols-[var(--coluna-rotulo)_1fr]">
             <span class="text-pequeno text-secundario sm:pt-0.5">
               {pt.course.materialType[material.tipo]}
             </span>

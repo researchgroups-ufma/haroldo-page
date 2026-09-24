@@ -9,8 +9,8 @@
  *                 progressiva (RNF-02) — sem JS a lista abre e o botão some.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.4.0
  *
  *  Dependências : src/i18n/pt.ts, src/lib/config.ts (siteConfig),
  *                 src/lib/navigation.ts (NAV_ITEMS, isActivePath)
@@ -41,7 +41,7 @@ import { NAV_ITEMS, isActivePath } from '../lib/navigation';
         hidden
         aria-expanded="false"
         aria-controls="menu-lista"
-        class="inline-flex min-h-11 items-center px-2 text-[0.9375rem] lg:hidden"
+        class="text-nav inline-flex min-h-11 items-center px-2 lg:hidden"
       >
         {pt.site.menu}
       </button>
@@ -61,7 +61,7 @@ import { NAV_ITEMS, isActivePath } from '../lib/navigation';
                       href={item.href}
                       aria-current={active ? 'page' : undefined}
                       class:list={[
-                        'flex min-h-11 items-center justify-between gap-2 text-[0.9375rem] lg:inline-flex lg:min-h-0',
+                        'link-sublinhado text-nav flex min-h-11 items-center justify-between gap-2 lg:inline-flex lg:min-h-0',
                         active && 'underline decoration-1 underline-offset-[6px]',
                       ]}
                     >

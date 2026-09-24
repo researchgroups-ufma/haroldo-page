@@ -12,8 +12,8 @@
  *                 bibliografia e links. Rascunho não gera página (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.4.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
  *                 src/components/CoursePanel.astro, src/components/LessonList.astro,
@@ -92,7 +92,7 @@ const lessons = data.aulas ?? [];
     <span class="text-pequeno text-secundario">{data.codigo ?? data.nome}</span>
   </nav>
 
-  <PageHeader eyebrow={meta} title={data.nome}>
+  <PageHeader title={data.nome} meta={meta}>
     <Fragment slot="aside">
       {descriptionParagraphs.map((paragraph) => <p class="text-corpo">{paragraph}</p>)}
       {

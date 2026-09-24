@@ -11,8 +11,8 @@
  *                 deles, o ano fecha e o seguinte abre (GSAP ScrollTrigger).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-22
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
  *                 src/components/PublicationItem.astro, src/i18n/pt.ts,
@@ -47,7 +47,7 @@ const groups = groupByYear(published);
 ---
 
 <BaseLayout title={pt.publications.title}>
-  <PageHeader eyebrow={pt.publications.eyebrow(published.length)} title={pt.publications.title} />
+  <PageHeader title={pt.publications.title} />
 
   {
     /* Pai em bloco: o ScrollTrigger desliga o `pinSpacing` quando o pai do pin é flex (o `<main>`). */
@@ -62,7 +62,7 @@ const groups = groupByYear(published);
             <section id={sectionId} aria-labelledby={headingId} class="pub-ano">
               <h2
                 id={headingId}
-                class="flex items-baseline justify-between gap-4 py-4 lg:grid lg:grid-cols-[11rem_1fr]"
+                class="flex items-baseline justify-between gap-4 py-4 lg:grid lg:grid-cols-[var(--coluna-rotulo)_1fr]"
               >
                 <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
                   {group.year}
@@ -72,7 +72,7 @@ const groups = groupByYear(published);
                 </span>
               </h2>
               <div class="pub-ano-corpo">
-                <ol class="pub-ano-lista space-y-6 pb-8 lg:pl-[11rem]">
+                <ol class="pub-ano-lista space-y-6 pb-8 lg:pl-[var(--coluna-rotulo)]">
                   {group.items.map((item) => (
                     <li>
                       <PublicationItem publication={item} />

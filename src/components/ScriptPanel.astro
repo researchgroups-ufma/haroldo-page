@@ -10,8 +10,8 @@
  *                 "Copiado" por `aria-live`, e "Abrir arquivo ↗" só com `url`.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-21
- *  Atualizado em: 2026-09-21
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.2.0
  *
  *  Dependências : astro:components (Code), astro:content (tipo
  *                 CollectionEntry<'disciplinas'>), src/components/ExternalLink.astro,
@@ -64,7 +64,7 @@ const paragraphs = toParagraphs(script.descricao);
         hidden
         data-copy-label={pt.script.copy}
         data-copied-label={pt.script.copied}
-        class="bg-tinta text-papel border-tinta inline-flex min-h-11 items-center justify-center rounded-full border px-6 text-[0.9375rem] transition-colors duration-[120ms]"
+        class="bg-tinta text-papel border-tinta text-nav inline-flex min-h-11 items-center justify-center rounded-full border px-6 transition-colors duration-[120ms]"
       >
         {pt.script.copy}
       </button>

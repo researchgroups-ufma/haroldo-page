@@ -55,10 +55,7 @@ const publishedLineIds = new Set(lines.map((line) => line.id));
 ---
 
 <BaseLayout title={pt.nav.research}>
-  <PageHeader
-    eyebrow={pt.research.summary(lines.length, projects.length)}
-    title={pt.research.title}
-  />
+  <PageHeader title={pt.research.title} />
 
   <div class="px-margem mx-auto max-w-[90rem]">
     {

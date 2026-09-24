@@ -10,8 +10,8 @@
  *                 sempre rotulados, com estado vazio explícito (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
  *                 src/components/ExternalLink.astro, src/i18n/pt.ts,
@@ -46,7 +46,7 @@ buildCourseSlugs(disciplinas);
 ---
 
 <BaseLayout title={pt.nav.teaching}>
-  <PageHeader eyebrow={pt.teaching.eyebrow} title={pt.teaching.title} />
+  <PageHeader title={pt.teaching.title} />
 
   <section aria-labelledby="ensino-atuais" class="px-margem pt-8 pb-4">
     <h2 id="ensino-atuais" class="text-rotulo text-secundario">{pt.teaching.current}</h2>
@@ -60,13 +60,13 @@ buildCourseSlugs(disciplinas);
           // RN-04: a ordem das aulas é a do professor — a "última" é a última da lista dele.
           const latest = aulas?.at(-1);
           return (
-            <article class="grid gap-x-8 gap-y-2 py-6 lg:grid-cols-[11rem_1fr]">
+            <article class="grid gap-x-8 gap-y-2 py-6 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
               <p class="text-pequeno text-secundario lg:pt-3">
                 {codigo ? `${codigo} · ${semestre}` : semestre}
               </p>
               <div>
                 <h3 class="text-display-2">
-                  <a href={`/ensino/${courseSlug(course.filePath)}/`} class="hover:underline">
+                  <a href={`/ensino/${courseSlug(course.filePath)}/`} class="link-sublinhado">
                     {nome}
                   </a>
                 </h3>
@@ -105,13 +105,15 @@ buildCourseSlugs(disciplinas);
               <li class="disciplina-anterior">
                 <a
                   href={`/ensino/${courseSlug(course.filePath)}/`}
-                  class="group grid grid-cols-[1fr_auto] items-baseline gap-x-8 gap-y-1 py-3 lg:grid-cols-[11rem_1fr_auto]"
+                  class="group grid grid-cols-[1fr_auto] items-baseline gap-x-8 gap-y-1 py-3 lg:grid-cols-[var(--coluna-rotulo)_1fr_auto]"
                 >
                   {/* Mesma coluna e formato da disciplina atual, para os nomes alinharem. */}
                   <span class="text-pequeno text-secundario col-span-2 lg:col-span-1">
                     {codigo ? `${codigo} · ${semestre}` : semestre}
                   </span>
-                  <span class="text-titulo-item group-hover:underline">{nome}</span>
+                  <span class="text-titulo-item decoration-1 underline-offset-[6px] group-hover:underline">
+                    {nome}
+                  </span>
                   <span aria-hidden="true" class="text-secundario">
                     ›
                   </span>
