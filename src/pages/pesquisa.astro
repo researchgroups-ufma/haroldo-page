@@ -5,22 +5,21 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Página Pesquisa do site público (RF-22, RF-13, §6.3 da
  *                 identidade visual): linhas de pesquisa publicadas, na ordem
- *                 do professor, com resumo, corpo e imagem quando houver, e
- *                 os projetos publicados (em andamento antes de concluídos)
- *                 com status, período, financiador, descrição, colaboradores
- *                 e link para a linha relacionada, sem revelar linha não
- *                 publicada (RN-01).
+ *                 do professor, com resumo, corpo e imagem quando houver, e os
+ *                 projetos de cada uma logo abaixo (em andamento antes de
+ *                 concluídos), com período, status, descrição, financiador e
+ *                 colaboradores; "Outros projetos" no fim reúne os sem linha ou
+ *                 ligados a linha não publicada, sem revelá-la (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-18
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
- *                 src/components/Tag.astro, src/components/ProjectCard.astro,
  *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs, padCount),
  *                 src/lib/published.ts (filterPublished),
  *                 src/lib/research.ts (sortResearchLines, sortProjects,
- *                 countActiveProjectsByLine, relatedLineAnchor), astro:content
+ *                 groupProjectsByLine), astro:content
  *                 (getCollection)
  *  Entradas     : coleções `linhas-pesquisa` e `projetos`, já validadas pelo Zod
  *  Saídas       : HTML estático da rota `/pesquisa/`
@@ -33,99 +32,130 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
-import Tag from '../components/Tag.astro';
-import ProjectCard from '../components/ProjectCard.astro';
 import { pt } from '../i18n/pt';
 import { padCount, toParagraphs } from '../lib/text';
 import { filterPublished } from '../lib/published';
-import {
-  countActiveProjectsByLine,
-  relatedLineAnchor,
-  sortProjects,
-  sortResearchLines,
-} from '../lib/research';
+import { groupProjectsByLine, sortProjects, sortResearchLines } from '../lib/research';
 
 // RN-01: só linhas e projetos publicados entram na página.
 const lines = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')));
 const projects = sortProjects(filterPublished(await getCollection('projetos')));
+const { byLine, others } = groupProjectsByLine(new Set(lines.map((line) => line.id)), projects);
 
-const activeCountsByLine = countActiveProjectsByLine(projects);
-// RN-01: um projeto só linka a âncora de uma linha publicada, presente nesta página.
-const publishedLineIds = new Set(lines.map((line) => line.id));
+/** Período do projeto: "inicio–fim", ou "inicio–" em aberto. */
+const period = (p: (typeof projects)[number]) =>
+  p.data.periodo ? `${p.data.periodo.inicio}–${p.data.periodo.fim ?? ''}` : undefined;
 ---
 
 <BaseLayout title={pt.nav.research}>
   <PageHeader title={pt.research.title} />
 
-  <div class="px-margem mx-auto max-w-[90rem]">
+  <div class="px-margem pb-10">
     {
       lines.map((line, index) => {
-        const activeCount = activeCountsByLine.get(line.id) ?? 0;
         const paragraphs = [...toParagraphs(line.data.resumo), ...toParagraphs(line.data.corpo)];
+        const lineProjects = byLine.get(line.id) ?? [];
         return (
-          <section
-            id={line.id}
-            class:list={[
-              'linha-pesquisa grid grid-cols-1 gap-4 py-10 sm:grid-cols-[7rem_1fr] sm:gap-8',
-              index === 0 && 'linha-pesquisa-primeira',
-            ]}
-          >
-            <span aria-hidden="true" class="text-numeral">
-              {padCount(index + 1)}
-            </span>
-            <div>
-              <div class="flex flex-wrap items-baseline gap-3">
-                <h2 class="text-display-2">{line.data.titulo}</h2>
-                {activeCount > 0 && (
-                  <Tag variant="strong" dot>
-                    {pt.research.activeProjects(activeCount)}
-                  </Tag>
+          <section id={line.id} aria-labelledby={`${line.id}-titulo`} class="linha-pesquisa py-8">
+            <div class="grid gap-x-8 gap-y-2 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
+              <span aria-hidden="true" class="text-pequeno text-secundario lg:pt-3">
+                {padCount(index + 1)}
+              </span>
+              <div>
+                <h2 id={`${line.id}-titulo`} class="text-display-2">
+                  {line.data.titulo}
+                </h2>
+                {paragraphs.map((paragraph, i) => (
+                  <p class:list={['text-corpo max-w-medida mt-3', i === 0 && 'text-secundario']}>
+                    {paragraph}
+                  </p>
+                ))}
+                {line.data.imagem && (
+                  <img
+                    src={line.data.imagem}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    class="mt-4 w-full max-w-md object-cover grayscale"
+                  />
                 )}
               </div>
-              {paragraphs.map((paragraph) => (
-                <p class="text-corpo max-w-medida mt-3">{paragraph}</p>
-              ))}
-              {line.data.imagem && (
-                <img
-                  src={line.data.imagem}
-                  alt={line.data.titulo}
-                  loading="lazy"
-                  decoding="async"
-                  class="mt-4 w-full max-w-md object-cover"
-                />
-              )}
             </div>
+            {lineProjects.length > 0 && (
+              <ol class="mt-6">
+                {lineProjects.map((project) => (
+                  <li class="projeto-linha grid gap-x-8 gap-y-1 py-3 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
+                    <p class="text-pequeno text-secundario">
+                      {period(project)}
+                      {project.data.status && (
+                        <span class="block">{pt.research.status[project.data.status]}</span>
+                      )}
+                    </p>
+                    <div>
+                      <h3 class="text-titulo-item">{project.data.titulo}</h3>
+                      <p class="text-pequeno text-secundario max-w-medida mt-1">
+                        {project.data.descricao}
+                      </p>
+                      {(project.data.financiador || project.data.colaboradores?.length) && (
+                        <p class="text-pequeno text-secundario mt-1">
+                          {[project.data.financiador, project.data.colaboradores?.join(', ')]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
           </section>
         );
       })
     }
-  </div>
 
-  {
-    projects.length > 0 && (
-      <div class="px-margem mx-auto max-w-[90rem] py-10">
-        <h2 class="text-rotulo text-secundario">{pt.research.projects}</h2>
-        <div class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-6">
-          {projects.map((project) => {
-            const lineHref = relatedLineAnchor(project, publishedLineIds);
-            const lineTitle = lineHref
-              ? lines.find((line) => line.id === project.data.linha_relacionada?.id)?.data.titulo
-              : undefined;
-            return <ProjectCard project={project} lineHref={lineHref} lineTitle={lineTitle} />;
-          })}
-        </div>
-      </div>
-    )
-  }
+    {
+      others.length > 0 && (
+        <section aria-labelledby="outros-projetos" class="linha-pesquisa py-8">
+          <h2 id="outros-projetos" class="text-rotulo text-secundario">
+            {pt.research.otherProjects}
+          </h2>
+          <ol class="mt-4">
+            {others.map((project) => (
+              <li class="projeto-linha grid gap-x-8 gap-y-1 py-3 lg:grid-cols-[var(--coluna-rotulo)_1fr]">
+                <p class="text-pequeno text-secundario">
+                  {period(project)}
+                  {project.data.status && (
+                    <span class="block">{pt.research.status[project.data.status]}</span>
+                  )}
+                </p>
+                <div>
+                  <h3 class="text-titulo-item">{project.data.titulo}</h3>
+                  <p class="text-pequeno text-secundario max-w-medida mt-1">
+                    {project.data.descricao}
+                  </p>
+                  {(project.data.financiador || project.data.colaboradores?.length) && (
+                    <p class="text-pequeno text-secundario mt-1">
+                      {[project.data.financiador, project.data.colaboradores?.join(', ')]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+  </div>
 </BaseLayout>
 
 <style>
-  /* §5.5: grade com régua no topo, régua forte só na primeira linha — aplicado à lista de
-     linhas de pesquisa do §6.3, mesmo padrão de .formacao-linha em sobre.astro. */
+  /* Blocos de linha com régua forte; projetos com régua fina — padrão de lista do site. */
   .linha-pesquisa {
-    border-top: 1px solid var(--color-regua);
-  }
-  .linha-pesquisa-primeira {
     border-top: 1px solid var(--color-tinta);
+  }
+  .projeto-linha {
+    border-top: 1px solid var(--color-regua);
   }
 </style>

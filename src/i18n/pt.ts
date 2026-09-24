@@ -12,8 +12,8 @@
  *                 se um enum mudar sem o dicionário acompanhar.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
- *  Atualizado em: 2026-09-16
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/content.config.ts (projetosSchema, disciplinasSchema,
  *                 publicacoesSchema — só para os tipos dos mapas de enum)
@@ -109,6 +109,7 @@ export const pt = {
     projects: 'Projetos',
     collaborators: 'Colaboradores',
     relatedLine: 'Linha relacionada',
+    otherProjects: 'Outros projetos',
     status: {
       'em andamento': 'Em andamento',
       concluído: 'Concluído',
