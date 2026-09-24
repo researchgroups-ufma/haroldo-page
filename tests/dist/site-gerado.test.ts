@@ -405,3 +405,19 @@ describe('página de disciplina: seta de volta no lugar da trilha', () => {
     }
   });
 });
+
+describe('contato da Home igual ao da Sobre', () => {
+  /** Links do parágrafo de contato (o que tem o `mailto:`), na ordem em que aparecem. */
+  const contactHrefs = (rota: string) => {
+    const html = readFileSync(join(distDir, rota, 'index.html'), 'utf-8');
+    const bloco = html.match(/<p[^>]*>(?:(?!<\/p>)[\s\S])*?mailto:[\s\S]*?<\/p>/)?.[0] ?? '';
+    return [...bloco.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+  };
+
+  it('mesmos links, na mesma sequência, começando pelo e-mail', () => {
+    const sobre = contactHrefs('sobre');
+    expect(sobre.length).toBeGreaterThan(1);
+    expect(sobre[0]).toMatch(/^mailto:/);
+    expect(contactHrefs('')).toEqual(sobre);
+  });
+});

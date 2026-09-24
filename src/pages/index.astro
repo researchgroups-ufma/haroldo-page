@@ -8,13 +8,15 @@
  *                 de `lg`) com o nome de exibição e a navegação no topo, o
  *                 retrato em p&b quando o perfil tiver `foto` (F-08) e, sob a
  *                 régua, dados do Lattes — cargo, instituição, `resumo_home`,
- *                 link do currículo, formação e áreas.
+ *                 contato (e-mail e perfis, na sequência da Sobre), formação
+ *                 e áreas.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
  *  Atualizado em: 2026-09-24
  *  Versão       : 0.6.0
  *
- *  Dependências : src/layouts/BaseLayout.astro, src/lib/config.ts (siteConfig),
+ *  Dependências : src/layouts/BaseLayout.astro, src/components/ExternalLink.astro,
+ *                 src/lib/config.ts (siteConfig), src/lib/profile.ts (profileLinks),
  *                 src/lib/navigation.ts (NAV_ITEMS), src/i18n/pt.ts,
  *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
  *  Entradas     : coleção `perfil` (singleton), já validada pelo Zod
@@ -27,9 +29,11 @@
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ExternalLink from '../components/ExternalLink.astro';
 import { pt } from '../i18n/pt';
 import { siteConfig } from '../lib/config';
 import { NAV_ITEMS } from '../lib/navigation';
+import { profileLinks } from '../lib/profile';
 import { requireSingleton } from '../lib/published';
 
 // `perfil` é singleton (plano 039): `requireSingleton` estoura se o painel não tiver exatamente 1 item.
@@ -37,7 +41,8 @@ const perfil = requireSingleton(await getCollection('perfil'), 'perfil').data;
 
 const formacao = perfil.formacao ?? [];
 const areas = perfil.areas ?? [];
-const lattesUrl = perfil.links?.lattes;
+// Mesmo contato da Sobre: e-mail e perfis acadêmicos na ordem fixa do schema, CV por último.
+const links = profileLinks(perfil.links, perfil.cv_url, pt.about.links);
 // A Home não lista a si mesma no menu.
 const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
 ---
@@ -94,14 +99,19 @@ const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
           <p>{perfil.instituicao}</p>
         </div>
         <p class="max-w-[24rem]">{perfil.resumo_home}</p>
-        {
-          lattesUrl && (
-            <a href={lattesUrl} target="_blank" rel="noopener noreferrer" class="underline">
-              {pt.about.links.lattes} <span aria-hidden="true">↗</span>{' '}
-              <span class="sr-only">{pt.site.opensInNewTab}</span>
-            </a>
-          )
-        }
+        <div>
+          <h2 class="text-secundario">{pt.about.contact}</h2>
+          <p class="mt-1 flex flex-wrap gap-x-5 gap-y-1">
+            <a href={`mailto:${perfil.email}`} class="underline">{perfil.email}</a>
+            {
+              links.map((link) => (
+                <ExternalLink href={link.href} class="underline">
+                  {link.label}
+                </ExternalLink>
+              ))
+            }
+          </p>
+        </div>
       </div>
       {
         formacao.length > 0 && (

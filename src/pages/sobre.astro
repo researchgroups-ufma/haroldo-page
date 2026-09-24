@@ -16,7 +16,7 @@
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/ExternalLink.astro,
  *                 src/components/PageHeader.astro,
- *                 src/i18n/pt.ts, src/lib/config.ts (siteConfig), src/lib/text.ts (toParagraphs),
+ *                 src/i18n/pt.ts, src/lib/config.ts (siteConfig), src/lib/profile.ts (profileLinks), src/lib/text.ts (toParagraphs),
  *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
  *  Entradas     : coleção `perfil` (singleton), já validada pelo Zod
  *  Saídas       : HTML estático da rota `/sobre/`
@@ -31,6 +31,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { siteConfig } from '../lib/config';
+import { profileLinks } from '../lib/profile';
 import { pt } from '../i18n/pt';
 import { toParagraphs } from '../lib/text';
 import { requireSingleton } from '../lib/published';
@@ -40,21 +41,8 @@ const perfil = requireSingleton(await getCollection('perfil'), 'perfil').data;
 
 const bioParagraphs = toParagraphs(perfil.bio);
 
-// RF-21: ordem fixa dos perfis acadêmicos, igual à do schema (`linksSchema`); `cv_url` por último.
-const LINK_ORDER = [
-  'lattes',
-  'orcid',
-  'scholar',
-  'arxiv',
-  'researchgate',
-  'github',
-  'institucional',
-] as const;
-const profileLinks = LINK_ORDER.flatMap((key) => {
-  const href = perfil.links?.[key];
-  return href ? [{ href, label: pt.about.links[key] }] : [];
-});
-if (perfil.cv_url) profileLinks.push({ href: perfil.cv_url, label: pt.about.links.cv });
+// RF-21: perfis acadêmicos na ordem fixa do schema, `cv_url` por último — a mesma lista da Home.
+const links = profileLinks(perfil.links, perfil.cv_url, pt.about.links);
 
 /** Um bloco de timeline: rótulo e itens (período · título · instituição), na ordem do professor. */
 interface Timeline {
@@ -118,7 +106,7 @@ const timelines: Timeline[] = [
         <p class="mt-2 flex flex-wrap gap-x-5 gap-y-1">
           <a href={`mailto:${perfil.email}`} class="underline">{perfil.email}</a>
           {
-            profileLinks.map((link) => (
+            links.map((link) => (
               <ExternalLink href={link.href} class="underline">
                 {link.label}
               </ExternalLink>

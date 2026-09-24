@@ -180,7 +180,8 @@ nativa, fina, nas cores do site.
   "Início".
 - Meio: **foto** em p&b, 3:4, quando houver.
 - Régua forte e três blocos: **cargo** / **departamento** / **instituicao**, **resumo_home** e o
-  link do Lattes; **formacao[]** (ano · grau — curso); **areas[]**.
+  contato (rubrica "Contato", **email** e os perfis acadêmicos na mesma sequência da Sobre —
+  `profileLinks`); **formacao[]** (ano · grau — curso); **areas[]**.
 - Sem rolagem a partir de `lg`. Os caminhos para Pesquisa, Ensino e Publicações são a navegação.
 
 ### 6.2 Sobre `/sobre` (RF-21)
