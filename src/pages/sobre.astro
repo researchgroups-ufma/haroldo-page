@@ -16,7 +16,7 @@
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/ExternalLink.astro,
  *                 src/components/PageHeader.astro,
- *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
+ *                 src/i18n/pt.ts, src/lib/config.ts (siteConfig), src/lib/text.ts (toParagraphs),
  *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
  *  Entradas     : coleção `perfil` (singleton), já validada pelo Zod
  *  Saídas       : HTML estático da rota `/sobre/`
@@ -30,6 +30,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import PageHeader from '../components/PageHeader.astro';
+import { siteConfig } from '../lib/config';
 import { pt } from '../i18n/pt';
 import { toParagraphs } from '../lib/text';
 import { requireSingleton } from '../lib/published';
@@ -99,7 +100,7 @@ const timelines: Timeline[] = [
           perfil.foto && (
             <img
               src={perfil.foto}
-              alt={perfil.nome}
+              alt={pt.site.portraitAlt(siteConfig.displayName)}
               decoding="async"
               class="aspect-[3/4] w-40 object-cover grayscale sm:w-48 lg:h-full lg:max-h-[20rem] lg:w-auto"
             />

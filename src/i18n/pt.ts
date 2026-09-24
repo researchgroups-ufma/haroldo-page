@@ -65,6 +65,7 @@ export const pt = {
     mainNavLabel: 'Navegação principal',
     opensInNewTab: '(abre em nova aba)',
     pageTitle: (page: string, site: string) => `${page} — ${site}`,
+    portraitAlt: (nome: string) => `Retrato de ${nome}`,
   },
   nav: {
     home: 'Início',

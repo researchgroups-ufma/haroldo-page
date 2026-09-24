@@ -10,8 +10,8 @@
  *                 rolar.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-23
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.2.0
  *
  *  Dependências : nenhuma
  *  Entradas     : nenhuma — lê o `#conteudo` do `BaseLayout`
@@ -173,7 +173,11 @@
     thumb.addEventListener('pointercancel', endDrag);
     track.addEventListener('pointerdown', (event) => {
       const y = event.clientY - track.getBoundingClientRect().top - thumbHeight / 2;
-      scroller.scrollTo({ top: (y / maxOffset()) * maxScroll(), behavior: 'smooth' });
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      scroller.scrollTo({
+        top: (y / maxOffset()) * maxScroll(),
+        behavior: reduce ? 'auto' : 'smooth',
+      });
     });
 
     render();

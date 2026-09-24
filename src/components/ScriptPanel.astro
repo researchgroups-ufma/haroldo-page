@@ -17,7 +17,8 @@
  *                 CollectionEntry<'disciplinas'>), src/components/ExternalLink.astro,
  *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
  *                 src/lib/code-theme.ts (monochromeTheme, shikiLanguage)
- *  Entradas     : prop `script` (um item de `data.scripts`, já validado pelo Zod)
+ *  Entradas     : prop `script` (um item de `data.scripts`, já validado pelo Zod);
+ *                 prop `headingLevel` (3 ou 4, padrão 3)
  *  Saídas       : `<article data-script>` com o painel e o `<script>` do botão copiar
  *  Uso          : import ScriptPanel from '../components/ScriptPanel.astro'
  *
@@ -39,9 +40,12 @@ export interface Props {
    * não há o que renderizar (nenhum comportamento de prop ausente definido, §10.2).
    */
   script: NonNullable<CollectionEntry<'disciplinas'>['data']['scripts']>[number];
+  /** Nível do título do script; 4 quando o painel está dentro de uma aula (que já é `h3`). Padrão 3. */
+  headingLevel?: 3 | 4;
 }
 
-const { script } = Astro.props;
+const { script, headingLevel = 3 } = Astro.props;
+const Heading = headingLevel === 4 ? 'h4' : 'h3';
 const paragraphs = toParagraphs(script.descricao);
 ---
 
@@ -53,7 +57,7 @@ const paragraphs = toParagraphs(script.descricao);
     <p class="text-rotulo text-secundario">
       {pt.script.eyebrow(pt.script.language[script.linguagem])}
     </p>
-    <h3 class="text-titulo-item mt-2">{script.titulo}</h3>
+    <Heading class="text-titulo-item mt-2">{script.titulo}</Heading>
     {paragraphs.map((paragraph) => <p class="text-corpo mt-2">{paragraph}</p>)}
     <div class="mt-4 flex flex-wrap items-center gap-4">
       {

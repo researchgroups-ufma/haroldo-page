@@ -139,3 +139,9 @@ describe('pt — mapas de enum alinhados aos schemas Zod', () => {
     expect(Object.keys(pt.publications.type)).toEqual(options);
   });
 });
+
+describe('pt.site.portraitAlt', () => {
+  it('monta o texto alternativo do retrato', () => {
+    expect(pt.site.portraitAlt('Haroldo Lima')).toBe('Retrato de Haroldo Lima');
+  });
+});

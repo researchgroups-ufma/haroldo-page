@@ -60,17 +60,16 @@ const groups = groupByYear(published);
           const headingId = `${sectionId}-titulo`;
           return (
             <section id={sectionId} aria-labelledby={headingId} class="pub-ano">
-              <h2
-                id={headingId}
-                class="flex items-baseline justify-between gap-4 py-4 lg:grid lg:grid-cols-[var(--coluna-rotulo)_1fr]"
-              >
-                <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
-                  {group.year}
-                </a>
+              <div class="flex items-baseline justify-between gap-4 py-4 lg:grid lg:grid-cols-[var(--coluna-rotulo)_1fr]">
+                <h2 id={headingId}>
+                  <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
+                    {group.year}
+                  </a>
+                </h2>
                 <span class="text-pequeno text-secundario lg:justify-self-end">
                   {pt.publications.eyebrow(group.items.length)}
                 </span>
-              </h2>
+              </div>
               <div class="pub-ano-corpo">
                 <ol class="pub-ano-lista space-y-6 pb-8 lg:pl-[var(--coluna-rotulo)]">
                   {group.items.map((item) => (
@@ -112,7 +111,8 @@ const groups = groupByYear(published);
 
   // Com um ano só não há o que sanfonar — a lista fica como está.
   if (scroller && wrapper && sections.length > 1) {
-    const headers = sections.map((section) => section.querySelector('h2') as HTMLElement);
+    // Cabeçalho do ano = primeiro filho da seção (o <h2> com o ano e a contagem ao lado).
+    const headers = sections.map((section) => section.firstElementChild as HTMLElement);
     const bodies = sections.map(
       (section) => section.querySelector('.pub-ano-corpo') as HTMLElement,
     );
@@ -155,6 +155,9 @@ const groups = groupByYear(published);
         }
       });
 
+      // Ano fechado (altura 0) sai do Tab e do leitor de tela; volta ao abrir.
+      const syncInert = () => bodies.forEach((body) => (body.inert = body.offsetHeight < 1));
+
       const trigger = ScrollTrigger.create({
         trigger: wrapper,
         scroller,
@@ -164,7 +167,10 @@ const groups = groupByYear(published);
         scrub: 0.4,
         animation: timeline,
         invalidateOnRefresh: true,
+        onUpdate: syncInert,
+        onRefresh: syncInert,
       });
+      syncInert();
 
       // O link do ano leva a rolagem ao ponto em que aquele ano está aberto.
       const onClick = (event: MouseEvent) => {
@@ -177,7 +183,10 @@ const groups = groupByYear(published);
       };
       links.forEach((link) => link.addEventListener('click', onClick));
 
-      return () => links.forEach((link) => link.removeEventListener('click', onClick));
+      return () => {
+        links.forEach((link) => link.removeEventListener('click', onClick));
+        bodies.forEach((body) => (body.inert = false));
+      };
     });
   }
 </script>
