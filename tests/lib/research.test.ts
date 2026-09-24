@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   countActiveProjectsByLine,
+  groupProjectsByLine,
   relatedLineAnchor,
   sortProjects,
   sortResearchLines,
@@ -144,5 +145,36 @@ describe('relatedLineAnchor', () => {
       data: { titulo: 'Linha rascunho', linha_relacionada: { id: 'linha-oculta' } },
     };
     expect(relatedLineAnchor(project, new Set(['linha-1']))).toBeUndefined();
+  });
+});
+
+describe('groupProjectsByLine', () => {
+  const project = (titulo: string, linha?: string) => ({
+    data: { titulo, linha_relacionada: linha ? { id: linha } : undefined },
+  });
+
+  it('agrupa por linha publicada, preservando a ordem recebida', () => {
+    const projects = [project('B', 'l1'), project('A', 'l1'), project('C', 'l2')];
+    const { byLine, others } = groupProjectsByLine(new Set(['l1', 'l2']), projects);
+    expect(byLine.get('l1')?.map((p) => p.data.titulo)).toEqual(['B', 'A']);
+    expect(byLine.get('l2')?.map((p) => p.data.titulo)).toEqual(['C']);
+    expect(others).toEqual([]);
+  });
+
+  it('projeto sem linha vai para others', () => {
+    const { byLine, others } = groupProjectsByLine(new Set(['l1']), [project('Solto')]);
+    expect(byLine.size).toBe(0);
+    expect(others.map((p) => p.data.titulo)).toEqual(['Solto']);
+  });
+
+  it('RN-01: projeto ligado a linha não publicada vai para others, sem criar a chave', () => {
+    const { byLine, others } = groupProjectsByLine(new Set(['l1']), [project('X', 'rascunho')]);
+    expect(byLine.has('rascunho')).toBe(false);
+    expect(others.map((p) => p.data.titulo)).toEqual(['X']);
+  });
+
+  it('linha sem projetos não aparece no mapa', () => {
+    const { byLine } = groupProjectsByLine(new Set(['l1', 'l2']), [project('A', 'l1')]);
+    expect(byLine.has('l2')).toBe(false);
   });
 });

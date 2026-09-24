@@ -3,13 +3,14 @@
  *  Arquivo      : research.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Ordena linhas de pesquisa e projetos (§6.3 da identidade
- *                 visual), conta projetos em andamento por linha e decide se
+ *                 visual), agrupa projetos por linha publicada, conta projetos
+ *                 em andamento por linha e decide se
  *                 um projeto pode linkar a âncora da linha relacionada sem
  *                 revelar um rascunho (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
- *  Atualizado em: 2026-09-16
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-24
+ *  Versão       : 0.2.0
  *
  *  Dependências : nenhuma
  *  Entradas     : arrays de entradas de coleção, na forma devolvida por
@@ -86,6 +87,35 @@ function compareProjects(a: ProjectLike, b: ProjectLike): number {
  */
 export function sortProjects<T extends ProjectLike>(entries: T[]): T[] {
   return [...entries].sort(compareProjects);
+}
+
+/**
+ * Agrupa projetos pela linha de pesquisa a que pertencem, para a página Pesquisa listar os
+ * projetos dentro de cada linha.
+ *
+ * RN-01: projeto ligado a uma linha fora de `lineIds` (não publicada) vai para `others`, como
+ * se não tivesse linha — a página nunca revela o rascunho.
+ *
+ * @param lineIds Ids das linhas publicadas, presentes na página.
+ * @param projects Projetos já publicados e ordenados (`sortProjects`).
+ * @returns `byLine` (id da linha → projetos, na ordem recebida; linha sem projeto não tem chave)
+ *   e `others` (sem linha ou com linha não publicada).
+ */
+export function groupProjectsByLine<P extends ProjectLike>(
+  lineIds: ReadonlySet<string>,
+  projects: P[],
+): { byLine: Map<string, P[]>; others: P[] } {
+  const byLine = new Map<string, P[]>();
+  const others: P[] = [];
+  for (const project of projects) {
+    const lineId = project.data.linha_relacionada?.id;
+    if (lineId === undefined || !lineIds.has(lineId)) {
+      others.push(project);
+      continue;
+    }
+    byLine.set(lineId, [...(byLine.get(lineId) ?? []), project]);
+  }
+  return { byLine, others };
 }
 
 /**
