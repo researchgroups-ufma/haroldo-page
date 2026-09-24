@@ -128,7 +128,8 @@ Todos em `src/components/`. Não existem mais botão pílula, tag nem rodapé: `
 ### 5.1 Cabeçalho (`SiteHeader.astro`)
 
 - Nome de exibição (`siteConfig.displayName`, "Haroldo Lima") em `display-2`, link para `/`; à
-  direita a navegação em `text-nav` (Início, Sobre, Pesquisa, Ensino, Publicações — `NAV_ITEMS`).
+  direita a navegação em `text-nav` (Sobre, Pesquisa, Ensino, Publicações — `NAV_ITEMS` sem
+  "Início", como na Home: a volta para `/` é sempre o nome).
 - Página ativa: sublinhado de 1 px deslocado 6 px e `aria-current="page"`; o hover faz o mesmo
   sublinhado (`link-sublinhado`). A página de disciplina marca "Ensino".
 - Abaixo de `lg`: botão "Menu" (alvo ≥ 44 px, `aria-expanded`/`aria-controls`) que abre a lista

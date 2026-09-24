@@ -4,8 +4,9 @@
  *  Arquivo      : SiteHeader.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Cabeçalho das páginas internas, dentro do cartão do
- *                 `BaseLayout`: nome de exibição com link para `/`, navegação
- *                 com a rota ativa marcada, e o menu do celular como melhoria
+ *                 `BaseLayout`: nome de exibição com link para `/` (a única
+ *                 volta à Home — o menu não tem "Início"), navegação com a
+ *                 rota ativa marcada, e o menu do celular como melhoria
  *                 progressiva (RNF-02) — sem JS a lista abre e o botão some.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
@@ -24,6 +25,9 @@
 import { pt } from '../i18n/pt';
 import { siteConfig } from '../lib/config';
 import { NAV_ITEMS, isActivePath } from '../lib/navigation';
+
+// Sem "Início", como na Home: a volta para `/` é o nome, igual em todas as páginas.
+const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
 ---
 
 <header class="shrink-0">
@@ -56,7 +60,7 @@ import { NAV_ITEMS, isActivePath } from '../lib/navigation';
             class="divide-regua divide-y lg:flex lg:items-center lg:gap-8 lg:divide-y-0 lg:pt-3"
           >
             {
-              NAV_ITEMS.map((item) => {
+              navItems.map((item) => {
                 const active = isActivePath(item.href, Astro.url.pathname);
                 return (
                   <li>

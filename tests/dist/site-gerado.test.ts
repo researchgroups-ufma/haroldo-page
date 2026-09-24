@@ -372,3 +372,16 @@ describe('desempenho e metadados', () => {
     }
   });
 });
+
+describe('navegação principal sem "Início"', () => {
+  const htmlFiles = listSiteHtmlFiles();
+
+  it('em toda página, o <nav> principal não tem link para "/" — a volta à Home é o nome', () => {
+    for (const file of htmlFiles) {
+      const html = readFileSync(file, 'utf-8');
+      const nav = html.match(/<nav aria-label="Navegação principal"[\s\S]*?<\/nav>/)?.[0];
+      expect(nav, `${file} sem navegação principal`).toBeDefined();
+      expect(nav?.includes('href="/"'), `${file}: menu com "Início"`).toBe(false);
+    }
+  });
+});
