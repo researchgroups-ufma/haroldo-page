@@ -188,7 +188,10 @@ Tests  14 passed (14)
 (uma linha por arquivo, template intocado).
 
 **Passo 5** — `npm run build:pipeline` exit 0 (`8 page(s) built`, `Complete!`);
-`comparar antes.json depois.json` (exit 0):
+`comparar antes.json depois.json` (exit 0). **Refeito em 2026-09-25 com o comparador corrigido**
+(emenda do 055, que passou a manter os `<script>` — o 056 mexe no `SiteHeader.astro`, que carrega o
+script do menu): build real com `src/` e `tests/` de `0ebf8ed` (antes do 056; `git checkout 0ebf8ed --
+src tests`, exit 0) e build real do `HEAD` (exit 0), um retrato de cada:
 
 ```
 IGUAL      404.html

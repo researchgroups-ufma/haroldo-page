@@ -7,12 +7,13 @@
  *                 as páginas geradas (sabatina fase 4, Decisão 6): a
  *                 normalização tira só o que o Astro muda por construção
  *                 quando marcação e `<style>` trocam de arquivo — o sufixo de
- *                 `data-astro-cid-*` e os nomes com hash em `/_astro/` — e os
- *                 blocos `<script>`, `<style>` e `<link rel="stylesheet">`.
+ *                 `data-astro-cid-*` e o hash dos nomes em `/_astro/` — e os
+ *                 blocos `<style>` e `<link rel="stylesheet">`. Os `<script>`
+ *                 ficam: são eles que carregam o comportamento da página.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-25
  *  Atualizado em: 2026-09-25
- *  Versão       : 0.1.0
+ *  Versão       : 0.2.0
  *
  *  Dependências : node:fs, node:path, node:process, node:console
  *  Entradas     : `dist/` (ou a pasta de `--dist`); dois retratos `.json`
@@ -41,20 +42,22 @@ const USO = `uso:
 const CONTEXTO = 120;
 
 /**
- * Normaliza o HTML de uma rota. Remove exatamente cinco coisas, nesta ordem, e nada mais — o
- * comparador não pode esconder mudança de texto, de ordem ou de outro atributo (plano 055).
- * A normalização é sobre a string inteira: o `dist/` sai minificado numa linha só.
+ * Normaliza o HTML de uma rota. Mexe em exatamente quatro coisas, nesta ordem, e nada mais — o
+ * comparador não pode esconder mudança de texto, de ordem, de outro atributo, de `<script>` ou de
+ * asset (plano 055). Os `<script>` não são removidos: um script perdido numa extração de view
+ * quebra a página sem mudar a marcação. Do nome em `/_astro/` só o hash de 8 caracteres vira `*`;
+ * o nome-base vem do arquivo-fonte, e trocar o asset tem de aparecer. A normalização é sobre a
+ * string inteira: o `dist/` sai minificado numa linha só.
  *
  * @param {string} html HTML cru da rota.
  * @returns {string} HTML normalizado.
  */
 function normalizar(html) {
   return html
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<link\b[^>]*\brel=(?:"stylesheet"|'stylesheet'|stylesheet)[^>]*>/gi, '')
     .replace(/\s+data-astro-cid-[a-z0-9]+(?:=(?:"[^"]*"|'[^']*'|[^\s>]*))?/g, '')
-    .replace(/\/_astro\/[^"'\s)]*/g, '/_astro/*');
+    .replace(/(\/_astro\/[^"'\s)]*?)\.[A-Za-z0-9_-]{8}(\.[a-z0-9]+)/g, '$1.*$2');
 }
 
 /**

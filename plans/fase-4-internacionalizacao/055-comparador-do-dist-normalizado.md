@@ -44,11 +44,17 @@ node scripts/comparar-dist.mjs comparar <antes.json> <depois.json> [--ignorar '<
   `.html` e grava `{ "<rota>": "<html normalizado>" }`, com a rota relativa a `dist/` e separador `/`
   (`index.html`, `sobre/index.html`, `404.html`, `en/about/index.html`…). Falha com mensagem se
   `dist/` não existir.
-- Normalização, nesta ordem: remover blocos `<script …>…</script>`; remover blocos
-  `<style …>…</style>`; remover tags `<link rel="stylesheet" …>`; remover atributos
-  `data-astro-cid-[a-z0-9]+` (com ou sem `="…"`); trocar todo `/_astro/<qualquer coisa até aspas,
-  espaço ou parêntese>` por `/_astro/*`. Nada além disso — **o comparador não pode esconder mudança
-  de texto, de ordem ou de atributo que não seja uma dessas cinco**.
+- Normalização, nesta ordem: remover blocos `<style …>…</style>`; remover tags
+  `<link rel="stylesheet" …>`; remover atributos `data-astro-cid-[a-z0-9]+` (com ou sem `="…"`);
+  trocar **só o hash** de 8 caracteres dos nomes em `/_astro/` por `*` (`/_astro/nome.HASH.ext` →
+  `/_astro/nome.*.ext`). Nada além disso — **o comparador não pode esconder mudança de texto, de
+  ordem, de atributo, de `<script>` ou de asset que não seja uma dessas quatro**.
+- **Emenda de 2026-09-25 (revisão final da branch `fase-4-inline`):** a versão original removia os
+  blocos `<script>` e trocava o nome `/_astro/…` inteiro. A revisão reproduziu as duas regressões
+  que isso esconde: um `<script>` perdido numa extração de view (as abas da disciplina somem e o
+  comparador dá `IGUAL`) e a troca de um asset (`archivo-latin-300-normal` → outra fonte, `IGUAL`).
+  Os scripts ficam no retrato; dois builds seguidos do mesmo código os produzem idênticos (provado
+  no 056).
 - `comparar`: para cada rota da união dos dois retratos imprime uma linha `IGUAL`, `DIFERENTE`,
   `SÓ ANTES` ou `SÓ DEPOIS`. Para `DIFERENTE`, imprime o deslocamento do primeiro caractere
   diferente e 120 caracteres de contexto de cada lado. `--ignorar` recebe uma regex aplicada à rota
@@ -77,16 +83,18 @@ string inteira, não por linha. Um build por vez no working tree (DESPACHO, item
    (a) trocar uma letra de texto visível da rota `sobre/index.html` → `DIFERENTE` com o contexto
    mostrando a letra, exit 1; (b) apagar a chave `404.html` → `SÓ ANTES`, exit 1; (c) copiar `dist/` para
    o scratchpad, trocar ali, no HTML **cru** de uma rota, só o sufixo de um `data-astro-cid-*`, o hash
-   de um `/_astro/*.css` e o conteúdo de um `<script>`, e rodar `retrato --dist <cópia>` → comparado
-   com `a.json`, `IGUAL`; (d) `--ignorar '^sobre/'` com o
-   canário (a) → `IGNORADA`, exit 0 → verify: as quatro saídas coladas.
+   de um `/_astro/*.css` e o hash de um asset `/_astro/*.woff2`, e rodar `retrato --dist <cópia>` →
+   comparado com `a.json`, `IGUAL`; (d) `--ignorar '^sobre/'` com o
+   canário (a) → `IGNORADA`, exit 0; (e) numa cópia do `dist/`, apagar um `<script>` inline da
+   disciplina → `DIFERENTE`, exit 1; (f) numa cópia, trocar o nome-base de um asset `/_astro/` →
+   `DIFERENTE`, exit 1 → verify: as seis saídas coladas.
 4. Rode o comparador duas vezes seguidas sobre o mesmo build e compare os dois `.json` byte a byte
    (`Get-FileHash`) → verify: hashes iguais (retrato determinístico).
 
 ## Critérios de aceitação
 
 - [x] `retrato` grava uma entrada por `.html` de `dist/` fora de `dist/admin/`, com a rota relativa e `/`
-- [x] A normalização remove exatamente as cinco coisas do Contexto, e nada mais (canário (c) `IGUAL`, canário (a) `DIFERENTE`)
+- [x] A normalização mexe exatamente nas quatro coisas do Contexto, e nada mais (canário (c) `IGUAL`; canários (a), (e) e (f) `DIFERENTE`)
 - [x] `comparar` sai 0 só com todas as rotas não ignoradas `IGUAL`; `SÓ ANTES`/`SÓ DEPOIS`/`DIFERENTE` saem 1
 - [x] `--ignorar` funciona (canário (d))
 - [x] Retrato determinístico (passo 4)
@@ -107,12 +115,17 @@ OK    passo 2: a×b tudo IGUAL
 OK    rotas relativas com /, sem admin/
 OK    canário (a) DIFERENTE com a letra
 OK    canário (b) SÓ ANTES
-OK    canário (c) IGUAL apesar de cid/hash/script
+OK    canário (c) IGUAL apesar de cid/hash css/hash asset
+OK    canário (e) script apagado → DIFERENTE
+OK    canário (f) asset trocado → DIFERENTE
 OK    canário (d) IGNORADA
 OK    passo 4: retrato determinístico
 OK    dist ausente falha
 falhas: 0
 ```
+
+Na correção da revisão final, os canários (e) e (f) foram escritos antes da mudança no
+`normalizar` e vistos vermelhos (`FALHA canário (e) … (exit 0, esperado 1 …)` e o mesmo para (f)).
 
 **Passo 1** — `npm run lint` (exit 0, sem problemas) e `npm run format:check`:
 
@@ -156,9 +169,15 @@ resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
 `resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 1 · SÓ DEPOIS 0 · IGNORADA 0`.
 
 (c) cópia do `dist/` com, no HTML cru de `sobre/index.html`, o sufixo de um `data-astro-cid-*`, o hash
-de um `/_astro/*.css` e o conteúdo de um `<script>` trocados (o harness confere que as três trocas
-entraram no arquivo); `retrato --dist <cópia>` comparado com `a.json` (exit 0):
-`resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
+de um `/_astro/*.css` e o hash do `/_astro/archivo-latin-300-normal.*.woff2` trocados (o harness
+confere que as três trocas entraram no arquivo); `retrato --dist <cópia>` comparado com `a.json`
+(exit 0): `resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
+
+(e) último `<script>` inline de `ensino/2026-2-relatividade-geral/index.html` apagado (exit 1):
+`resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
+
+(f) `archivo-latin-300-normal` trocado por `archivo-latin-900-italic` na Sobre (exit 1):
+`resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
 
 (d) `--ignorar '^sobre/'` sobre o canário (a) (exit 0): `IGNORADA   sobre/index.html`, resumo
 `resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 1`.
