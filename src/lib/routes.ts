@@ -99,7 +99,8 @@ export function counterpartPath(pathname: string): string {
   const to: Locale = from === 'en' ? 'pt' : 'en';
   const rest = pathname.slice(prefix(from).length).replace(/^\/|\/$/g, '');
 
-  // RF-27: a 404 sai como `404.html` na raiz de cada árvore; só ela aceita a extensão.
+  // RF-27: a 404 sai como `404.html` na raiz de cada árvore — é a única rota fixa que aceita a
+  // extensão. O slug da disciplina não é validado aqui: ele vem de `getStaticPaths`.
   if (rest === '404' || rest === '404.html') return routePath('home', to);
 
   for (const key of Object.keys(SEGMENTS) as RouteKey[]) {

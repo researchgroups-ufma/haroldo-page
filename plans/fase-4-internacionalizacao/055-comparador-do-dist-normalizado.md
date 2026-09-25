@@ -46,15 +46,24 @@ node scripts/comparar-dist.mjs comparar <antes.json> <depois.json> [--ignorar '<
   `dist/` não existir.
 - Normalização, nesta ordem: remover blocos `<style …>…</style>`; remover tags
   `<link rel="stylesheet" …>`; remover atributos `data-astro-cid-[a-z0-9]+` (com ou sem `="…"`);
-  trocar **só o hash** de 8 caracteres dos nomes em `/_astro/` por `*` (`/_astro/nome.HASH.ext` →
-  `/_astro/nome.*.ext`). Nada além disso — **o comparador não pode esconder mudança de texto, de
-  ordem, de atributo, de `<script>` ou de asset que não seja uma dessas quatro**.
+  trocar o `src="/_astro/….js"` de um `<script>` pelo **conteúdo** do `.js` (com o hash dos imports
+  relativos `./x.HASH.js` trocado por `*`; arquivo ausente vira um marcador); no que sobra de
+  `/_astro/` (fontes, imagens), trocar **só o hash** de 8 caracteres por `*`
+  (`/_astro/nome.HASH.ext` → `/_astro/nome.*.ext`). Nada além disso — **o comparador não pode
+  esconder mudança de texto, de ordem, de atributo, de `<script>` ou de asset que não seja uma
+  dessas cinco**.
 - **Emenda de 2026-09-25 (revisão final da branch `fase-4-inline`):** a versão original removia os
   blocos `<script>` e trocava o nome `/_astro/…` inteiro. A revisão reproduziu as duas regressões
   que isso esconde: um `<script>` perdido numa extração de view (as abas da disciplina somem e o
   comparador dá `IGUAL`) e a troca de um asset (`archivo-latin-300-normal` → outra fonte, `IGUAL`).
   Os scripts ficam no retrato; dois builds seguidos do mesmo código os produzem idênticos (provado
   no 056).
+- **Segunda emenda, 2026-09-25 (revisão `code-reviewer` do 055):** com só o hash trocado, o script
+  **externo** (`/_astro/publicacoes.astro_…js`, a sanfona) ficava de fora do retrato — mudança no
+  corpo dele dava `IGUAL` — e, como o nome do chunk segue o módulo `.astro` que o importa, movê-lo
+  para `PublicationsView` (064) daria `DIFERENTE` sem mudança de comportamento. Por isso o script
+  externo entra pelo conteúdo, e não pelo nome. Os chunks que ele importa (gsap, ScrollTrigger) não
+  entram: um nível só.
 - `comparar`: para cada rota da união dos dois retratos imprime uma linha `IGUAL`, `DIFERENTE`,
   `SÓ ANTES` ou `SÓ DEPOIS`. Para `DIFERENTE`, imprime o deslocamento do primeiro caractere
   diferente e 120 caracteres de contexto de cada lado. `--ignorar` recebe uma regex aplicada à rota
@@ -87,14 +96,16 @@ string inteira, não por linha. Um build por vez no working tree (DESPACHO, item
    comparado com `a.json`, `IGUAL`; (d) `--ignorar '^sobre/'` com o
    canário (a) → `IGNORADA`, exit 0; (e) numa cópia do `dist/`, apagar um `<script>` inline da
    disciplina → `DIFERENTE`, exit 1; (f) numa cópia, trocar o nome-base de um asset `/_astro/` →
-   `DIFERENTE`, exit 1 → verify: as seis saídas coladas.
+   `DIFERENTE`, exit 1; (g) numa cópia, alterar o corpo do script externo de `publicacoes/` (com hash
+   novo no nome, como o Vite faria) → `DIFERENTE`, exit 1; (h) numa cópia, trocar só o nome-base
+   desse script, conteúdo idêntico → `IGUAL`, exit 0 → verify: as oito saídas coladas.
 4. Rode o comparador duas vezes seguidas sobre o mesmo build e compare os dois `.json` byte a byte
    (`Get-FileHash`) → verify: hashes iguais (retrato determinístico).
 
 ## Critérios de aceitação
 
 - [x] `retrato` grava uma entrada por `.html` de `dist/` fora de `dist/admin/`, com a rota relativa e `/`
-- [x] A normalização mexe exatamente nas quatro coisas do Contexto, e nada mais (canário (c) `IGUAL`; canários (a), (e) e (f) `DIFERENTE`)
+- [x] A normalização mexe exatamente nas cinco coisas do Contexto, e nada mais (canários (c) e (h) `IGUAL`; canários (a), (e), (f) e (g) `DIFERENTE`)
 - [x] `comparar` sai 0 só com todas as rotas não ignoradas `IGUAL`; `SÓ ANTES`/`SÓ DEPOIS`/`DIFERENTE` saem 1
 - [x] `--ignorar` funciona (canário (d))
 - [x] Retrato determinístico (passo 4)

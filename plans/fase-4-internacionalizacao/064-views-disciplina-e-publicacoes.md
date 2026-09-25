@@ -59,7 +59,9 @@ seguir verde. `PublicationsView`: `BaseLayout title={t.nav.publications}` (o 057
 
 **Tamanho:** cada view, `CourseTabs` e o módulo < 150 linhas.
 
-**Prova:** o comparador remove `<script>` e `<style>` (055) — então ele prova a marcação, e **o
+**Prova:** o comparador remove `<style>` mas **mantém** os `<script>` inline e compara o script
+externo pelo conteúdo, não pelo nome do chunk (055, emendado em 2026-09-25) — mover o script da
+sanfona para a view não muda o retrato se o conteúdo for o mesmo. Ele prova marcação e scripts; **o
 navegador prova o comportamento das abas e da sanfona** (passo 7). As duas provas são necessárias.
 
 **Regras de código:** README da fase 4. Os comentários de RF-37/F-13/F-06/RN-04/RN-02 vão com o código

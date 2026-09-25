@@ -9,11 +9,12 @@
  *                 quando marcação e `<style>` trocam de arquivo — o sufixo de
  *                 `data-astro-cid-*` e o hash dos nomes em `/_astro/` — e os
  *                 blocos `<style>` e `<link rel="stylesheet">`. Os `<script>`
- *                 ficam: são eles que carregam o comportamento da página.
+ *                 ficam, e o script externo entra pelo **conteúdo** do `.js`:
+ *                 são eles que carregam o comportamento da página.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-25
  *  Atualizado em: 2026-09-25
- *  Versão       : 0.2.0
+ *  Versão       : 0.3.0
  *
  *  Dependências : node:fs, node:path, node:process, node:console
  *  Entradas     : `dist/` (ou a pasta de `--dist`); dois retratos `.json`
@@ -41,23 +42,57 @@ const USO = `uso:
 /** Caracteres de contexto mostrados de cada lado da primeira divergência. */
 const CONTEXTO = 120;
 
+/** Hash de 8 caracteres que o Vite põe no nome dos arquivos de `/_astro/`. */
+const HASH = String.raw`\.[A-Za-z0-9_-]{8}`;
+
 /**
- * Normaliza o HTML de uma rota. Mexe em exatamente quatro coisas, nesta ordem, e nada mais — o
+ * Conteúdo de um script externo de `/_astro/`, com o hash dos imports relativos (`./gsap.HASH.js`)
+ * trocado por `*`. Um nível só: o conteúdo dos chunks importados (bibliotecas) não entra.
+ *
+ * @param {string} dist Pasta do build.
+ * @param {string} arquivo Nome do arquivo sob `_astro/`.
+ * @returns {string} Conteúdo normalizado, ou um marcador se o arquivo não existe.
+ */
+function conteudoDoScript(dist, arquivo) {
+  const caminho = join(dist, '_astro', arquivo);
+  if (!existsSync(caminho)) return `(ausente: ${arquivo})`;
+  return readFileSync(caminho, 'utf8').replace(
+    new RegExp(String.raw`(\.\/[^"'\`\s)]*?)${HASH}(\.js)`, 'g'),
+    '$1.*$2',
+  );
+}
+
+/**
+ * Normaliza o HTML de uma rota. Mexe em exatamente cinco coisas, nesta ordem, e nada mais — o
  * comparador não pode esconder mudança de texto, de ordem, de outro atributo, de `<script>` ou de
- * asset (plano 055). Os `<script>` não são removidos: um script perdido numa extração de view
- * quebra a página sem mudar a marcação. Do nome em `/_astro/` só o hash de 8 caracteres vira `*`;
- * o nome-base vem do arquivo-fonte, e trocar o asset tem de aparecer. A normalização é sobre a
- * string inteira: o `dist/` sai minificado numa linha só.
+ * asset (plano 055):
+ *
+ * 1–3. remove `<style>`, `<link rel="stylesheet">` e os atributos `data-astro-cid-*`;
+ * 4. troca o `src="/_astro/….js"` de um `<script>` pelo **conteúdo** do arquivo
+ *    (`conteudoDoScript`) — o nome do chunk segue o módulo `.astro` que o importa e muda quando o
+ *    script troca de componente, e o hash é o que acusa mudança de conteúdo; os dois saem, o
+ *    conteúdo fica;
+ * 5. no que sobra de `/_astro/` (fontes, imagens), troca só o hash por `*` — o nome-base vem do
+ *    arquivo-fonte, e trocar o asset tem de aparecer.
+ *
+ * Os `<script>` inline não são removidos: um script perdido numa extração de view quebra a página
+ * sem mudar a marcação. A normalização é sobre a string inteira: o `dist/` sai minificado numa
+ * linha só.
  *
  * @param {string} html HTML cru da rota.
+ * @param {string} dist Pasta do build (para ler os scripts externos).
  * @returns {string} HTML normalizado.
  */
-function normalizar(html) {
+function normalizar(html, dist) {
   return html
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<link\b[^>]*\brel=(?:"stylesheet"|'stylesheet'|stylesheet)[^>]*>/gi, '')
     .replace(/\s+data-astro-cid-[a-z0-9]+(?:=(?:"[^"]*"|'[^']*'|[^\s>]*))?/g, '')
-    .replace(/(\/_astro\/[^"'\s)]*?)\.[A-Za-z0-9_-]{8}(\.[a-z0-9]+)/g, '$1.*$2');
+    .replace(
+      /(<script\b[^>]*?\s)src=["']?\/_astro\/([^"'\s>]+\.js)["']?/gi,
+      (_, inicio, arquivo) => `${inicio}src="(conteúdo) ${conteudoDoScript(dist, arquivo)}"`,
+    )
+    .replace(new RegExp(String.raw`(\/_astro\/[^"'\s)]*?)${HASH}(\.[a-z0-9]+)`, 'g'), '$1.*$2');
 }
 
 /**
@@ -98,7 +133,7 @@ function retrato(saida, dist) {
     .map((caminho) => [relative(dist, caminho).split(sep).join('/'), caminho])
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
   const mapa = Object.fromEntries(
-    rotas.map(([rota, caminho]) => [rota, normalizar(readFileSync(caminho, 'utf8'))]),
+    rotas.map(([rota, caminho]) => [rota, normalizar(readFileSync(caminho, 'utf8'), dist)]),
   );
   writeFileSync(saida, JSON.stringify(mapa, null, 2) + '\n');
   console.log(`retrato: ${rotas.length} rota(s) de ${dist} em ${saida}`);
