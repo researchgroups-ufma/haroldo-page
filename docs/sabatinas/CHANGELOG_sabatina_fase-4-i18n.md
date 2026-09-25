@@ -211,3 +211,55 @@ uma listada no teste.
 `pt`, coisas que o tipo `UiStrings` não pega. Alternativa descartada: só a paridade de chaves pelo
 tipo, mais a inspeção.
 **Impacto no PRD:** M-07 (método de medição); §11 (teste de integração sobre o `dist/`).
+
+## Decisão 13 — Texto em PT sem campo em inglês recebe `lang="pt-BR"`, mas não liga o aviso
+
+**Data:** 2026-09-24
+**Questão:** (Q-F4-1, levantada no fatiamento) as rotas `/en` exibem texto livre em português que
+não tem par no grupo `en`: títulos e descrições de aula, lista, material, link e script;
+bibliografia; instituições da formação e da atuação; `atuacao[].periodo`; financiador e
+colaboradores de projeto; título e veículo de publicação. A Decisão 4 só cobre o fallback de
+campo traduzível (RN-06), e o exemplo do RF-28 (publicação em `/en/publications`) usava justamente
+um desses casos.
+**Decisão:** esses campos **recebem `lang="pt-BR"`, mas não disparam o aviso da página**. O aviso
+fica restrito ao fallback de campo traduzível (Decisão 4). **Exceção:** `publicacoes.titulo` e
+`publicacoes.veiculo` ficam **sem** `lang` e sem aviso, porque em geral já estão em inglês. O
+exemplo do RF-28 passa a ser a publicação sem `en.resumo` (substituído pela Decisão 15).
+**Justificativa:** o leitor de tela pronuncia certo o texto em português, e o aviso continua
+significando "o professor poderia ter traduzido isto e não traduziu", em vez de aparecer sempre
+em Disciplina, Sobre e Publicações. Alternativas descartadas: (a) só o fallback recebe `lang` (o
+título de aula em PT seria lido com pronúncia inglesa); (b) todo texto sem campo EN marca e avisa
+(aviso permanente em três páginas, e título de artigo em inglês marcado como `pt-BR`).
+**Impacto no PRD:** RF-28 (exemplo e critério); F-07 (o aviso é só para o fallback; `lang` também
+em texto sem campo EN).
+
+## Decisão 14 — Pares do sitemap por `serialize` se a opção `i18n` não parear rotas traduzidas
+
+**Data:** 2026-09-24
+**Questão:** (Q-F4-2, levantada no fatiamento) a opção `i18n` do `@astrojs/sitemap`
+provavelmente pareia URLs pelo caminho sem prefixo (`/x` ↔ `/en/x`). Com segmentos traduzidos
+(`/ensino` ↔ `/en/teaching`), só a Home formaria par. Premissa não verificada; o plano 071 mede
+antes.
+**Decisão:** se a opção não parear, os pares `alternate` são preenchidos pela opção `serialize`
+**da mesma integração**, a partir do mapa de rotas PT↔EN (Decisão 6). **Não reabre a Decisão
+10**: a integração, o filtro das 404 e a lista de páginas geradas continuam os mesmos.
+**Justificativa:** uma única fonte de pares para o seletor, o `hreflang` e o sitemap. Alternativa
+descartada: sitemap sem pares, com os pares só no `hreflang` do `<head>` (menos código, mas o
+sitemap bilíngue do RF-30 ficaria incompleto).
+**Impacto no PRD:** RF-30 (os pares do sitemap vêm do mapa de rotas quando a opção `i18n` não
+bastar).
+
+## Decisão 15 — Publicações sem resumo; o exemplo do RF-28 passa para a Pesquisa
+
+**Data:** 2026-09-25
+**Questão:** a Decisão 13 emendou o exemplo do RF-28 para "publicação sem `en.resumo`", mas o §6.6 de
+`docs/identidade-visual.md` (redesenho, `f7e7345`) já tinha tirado o resumo da página Publicações. O
+exemplo descrevia um caso que o site não produz.
+**Decisão:** Publicações fica **sem resumo**, como na maioria dos sites acadêmicos: título, ano,
+autores, veículo e links. O exemplo do RF-28 passa a ser a linha de pesquisa com `en.titulo` e sem
+`en.resumo`: em `/en/research`, título em inglês e resumo em português com `lang="pt-BR"` e o aviso —
+caso que já existe no conteúdo real. `/en/publications` não tem aviso nem `lang="pt-BR"`. O campo
+`resumo` (e `en.resumo`) continua no esquema e no painel, sem uso no site.
+**Justificativa:** decisão do stakeholder, 2026-09-25: a página deve ser simples. Alternativas
+descartadas: manter o exemplo (critério indemonstrável na fase 4); voltar a exibir o resumo.
+**Impacto no PRD:** RF-28 (exemplo e critério).
