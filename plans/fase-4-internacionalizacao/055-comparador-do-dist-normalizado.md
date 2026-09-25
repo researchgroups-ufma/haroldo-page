@@ -85,13 +85,86 @@ string inteira, não por linha. Um build por vez no working tree (DESPACHO, item
 
 ## Critérios de aceitação
 
-- [ ] `retrato` grava uma entrada por `.html` de `dist/` fora de `dist/admin/`, com a rota relativa e `/`
-- [ ] A normalização remove exatamente as cinco coisas do Contexto, e nada mais (canário (c) `IGUAL`, canário (a) `DIFERENTE`)
-- [ ] `comparar` sai 0 só com todas as rotas não ignoradas `IGUAL`; `SÓ ANTES`/`SÓ DEPOIS`/`DIFERENTE` saem 1
-- [ ] `--ignorar` funciona (canário (d))
-- [ ] Retrato determinístico (passo 4)
-- [ ] Cabeçalho §10.1 e JSDoc; `lint` e `format:check` verdes, com saída colada
+- [x] `retrato` grava uma entrada por `.html` de `dist/` fora de `dist/admin/`, com a rota relativa e `/`
+- [x] A normalização remove exatamente as cinco coisas do Contexto, e nada mais (canário (c) `IGUAL`, canário (a) `DIFERENTE`)
+- [x] `comparar` sai 0 só com todas as rotas não ignoradas `IGUAL`; `SÓ ANTES`/`SÓ DEPOIS`/`DIFERENTE` saem 1
+- [x] `--ignorar` funciona (canário (d))
+- [x] Retrato determinístico (passo 4)
+- [x] Cabeçalho §10.1 e JSDoc; `lint` e `format:check` verdes, com saída colada
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir: saídas literais coladas, por passo. Plano sem esta seção preenchida não é DONE.>
+Executado em 2026-09-25, inline (`superpowers:executing-plans`), na branch `fase-4-inline`. Build de
+base: `npm run build:pipeline` → `8 page(s) built`, `Complete!`, exit 0.
+
+Os canários dos passos 2–4 rodaram num harness (fora do repositório; retratos no scratchpad), que
+checa código de saída e padrão de cada um. Visto falhar antes do script existir (9 falhas,
+`MODULE_NOT_FOUND`) e passar depois:
+
+```
+OK    retrato a.json
+OK    passo 2: a×b tudo IGUAL
+OK    rotas relativas com /, sem admin/
+OK    canário (a) DIFERENTE com a letra
+OK    canário (b) SÓ ANTES
+OK    canário (c) IGUAL apesar de cid/hash/script
+OK    canário (d) IGNORADA
+OK    passo 4: retrato determinístico
+OK    dist ausente falha
+falhas: 0
+```
+
+**Passo 1** — `npm run lint` (exit 0, sem problemas) e `npm run format:check`:
+
+```
+Checking formatting...
+All matched files use Prettier code style!
+```
+
+**Passo 2** — `retrato a.json`, `retrato b.json` sem rebuild, `comparar a.json b.json` (exit 0):
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGUAL      sobre/index.html
+resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
+
+**Passo 3** — (a) uma letra de "Formação" trocada na Sobre (exit 1):
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+DIFERENTE  sobre/index.html
+           primeira divergência no caractere 4731
+           antes : …-4 lg:col-span-6"><section aria-labelledby="sobre-formacao"><h2 id="sobre-formacao" class="text-rotulo text-secundario">Formação acadêmica</h2><ol class="text-pequeno mt-2 space-y-1"><li class="grid grid-cols-[6.5rem_1fr] gap-x-4 sm:grid-co…
+           depois: …-4 lg:col-span-6"><section aria-labelledby="sobre-formacao"><h2 id="sobre-formacao" class="text-rotulo text-secundario">Xormação acadêmica</h2><ol class="text-pequeno mt-2 space-y-1"><li class="grid grid-cols-[6.5rem_1fr] gap-x-4 sm:grid-co…
+resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
+
+(b) chave `404.html` apagada (exit 1): `SÓ ANTES   404.html`, resumo
+`resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 1 · SÓ DEPOIS 0 · IGNORADA 0`.
+
+(c) cópia do `dist/` com, no HTML cru de `sobre/index.html`, o sufixo de um `data-astro-cid-*`, o hash
+de um `/_astro/*.css` e o conteúdo de um `<script>` trocados (o harness confere que as três trocas
+entraram no arquivo); `retrato --dist <cópia>` comparado com `a.json` (exit 0):
+`resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
+
+(d) `--ignorar '^sobre/'` sobre o canário (a) (exit 0): `IGNORADA   sobre/index.html`, resumo
+`resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 1`.
+
+**Passo 4** — dois retratos seguidos do mesmo build, SHA-256 iguais:
+`10f4d3a8b5ac01ed115ca587d61ed92a8e9a73213e5a541587e488d86f54d76e` nos dois.
+
+Extra: `retrato --dist <pasta inexistente>` sai 1 com
+`erro: a pasta do build não existe: … (rode npm run build:pipeline)`.
