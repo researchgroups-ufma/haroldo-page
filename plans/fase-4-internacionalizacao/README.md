@@ -5,7 +5,9 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-24 — fase fatiada em 19 planos (**055–073**), a partir do PRD v0.1.58 e
+Última atualização: 2026-09-25 — **055 e 056 DONE** (trabalho em `0ebf8ed` e `d44a874`,
+executados em modo de teste com `superpowers:executing-plans`, depois triage e `code-reviewer` da
+casa; CI e Workers Builds verdes em `48b9a4f`). Antes, 2026-09-24: fase fatiada em 19 planos (**055–073**), a partir do PRD v0.1.58 e
 da sabatina [`CHANGELOG_sabatina_fase-4-i18n.md`](../../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md)
 (12 decisões; a 1 e a 2 substituídas pela 3). No mesmo dia, as duas questões abertas pelo fatiamento
 foram respondidas (Decisões 13 e 14, PRD v0.1.59) e incorporadas aos planos 061, 065, 066, 067, 071,
@@ -113,8 +115,8 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 
 | Plano | Título | Status | Executável por | Agente | Commits |
 |---|---|---|---|---|---|
-| 055 | Ferramenta de comparação do `dist/` normalizado | ⬜ TODO | agente | implementer (sonnet) | — |
-| 056 | Mapa de rotas PT↔EN, idioma pelo caminho e navegação por idioma | ⬜ TODO | agente | implementer (sonnet) | — |
+| 055 | Ferramenta de comparação do `dist/` normalizado | 🟢 DONE | agente | implementer (sonnet) | `0ebf8ed` (correções `efe15c8`, `9cb54f1`) |
+| 056 | Mapa de rotas PT↔EN, idioma pelo caminho e navegação por idioma | 🟢 DONE | agente | implementer (sonnet) | `d44a874` |
 | 057 | Dicionário `en.ts`, chaves novas e `strings(lang)` | ⬜ TODO | agente + **stakeholder** (revisão do inglês) | implementer (sonnet) | — |
 | 058 | Layout e cabeçalhos escolhem o dicionário pelo caminho | ⬜ TODO | agente | implementer (sonnet) | — |
 | 059 | Componentes de conteúdo e data por idioma | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |

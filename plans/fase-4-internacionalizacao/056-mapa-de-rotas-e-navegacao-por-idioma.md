@@ -1,6 +1,6 @@
 # Plano 056 — Mapa de rotas PT↔EN, idioma pelo caminho e navegação por idioma
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** base de RF-29 e RF-30 (`hreflang`); RN-09; sabatina fase 4, Decisões 3 e 6; dívida (e) da fase 3
 **Depende de:** plano 055 (comparador)
 **Modelo recomendado:** sonnet
@@ -113,7 +113,9 @@ três callers, observações da revisão). Todos os blocos abaixo são o conteú
 indicado, capturado com `NO_COLOR=1` depois da última edição de código e inserido por script; o
 verificador de fidelidade está no relatório.
 
-**Passos 1 e 5** — prova de "PT idêntico" refeita com o comparador final do 055 (que mantém os
+### Passos 1 e 5
+
+prova de "PT idêntico" refeita com o comparador final do 055 (que mantém os
 `<script>` e compara o script externo pelo conteúdo): build real com `src/` e `tests/` de `0ebf8ed`
 (antes do 056, `git checkout 0ebf8ed -- src tests`) e build real do `HEAD` (`git checkout HEAD -- src
 tests`; `git status --short` vazio depois), um retrato de cada.
@@ -286,7 +288,9 @@ IGUAL      sobre/index.html
 resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
 ```
 
-**Passo 2** — o teste foi escrito antes do módulo e visto vermelho (`Test Files 1 failed`, import de
+### Passo 2
+
+o teste foi escrito antes do módulo e visto vermelho (`Test Files 1 failed`, import de
 `src/lib/routes` inexistente); o caso `'/sobre.html'` foi acrescentado e visto vermelho antes da
 correção de `counterpartPath`. Saída final, `npm test -- --reporter=verbose tests/lib/routes.test.ts`
 (exit 0):
@@ -345,7 +349,9 @@ correção de `counterpartPath`. Saída final, `npm test -- --reporter=verbose t
    Duration  427ms (transform 47ms, setup 0ms, import 73ms, tests 10ms, environment 0ms)
 ```
 
-**Passo 3** — os testes novos foram vistos vermelhos antes da mudança (6 falhas). Saída final,
+### Passo 3
+
+os testes novos foram vistos vermelhos antes da mudança (6 falhas). Saída final,
 `npm test -- --reporter=verbose tests/lib/navigation.test.ts` (exit 0):
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ev056/passo3.txt -->
@@ -379,7 +385,9 @@ correção de `counterpartPath`. Saída final, `npm test -- --reporter=verbose t
    Duration  480ms (transform 66ms, setup 0ms, import 99ms, tests 8ms, environment 0ms)
 ```
 
-**Passo 4** — `npx astro check` (exit 0). `SiteHeader.astro` e `index.astro` já tinham
+### Passo 4
+
+`npx astro check` (exit 0). `SiteHeader.astro` e `index.astro` já tinham
 uma `const navItems` local; o import entrou como `navItems as navItemsFor`:
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ev056/passo4-astro-check.txt -->
@@ -395,7 +403,9 @@ Result (63 files):
 - 0 hints
 ```
 
-**Passo 6** — canário: `throw` trocado por `return '/'` (exit 1):
+### Passo 6
+
+canário: `throw` trocado por `return '/'` (exit 1):
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ev056/passo6-vermelho.txt -->
 
@@ -538,7 +548,9 @@ Restaurado (`git status --short` vazio) (exit 0):
    Duration  503ms (transform 56ms, setup 0ms, import 89ms, tests 12ms, environment 0ms)
 ```
 
-**Passo 7** — `npm run lint` (exit 0), `npm run format:check` (exit 0), `npm run test:coverage` (exit 0):
+### Passo 7
+
+`npm run lint` (exit 0), `npm run format:check` (exit 0), `npm run test:coverage` (exit 0):
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ev056/passo7-lint.txt -->
 
@@ -601,3 +613,18 @@ src/lib/routes.ts linhas 17/17 ramos 21/21 funções 5/5
 ```
 
 `routes.ts` tem um único import, `import type { Locale } from './config'`.
+
+### CI
+
+push de `48b9a4f` (fast-forward da `main` com a branch `fase-4-inline`, 2026-09-25); check-runs
+do commit (`gh api …/commits/48b9a4f…/check-runs`):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ci-48b9a4f.txt -->
+
+```
+Workers Builds: haroldo-page  status=completed  conclusion=success  completed_at=2026-09-25T18:46:11Z
+qualidade  status=completed  conclusion=success  completed_at=2026-09-25T18:46:03Z
+```
+
+Portões da casa: `triage-runner` VERDE (ciclo 2, build às 15:23 de `ac4b820`) e `code-reviewer`
+APROVADO (ciclo 2).

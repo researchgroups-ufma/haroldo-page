@@ -1,6 +1,6 @@
 # Plano 055 — Ferramenta de comparação do `dist/` normalizado
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** nenhum diretamente — é a prova de "sem mudança de comportamento" que os planos 056–067 usam (sabatina fase 4, Decisão 6)
 **Depende de:** nenhum
 **Modelo recomendado:** sonnet
@@ -161,7 +161,9 @@ OK    dist-ausente
 falhas: 0
 ```
 
-**Passo 1** — `npm run lint` (exit 0) e `npm run format:check` (exit 0), no `HEAD`:
+### Passo 1
+
+`npm run lint` (exit 0) e `npm run format:check` (exit 0), no `HEAD`:
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ev056/passo7-lint.txt -->
 
@@ -182,7 +184,9 @@ Checking formatting...
 All matched files use Prettier code style!
 ```
 
-**Passo 2** — `retrato a.json` (exit 0), `retrato b.json` sem rebuild, `comparar a.json b.json` (exit 0):
+### Passo 2
+
+`retrato a.json` (exit 0), `retrato b.json` sem rebuild, `comparar a.json b.json` (exit 0):
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/retrato-a.out -->
 
@@ -204,7 +208,9 @@ IGUAL      sobre/index.html
 resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
 ```
 
-**Passo 3** — (a) uma letra de "Formação" trocada na Sobre (exit 1):
+### Passo 3
+
+(a) uma letra de "Formação" trocada na Sobre (exit 1):
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-a.out -->
 
@@ -345,7 +351,9 @@ IGUAL      sobre/index.html
 resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
 ```
 
-**Passo 4** — dois retratos seguidos do mesmo build (`sha256sum`):
+### Passo 4
+
+dois retratos seguidos do mesmo build (`sha256sum`):
 
 <!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/passo4.out -->
 
@@ -361,3 +369,18 @@ Extra: `retrato --dist <pasta inexistente>` (exit 1):
 ```
 erro: a pasta do build não existe: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/nao-existe (rode npm run build:pipeline)
 ```
+
+### CI
+
+push de `48b9a4f` (fast-forward da `main` com a branch `fase-4-inline`, 2026-09-25); check-runs
+do commit (`gh api …/commits/48b9a4f…/check-runs`):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ci-48b9a4f.txt -->
+
+```
+Workers Builds: haroldo-page  status=completed  conclusion=success  completed_at=2026-09-25T18:46:11Z
+qualidade  status=completed  conclusion=success  completed_at=2026-09-25T18:46:03Z
+```
+
+Portões da casa: `triage-runner` VERDE (ciclo 2, build às 15:23 de `ac4b820`) e `code-reviewer`
+APROVADO (ciclo 2).
