@@ -4,9 +4,9 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-24 (fase 4 fatiada em 19 planos, 055–073, a partir da sabatina da
-mesma data; antes, o redesenho e o polimento do site público integrados à `main` em `00fdef9` — ver
-a seção abaixo)
+Última atualização: 2026-09-25 (fase 4: **055 e 056 DONE**, promovidos em `53c057b`; próximo, o 057.
+Em 2026-09-24 a fase foi fatiada em 19 planos, 055–073; antes, o redesenho e o polimento do site
+público integrados à `main` em `00fdef9` — ver a seção abaixo)
 
 ## Fases
 

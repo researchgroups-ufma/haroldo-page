@@ -250,9 +250,10 @@ plano correspondente, mas elas não bloqueiam.
     idiomas) vive em `tests/i18n/excecoes-m07.ts`, criada no 057 e reusada no 072.
 13. **Prova de "sem mudança de comportamento" (Decisão 6):** `scripts/comparar-dist.mjs` (055) —
     retrato do HTML normalizado de cada rota antes e depois. A normalização tira o que muda por
-    construção quando marcação muda de arquivo: atributos `data-astro-cid-*`, nomes com hash em
-    `/_astro/`, e os blocos `<script>`/`<style>`/`<link rel="stylesheet">`. O que ela tira é conferido
-    no navegador, não pelo comparador.
+    construção quando marcação muda de arquivo: atributos `data-astro-cid-*`, o **hash** dos nomes em
+    `/_astro/`, e os blocos `<style>`/`<link rel="stylesheet">`. Os `<script>` inline **ficam**, e o
+    script externo entra pelo **conteúdo** do `.js` (um nível só), não pelo nome do chunk — emendas
+    de 2026-09-25, das revisões do 055. O CSS que ela tira é conferido no navegador.
 14. **404 em inglês com nome de arquivo garantido (068):** se o Astro gerar `dist/en/404/index.html` em
     vez de `dist/en/404.html` (o caso especial do Astro vale para `/404`, não para `/en/404` — a
     confirmar no build), o plano está pré-autorizado a renomear o arquivo num gancho
@@ -369,7 +370,14 @@ empurrado.
 5. **`tina/tina-lock.json` só se regenera por `tinacms dev`** (`npx tinacms dev -c "echo ready"`,
    plano 017), com a porta 9000 livre. `tests/content/tina-lock-coerente.test.ts` reprova lock defasado.
 6. **Mover `<style>` e `<script>` de arquivo muda o hash** dos atributos `data-astro-cid-*` e dos
-   arquivos em `/_astro/` — daí a normalização do comparador (055) e a verificação no navegador.
+   arquivos em `/_astro/`, e o **nome** do chunk de script externo (ele segue o `.astro` que o
+   importa) — daí a normalização do comparador (055) e a verificação no navegador.
+6a. **`npx astro check` confere `tests/` também.** Para refazer um build "antes" com o `src/` de um
+   commit anterior, é `git checkout <commit> -- src tests` (só `src` reprova o build pelos testes
+   novos) — e só com a árvore commitada, porque voltar com `git checkout HEAD -- src tests` apaga
+   edição não commitada (medido no 056, 2026-09-25).
+6b. **`scripts/verificar-promocao.mjs` só confere a Evidência que tem subseções `###`.** Com
+   títulos em negrito ele imprime `PULADO` e sai 0 — parece aprovação e não conferiu nada (055/056).
 7. **A 404 em inglês pode sair como `dist/en/404/index.html`** (decisão 14) e o Worker procura
    `404.html`.
 8. **Existe conteúdo real com `publicado: false`**
