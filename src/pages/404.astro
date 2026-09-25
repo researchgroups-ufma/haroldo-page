@@ -6,7 +6,7 @@
  *  Descrição    : Página de erro 404 (RF-27, §6.7 da identidade visual):
  *                 cabeçalho compacto com "Erro 404" abaixo do título, texto
  *                 explicativo e a lista "Todas as páginas" com as cinco rotas
- *                 de `NAV_ITEMS` ("Início" primeiro), em linhas com régua.
+ *                 de `navItems` ("Início" primeiro), em linhas com régua.
  *                 Gerada como `dist/404.html`, o corpo que o
  *                 `not_found_handling = "404-page"` do `wrangler.toml`
  *                 devolve para qualquer rota inexistente.
@@ -17,7 +17,7 @@
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
  *                 src/i18n/pt.ts,
- *                 src/lib/navigation.ts (NAV_ITEMS)
+ *                 src/lib/navigation.ts (navItems)
  *  Entradas     : nenhuma (página estática, sem props nem conteúdo)
  *  Saídas       : HTML estático da rota `/404` — o Astro grava `dist/404.html`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/404.astro`
@@ -30,7 +30,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { pt } from '../i18n/pt';
-import { NAV_ITEMS } from '../lib/navigation';
+import { navItems } from '../lib/navigation';
 ---
 
 <BaseLayout title={pt.notFound.title}>
@@ -42,8 +42,8 @@ import { NAV_ITEMS } from '../lib/navigation';
     <h2 class="text-rotulo text-secundario mt-10">{pt.notFound.allPages}</h2>
     <ul class="mt-4">
       {
-        // RF-27: as cinco rotas de NAV_ITEMS, sem CV; "Início" é a primeira.
-        NAV_ITEMS.map((item) => (
+        // RF-27: as cinco rotas de navItems, sem CV; "Início" é a primeira.
+        navItems('pt').map((item) => (
           <li class="pagina-linha">
             <a href={item.href} class="group flex items-center justify-between py-3">
               <span class="text-titulo-item decoration-1 underline-offset-[6px] group-hover:underline">

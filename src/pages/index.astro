@@ -17,7 +17,7 @@
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/ExternalLink.astro,
  *                 src/lib/config.ts (siteConfig), src/lib/profile.ts (profileLinks),
- *                 src/lib/navigation.ts (NAV_ITEMS), src/i18n/pt.ts,
+ *                 src/lib/navigation.ts (navItems), src/i18n/pt.ts,
  *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
  *  Entradas     : coleção `perfil` (singleton), já validada pelo Zod
  *  Saídas       : HTML estático da rota `/`
@@ -32,7 +32,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import { pt } from '../i18n/pt';
 import { siteConfig } from '../lib/config';
-import { NAV_ITEMS } from '../lib/navigation';
+import { navItems as navItemsFor } from '../lib/navigation';
 import { profileLinks } from '../lib/profile';
 import { requireSingleton } from '../lib/published';
 
@@ -44,7 +44,7 @@ const areas = perfil.areas ?? [];
 // Mesmo contato da Sobre: e-mail e perfis acadêmicos na ordem fixa do schema, CV por último.
 const links = profileLinks(perfil.links, perfil.cv_url, pt.about.links);
 // A Home não lista a si mesma no menu.
-const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
+const navItems = navItemsFor('pt').filter((item) => item.href !== '/');
 ---
 
 <BaseLayout title={undefined} bare>

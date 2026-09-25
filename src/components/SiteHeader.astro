@@ -14,7 +14,7 @@
  *  Versão       : 0.4.0
  *
  *  Dependências : src/i18n/pt.ts, src/lib/config.ts (siteConfig),
- *                 src/lib/navigation.ts (NAV_ITEMS, isActivePath)
+ *                 src/lib/navigation.ts (navItems, isActivePath)
  *  Entradas     : nenhuma
  *  Saídas       : `<header>` com nome, navegação e menu do celular
  *  Uso          : import SiteHeader from '../components/SiteHeader.astro'
@@ -24,10 +24,10 @@
  */
 import { pt } from '../i18n/pt';
 import { siteConfig } from '../lib/config';
-import { NAV_ITEMS, isActivePath } from '../lib/navigation';
+import { navItems as navItemsFor, isActivePath } from '../lib/navigation';
 
 // Sem "Início", como na Home: a volta para `/` é o nome, igual em todas as páginas.
-const navItems = NAV_ITEMS.filter((item) => item.href !== '/');
+const navItems = navItemsFor('pt').filter((item) => item.href !== '/');
 ---
 
 <header class="shrink-0">

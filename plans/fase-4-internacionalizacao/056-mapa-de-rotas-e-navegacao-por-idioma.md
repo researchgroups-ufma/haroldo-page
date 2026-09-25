@@ -98,13 +98,129 @@ Cite **RN-09** onde o PT é o idioma sem prefixo e **RF-29** no par de rotas.
 
 ## Critérios de aceitação
 
-- [ ] `routePath`, `coursePath`, `localeFromPath`, `counterpartPath` e `HTML_LANG` com a API e as regras do Contexto, testados linha a linha das tabelas
-- [ ] `counterpartPath` lança para caminho sem par (canário do passo 6)
-- [ ] `navItems(locale)` substitui `NAV_ITEMS`; `'/en/'` não fica ativo nas rotas EN internas
-- [ ] `routes.ts` sem import de valor (só `import type`)
-- [ ] Páginas PT idênticas: comparador com toda rota `IGUAL` (passo 5)
-- [ ] `astro check`, `lint`, `format:check`, `test:coverage`, `build:pipeline` verdes, com saída colada
+- [x] `routePath`, `coursePath`, `localeFromPath`, `counterpartPath` e `HTML_LANG` com a API e as regras do Contexto, testados linha a linha das tabelas
+- [x] `counterpartPath` lança para caminho sem par (canário do passo 6)
+- [x] `navItems(locale)` substitui `NAV_ITEMS`; `'/en/'` não fica ativo nas rotas EN internas
+- [x] `routes.ts` sem import de valor (só `import type`)
+- [x] Páginas PT idênticas: comparador com toda rota `IGUAL` (passo 5)
+- [x] `astro check`, `lint`, `format:check`, `test:coverage`, `build:pipeline` verdes, com saída colada
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir: saídas literais coladas, por passo. Plano sem esta seção preenchida não é DONE.>
+Executado em 2026-09-25, inline (`superpowers:executing-plans`), na branch `fase-4-inline`, sobre o
+055 (`0ebf8ed`).
+
+**Passo 1** — o `dist/` do build de base do 055 (exit 0, `8 page(s) built`) já era o "antes":
+`git diff --quiet 42bae79 -- src content` confirmou `src/` e `content/` inalterados desde ele. Retrato:
+`retrato: 8 rota(s) de dist em …/scratchpad/056/antes.json`.
+
+**Passo 2** — teste escrito antes do módulo: vermelho com `Test Files 1 failed`, `Tests no tests`
+(import de `src/lib/routes` inexistente). Depois de `routes.ts`, verde. Um caso a mais que o plano:
+`'/sobre.html'` lança (só a 404 aceita `.html`) — visto vermelho antes da correção:
+`× caminho sem par (/sobre.html) lança nomeando o caminho`. Saída final
+(`npm test -- --reporter=verbose tests/lib/routes.test.ts`):
+
+```
+✓ tests/lib/routes.test.ts > HTML_LANG > pt → "pt-BR", en → "en" 1ms
+✓ tests/lib/routes.test.ts > routePath > home → / (pt) e /en/ (en) 0ms
+✓ tests/lib/routes.test.ts > routePath > about → /sobre/ (pt) e /en/about/ (en) 0ms
+✓ tests/lib/routes.test.ts > routePath > research → /pesquisa/ (pt) e /en/research/ (en) 0ms
+✓ tests/lib/routes.test.ts > routePath > teaching → /ensino/ (pt) e /en/teaching/ (en) 0ms
+✓ tests/lib/routes.test.ts > routePath > publications → /publicacoes/ (pt) e /en/publications/ (en) 0ms
+✓ tests/lib/routes.test.ts > coursePath > mesmo slug nos dois idiomas (sabatina fase 4, Decisão 3) 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /en → en 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /en/ → en 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /en/about/ → en 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /en/teaching/2026-2-relatividade-geral/ → en 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > / → pt (prefixo só conta como segmento inteiro) 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /sobre → pt (prefixo só conta como segmento inteiro) 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /enx/ → pt (prefixo só conta como segmento inteiro) 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /ensino/ → pt (prefixo só conta como segmento inteiro) 0ms
+✓ tests/lib/routes.test.ts > localeFromPath > /ensino/2026-2-relatividade-geral/ → pt (prefixo só conta como segmento inteiro) 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > home: / ↔ /en/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > about: /sobre/ ↔ /en/about/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > research: /pesquisa/ ↔ /en/research/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > teaching: /ensino/ ↔ /en/teaching/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > publications: /publicacoes/ ↔ /en/publications/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > sem barra final: /sobre → /en/about/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > sem barra final: /en/about → /sobre/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > sem barra final: /en → / 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > sem barra final: /ensino → /en/teaching/ 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > disciplina: o slug passa intacto, com ou sem barra 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > 404 PT (/404) → Home EN 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > 404 PT (/404/) → Home EN 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > 404 PT (/404.html) → Home EN 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > 404 EN (/en/404) → Home PT 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > 404 EN (/en/404/) → Home PT 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > 404 EN (/en/404.html) → Home PT 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > caminho sem par (/cv/) lança nomeando o caminho 1ms
+✓ tests/lib/routes.test.ts > counterpartPath > caminho sem par (/en/cv/) lança nomeando o caminho 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > caminho sem par (/ensino/a/b/) lança nomeando o caminho 0ms
+✓ tests/lib/routes.test.ts > counterpartPath > caminho sem par (/enx/) lança nomeando o caminho 0ms
+Tests  36 passed (36)
+```
+
+(a linha `/sobre.html` entrou depois deste log; a rodada seguinte deu `Tests 37 passed (37)`.)
+
+**Passo 3** — testes novos vistos vermelhos antes da mudança (6 falhas: `navItems` inexistente e
+`"/en/" (Home EN) inativo em "/en/about/"` com `expected true to be false`). Depois:
+
+```
+✓ tests/lib/navigation.test.ts > isActivePath > "/" ativo só em "/" 1ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/sobre/" ativo em "/sobre" e "/sobre/" 0ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/ensino/" ativo em "/ensino/2026-2-relatividade-geral/" 0ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/ensino/" inativo em "/ensinox/" 0ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/ensino" (sem barra) ativo em "/ensino/algo/" 0ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/ensino" (sem barra) inativo em "/ensinox/" (sem falso positivo de prefixo) 0ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/en/" (Home EN) inativo em "/en/about/" 0ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/en/" ativo em "/en/" e "/en" 0ms
+✓ tests/lib/navigation.test.ts > isActivePath > "/en/teaching/" ativo em "/en/teaching/2026-2-relatividade-geral/" 0ms
+✓ tests/lib/navigation.test.ts > navItems > pt: as cinco rotas na ordem do menu, com os caminhos PT 1ms
+✓ tests/lib/navigation.test.ts > navItems > en: mesma ordem, com os caminhos EN 0ms
+✓ tests/lib/navigation.test.ts > navItems > pt: todo href termina em "/" 0ms
+✓ tests/lib/navigation.test.ts > navItems > en: todo href termina em "/" 0ms
+✓ tests/lib/navigation.test.ts > navItems > todo key existe em pt.nav 1ms
+Tests  14 passed (14)
+```
+
+**Passo 4** — `npx astro check`: `0 errors`, `0 warnings`, `0 hints`. `SiteHeader.astro` e
+`index.astro` já tinham uma `const navItems` local; o import entrou como `navItems as navItemsFor`
+(uma linha por arquivo, template intocado).
+
+**Passo 5** — `npm run build:pipeline` exit 0 (`8 page(s) built`, `Complete!`);
+`comparar antes.json depois.json` (exit 0):
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGUAL      sobre/index.html
+resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
+
+**Passo 6** — canário: `throw` trocado por `return '/'` →
+
+```
+× caminho sem par (/cv/) lança nomeando o caminho 4ms
+× caminho sem par (/en/cv/) lança nomeando o caminho 0ms
+× caminho sem par (/ensino/a/b/) lança nomeando o caminho 0ms
+× caminho sem par (/enx/) lança nomeando o caminho 0ms
+× caminho sem par (/sobre.html) lança nomeando o caminho 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+Tests  5 failed | 32 passed (37)
+```
+
+Restaurado → `Tests 37 passed (37)`.
+
+**Passo 7** — `npm run lint` exit 0; `npm run format:check`: `All matched files use Prettier code
+style!`; `npm run test:coverage` exit 0: `Test Files 18 passed (18)`, `Tests 303 passed (303)`, resumo
+`Statements 100% (263/263)`, `Branches 100% (127/127)`, `Functions 100% (65/65)`, `Lines 100%
+(238/238)`. A tabela do `text` esconde arquivos em 100%; por arquivo (reporter `json-summary`):
+`src/lib/navigation.ts` e `src/lib/routes.ts` com 100% de linhas, ramos e funções. Extra:
+`npm run test:dist` → `Tests 18 passed (18)`.
+
+`routes.ts` tem um único import, `import type { Locale } from './config'`.
