@@ -113,39 +113,84 @@ string inteira, não por linha. Um build por vez no working tree (DESPACHO, item
 
 ## Evidência
 
-Executado em 2026-09-25, inline (`superpowers:executing-plans`), na branch `fase-4-inline`. Build de
-base: `npm run build:pipeline` → `8 page(s) built`, `Complete!`, exit 0.
+Executado em 2026-09-25, inline (`superpowers:executing-plans`), branch `fase-4-inline`. Código final:
+`9cb54f1` (trabalho em `0ebf8ed`; correções da revisão final da skill em `efe15c8` e da revisão
+`code-reviewer` em `9cb54f1`). `dist/` de entrada: build do `HEAD` às 15:13 (bloco "Build" da
+Evidência do 056, exit 0). Todos os blocos abaixo são o conteúdo integral do arquivo indicado,
+capturado com `NO_COLOR=1` e inserido por script; o verificador de fidelidade está no relatório.
 
-Os canários dos passos 2–4 rodaram num harness (fora do repositório; retratos no scratchpad), que
-checa código de saída e padrão de cada um. Visto falhar antes do script existir (9 falhas,
-`MODULE_NOT_FOUND`) e passar depois:
+Os canários rodam num harness fora do repositório (`scratchpad/055h/canarios.sh`), que grava a saída
+crua de cada comando em `run/<nome>.out` e o código de saída em `run/<nome>.exit`. Antes da correção
+de `9cb54f1`, os canários novos (g) e (h) foram vistos vermelhos:
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/red.log -->
 
 ```
-OK    retrato a.json
-OK    passo 2: a×b tudo IGUAL
-OK    rotas relativas com /, sem admin/
-OK    canário (a) DIFERENTE com a letra
-OK    canário (b) SÓ ANTES
-OK    canário (c) IGUAL apesar de cid/hash css/hash asset
-OK    canário (e) script apagado → DIFERENTE
-OK    canário (f) asset trocado → DIFERENTE
-OK    canário (d) IGNORADA
-OK    passo 4: retrato determinístico
-OK    dist ausente falha
+OK    retrato-a
+OK    passo2
+OK    canario-a
+OK    canario-b
+OK    canario-c
+OK    canario-d
+OK    canario-e
+OK    canario-f
+FALHA canario-g (exit 0, esperado 1; padrão 'DIFERENTE  publicacoes/index.html')
+FALHA canario-h (exit 1, esperado 0; padrão 'IGUAL 8')
+OK    passo4
+OK    dist-ausente
+falhas: 2
+```
+
+Com o código final:
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/green.log -->
+
+```
+OK    retrato-a
+OK    passo2
+OK    canario-a
+OK    canario-b
+OK    canario-c
+OK    canario-d
+OK    canario-e
+OK    canario-f
+OK    canario-g
+OK    canario-h
+OK    passo4
+OK    dist-ausente
 falhas: 0
 ```
 
-Na correção da revisão final, os canários (e) e (f) foram escritos antes da mudança no
-`normalizar` e vistos vermelhos (`FALHA canário (e) … (exit 0, esperado 1 …)` e o mesmo para (f)).
+**Passo 1** — `npm run lint` (exit 0) e `npm run format:check` (exit 0), no `HEAD`:
 
-**Passo 1** — `npm run lint` (exit 0, sem problemas) e `npm run format:check`:
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ev056/passo7-lint.txt -->
 
 ```
+
+> haroldo-page@0.1.0 lint
+> eslint .
+```
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/ev056/passo7-format.txt -->
+
+```
+
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
 Checking formatting...
 All matched files use Prettier code style!
 ```
 
-**Passo 2** — `retrato a.json`, `retrato b.json` sem rebuild, `comparar a.json b.json` (exit 0):
+**Passo 2** — `retrato a.json` (exit 0), `retrato b.json` sem rebuild, `comparar a.json b.json` (exit 0):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/retrato-a.out -->
+
+```
+retrato: 8 rota(s) de dist em C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/a.json
+```
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/passo2.out -->
 
 ```
 IGUAL      404.html
@@ -161,6 +206,8 @@ resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
 
 **Passo 3** — (a) uma letra de "Formação" trocada na Sobre (exit 1):
 
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-a.out -->
+
 ```
 IGUAL      404.html
 IGUAL      ensino/2025-1-mecanica-classica/index.html
@@ -170,31 +217,147 @@ IGUAL      index.html
 IGUAL      pesquisa/index.html
 IGUAL      publicacoes/index.html
 DIFERENTE  sobre/index.html
-           primeira divergência no caractere 4731
+           primeira divergência no caractere 5532
            antes : …-4 lg:col-span-6"><section aria-labelledby="sobre-formacao"><h2 id="sobre-formacao" class="text-rotulo text-secundario">Formação acadêmica</h2><ol class="text-pequeno mt-2 space-y-1"><li class="grid grid-cols-[6.5rem_1fr] gap-x-4 sm:grid-co…
            depois: …-4 lg:col-span-6"><section aria-labelledby="sobre-formacao"><h2 id="sobre-formacao" class="text-rotulo text-secundario">Xormação acadêmica</h2><ol class="text-pequeno mt-2 space-y-1"><li class="grid grid-cols-[6.5rem_1fr] gap-x-4 sm:grid-co…
 resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
 ```
 
-(b) chave `404.html` apagada (exit 1): `SÓ ANTES   404.html`, resumo
-`resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 1 · SÓ DEPOIS 0 · IGNORADA 0`.
+(b) chave `404.html` apagada (exit 1):
 
-(c) cópia do `dist/` com, no HTML cru de `sobre/index.html`, o sufixo de um `data-astro-cid-*`, o hash
-de um `/_astro/*.css` e o hash do `/_astro/archivo-latin-300-normal.*.woff2` trocados (o harness
-confere que as três trocas entraram no arquivo); `retrato --dist <cópia>` comparado com `a.json`
-(exit 0): `resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-b.out -->
 
-(e) último `<script>` inline de `ensino/2026-2-relatividade-geral/index.html` apagado (exit 1):
-`resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
+```
+SÓ ANTES   404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGUAL      sobre/index.html
+resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 1 · SÓ DEPOIS 0 · IGNORADA 0
+```
+
+(c) cópia do `dist/` com o sufixo de um `data-astro-cid-*`, o hash de um `/_astro/*.css` e o hash do
+`archivo-latin-300-normal.*.woff2` trocados no HTML cru da Sobre (exit 0):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-c.out -->
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGUAL      sobre/index.html
+resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
+
+(d) `--ignorar '^sobre/'` sobre o canário (a) (exit 0):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-d.out -->
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGNORADA   sobre/index.html
+resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 1
+```
+
+(e) último `<script>` inline da disciplina apagado (exit 1):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-e.out -->
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+DIFERENTE  ensino/2026-2-relatividade-geral/index.html
+           primeira divergência no caractere 18340
+           antes : …yle.setProperty(`--origem`,`${a}%`)};e.addEventListener(`pointerenter`,n),e.addEventListener(`pointerleave`,n)}</script><script type="module">var e=document.getElementById(`curso-abas`),t=e?[...e.querySelectorAll(`[role="tab"]`)]:[];if(e&&t…
+           depois: …yle.setProperty(`--origem`,`${a}%`)};e.addEventListener(`pointerenter`,n),e.addEventListener(`pointerleave`,n)}</script>…
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGUAL      sobre/index.html
+resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
 
 (f) `archivo-latin-300-normal` trocado por `archivo-latin-900-italic` na Sobre (exit 1):
-`resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0`.
 
-(d) `--ignorar '^sobre/'` sobre o canário (a) (exit 0): `IGNORADA   sobre/index.html`, resumo
-`resumo: IGUAL 7 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 1`.
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-f.out -->
 
-**Passo 4** — dois retratos seguidos do mesmo build, SHA-256 iguais:
-`10f4d3a8b5ac01ed115ca587d61ed92a8e9a73213e5a541587e488d86f54d76e` nos dois.
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+DIFERENTE  sobre/index.html
+           primeira divergência no caractere 368
+           antes : …te Lima Junior, Professor Adjunto A do Departamento de Física da UFMA."><link rel="preload" href="/_astro/archivo-latin-300-normal.*.woff2" as="font" type="font/woff2" crossorigin><link rel="icon" href="/favicon.svg" type="image/svg+xml"><m…
+           depois: …te Lima Junior, Professor Adjunto A do Departamento de Física da UFMA."><link rel="preload" href="/_astro/archivo-latin-900-italic.*.woff2" as="font" type="font/woff2" crossorigin><link rel="icon" href="/favicon.svg" type="image/svg+xml"><m…
+resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
 
-Extra: `retrato --dist <pasta inexistente>` sai 1 com
-`erro: a pasta do build não existe: … (rode npm run build:pipeline)`.
+(g) corpo do script externo de Publicações alterado, com hash novo no nome (exit 1):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-g.out -->
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+DIFERENTE  publicacoes/index.html
+           primeira divergência no caractere 12190
+           antes : …,l.forEach(e=>e.inert=!1)}})}a&&o&&s.length>1&&(l.matches&&d(a,o),l.addEventListener(`change`,()=>{l.matches&&d(a,o)}));"></script>…
+           depois: …,l.forEach(e=>e.inert=!1)}})}a&&o&&s.length>1&&(l.matches&&d(a,o),l.addEventListener(`change`,()=>{l.matches&&d(a,o)}));;console.log(1)"></script>…
+IGUAL      sobre/index.html
+resumo: IGUAL 7 · DIFERENTE 1 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
+
+(h) mesmo script, conteúdo idêntico, nome-base trocado para `PublicationsView.astro_…` (exit 0):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/canario-h.out -->
+
+```
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGUAL      sobre/index.html
+resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+```
+
+**Passo 4** — dois retratos seguidos do mesmo build (`sha256sum`):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/passo4.out -->
+
+```
+9fd339c8abe36c4428c5ffdfa125f1c3f0624d065725c4826ab1d2bfd3c5c6d2 *C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/d1.json
+9fd339c8abe36c4428c5ffdfa125f1c3f0624d065725c4826ab1d2bfd3c5c6d2 *C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/d2.json
+```
+
+Extra: `retrato --dist <pasta inexistente>` (exit 1):
+
+<!-- fonte: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/dist-ausente.out -->
+
+```
+erro: a pasta do build não existe: C:/Users/andne/AppData/Local/Temp/claude/S--Projetos-academic-page-haroldo/e7ee2ab5-85c3-4108-bc49-0c99bb3eef72/scratchpad/055h/run/nao-existe (rode npm run build:pipeline)
+```
