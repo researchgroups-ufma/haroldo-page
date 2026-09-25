@@ -63,6 +63,10 @@ seguir verde. `PublicationsView`: `BaseLayout title={t.nav.publications}` (o 057
 externo pelo conteúdo, não pelo nome do chunk (055, emendado em 2026-09-25) — mover o script da
 sanfona para a view não muda o retrato se o conteúdo for o mesmo. Ele prova marcação e scripts; **o
 navegador prova o comportamento das abas e da sanfona** (passo 7). As duas provas são necessárias.
+**Limite do comparador (revisão do 055):** ele lê o conteúdo do script externo só um nível abaixo —
+os chunks que ele importa (gsap, ScrollTrigger) entram só pelo nome. Se a extração fizer o Vite
+separar a lógica da sanfona num chunk compartilhado, essa lógica sai do retrato: confira no `dist/`
+que o chunk de entrada de `publicacoes/` continua contendo a lógica, e diga isso na Evidência.
 
 **Regras de código:** README da fase 4. Os comentários de RF-37/F-13/F-06/RN-04/RN-02 vão com o código
 que explicam. O módulo `.ts` em `src/scripts/` leva cabeçalho §10.1 e TSDoc na função exportada, se
