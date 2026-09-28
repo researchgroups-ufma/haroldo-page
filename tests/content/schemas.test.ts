@@ -14,8 +14,8 @@
  *                 narrowing.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-03
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.3.0
  *
  *  Dependências : vitest, src/content.config.ts
  *  Entradas     : nenhuma (objetos sintéticos construídos no próprio teste)
@@ -32,9 +32,11 @@
  *                 um campo factual dentro de `en` rejeitado por `.strict()` —
  *                 em `publicacoes`, os dois casos exigidos por RN-07
  *                 (`en.titulo` e `en.autores`); em `perfil`, também o
- *                 `.strict()` do sub-objeto `en.formacao[]`
- *                 (`formacaoEnSchema`), separado do `.strict()` do `en` de
- *                 topo.
+ *                 `.strict()` do `en` dentro de cada item de `formacao[]`
+ *                 (`formacaoEnSchema`) e `atuacao[]` (`atuacaoEnSchema`),
+ *                 separado do `.strict()` do `en` de topo — desde o plano 060
+ *                 (sabatina fase 4, Decisões 7 e 8) essa tradução vive dentro
+ *                 do próprio item, não mais em lista paralela.
  * ============================================================================
  */
 import { describe, expect, it } from 'vitest';
@@ -125,7 +127,7 @@ describe('coleção perfil', () => {
   it('aceita `en` parcial — só um campo preenchido (RN-09)', () => {
     const resultado = perfilSchema.safeParse({
       ...valido,
-      en: { cargo: 'Associate Professor', formacao: [{ grau: 'PhD' }] },
+      en: { cargo: 'Associate Professor' },
     });
     expect(resultado.success).toBe(true);
   });
@@ -139,10 +141,98 @@ describe('coleção perfil', () => {
     expect(resultado.success).toBe(false);
   });
 
-  it('rejeita campo factual dentro de `en.formacao[]` — `instituicao` e `ano` não são traduzíveis (RN-07, `.strict()`)', () => {
+  it('rejeita `en.formacao` — a lista paralela saiu; a tradução vive dentro do item (sabatina fase 4, Decisão 7, `.strict()`)', () => {
     const resultado = perfilSchema.safeParse({
       ...valido,
-      en: { formacao: [{ instituicao: 'UFMA' }] },
+      en: { formacao: [{ grau: 'PhD' }] },
+    });
+    expect(resultado.success).toBe(false);
+  });
+
+  it('rejeita `en.areas` — a lista paralela saiu; a tradução vive dentro do item (sabatina fase 4, Decisão 7, `.strict()`)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      en: { areas: ['Relatividade Geral'] },
+    });
+    expect(resultado.success).toBe(false);
+  });
+
+  it('aceita `formacao[i].en.{grau,curso}` — tradução dentro do próprio item (sabatina fase 4, Decisão 7)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      formacao: [
+        {
+          grau: 'Doutorado',
+          curso: 'Física',
+          instituicao: 'UFPA',
+          ano: '2019–2023',
+          en: { grau: 'PhD', curso: 'Physics' },
+        },
+      ],
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('rejeita campo factual dentro de `formacao[i].en` — `instituicao` não é traduzível (RN-07, `.strict()`)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      formacao: [
+        { grau: 'Doutorado', curso: 'Física', instituicao: 'UFPA', ano: '2019–2023', en: { instituicao: 'UFPA' } },
+      ],
+    });
+    expect(resultado.success).toBe(false);
+  });
+
+  it('aceita `atuacao[i].en.cargo` — só `cargo` traduz (sabatina fase 4, Decisão 8)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      atuacao: [
+        {
+          cargo: 'Professor Adjunto A',
+          instituicao: 'UFMA',
+          periodo: 'atual',
+          en: { cargo: 'Associate Professor' },
+        },
+      ],
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('rejeita `atuacao[i].en.instituicao` — só `cargo` traduz (sabatina fase 4, Decisão 8, `.strict()`)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      atuacao: [
+        {
+          cargo: 'Professor Adjunto A',
+          instituicao: 'UFMA',
+          periodo: 'atual',
+          en: { instituicao: 'UFMA' },
+        },
+      ],
+    });
+    expect(resultado.success).toBe(false);
+  });
+
+  it('rejeita `areas` como lista de string — formato antigo, substituído por lista de objeto (decisão 11 do fatiamento da fase 4)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      areas: ['Relatividade Geral'],
+    });
+    expect(resultado.success).toBe(false);
+  });
+
+  it('aceita `areas` como lista de `{ nome, en? }` (decisão 11 do fatiamento da fase 4)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      areas: [{ nome: 'Relatividade Geral', en: { nome: 'General Relativity' } }],
+    });
+    expect(resultado.success).toBe(true);
+  });
+
+  it('rejeita campo desconhecido dentro de `areas[i].en` — só `nome` existe no grupo (decisão 11 do fatiamento da fase 4, `.strict()`)', () => {
+    const resultado = perfilSchema.safeParse({
+      ...valido,
+      areas: [{ nome: 'Relatividade Geral', en: { descricao: 'não existe' } }],
     });
     expect(resultado.success).toBe(false);
   });

@@ -31,10 +31,10 @@ atuacao:
     instituicao: Universidade Federal do Maranhão (UFMA) — Departamento de Física
     periodo: atual
 areas:
-  - Teoria da Relatividade Geral e teorias alternativas de gravitação
-  - Perturbações lineares em espaços-tempos curvos
-  - Forças de maré
-  - Sombras de buracos negros
+  - nome: Teoria da Relatividade Geral e teorias alternativas de gravitação
+  - nome: Perturbações lineares em espaços-tempos curvos
+  - nome: Forças de maré
+  - nome: Sombras de buracos negros
 email: haroldo.lima@ufma.br
 foto: /uploads/profile.jpg
 links:

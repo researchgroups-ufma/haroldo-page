@@ -10,8 +10,8 @@
  *                 entrada — quem decide o que é um dado válido é este arquivo.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-03
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.3.0
  *
  *  Dependências : astro:content (defineCollection, reference), astro/loaders
  *                 (glob), astro/zod (z)
@@ -86,28 +86,69 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 /**
+ * Subconjunto traduzível de `formacaoSchema`, dentro do item de lista
+ * (sabatina fase 4, Decisão 7).
+ *
+ * A §7.3 marca `formacao[]` como "✔ (título)", mas o objeto `{grau, curso,
+ * instituicao, ano}` não tem campo `titulo` — o título de uma formação é a
+ * junção de `grau` e `curso` (ex.: "Doutorado em Física" → "PhD in Physics");
+ * traduzir só `curso` produziria "Doutorado in Physics" na rota `/en`.
+ * `instituicao` e `ano` são dados factuais (RN-07) e ficam fora — `.strict()`
+ * rejeita, em vez de descartar silenciosamente, um deles colado aqui dentro.
+ */
+const formacaoEnSchema = z
+  .object({
+    grau: z.string().optional(),
+    curso: z.string().optional(),
+  })
+  .strict();
+
+/**
  * Item de formação acadêmica dentro do perfil.
  *
  * `ano` é texto livre (não `number`) porque a formação costuma ser expressa
  * como período ("2019–2023"), diferente de `publicacoes.ano`, que é um único
  * ano numérico validado pela F-09.
+ *
+ * `en` (sabatina fase 4, Decisão 7) viaja dentro do próprio item — não é mais
+ * lista paralela: reordenar `formacao[]` no painel leva a tradução junto.
+ * Opcional (RN-09, português é canônico).
  */
 const formacaoSchema = z.object({
   grau: z.string(),
   curso: z.string(),
   instituicao: z.string(),
   ano: z.string(),
+  en: formacaoEnSchema.optional(),
 });
+
+/**
+ * Subconjunto traduzível de `atuacaoSchema`, dentro do item de lista
+ * (sabatina fase 4, Decisão 8).
+ *
+ * Só `cargo`: `instituicao` e `periodo` são dados factuais (RN-07) e ficam
+ * únicos, em português, como a instituição da formação. `.strict()` rejeita
+ * um deles colado aqui dentro.
+ */
+const atuacaoEnSchema = z
+  .object({
+    cargo: z.string().optional(),
+  })
+  .strict();
 
 /**
  * Cargo ou posição na atuação profissional do perfil (timeline da página Sobre).
  *
  * `periodo` é texto livre, como `formacaoSchema.ano` ("2024–atual", "atual").
+ *
+ * `en` (sabatina fase 4, Decisão 8) traduz só `cargo`, dentro do próprio item
+ * — mesmo mecanismo de `formacaoSchema.en`. Opcional (RN-09).
  */
 const atuacaoSchema = z.object({
   cargo: z.string(),
   instituicao: z.string(),
   periodo: z.string(),
+  en: atuacaoEnSchema.optional(),
 });
 
 /** Links acadêmicos do perfil (§7.3) — todos opcionais e, quando preenchidos, URLs válidas. */
@@ -122,33 +163,16 @@ const linksSchema = z.object({
 });
 
 /**
- * Subconjunto traduzível de `formacaoSchema`, dentro do grupo `en` (plano 018).
- *
- * A §7.3 marca `formacao[]` como "✔ (título)", mas o objeto `{grau, curso,
- * instituicao, ano}` não tem campo `titulo` — o título de uma formação é a
- * junção de `grau` e `curso` (ex.: "Doutorado em Física" → "PhD in Physics");
- * traduzir só `curso` produziria "Doutorado in Physics" na rota `/en`.
- * `instituicao` e `ano` são dados factuais (RN-07) e ficam fora.
- *
- * `en.formacao[]` é uma lista paralela a `formacao[]`, alinhada por índice —
- * reordenar a lista em português desalinha a tradução. O realinhamento não é
- * implementado aqui: é um mecanismo da fase 4, junto do fallback.
- */
-const formacaoEnSchema = z
-  .object({
-    grau: z.string().optional(),
-    curso: z.string().optional(),
-  })
-  .strict();
-
-/**
  * Grupo `en` da coleção `perfil` (§7.3, RN-06, RN-09, plano 018) — opcional,
  * e cada campo dentro dele também. `.strict()`: um campo factual (ex.:
  * `email`, `nome`) colado dentro de `en` é rejeitado em vez de
  * silenciosamente descartado.
  *
- * `en.areas[]` é lista paralela a `areas[]`, alinhada por índice — mesma
- * ressalva de `formacaoEnSchema` acima.
+ * Sem `formacao` e sem `areas` (sabatina fase 4, Decisão 7): a tradução de
+ * cada item de `formacao[]`, `atuacao[]` e `areas[]` viaja dentro do próprio
+ * item (`formacaoSchema.en`, `atuacaoSchema.en`, `areaSchema.en`), não mais
+ * como lista paralela alinhada por posição — reordenar o item no painel leva
+ * a tradução junto.
  */
 const perfilEnSchema = z
   .object({
@@ -157,10 +181,30 @@ const perfilEnSchema = z
     departamento: z.string().optional(),
     bio: z.string().optional(),
     resumo_home: z.string().optional(),
-    formacao: z.array(formacaoEnSchema).optional(),
-    areas: z.array(z.string()).optional(),
   })
   .strict();
+
+/**
+ * Subconjunto traduzível de `areaSchema`, dentro do item de lista (decisão 11
+ * do fatiamento da fase 4 — README da fase 4). `.strict()` como os demais
+ * grupos `en` de item.
+ */
+const areaEnSchema = z
+  .object({
+    nome: z.string().optional(),
+  })
+  .strict();
+
+/**
+ * Área de atuação do perfil (§7.3). Até este plano `areas[]` era lista de
+ * string; passa a lista de objeto para carregar a tradução dentro do próprio
+ * item (decisão 11 do fatiamento da fase 4), no mesmo formato de `en` de
+ * `formacaoSchema`/`atuacaoSchema` acima. Opcional (RN-09).
+ */
+const areaSchema = z.object({
+  nome: z.string(),
+  en: areaEnSchema.optional(),
+});
 
 /**
  * Schema Zod da coleção `perfil` — singleton em `content/perfil/index.md`
@@ -183,7 +227,7 @@ export const perfilSchema = z.object({
   resumo_home: z.string(),
   formacao: z.array(formacaoSchema).optional(),
   atuacao: z.array(atuacaoSchema).optional(),
-  areas: z.array(z.string()).optional(),
+  areas: z.array(areaSchema).optional(),
   email: z.email(),
   links: linksSchema.optional(),
   cv_url: z.url().optional(),

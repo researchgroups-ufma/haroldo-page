@@ -13,8 +13,8 @@
  *                 quebrado que ele não sabe diagnosticar.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-03
- *  Atualizado em: 2026-09-11
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.3.0
  *
  *  Dependências : vitest, src/content.config.ts, tina/config.ts
  *  Entradas     : nenhuma (introspecção dos dois schemas em memória)
@@ -466,5 +466,43 @@ describe('três falsos positivos que um teste ingênuo reprovaria sem haver dive
     for (const [, filho] of Object.entries(tinaEn.children ?? {})) {
       expect(filho.required).toBe(false);
     }
+  });
+});
+
+describe('grupo `en` dentro de item de lista — formacao[], atuacao[] e areas[] do perfil (sabatina fase 4, Decisões 7 e 8; plano 060)', () => {
+  const tinaPerfil = tinaCollections.find((c) => normalizeCollectionName(c.name) === 'perfil')!;
+  const zodPerfilNorm = classifyZod(zodSchemas.perfil);
+  const tinaPerfilNorm: NormField = {
+    required: true,
+    kind: 'object',
+    children: buildTinaChildren(tinaPerfil.fields),
+  };
+
+  it.each(['formacao', 'atuacao', 'areas'] as const)(
+    'item de `%s`: o grupo `en` existe dos dois lados, opcional, com todo subcampo opcional',
+    (listName) => {
+      const zodEn = zodPerfilNorm.children?.[listName]?.item?.children?.en;
+      const tinaEn = tinaPerfilNorm.children?.[listName]?.item?.children?.en;
+
+      expect(zodEn).toBeDefined();
+      expect(tinaEn).toBeDefined();
+      expect(zodEn?.required).toBe(false);
+      expect(tinaEn?.required).toBe(false);
+      for (const [, filho] of Object.entries(zodEn?.children ?? {})) {
+        expect(filho.required).toBe(false);
+      }
+      for (const [, filho] of Object.entries(tinaEn?.children ?? {})) {
+        expect(filho.required).toBe(false);
+      }
+    },
+  );
+
+  it('`perfil.en` (grupo de topo) não tem mais `formacao` nem `areas` — a tradução saiu para dentro do item', () => {
+    const zodTopEn = zodPerfilNorm.children?.en;
+    const tinaTopEn = tinaPerfilNorm.children?.en;
+    expect(zodTopEn?.children).not.toHaveProperty('formacao');
+    expect(zodTopEn?.children).not.toHaveProperty('areas');
+    expect(tinaTopEn?.children).not.toHaveProperty('formacao');
+    expect(tinaTopEn?.children).not.toHaveProperty('areas');
   });
 });

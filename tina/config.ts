@@ -12,8 +12,8 @@
  *                 (`src/content.config.ts`, D-06).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-03
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.4.0
  *
  *  Dependências : tinacms (defineConfig), src/lib/slug.ts (slugify, reusado
  *                 nos templates de nome de arquivo — ver nota abaixo)
@@ -76,6 +76,16 @@
  *                 grupo inteiro e cada campo dentro dele são opcionais
  *                 (RN-09, português é canônico). A função de fallback por
  *                 campo (RN-06) não é implementada aqui — é da fase 4.
+ *
+ *                 Dentro do perfil, cada item de `formacao`, `atuacao` e
+ *                 `areas` também carrega o próprio grupo "Versão em inglês"
+ *                 (sabatina fase 4, Decisões 7 e 8; decisão 11 do fatiamento
+ *                 da fase 4 — README da fase 4, plano 060): não é mais lista
+ *                 paralela alinhada por posição — a tradução acompanha o
+ *                 item quando ele é reordenado no painel. `formacao[].en`
+ *                 traduz `grau`/`curso`; `atuacao[].en` traduz só `cargo`
+ *                 (instituição e período são dados factuais); `areas`
+ *                 passou de lista de texto a lista de `{ nome, en? }`.
  * ============================================================================
  */
 import { defineConfig } from 'tinacms';
@@ -174,6 +184,17 @@ export default defineConfig({
                 required: true,
                 description: 'Período em formato livre, ex.: 2019–2023.',
               },
+              {
+                type: 'object',
+                name: 'en',
+                label: 'Versão em inglês (opcional)',
+                description:
+                  'Tradução opcional deste item — o site usa o texto em português como reserva (RN-06).',
+                fields: [
+                  { type: 'string', name: 'grau', label: 'Grau (EN)' },
+                  { type: 'string', name: 'curso', label: 'Curso (EN)' },
+                ],
+              },
             ],
           },
           {
@@ -198,14 +219,36 @@ export default defineConfig({
                 required: true,
                 description: 'Formato livre, ex.: 2024–atual.',
               },
+              {
+                type: 'object',
+                name: 'en',
+                label: 'Versão em inglês (opcional)',
+                description:
+                  'Tradução opcional do cargo — o site usa o texto em português como reserva (RN-06). Instituição e período são dados factuais e ficam únicos.',
+                fields: [{ type: 'string', name: 'cargo', label: 'Cargo (EN)' }],
+              },
             ],
           },
           {
-            type: 'string',
+            type: 'object',
             name: 'areas',
             label: 'Áreas de atuação',
             list: true,
             description: 'Uma área por item — toque em "+" para adicionar outra.',
+            ui: {
+              itemProps: (item) => ({ label: item?.nome || 'Nova área' }),
+            },
+            fields: [
+              { type: 'string', name: 'nome', label: 'Área', required: true },
+              {
+                type: 'object',
+                name: 'en',
+                label: 'Versão em inglês (opcional)',
+                description:
+                  'Tradução opcional desta área — o site usa o texto em português como reserva (RN-06).',
+                fields: [{ type: 'string', name: 'nome', label: 'Área (EN)' }],
+              },
+            ],
           },
           {
             type: 'string',
@@ -256,31 +299,6 @@ export default defineConfig({
                 name: 'resumo_home',
                 label: 'Resumo para a Home (EN)',
                 ui: { component: 'textarea' },
-              },
-              {
-                type: 'object',
-                name: 'formacao',
-                label: 'Formação acadêmica (EN)',
-                list: true,
-                description:
-                  'Título de cada formação em inglês (grau + curso) — lista paralela à "Formação acadêmica" em português, alinhada por posição.',
-                ui: {
-                  itemProps: (item) => ({
-                    label: [item?.grau, item?.curso].filter(Boolean).join(' — ') || 'Nova formação',
-                  }),
-                },
-                fields: [
-                  { type: 'string', name: 'grau', label: 'Grau (EN)' },
-                  { type: 'string', name: 'curso', label: 'Curso (EN)' },
-                ],
-              },
-              {
-                type: 'string',
-                name: 'areas',
-                label: 'Áreas de atuação (EN)',
-                list: true,
-                description:
-                  'Lista paralela a "Áreas de atuação" em português, alinhada por posição.',
               },
             ],
           },
