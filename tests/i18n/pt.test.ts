@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pt } from '../../src/i18n/pt';
 import { disciplinasSchema, projetosSchema, publicacoesSchema } from '../../src/content.config';
+import { siteConfig } from '../../src/lib/config';
 
 /**
  * Percorre `obj` recursivamente e devolve todas as strings folha, ignorando
@@ -78,5 +79,31 @@ describe('pt — mapas de enum alinhados aos schemas Zod', () => {
 describe('pt.site.portraitAlt', () => {
   it('monta o texto alternativo do retrato', () => {
     expect(pt.site.portraitAlt('Haroldo Lima')).toBe('Retrato de Haroldo Lima');
+  });
+});
+
+describe('pt — chaves novas da fase 4 (decisão 4 do fatiamento da fase 4)', () => {
+  it('site.description é, byte a byte, o valor de siteConfig.description', () => {
+    expect(pt.site.description).toBe(siteConfig.description);
+  });
+
+  it('language.code e language.name apontam para o idioma de destino (EN)', () => {
+    expect(pt.language.code).toBe('EN');
+    expect(pt.language.name).toBe('English version');
+  });
+
+  it('fallback.notice tem o texto do aviso de idioma (F-07)', () => {
+    expect(pt.fallback.notice).toBe(
+      'Parte do conteúdo desta página só está disponível em português.',
+    );
+  });
+
+  it('date.format monta dd/mm/aaaa sem validar o mês (§8.3; decisão 6 do fatiamento da fase 4)', () => {
+    expect(pt.date.format('2026', '03', '15')).toBe('15/03/2026');
+    expect(pt.date.format('2026', '13', '15')).toBe('15/13/2026');
+  });
+
+  it('about.eyebrow saiu do dicionário (dívida (d) da fase 3)', () => {
+    expect('eyebrow' in pt.about).toBe(false);
   });
 });

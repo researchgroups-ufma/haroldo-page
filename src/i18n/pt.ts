@@ -3,17 +3,17 @@
  *  Arquivo      : pt.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Dicionário único de strings de interface em português das
- *                 sete rotas da fase 3 (§10.4 do PRD: proibido texto de
- *                 interface hardcoded em componente). Os quatro grupos de
- *                 rótulo de enum (`research.status`, `course.status`,
+ *                 rotas do site (§10.4 do PRD: proibido texto de interface
+ *                 hardcoded em componente). Os quatro grupos de rótulo de
+ *                 enum (`research.status`, `course.status`,
  *                 `course.materialType`, `script.language`) e
  *                 `publications.type` são tipados a partir dos schemas Zod de
  *                 `src/content.config.ts`, para que o `astro check` reprove
  *                 se um enum mudar sem o dicionário acompanhar.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.3.0
  *
  *  Dependências : src/content.config.ts (projetosSchema, disciplinasSchema,
  *                 publicacoesSchema — só para os tipos dos mapas de enum)
@@ -21,10 +21,13 @@
  *  Saídas       : `pt` (objeto de strings e funções) e o tipo `UiStrings`
  *  Uso          : import { pt } from '../i18n/pt'; pt.nav.home
  *
- *  Notas        : só o PT existe nesta fase (Decisão 1 do fatiamento da fase
- *                 3) — nenhum `en.ts`, seletor de idioma nem fallback RN-06.
- *                 A fase 4 acrescenta `en: UiStrings`. Dados que vêm do
- *                 conteúdo (frontmatter) não entram aqui.
+ *  Notas        : a fase 4 acrescentou `src/i18n/en.ts` e `src/i18n/index.ts`
+ *                 (`strings(lang)`), com o texto do `en.ts` revisado pelo
+ *                 stakeholder (sabatina fase 4, Decisão 11); as chaves novas
+ *                 vêm da decisão 4 do fatiamento da fase 4. `about.eyebrow`
+ *                 saiu (dívida (d) da fase 3): o `<title>` das rotas fixas
+ *                 usa `nav[chave]`. Dados que vêm do conteúdo (frontmatter)
+ *                 não entram aqui.
  * ============================================================================
  */
 import type { disciplinasSchema, projetosSchema, publicacoesSchema } from '../content.config';
@@ -59,6 +62,11 @@ export const pt = {
     menu: 'Menu',
     mainNavLabel: 'Navegação principal',
     opensInNewTab: '(abre em nova aba)',
+    // decisão 4 do fatiamento da fase 4: mesmo valor de `siteConfig.description`
+    // (`src/lib/config.ts`), texto em português fora do dicionário até o 058 remover o campo do
+    // `siteConfig`.
+    description:
+      'Site acadêmico do Prof. Haroldo Cilas Duarte Lima Junior, Professor Adjunto A do Departamento de Física da UFMA.',
     pageTitle: (page: string, site: string) => `${page} — ${site}`,
     portraitAlt: (nome: string) => `Retrato de ${nome}`,
   },
@@ -69,8 +77,21 @@ export const pt = {
     teaching: 'Ensino',
     publications: 'Publicações',
   },
+  // sabatina fase 4, Decisão 5: o link do seletor mostra o idioma de destino — nas páginas PT, o
+  // destino é o inglês.
+  language: {
+    code: 'EN',
+    name: 'English version',
+  },
+  // F-07 / sabatina fase 4, Decisão 4: aviso único por página quando algum texto caiu no PT.
+  fallback: {
+    notice: 'Parte do conteúdo desta página só está disponível em português.',
+  },
+  // §8.3 do PRD: data no formato do locale da rota; sem `Date`/`Intl` (ver `src/lib/date.ts`).
+  date: {
+    format: (year: string, month: string, day: string) => `${day}/${month}/${year}`,
+  },
   about: {
-    eyebrow: 'Sobre',
     title: 'Biografia e formação',
     education: 'Formação acadêmica',
     experience: 'Atuação profissional',
