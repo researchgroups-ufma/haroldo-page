@@ -5,8 +5,10 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-28 — **059 DONE** (`102c8a8`, dois ciclos de revisão, hover e larguras
-conferidos no navegador pelo orquestrador). Próximo: 060. Antes, no mesmo dia — **058 DONE** (`0583324`, dois ciclos de revisão; o escopo ganhou
+Última atualização: 2026-09-28 — **060 DONE** (`122df25`, quatro ciclos de revisão, todos por texto; a
+reordenação no painel foi feita à mão pelo stakeholder, porque a extensão não arrasta a lista do Tina;
+fecha o item do grupo `en` do perfil, 2/9). Próximo: 061. Antes, no mesmo dia — **059 DONE** (`102c8a8`, dois ciclos de revisão, hover e larguras
+conferidos no navegador pelo orquestrador). Antes, no mesmo dia — **058 DONE** (`0583324`, dois ciclos de revisão; o escopo ganhou
 `tests/i18n/pt.test.ts` por autorização do orquestrador, porque o teste do 057 lia o
 `siteConfig.description` que o 058 removeu). Depois dele, o 059. Antes, no mesmo dia — **057 DONE** (`82a7947`, de volta ao setup da casa: implementer,
 triage e `code-reviewer`, três ciclos de revisão; inglês aprovado pelo stakeholder na nomenclatura
@@ -126,7 +128,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 057 | Dicionário `en.ts`, chaves novas e `strings(lang)` | 🟢 DONE | agente + **stakeholder** (revisão do inglês) | implementer (sonnet) | `82a7947` |
 | 058 | Layout e cabeçalhos escolhem o dicionário pelo caminho | 🟢 DONE | agente | implementer (sonnet) | `0583324` |
 | 059 | Componentes de conteúdo e data por idioma | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `102c8a8` |
-| 060 | Tradução dentro do item: `formacao[]`, `atuacao[]` e `areas[]` (Decisões 7 e 8) | ⬜ TODO | agente + orquestrador (painel e cloud check) | implementer (sonnet) | — |
+| 060 | Tradução dentro do item: `formacao[]`, `atuacao[]` e `areas[]` (Decisões 7 e 8) | 🟢 DONE | agente + orquestrador (painel e cloud check) | implementer (sonnet) | `122df25` |
 | 061 | Fallback por campo (RN-06) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 062 | Views: Home, Sobre e 404 | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 063 | Views: Pesquisa e Ensino | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |

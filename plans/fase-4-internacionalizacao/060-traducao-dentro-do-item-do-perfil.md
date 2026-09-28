@@ -1,6 +1,6 @@
 # Plano 060 — Tradução dentro do item: `formacao[]`, `atuacao[]` e `areas[]` (Decisões 7 e 8)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** RF-14, RN-06, RN-07, RN-09, RNF-09 (paridade), D-06; sabatina fase 4, Decisões 7 e 8; §12 fase 4, item 9
 **Depende de:** plano 055 (comparador)
 **Modelo recomendado:** sonnet
@@ -138,8 +138,8 @@ opcional; a Decisão 7 se cita como "sabatina fase 4, Decisão 7".
 - [x] `tina/tina-lock.json` regenerado; `tina-lock-coerente` verde
 - [x] Só `areas` mudou em `content/perfil/index.md`; `conteudo-valido` verde
 - [x] Páginas PT idênticas: comparador com toda rota `IGUAL`
-- [ ] Painel: grupo "Versão em inglês" dentro de cada item, e a tradução acompanha o item reordenado (orquestrador)
-- [ ] `npm run build` **com cloud check** verde depois do push (orquestrador)
+- [x] Painel: grupo "Versão em inglês" dentro de cada item, e a tradução acompanha o item reordenado (orquestrador)
+- [x] `npm run build` **com cloud check** verde depois do push (orquestrador)
 - [x] `astro check`, `lint`, `format:check`, `test:coverage`, `build:pipeline`, `test:dist` verdes, com saída colada
 
 ## Evidência
@@ -1074,15 +1074,163 @@ EXIT=0
 
 ### Passo 9 — painel local (orquestrador)
 
-Não rodado pelo executor. O passo 9 (subir `astro dev` + `tinacms dev` e verificar o painel —
-grupo "Versão em inglês" dentro de cada item de Formação/Atuação/Áreas, reordenar item preenchido e
-conferir que a tradução acompanha, reverter) é do orquestrador, por despacho explícito. O critério
-de aceitação correspondente fica `[ ]`.
+Rodado pelo orquestrador em 2026-09-28, 16:35–16:52, sobre o commit de trabalho `122df25` já
+empurrado, com `npx astro dev --background --force` e `npx tinacms dev` separados, no Vivaldi com a
+extensão ("You are in local mode").
+
+- No Perfil, os itens de Formação acadêmica, Atuação profissional e Áreas de atuação aparecem
+  rotulados; dentro do item de Formação aberto, o grupo "Versão em inglês (opcional)" aparece
+  recolhido, com "Grau (EN)" e "Curso (EN)" no subpainel. O `name` do campo no DOM é
+  `formacao.1.en.grau`.
+- Preenchi "Grau (EN)" do 2º item ("Pós-doutorado") com `Postdoctoral fellowship` e salvei. A
+  reordenação **não** saiu pela extensão: o arrasto (duas tentativas), o teclado (Espaço/seta — as
+  teclas chegaram à página, conferido por ouvinte de `keydown`, mas a lista não se moveu) e eventos
+  de ponteiro disparados por JS não moveram o item. **O stakeholder arrastou o item à mão** para o
+  1º lugar e salvou; o arquivo abaixo é o gravado depois disso.
+- Observado, não confirmado como defeito do Tina: um valor digitado no subpainel se perdeu ao voltar
+  ao formulário pelo breadcrumb "index" antes de salvar (o campo voltou vazio e o Save voltou a
+  ficar desabilitado). Salvar de dentro do subpainel gravou. Pode ser efeito da automação.
+
+Frontmatter gravado — a tradução está **dentro** do item que foi movido (o `foto` mudou de lugar
+pela ordem dos campos do Tina, sem mudar de valor):
+
+```
+$ git diff -- content/perfil/index.md
+diff --git a/content/perfil/index.md b/content/perfil/index.md
+index 87e7580..66ebc4e 100644
+--- a/content/perfil/index.md
++++ b/content/perfil/index.md
+@@ -3,17 +3,20 @@ nome: Haroldo Cilas Duarte Lima Junior
+ cargo: Professor Adjunto A
+ instituicao: 'Universidade Federal do Maranhão (UFMA), Campus São Luís'
+ departamento: Centro Tecnológico — Departamento de Física
++foto: /uploads/profile.jpg
+ bio: 'Professor Adjunto A no Departamento de Física do Centro Tecnológico da Universidade Federal do Maranhão (UFMA), Campus São Luís, e bolsista de Produtividade em Pesquisa do CNPq — Nível C. Doutor em Física pela UFPA (2023), com período sanduíche na Universidade de Aveiro. Pesquisa relatividade geral e teorias alternativas de gravitação, com ênfase em buracos negros de Kerr, forças de maré, campos escalares e sombras de buracos negros.'
+ resumo_home: 'Pesquisa Relatividade Geral, teorias alternativas de gravitação e sombras de buracos negros.'
+ formacao:
+-  - grau: Formação complementar
+-    curso: Quantum Field Theory
+-    instituicao: 'ICTP — Trieste, Itália'
+-    ano: 2023–2024
+   - grau: Pós-doutorado
+     curso: Física
+     instituicao: Universidade Federal do Pará (UFPA)
+     ano: '2023'
++    en:
++      grau: Postdoctoral fellowship
++  - grau: Formação complementar
++    curso: Quantum Field Theory
++    instituicao: 'ICTP — Trieste, Itália'
++    ano: 2023–2024
+   - grau: Doutorado
+     curso: Física
+     instituicao: Universidade Federal do Pará (UFPA)
+@@ -36,7 +39,6 @@ areas:
+   - nome: Forças de maré
+   - nome: Sombras de buracos negros
+ email: haroldo.lima@ufma.br
+-foto: /uploads/profile.jpg
+ links:
+   lattes: 'http://lattes.cnpq.br/8115459874963916'
+   orcid: 'https://orcid.org/0000-0002-3702-7683'
+EXIT=0
+```
+
+Reversão, depois do commit de trabalho, com `git checkout -- content/perfil/index.md`:
+
+```
+$ git status --short
+EXIT=0
+$ git diff -- content/
+EXIT=0
+```
+
+Servidores encerrados com `npx astro dev stop` e `Stop-Process` no processo que escutava 4001 e
+9000; as três portas (4321, 4001, 9000) ficaram sem escuta.
 
 ### Passo 10 — depois do push (orquestrador)
 
-Não rodado pelo executor. Não houve commit nem push nesta execução (`Status:` permanece `TODO`,
-por regra do despacho). O passo 10 (`npm run build` com cloud check, CI e Workers Builds) só se
-aplica depois de um push que este agente não faz. O critério de aceitação correspondente fica
-`[ ]`.
+`npm run build` com cloud check (sem `--skip-cloud-checks`), sobre a árvore limpa em `122df25`,
+depois de o TinaCloud reindexar. O `NativeCommandError` no topo é o PowerShell 5.1 embrulhando a
+saída de erro do `node`; o código de saída é o da última linha.
 
+```
+
+> haroldo-page@0.1.0 build
+> tinacms build && astro check && astro build
+
+Starting Tina build
+node.exe : 
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[2K[1GChecking indexing process in TinaCloud... ⠋[2K[1GChecking indexing process in TinaCloud... ⠙[2K[1GChecking 
+indexing process in TinaCloud... ⠹[2K[1GChecking indexing process in TinaCloud... ⠸[2K[1GChecking indexing process 
+in TinaCloud... ⠼[2K[1GChecking indexing process in TinaCloud... ⠴
+
+
+
+│
+○  Tina build complete ───────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                 │
+│  🦙 Tina Config                                                                                                 │
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main  │
+│                                                                                                                 │
+│  🤖 Auto-generated files                                                                                        │
+│     GraphQL Client:     tina/__generated__/client.ts                                                            │
+│     Typescript Types:   tina/__generated__/types.ts                                                             │
+│     Static HTML file:   public/admin/index.html                                                                 │
+│                                                                                                                 │
+│                                                                                                                 │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+16:54:05 [vite] Re-optimizing dependencies because vite config has changed
+16:54:05 [content] Syncing content
+16:54:05 [content] Synced content
+16:54:05 [types] Generated 475ms
+16:54:05 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (67 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+16:54:13 [content] Syncing content
+16:54:13 [content] Synced content
+16:54:13 [types] Generated 415ms
+16:54:13 [build] output: "static"
+16:54:13 [build] mode: "static"
+16:54:13 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+16:54:13 [build] Collecting build info...
+16:54:13 [build] ✓ Completed in 450ms.
+16:54:13 [build] Building static entrypoints...
+16:54:13 [vite] ✓ built in 318ms
+16:54:13 [vite] ✓ built in 79ms
+16:54:13 [build] Rearranging server assets...
+
+ generating static routes 
+16:54:13   ├─ /404.html (+11ms) 
+16:54:13   ├─ /ensino/2025-1-mecanica-classica/index.html (+4ms) 
+16:54:13   ├─ /ensino/2026-2-relatividade-geral/index.html (+85ms) 
+16:54:13   ├─ /ensino/index.html (+5ms) 
+16:54:13   ├─ /pesquisa/index.html (+3ms) 
+16:54:13   ├─ /publicacoes/index.html (+4ms) 
+16:54:13   ├─ /sobre/index.html (+5ms) 
+16:54:13   ├─ /index.html (+3ms) 
+16:54:13 ✓ Completed in 147ms.
+
+16:54:13 [build] ✓ Completed in 610ms.
+16:54:13 [build] 8 page(s) built in 1.12s
+16:54:13 [build] Complete!
+EXIT=0
+```
+
+CI e Workers Builds no commit de trabalho, check-runs pelo SHA completo:
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/122df25060ed65ff0ba182f0f9baa97b38f4f6d9/check-runs --jq '.check_runs[] | "\(.name)|\(.status)|\(.conclusion)|\(.completed_at)|\(.html_url)"'
+Workers Builds: haroldo-page|completed|success|2026-09-28T19:47:04Z|https://github.com/researchgroups-ufma/haroldo-page/runs/109105075307
+qualidade|completed|success|2026-09-28T19:46:33Z|https://github.com/researchgroups-ufma/haroldo-page/actions/runs/36474390115/job/109104329655
+```
