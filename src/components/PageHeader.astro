@@ -11,13 +11,13 @@
  *                 `aside` opcional que compõe a coluna direita a partir de `lg`.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.5.0
  *
  *  Dependências : src/styles/global.css (classes `regua-entrada`/`titulo-entrada`
  *                 do plano 036, tokens `--color-tinta`/`--color-secundario`)
- *  Entradas     : props `title`, `meta` (opcional), `back` (opcional); slot
- *                 nomeado `aside` (opcional)
+ *  Entradas     : props `title`, `meta` (opcional), `back` (opcional), `titleLang`
+ *                 (opcional), `metaLang` (opcional); slot nomeado `aside` (opcional)
  *  Saídas       : `<div>` com título (+ seta, + meta, + coluna `aside`) e a régua forte
  *  Uso          : import PageHeader from '../components/PageHeader.astro'
  *
@@ -35,9 +35,13 @@ export interface Props {
   meta?: string;
   /** Seta de volta à esquerda do título: destino e nome acessível (ex.: "Voltar para Ensino"). Ausente = nada. */
   back?: { href: string; label: string };
+  /** `lang` do `<h1>`, para o título em fallback (RN-06) nas rotas `/en`. Ausente = sem atributo. */
+  titleLang?: string;
+  /** `lang` da linha de `meta`, para o texto em fallback (RN-06) nas rotas `/en`. Ausente = sem atributo. */
+  metaLang?: string;
 }
 
-const { title, meta, back } = Astro.props;
+const { title, meta, back, titleLang, metaLang } = Astro.props;
 // Sem slot `aside`, o título ocupa a largura inteira — sem grade nem coluna vazia.
 const hasAside = Astro.slots.has('aside');
 ---
@@ -69,9 +73,15 @@ const hasAside = Astro.slots.has('aside');
             </a>
           )
         }
-        <h1 class="text-display-2 titulo-entrada">{title}</h1>
+        <h1 class="text-display-2 titulo-entrada" lang={titleLang}>{title}</h1>
       </div>
-      {meta && <p class="text-pequeno text-secundario mt-2">{meta}</p>}
+      {
+        meta && (
+          <p class="text-pequeno text-secundario mt-2" lang={metaLang}>
+            {meta}
+          </p>
+        )
+      }
     </div>
     {
       hasAside && (

@@ -10,11 +10,12 @@
  *                 progressiva (RNF-02) — sem JS a lista abre e o botão some.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-25
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.5.0
  *
- *  Dependências : src/i18n/pt.ts, src/lib/config.ts (siteConfig),
- *                 src/lib/navigation.ts (navItems, isActivePath)
+ *  Dependências : src/i18n (strings), src/lib/config.ts (siteConfig),
+ *                 src/lib/navigation.ts (navItems, isActivePath), src/lib/routes.ts
+ *                 (localeFromPath, routePath)
  *  Entradas     : nenhuma
  *  Saídas       : `<header>` com nome, navegação e menu do celular
  *  Uso          : import SiteHeader from '../components/SiteHeader.astro'
@@ -22,12 +23,17 @@
  *  Notas        : espaço do seletor de idioma (RF-29) não renderiza nada — só o comentário no HTML.
  * ============================================================================
  */
-import { pt } from '../i18n/pt';
+import { strings } from '../i18n';
 import { siteConfig } from '../lib/config';
 import { navItems as navItemsFor, isActivePath } from '../lib/navigation';
+import { localeFromPath, routePath } from '../lib/routes';
 
-// Sem "Início", como na Home: a volta para `/` é o nome, igual em todas as páginas.
-const navItems = navItemsFor('pt').filter((item) => item.href !== '/');
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
+
+// Sem "Início", como na Home: a volta para a Home é o nome, igual em todas as páginas.
+const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
 ---
 
 <header class="shrink-0">
@@ -35,7 +41,7 @@ const navItems = navItemsFor('pt').filter((item) => item.href !== '/');
     <div
       class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-5 pb-2 lg:items-start lg:pt-7"
     >
-      <a href="/" class="vt-nome text-display-2">{siteConfig.displayName}</a>
+      <a href={routePath('home', lang)} class="vt-nome text-display-2">{siteConfig.displayName}</a>
 
       <!-- fase 4: seletor de idioma (RF-29) -->
 
@@ -47,11 +53,11 @@ const navItems = navItemsFor('pt').filter((item) => item.href !== '/');
         aria-controls="menu-lista"
         class="text-nav inline-flex min-h-11 items-center px-2 lg:hidden"
       >
-        {pt.site.menu}
+        {t.site.menu}
       </button>
 
       <nav
-        aria-label={pt.site.mainNavLabel}
+        aria-label={t.site.mainNavLabel}
         class="vt-menu order-last w-full lg:order-none lg:w-auto"
       >
         <div id="menu-caixa">
@@ -70,7 +76,7 @@ const navItems = navItemsFor('pt').filter((item) => item.href !== '/');
                       class="text-nav flex min-h-11 items-center justify-between gap-2 lg:inline-flex lg:min-h-0"
                     >
                       {/* O traço fica no rótulo, não na linha inteira do menu do celular. */}
-                      <span class="link-traco">{pt.nav[item.key]}</span>
+                      <span class="link-traco">{t.nav[item.key]}</span>
                       <span aria-hidden="true" class="lg:hidden">
                         ›
                       </span>

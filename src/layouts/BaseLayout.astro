@@ -13,12 +13,13 @@
  *                 de onde o sublinhado nasce e para onde recolhe.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.5.0
  *
- *  Dependências : src/lib/config.ts (siteConfig), src/i18n/pt.ts,
- *                 src/components/SiteHeader.astro, src/components/ScrollBar.astro,
- *                 src/styles/global.css, @fontsource/archivo (preload do peso 300)
+ *  Dependências : src/lib/config.ts (siteConfig), src/lib/routes.ts (HTML_LANG,
+ *                 localeFromPath), src/i18n (strings), src/components/SiteHeader.astro,
+ *                 src/components/ScrollBar.astro, src/styles/global.css,
+ *                 @fontsource/archivo (preload do peso 300)
  *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`, `bare?`; conteúdo via `<slot />`; cabeçalho da página via `<slot name="cabecalho" />`
  *  Saídas       : documento HTML completo da rota
  *  Uso          : import BaseLayout from '../layouts/BaseLayout.astro'
@@ -27,7 +28,8 @@
  *                 Graph e `hreflang` ficam para as fases 4 e 5 (RF-30).
  * ============================================================================
  */
-import { pt } from '../i18n/pt';
+import { strings } from '../i18n';
+import { HTML_LANG, localeFromPath } from '../lib/routes';
 import { siteConfig } from '../lib/config';
 import SiteHeader from '../components/SiteHeader.astro';
 import ScrollBar from '../components/ScrollBar.astro';
@@ -36,25 +38,29 @@ import archivo300 from '@fontsource/archivo/files/archivo-latin-300-normal.woff2
 
 export interface Props {
   /**
-   * Nome da página, usado em `pt.site.pageTitle`. Obrigatória (mas pode ser `undefined`): toda
+   * Nome da página, usado em `t.site.pageTitle`. Obrigatória (mas pode ser `undefined`): toda
    * rota decide explicitamente se tem nome de página, em vez de esquecer a prop e herdar em
    * silêncio o `<title>` da Home. Na Home, `undefined` — o `<title>` vira só `siteConfig.title`.
    */
   title: string | undefined;
-  /** Meta description da rota. Ausente: usa `siteConfig.description`. */
+  /** Meta description da rota. Ausente: usa `t.site.description`. */
   description?: string;
   /** Sem o cabeçalho — a Home traz o próprio topo (nome grande e menu) dentro do cartão. */
   bare?: boolean;
 }
 
-const { title, description = siteConfig.description, bare = false } = Astro.props;
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
 
-// Home (sem `title`) não passa por `pt.site.pageTitle` — o <title> é só o nome completo do site.
+const { title, description = t.site.description, bare = false } = Astro.props;
+
+// Home (sem `title`) não passa por `t.site.pageTitle` — o <title> é só o nome completo do site.
 const pageTitle =
-  title !== undefined ? pt.site.pageTitle(title, siteConfig.shortTitle) : siteConfig.title;
+  title !== undefined ? t.site.pageTitle(title, siteConfig.shortTitle) : siteConfig.title;
 ---
 
-<html lang="pt-BR">
+<html lang={HTML_LANG[lang]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -75,7 +81,7 @@ const pageTitle =
       href="#conteudo"
       class="focus:bg-papel focus:text-tinta sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2"
     >
-      {pt.site.skipToContent}
+      {t.site.skipToContent}
     </a>
     <div class="px-margem mx-auto max-w-[90rem] py-4 lg:h-svh lg:py-6">
       <div class="vt-cartao bg-bloco flex flex-col rounded-2xl lg:h-full lg:overflow-hidden">

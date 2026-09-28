@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { pt } from '../../src/i18n/pt';
 import { disciplinasSchema, projetosSchema, publicacoesSchema } from '../../src/content.config';
-import { siteConfig } from '../../src/lib/config';
 
 /**
  * Percorre `obj` recursivamente e devolve todas as strings folha, ignorando
@@ -83,8 +82,13 @@ describe('pt.site.portraitAlt', () => {
 });
 
 describe('pt — chaves novas da fase 4 (decisão 4 do fatiamento da fase 4)', () => {
-  it('site.description é, byte a byte, o valor de siteConfig.description', () => {
-    expect(pt.site.description).toBe(siteConfig.description);
+  // 058 removeu `siteConfig.description` (o texto passou a viver só no dicionário); o literal
+  // abaixo é o valor que era `siteConfig.description` até então (autorizado pelo orquestrador em
+  // 2026-09-28 — este teste nasceu no 057, depois do grep de 2026-09-24 citado no 058).
+  it('site.description é, byte a byte, o valor que era siteConfig.description antes do 058', () => {
+    expect(pt.site.description).toBe(
+      'Site acadêmico do Prof. Haroldo Cilas Duarte Lima Junior, Professor Adjunto A do Departamento de Física da UFMA.',
+    );
   });
 
   it('language.code e language.name apontam para o idioma de destino (EN)', () => {

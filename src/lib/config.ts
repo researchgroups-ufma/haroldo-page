@@ -8,8 +8,8 @@
  *                 pelos componentes.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
- *  Atualizado em: 2026-09-01
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.2.0
  *
  *  Dependências : nenhuma
  *  Entradas     : variável de ambiente `PUBLIC_SITE_URL` (opcional), lida via
@@ -42,8 +42,6 @@ export const siteConfig = {
   shortTitle: 'Haroldo Lima Junior',
   /** Nome de exibição do `<h1>` da Home — o nome completo segue em `perfil.nome` e no rodapé. */
   displayName: 'Haroldo Lima',
-  description:
-    'Site acadêmico do Prof. Haroldo Cilas Duarte Lima Junior, Professor Adjunto A do Departamento de Física da UFMA.',
   author: {
     name: 'Haroldo Cilas Duarte Lima Junior',
     citationName: 'LIMA JUNIOR, HAROLDO C. D.',
