@@ -1,6 +1,6 @@
 # Plano 059 — Componentes de conteúdo e data por idioma
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** §8.3 (data no formato do locale da rota), §10.4; menor adiado do polimento (`hover:underline` sem o afastamento único)
 **Depende de:** planos 055 (comparador), 056 (`localeFromPath`), 057 (`strings`, `date.format`)
 **Modelo recomendado:** sonnet
@@ -605,3 +605,13 @@ Não rodei nada além dos comandos dos passos 1–5 e 7 do plano. Não rodei o p
 orquestrador, ver acima. Não rodei `npm audit`, `npm ci`, CI do GitHub Actions nem Workers Builds —
 são verificações do `triage-runner`/orquestrador, não deste plano. Não commitei (`Status` permanece
 `TODO`).
+
+### CI no commit de trabalho (orquestrador, 2026-09-28)
+
+Commit de trabalho `102c8a8` empurrado para a `main`; check-runs pelo SHA completo:
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/102c8a878cc9911cb1fc5e9c410cf83528d1d589/check-runs --jq '.check_runs[] | "\(.name)|\(.status)|\(.conclusion)|\(.completed_at)|\(.html_url)"'
+Workers Builds: haroldo-page|completed|success|2026-09-28T18:50:37Z|https://github.com/researchgroups-ufma/haroldo-page/runs/109082968342
+qualidade|completed|success|2026-09-28T18:50:08Z|https://github.com/researchgroups-ufma/haroldo-page/actions/runs/36467811938/job/109082184689
+```
