@@ -12,11 +12,11 @@
  *                 para manter os dois abaixo de 150 linhas (§10.4 do PRD).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.4.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/CoursePanel.astro,
- *                 src/i18n/pt.ts,
+ *                 src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
  *                 src/lib/date.ts (formatDate),
  *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
  *  Entradas     : prop `data` (dados de uma disciplina, já validados pelo Zod)
@@ -29,7 +29,8 @@
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
 import CoursePanel from './CoursePanel.astro';
-import { pt } from '../i18n/pt';
+import { strings } from '../i18n';
+import { localeFromPath } from '../lib/routes';
 import { formatDate } from '../lib/date';
 
 export interface Props {
@@ -45,20 +46,27 @@ const listas = data.listas ?? [];
 const materiais = data.materiais ?? [];
 const bibliografia = data.bibliografia ?? [];
 const links = data.links ?? [];
+
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
 ---
 
 {
   listas.length > 0 && (
-    <CoursePanel id="listas" title={pt.course.problemSets}>
+    <CoursePanel id="listas" title={t.course.problemSets}>
       <ul>
         {listas.map((lista) => (
           <li class="recurso-linha grid grid-cols-[1fr_auto] items-baseline gap-4 py-3">
-            <ExternalLink href={lista.url} class="text-titulo-item hover:underline">
+            <ExternalLink
+              href={lista.url}
+              class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
+            >
               {lista.titulo}
             </ExternalLink>
             {lista.data_entrega && (
               <span class="text-pequeno text-secundario">
-                {pt.course.dueDate(formatDate(lista.data_entrega))}
+                {t.course.dueDate(formatDate(lista.data_entrega, lang))}
               </span>
             )}
           </li>
@@ -69,13 +77,16 @@ const links = data.links ?? [];
 }
 {
   materiais.length > 0 && (
-    <CoursePanel id="materiais" title={pt.course.materials}>
+    <CoursePanel id="materiais" title={t.course.materials}>
       <ul>
         {materiais.map((material) => (
           <li class="recurso-linha py-3">
-            <p class="text-pequeno text-secundario">{pt.course.materialType[material.tipo]}</p>
+            <p class="text-pequeno text-secundario">{t.course.materialType[material.tipo]}</p>
             <div>
-              <ExternalLink href={material.url} class="text-titulo-item hover:underline">
+              <ExternalLink
+                href={material.url}
+                class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
+              >
                 {material.titulo}
               </ExternalLink>
               {material.descricao && (
@@ -90,14 +101,14 @@ const links = data.links ?? [];
 }
 {
   bibliografia.length > 0 && (
-    <CoursePanel id="bibliografia" title={pt.course.bibliography}>
+    <CoursePanel id="bibliografia" title={t.course.bibliography}>
       <ol class="max-w-medida flex list-decimal flex-col gap-3 pl-5">
         {bibliografia.map((referencia) => (
           <li class="text-corpo">
             {referencia.referencia}{' '}
             {referencia.url && (
               <ExternalLink href={referencia.url} class="text-pequeno underline">
-                {pt.course.access}
+                {t.course.access}
               </ExternalLink>
             )}
           </li>
@@ -108,11 +119,14 @@ const links = data.links ?? [];
 }
 {
   links.length > 0 && (
-    <CoursePanel id="links" title={pt.course.links}>
+    <CoursePanel id="links" title={t.course.links}>
       <ul>
         {links.map((link) => (
           <li class="recurso-linha py-3">
-            <ExternalLink href={link.url} class="text-titulo-item hover:underline">
+            <ExternalLink
+              href={link.url}
+              class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
+            >
               {link.titulo}
             </ExternalLink>
           </li>

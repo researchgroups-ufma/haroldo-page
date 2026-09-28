@@ -10,12 +10,13 @@
  *                 "Copiado" por `aria-live`, e "Abrir arquivo ↗" só com `url`.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-21
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.3.0
  *
  *  Dependências : astro:components (Code), astro:content (tipo
  *                 CollectionEntry<'disciplinas'>), src/components/ExternalLink.astro,
- *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
+ *                 src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
+ *                 src/lib/text.ts (toParagraphs),
  *                 src/lib/code-theme.ts (monochromeTheme, shikiLanguage)
  *  Entradas     : prop `script` (um item de `data.scripts`, já validado pelo Zod);
  *                 prop `headingLevel` (3 ou 4, padrão 3)
@@ -30,7 +31,8 @@
 import { Code } from 'astro:components';
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
-import { pt } from '../i18n/pt';
+import { strings } from '../i18n';
+import { localeFromPath } from '../lib/routes';
 import { toParagraphs } from '../lib/text';
 import { monochromeTheme, shikiLanguage } from '../lib/code-theme';
 
@@ -47,6 +49,10 @@ export interface Props {
 const { script, headingLevel = 3 } = Astro.props;
 const Heading = headingLevel === 4 ? 'h4' : 'h3';
 const paragraphs = toParagraphs(script.descricao);
+
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
 ---
 
 <article
@@ -55,7 +61,7 @@ const paragraphs = toParagraphs(script.descricao);
 >
   <div>
     <p class="text-rotulo text-secundario">
-      {pt.script.eyebrow(pt.script.language[script.linguagem])}
+      {t.script.eyebrow(t.script.language[script.linguagem])}
     </p>
     <Heading class="text-titulo-item mt-2">{script.titulo}</Heading>
     {paragraphs.map((paragraph) => <p class="text-corpo mt-2">{paragraph}</p>)}
@@ -66,16 +72,16 @@ const paragraphs = toParagraphs(script.descricao);
       <button
         type="button"
         hidden
-        data-copy-label={pt.script.copy}
-        data-copied-label={pt.script.copied}
+        data-copy-label={t.script.copy}
+        data-copied-label={t.script.copied}
         class="bg-tinta text-papel border-tinta text-nav inline-flex min-h-11 items-center justify-center rounded-full border px-6 transition-colors duration-[120ms]"
       >
-        {pt.script.copy}
+        {t.script.copy}
       </button>
       {
         script.url && (
           <ExternalLink href={script.url} class="text-pequeno underline">
-            {pt.script.openFile}
+            {t.script.openFile}
           </ExternalLink>
         )
       }

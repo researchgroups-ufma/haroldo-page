@@ -10,11 +10,11 @@
  *                 DOI/arXiv/PDF que estiverem preenchidos.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-22
- *  Atualizado em: 2026-09-23
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.3.0
  *
- *  Dependências : src/components/ExternalLink.astro, src/i18n/pt.ts,
- *                 src/lib/config.ts (siteConfig),
+ *  Dependências : src/components/ExternalLink.astro, src/i18n (`strings`),
+ *                 src/lib/routes.ts (`localeFromPath`), src/lib/config.ts (siteConfig),
  *                 src/lib/publications.ts (isProfessorAuthor, doiUrl, arxivUrl),
  *                 astro:content (tipo `CollectionEntry<'publicacoes'>`)
  *  Entradas     : prop `publication` (entrada de `publicacoes`, já validada pelo Zod)
@@ -22,12 +22,13 @@
  *  Uso          : import PublicationItem from '../components/PublicationItem.astro'
  *
  *  Notas        : link externo só por `ExternalLink.astro` (regra da fase);
- *                 nenhum texto de interface hardcoded — tudo vem de `pt` (§10.4 do PRD).
+ *                 nenhum texto de interface hardcoded — tudo vem do dicionário do idioma (§10.4 do PRD).
  * ============================================================================
  */
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
-import { pt } from '../i18n/pt';
+import { strings } from '../i18n';
+import { localeFromPath } from '../lib/routes';
 import { siteConfig } from '../lib/config';
 import { arxivUrl, doiUrl, isProfessorAuthor } from '../lib/publications';
 
@@ -42,11 +43,15 @@ export interface Props {
 const { publication } = Astro.props;
 const { titulo, autores, veiculo, doi, arxiv, pdf_url } = publication.data;
 
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
+
 // F-05: só os links preenchidos entram — nenhum link vazio.
 const links = [
-  { href: doi ? doiUrl(doi) : undefined, label: pt.publications.doi },
-  { href: arxiv ? arxivUrl(arxiv) : undefined, label: pt.publications.arxiv },
-  { href: pdf_url, label: pt.publications.pdf },
+  { href: doi ? doiUrl(doi) : undefined, label: t.publications.doi },
+  { href: arxiv ? arxivUrl(arxiv) : undefined, label: t.publications.arxiv },
+  { href: pdf_url, label: t.publications.pdf },
 ].filter((link): link is { href: string; label: string } => Boolean(link.href));
 ---
 

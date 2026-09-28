@@ -5,16 +5,17 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Lista de aulas de uma disciplina (RF-24, RN-04), em linhas
  *                 enxutas: número, título como link para o arquivo da aula,
- *                 descrição, data pt-BR quando houver e os painéis de script
- *                 agrupados sob a aula correspondente (F-13, RF-37).
+ *                 descrição, data no formato do locale da rota quando houver
+ *                 (§8.3 do PRD) e os painéis de script agrupados sob a aula
+ *                 correspondente (F-13, RF-37).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.5.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/ScriptPanel.astro,
- *                 src/i18n/pt.ts, src/lib/date.ts (formatDate),
- *                 src/lib/text.ts (padCount, toParagraphs),
+ *                 src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
+ *                 src/lib/date.ts (formatDate), src/lib/text.ts (padCount, toParagraphs),
  *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
  *  Entradas     : props `lessons` (array de aulas, já validado pelo Zod) e
  *                 `byLesson` (scripts de cada aula, mesmo índice de `lessons`,
@@ -31,7 +32,8 @@
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
 import ScriptPanel from './ScriptPanel.astro';
-import { pt } from '../i18n/pt';
+import { strings } from '../i18n';
+import { localeFromPath } from '../lib/routes';
 import { formatDate } from '../lib/date';
 import { padCount, toParagraphs } from '../lib/text';
 
@@ -50,6 +52,10 @@ export interface Props {
 }
 
 const { lessons, byLesson } = Astro.props;
+
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
 ---
 
 <ol class="flex list-none flex-col">
@@ -68,11 +74,14 @@ const { lessons, byLesson } = Astro.props;
                 {padCount(aula.numero)}
                 {aula.data && ' · '}
               </span>
-              <span class="sr-only">{pt.course.lessonNumber(aula.numero)}</span>
-              {aula.data && formatDate(aula.data)}
+              <span class="sr-only">{t.course.lessonNumber(aula.numero)}</span>
+              {aula.data && formatDate(aula.data, lang)}
             </p>
             <h3 class="text-titulo-item mt-1">
-              <ExternalLink href={aula.url} class="hover:underline">
+              <ExternalLink
+                href={aula.url}
+                class="decoration-1 underline-offset-[6px] hover:underline"
+              >
                 {aula.titulo}
               </ExternalLink>
             </h3>

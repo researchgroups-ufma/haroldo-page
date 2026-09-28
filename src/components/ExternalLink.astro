@@ -10,10 +10,10 @@
  *                 044–050) usa este componente.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-17
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-28
+ *  Versão       : 0.2.0
  *
- *  Dependências : src/i18n/pt.ts (`pt.site.opensInNewTab`)
+ *  Dependências : src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`)
  *  Entradas     : props `href`, `class` (opcional); conteúdo por slot padrão
  *  Saídas       : `<a target="_blank" rel="noopener noreferrer">` com o slot e o aviso oculto
  *  Uso          : import ExternalLink from '../components/ExternalLink.astro'
@@ -22,7 +22,8 @@
  *                 mantém o link inline, com as mesmas regras — não é trocado aqui.
  * ============================================================================
  */
-import { pt } from '../i18n/pt';
+import { strings } from '../i18n';
+import { localeFromPath } from '../lib/routes';
 
 export interface Props {
   /** Destino do link externo. */
@@ -31,10 +32,14 @@ export interface Props {
   class?: string;
 }
 
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
+
 const { href, class: className } = Astro.props;
 ---
 
 <a href={href} class={className} target="_blank" rel="noopener noreferrer">
   <slot />
-  <span aria-hidden="true">↗</span>{' '}<span class="sr-only">{pt.site.opensInNewTab}</span>
+  <span aria-hidden="true">↗</span>{' '}<span class="sr-only">{t.site.opensInNewTab}</span>
 </a>
