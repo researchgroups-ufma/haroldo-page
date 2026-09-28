@@ -50,8 +50,20 @@ com um formulário só, elimina essa classe de erro por construção.
 - Dívida explícita para a fase 4: listas `en.formacao[]`/`en.areas[]` alinhadas por índice, sem
   mecanismo de realinhamento.
 
+## Atualização — 2026-09-28 (plano 060)
+
+A dívida das listas paralelas foi paga na fase 4, com a tradução movida para **dentro de cada
+item** (sabatina fase 4, Decisões 7 e 8; decisão 11 do fatiamento da fase 4):
+`formacao[i].en.{grau, curso}`, `atuacao[i].en.cargo` e `areas[i] = { nome, en?: { nome? } }`. As
+listas `perfil.en.formacao[]` e `perfil.en.areas[]` deixaram de existir. Reordenar um item no
+painel leva a tradução junto (verificado no painel local, plano 060), então o desalinhamento por
+índice deixou de ser possível por construção. O resto desta decisão continua valendo: um arquivo
+só, grupo `en` opcional e `.strict()`, português canônico.
+
 ## Referências
 
 - PRD §7.2 (D-03), RN-06, RN-07, RN-09, G-05, M-07
 - `../docs/plano-i18n.md` — padrão de i18n do LaFiM, avaliado e não adotado aqui
 - `plans/fase-1-modelo-de-conteudo/018-grupo-versao-em-ingles.md` — Evidência
+- `plans/fase-4-internacionalizacao/060-traducao-dentro-do-item-do-perfil.md` — Evidência da
+  atualização de 2026-09-28

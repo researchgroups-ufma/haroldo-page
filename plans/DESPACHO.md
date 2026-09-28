@@ -48,6 +48,10 @@ Nenhum agente herda o contexto do orquestrador; todos leem arquivo barato.
 10. **Critério de aceitação não se reescreve para caber no resultado.** Bloqueio externo → caixa
     **vazia** e bloqueio reportado. Nunca marque `[x]` o que não tem saída que demonstre.
 11. **Declare, no relatório e na Evidência, tudo o que você NÃO rodou.**
+11a. **Correção de ciclo de revisão não se narra.** A subseção de correções diz em poucas linhas
+    o que mudou e aponta para os blocos recapturados; não explica em prosa por que cada passo foi
+    ou não refeito. No plano 060, três ciclos seguidos reprovaram por frases novas dessa narrativa
+    que nenhum `.txt` sustentava.
 
 ### Prova
 
@@ -95,15 +99,21 @@ Você roda a suíte e **não corrige nada, não edita, não commita**.
 1. **Capture cada comando em arquivo**, um de cada vez, na ordem:
 
    ```
-   npm run lint          2>&1 | Tee-Object -FilePath "<scratch>\lint.txt"
-   npm run format:check  2>&1 | Tee-Object -FilePath "<scratch>\format.txt"
-   npm run test:coverage 2>&1 | Tee-Object -FilePath "<scratch>\coverage.txt"
-   & { npm run build:pipeline 2>&1; Get-ChildItem <artefatos> | Select-Object FullName,Length,LastWriteTime | Out-String } | Tee-Object -FilePath "<scratch>\build.txt"
-   npm audit --audit-level=high 2>&1 | Tee-Object -FilePath "<scratch>\audit.txt"
+   $p = '<scratch>'
+   & { npm run lint 2>&1; "EXIT=$LASTEXITCODE" } | Tee-Object -FilePath "$p\lint.txt"
+   & { npm run format:check 2>&1; "EXIT=$LASTEXITCODE" } | Tee-Object -FilePath "$p\format.txt"
+   & { npm run test:coverage 2>&1; "EXIT=$LASTEXITCODE" } | Tee-Object -FilePath "$p\coverage.txt"
+   & { npm run build:pipeline 2>&1; "EXIT=$LASTEXITCODE"; Get-ChildItem <artefatos> | Select-Object FullName,Length,LastWriteTime | Out-String } | Tee-Object -FilePath "$p\build.txt"
+   & { npm run test:dist 2>&1; "EXIT=$LASTEXITCODE" } | Tee-Object -FilePath "$p\test-dist.txt"
+   & { npm audit --audit-level=high 2>&1; "EXIT=$LASTEXITCODE" } | Tee-Object -FilePath "$p\audit.txt"
+   Select-String -Path "$p\*.txt" -Pattern '^EXIT='
    ```
 
    O `Get-ChildItem` dos carimbos vai **no mesmo comando** do build: é o cruzamento que prova que o
-   build veio depois da última edição do código.
+   build veio depois da última edição do código. O `"EXIT=..."` vai **dentro** da captura, e o
+   `Select-String` final tem de listar **seis** arquivos. *(Emenda de 2026-09-28: no plano 060 uma
+   rodada saiu sem `test:dist` e sem `EXIT=` em quatro arquivos, e outra gravou em
+   `academic_page` em vez de `academic-page` — defina `$p` uma vez, copiando o caminho do despacho.)*
 
 2. **Não cole a saída no relatório.** Os `.txt` são a evidência e o orquestrador os lê. Devolva
    apenas: o comando, o **exit code** (`$LASTEXITCODE`), a listagem `Get-ChildItem` confirmando que
@@ -154,7 +164,9 @@ Você roda a suíte e **não corrige nada, não edita, não commita**.
 4. **Não rode nada que escreva em `dist/` enquanto um agente estiver rodando.**
 5. **A seção do orquestrador entra no plano DEPOIS do último ciclo do executor** — ou é delegada a
    ele por mensagem explícita. Nunca antes.
-6. **Nunca afirme num despacho que algo está num arquivo sem abrir o arquivo.**
+6. **Nunca afirme num despacho que algo está num arquivo sem abrir o arquivo.** Nem sugira
+   identificador do PRD para o executor citar sem abrir a regra: no plano 060 o despacho sugeriu
+   "RN-09" para um teste de `.strict()` e isso custou um ciclo de revisão.
 7. **Ao devolver correção por `SendMessage`, não cole saída de execução anterior.** Redispare o
    `triage-runner` e use a saída nova.
 8. **Antes de commitar a promoção**, rode `node scripts/verificar-promocao.mjs <plano>`.
