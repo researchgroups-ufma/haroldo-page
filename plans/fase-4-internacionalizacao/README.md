@@ -5,7 +5,10 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-25 — **055 e 056 DONE** (trabalho em `0ebf8ed` e `d44a874`,
+Última atualização: 2026-09-28 — **057 DONE** (`82a7947`, de volta ao setup da casa: implementer,
+triage e `code-reviewer`, três ciclos de revisão; inglês aprovado pelo stakeholder na nomenclatura
+de davidtong.org; CI e Workers Builds verdes). Fecha o item "Dicionários" do §12 (1/9). Próximo: 058.
+Antes, 2026-09-25 — **055 e 056 DONE** (trabalho em `0ebf8ed` e `d44a874`,
 executados em modo de teste com `superpowers:executing-plans`, depois triage e `code-reviewer` da
 casa; CI e Workers Builds verdes em `48b9a4f`). Antes, 2026-09-24: fase fatiada em 19 planos (**055–073**), a partir do PRD v0.1.58 e
 da sabatina [`CHANGELOG_sabatina_fase-4-i18n.md`](../../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md)
@@ -117,7 +120,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 |---|---|---|---|---|---|
 | 055 | Ferramenta de comparação do `dist/` normalizado | 🟢 DONE | agente | implementer (sonnet) | `0ebf8ed` (correções `efe15c8`, `9cb54f1`) |
 | 056 | Mapa de rotas PT↔EN, idioma pelo caminho e navegação por idioma | 🟢 DONE | agente | implementer (sonnet) | `d44a874` |
-| 057 | Dicionário `en.ts`, chaves novas e `strings(lang)` | ⬜ TODO | agente + **stakeholder** (revisão do inglês) | implementer (sonnet) | — |
+| 057 | Dicionário `en.ts`, chaves novas e `strings(lang)` | 🟢 DONE | agente + **stakeholder** (revisão do inglês) | implementer (sonnet) | `82a7947` |
 | 058 | Layout e cabeçalhos escolhem o dicionário pelo caminho | ⬜ TODO | agente | implementer (sonnet) | — |
 | 059 | Componentes de conteúdo e data por idioma | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 060 | Tradução dentro do item: `formacao[]`, `atuacao[]` e `areas[]` (Decisões 7 e 8) | ⬜ TODO | agente + orquestrador (painel e cloud check) | implementer (sonnet) | — |

@@ -1,6 +1,6 @@
 # Plano 057 — Dicionário `en.ts`, chaves novas e `strings(lang)`
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** §10.4 (strings de interface), M-07 (parte unitária), F-07 (texto do aviso), RF-29 (texto do seletor), §8.3 (data por locale); sabatina fase 4, Decisões 4, 5, 11 e 12; dívida (d) da fase 3
 **Depende de:** plano 055 (comparador)
 **Modelo recomendado:** sonnet
@@ -802,3 +802,12 @@ Lines        : 100% ( 250/250 )
 
 Ficaram de fora, por decisão do orquestrador declarada ao stakeholder: o Title Case de davidtong.org (o site mantém caixa de frase nos dois idiomas) e o título "Lecture Notes" para `teaching.title` (a página lista disciplinas, não notas; ficou "Courses"). A tabela do passo 6 acima é a versão aprovada.
 
+### CI no commit de trabalho (orquestrador, 2026-09-28)
+
+Commit de trabalho `82a7947` empurrado para a `main`; check-runs pelo SHA completo:
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/82a7947dc4b1f69cf758e0b71004ca71299ff159/check-runs --jq '.check_runs[] | "\(.name)|\(.status)|\(.conclusion)|\(.completed_at)|\(.html_url)"'
+Workers Builds: haroldo-page|completed|success|2026-09-28T16:38:12Z|https://github.com/researchgroups-ufma/haroldo-page/runs/109030360591
+qualidade|completed|success|2026-09-28T16:29:00Z|https://github.com/researchgroups-ufma/haroldo-page/actions/runs/36451149628/job/109025928885
+```
