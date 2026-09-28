@@ -5,7 +5,9 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-28 — **057 DONE** (`82a7947`, de volta ao setup da casa: implementer,
+Última atualização: 2026-09-28 — **058 DONE** (`0583324`, dois ciclos de revisão; o escopo ganhou
+`tests/i18n/pt.test.ts` por autorização do orquestrador, porque o teste do 057 lia o
+`siteConfig.description` que o 058 removeu). Próximo: 059. Antes, no mesmo dia — **057 DONE** (`82a7947`, de volta ao setup da casa: implementer,
 triage e `code-reviewer`, três ciclos de revisão; inglês aprovado pelo stakeholder na nomenclatura
 de davidtong.org; CI e Workers Builds verdes). Fecha o item "Dicionários" do §12 (1/9). Próximo: 058.
 Antes, 2026-09-25 — **055 e 056 DONE** (trabalho em `0ebf8ed` e `d44a874`,
@@ -121,7 +123,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 055 | Ferramenta de comparação do `dist/` normalizado | 🟢 DONE | agente | implementer (sonnet) | `0ebf8ed` (correções `efe15c8`, `9cb54f1`) |
 | 056 | Mapa de rotas PT↔EN, idioma pelo caminho e navegação por idioma | 🟢 DONE | agente | implementer (sonnet) | `d44a874` |
 | 057 | Dicionário `en.ts`, chaves novas e `strings(lang)` | 🟢 DONE | agente + **stakeholder** (revisão do inglês) | implementer (sonnet) | `82a7947` |
-| 058 | Layout e cabeçalhos escolhem o dicionário pelo caminho | ⬜ TODO | agente | implementer (sonnet) | — |
+| 058 | Layout e cabeçalhos escolhem o dicionário pelo caminho | 🟢 DONE | agente | implementer (sonnet) | `0583324` |
 | 059 | Componentes de conteúdo e data por idioma | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 060 | Tradução dentro do item: `formacao[]`, `atuacao[]` e `areas[]` (Decisões 7 e 8) | ⬜ TODO | agente + orquestrador (painel e cloud check) | implementer (sonnet) | — |
 | 061 | Fallback por campo (RN-06) | ⬜ TODO | agente | implementer (sonnet) | — |
@@ -277,6 +279,7 @@ Da seção "Entre a fase 3 e a 4" de [`plans/README.md`](../README.md) e do
 | (d) `<title>` de chaves heterogêneas | **057** (decisão 5 acima) |
 | (e) Rotas escritas à mão fora de `NAV_ITEMS` | **056** + **062–064** (todo `href` interno sai de `routePath`/`coursePath`); o teste de cruzamento com o `dist/` entra no **072** |
 | `perfil.atuacao[]` sem par no grupo `en` | **060** |
+| Comentário de `src/i18n/pt.ts:65-67` citando `siteConfig.description` "até o 058 remover o campo" — o 058 removeu e o comentário ficou desatualizado (achado da revisão do 058, 2026-09-28) | **Sem plano:** pela decisão 4 acima, só o 057 editava os dicionários. Cai no primeiro commit autorizado a tocar `pt.ts` (ex.: chave nova acrescentada pelo orquestrador) |
 | Demais dívidas da fase 3 (F-08 com duas definições, Tailwind varrendo `plans/`, tag-link, `noPrevious` sem canário, …) | **Nenhum plano desta fase.** Continuam onde estão |
 
 ## Verificação no navegador (vale para todo plano marcado "orquestrador (navegador)")

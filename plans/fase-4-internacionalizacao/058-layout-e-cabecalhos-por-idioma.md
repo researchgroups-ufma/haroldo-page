@@ -1,6 +1,6 @@
 # Plano 058 — Layout e cabeçalhos escolhem o dicionário pelo caminho
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** §8.3 (`lang` no elemento raiz de cada árvore de idioma), §10.4, M-07 (meta description fora do dicionário)
 **Depende de:** planos 056 (`localeFromPath`, `routePath`, `HTML_LANG`, `navItems`), 057 (`strings`, `site.description`)
 **Modelo recomendado:** sonnet
@@ -673,3 +673,13 @@ ciclo 1. Não commitei (`Status` permanece `TODO`). Não rodei `npm audit`, `npm
 Actions nem Workers Builds — são verificações do `triage-runner`/orquestrador, não deste plano. Não
 abri o navegador — este plano não tem passo de verificação visual (não está marcado "orquestrador
 (navegador)" na tabela de estado da fase 4).
+
+### CI no commit de trabalho (orquestrador, 2026-09-28)
+
+Commit de trabalho `0583324` empurrado para a `main`; check-runs pelo SHA completo:
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/0583324e12dd32b5c9e21cee4af61cae53566f25/check-runs --jq '.check_runs[] | "\(.name)|\(.status)|\(.conclusion)|\(.completed_at)|\(.html_url)"'
+Workers Builds: haroldo-page|completed|success|2026-09-28T17:25:13Z|https://github.com/researchgroups-ufma/haroldo-page/runs/109049109423
+qualidade|completed|success|2026-09-28T17:23:42Z|https://github.com/researchgroups-ufma/haroldo-page/actions/runs/36457629212/job/109047905153
+```
