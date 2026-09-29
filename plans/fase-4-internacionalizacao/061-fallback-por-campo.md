@@ -1,6 +1,6 @@
 # Plano 061 — Fallback por campo (RN-06)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RN-06**, RN-09, F-07 (sinal para o aviso), RF-28; §8.3 (`lang` correto); sabatina fase 4, Decisões 4 e 13; §12 fase 4, item 4
 **Depende de:** plano 056 (`HTML_LANG`, tipo `Locale`)
 **Modelo recomendado:** sonnet
@@ -401,3 +401,26 @@ EXIT=0
 - Implementacao e testes foram escritos juntos; o passo 1 nao teve execucao vermelha previa. A falsificacao esta nos canarios do passo 2 (arquivo novo, desfeitos editando de volta).
 - A tabela de cobertura do vitest omite arquivos a 100%; `fallback.ts` esta em `src/i18n/**` (include) e o resumo global marca 100% em statements, branches, functions e lines.
 - Nao rodados (do triage-runner): `build:pipeline`, `test:dist`, `npm audit`. Nenhuma view alterada; nada commitado; `Status:` segue `TODO`.
+
+### Verificação autoritativa e CI (orquestrador)
+
+Terceira rodada do `triage-runner`, em 2026-09-29, depois do commit `e918303` (`fast-uri` 3.1.8 no
+lock, para o aviso `high` do `npm audit`, que não tem relação com este plano). A primeira rodada
+reprovou só no `audit`. A segunda, sobre um `npm audit fix` amplo, instalou duas cópias do `tinacms`
+(3.12.1 e 3.14.1) e foi descartada. Revisão: APROVADO, sem obrigatórios.
+
+```
+audit.txt:EXIT=0
+build.txt:EXIT=0
+coverage.txt:EXIT=0
+format.txt:EXIT=0
+lint.txt:EXIT=0
+test-dist.txt:EXIT=0
+```
+
+Check-runs do commit de trabalho `835f188`, empurrado:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+```
