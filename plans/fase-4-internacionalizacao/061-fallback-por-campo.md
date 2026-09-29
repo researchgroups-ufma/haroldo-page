@@ -91,13 +91,313 @@ passam por nenhuma das funções.
 
 ## Critérios de aceitação
 
-- [ ] `localize`, `localizeOptional`, `portugueseOnly` e `hasFallback` com a API e as regras do Contexto, uma asserção por linha da tabela
-- [ ] `portugueseOnly` em `/en` marca `lang="pt-BR"` e **não** faz `hasFallback` devolver `true` (Decisão 13)
-- [ ] Espaço em branco no `en` conta como vazio, e campo "P" não liga o aviso (canários do passo 2)
-- [ ] `lang` vem de `HTML_LANG`; nenhuma view alterada
-- [ ] Cobertura de `fallback.ts` em 100% de linhas e ramos
-- [ ] `astro check`, `lint`, `format:check`, `test:coverage` verdes, com saída colada
+- [x] `localize`, `localizeOptional`, `portugueseOnly` e `hasFallback` com a API e as regras do Contexto, uma asserção por linha da tabela
+- [x] `portugueseOnly` em `/en` marca `lang="pt-BR"` e **não** faz `hasFallback` devolver `true` (Decisão 13)
+- [x] Espaço em branco no `en` conta como vazio, e campo "P" não liga o aviso (canários do passo 2)
+- [x] `lang` vem de `HTML_LANG`; nenhuma view alterada
+- [x] Cobertura de `fallback.ts` em 100% de linhas e ramos
+- [x] `astro check`, `lint`, `format:check`, `test:coverage` verdes, com saída colada
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir: saídas literais coladas, por passo. Plano sem esta seção preenchida não é DONE.>
+
+### Passo 1 -- `npm test -- --reporter=verbose tests/i18n/fallback.test.ts`
+
+```
+﻿
+> haroldo-page@0.1.0 test
+> vitest run --reporter=verbose tests/i18n/fallback.test.ts
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ✓ tests/i18n/fallback.test.ts > localize > em rota PT devolve o português, sem lang, ignorando o inglês 2ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês preenchido devolve o inglês, sem lang 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN devolve o inglês como está, sem trim 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês ausente cai no português com lang e fellBack 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês vazio cai no português 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês só de espaço cai no português 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > o lang vem de HTML_LANG.pt 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio (undefined, undefined) não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio ("", "") não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio ("   ", "  ") não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio (undefined, "") não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > português vazio e inglês preenchido mostra o inglês em rota EN 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > português vazio e inglês preenchido não mostra nada em rota PT 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > português preenchido comporta-se como localize 0ms
+ ✓ tests/i18n/fallback.test.ts > portugueseOnly > em rota PT devolve o texto sem lang 0ms
+ ✓ tests/i18n/fallback.test.ts > portugueseOnly > em rota EN marca lang pt-BR sem ligar o aviso (Decisão 13) 0ms
+ ✓ tests/i18n/fallback.test.ts > hasFallback > é true se algum item definido caiu no português 0ms
+ ✓ tests/i18n/fallback.test.ts > hasFallback > é false quando nada caiu, com lista vazia ou só itens indefinidos 0ms
+ ✓ tests/i18n/fallback.test.ts > hasFallback > campo "P" em rota EN nunca liga o aviso (Decisão 13) 0ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  13:22:05
+   Duration  854ms (transform 71ms, setup 0ms, import 109ms, tests 7ms, environment 0ms)
+
+EXIT=0
+```
+
+### Passo 2a -- canario: `hasText` sem `trim()` (vermelho)
+
+```
+﻿
+> haroldo-page@0.1.0 test
+> vitest run tests/i18n/fallback.test.ts
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/i18n/fallback.test.ts (19 tests | 2 failed) 14ms
+     × em rota EN com inglês só de espaço cai no português 7ms
+     × campo vazio ("   ", "  ") não deixa rastro em nenhum idioma 1ms
+node.exe : 
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/i18n/fallback.test.ts > localize > em rota EN com inglês só de espaço cai no português
+AssertionError: expected { text: '   ', fellBack: false } to deeply equal { text: 'Olá', lang: 'pt-BR', …(1) }
+
+- Expected
++ Received
+
+  {
+-   "fellBack": true,
+-   "lang": "pt-BR",
+-   "text": "Olá",
++   "fellBack": false,
++   "text": "   ",
+  }
+
+ ❯ tests/i18n/fallback.test.ts:33:42
+     31|
+     32|   it('em rota EN com inglês só de espaço cai no português', () => {
+     33|     expect(localize('Olá', '   ', 'en')).toEqual({ text: 'Olá', lang: …
+       |                                          ^
+     34|   });
+     35|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/i18n/fallback.test.ts > localizeOptional > campo vazio ("   ", "  ") não deixa rastro em nenhum idioma
+AssertionError: expected { text: '   ', fellBack: false } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "fellBack": false,
+  "text": "   ",
+}
+
+ ❯ tests/i18n/fallback.test.ts:48:54
+     46|     [undefined, ''],
+     47|   ])('campo vazio (%j, %j) não deixa rastro em nenhum idioma', (ptValu…
+     48|     expect(localizeOptional(ptValue, enValue, 'pt')).toBeUndefined();
+       |                                                      ^
+     49|     expect(localizeOptional(ptValue, enValue, 'en')).toBeUndefined();
+     50|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 17 passed (19)
+   Start at  13:22:15
+   Duration  250ms (transform 53ms, setup 0ms, import 80ms, tests 14ms, environment 0ms)
+
+EXIT=1
+```
+
+### Passo 2b -- canario: `portugueseOnly` com `fellBack: true` (vermelho)
+
+```
+﻿
+> haroldo-page@0.1.0 test
+> vitest run tests/i18n/fallback.test.ts
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ❯ tests/i18n/fallback.test.ts (19 tests | 2 failed) 23ms
+     × em rota EN marca lang pt-BR sem ligar o aviso (Decisão 13) 11ms
+     × campo "P" em rota EN nunca liga o aviso (Decisão 13) 1ms
+node.exe : 
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/i18n/fallback.test.ts > portugueseOnly > em rota EN marca lang pt-BR sem ligar o aviso (Decisão 13)
+AssertionError: expected { text: 'Instituto', …(2) } to deeply equal { text: 'Instituto', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "fellBack": false,
++   "fellBack": true,
+    "lang": "pt-BR",
+    "text": "Instituto",
+  }
+
+ ❯ tests/i18n/fallback.test.ts:74:47
+     72|
+     73|   it('em rota EN marca lang pt-BR sem ligar o aviso (Decisão 13)', () …
+     74|     expect(portugueseOnly('Instituto', 'en')).toEqual({
+       |                                               ^
+     75|       text: 'Instituto',
+     76|       lang: 'pt-BR',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/i18n/fallback.test.ts > hasFallback > campo "P" em rota EN nunca liga o aviso (Decisão 13)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/i18n/fallback.test.ts:96:54
+     94|
+     95|   it('campo "P" em rota EN nunca liga o aviso (Decisão 13)', () => {
+     96|     expect(hasFallback([portugueseOnly('x', 'en')])).toBe(false);
+       |                                                      ^
+     97|   });
+     98| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 17 passed (19)
+   Start at  13:22:17
+   Duration  311ms (transform 61ms, setup 0ms, import 98ms, tests 23ms, environment 0ms)
+
+EXIT=1
+```
+
+### Passo 2 -- canarios desfeitos (verde)
+
+```
+﻿
+> haroldo-page@0.1.0 test
+> vitest run --reporter=verbose tests/i18n/fallback.test.ts
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+ ✓ tests/i18n/fallback.test.ts > localize > em rota PT devolve o português, sem lang, ignorando o inglês 2ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês preenchido devolve o inglês, sem lang 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN devolve o inglês como está, sem trim 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês ausente cai no português com lang e fellBack 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês vazio cai no português 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > em rota EN com inglês só de espaço cai no português 0ms
+ ✓ tests/i18n/fallback.test.ts > localize > o lang vem de HTML_LANG.pt 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio (undefined, undefined) não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio ("", "") não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio ("   ", "  ") não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > campo vazio (undefined, "") não deixa rastro em nenhum idioma 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > português vazio e inglês preenchido mostra o inglês em rota EN 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > português vazio e inglês preenchido não mostra nada em rota PT 0ms
+ ✓ tests/i18n/fallback.test.ts > localizeOptional > português preenchido comporta-se como localize 0ms
+ ✓ tests/i18n/fallback.test.ts > portugueseOnly > em rota PT devolve o texto sem lang 0ms
+ ✓ tests/i18n/fallback.test.ts > portugueseOnly > em rota EN marca lang pt-BR sem ligar o aviso (Decisão 13) 0ms
+ ✓ tests/i18n/fallback.test.ts > hasFallback > é true se algum item definido caiu no português 0ms
+ ✓ tests/i18n/fallback.test.ts > hasFallback > é false quando nada caiu, com lista vazia ou só itens indefinidos 0ms
+ ✓ tests/i18n/fallback.test.ts > hasFallback > campo "P" em rota EN nunca liga o aviso (Decisão 13) 0ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  13:22:19
+   Duration  267ms (transform 63ms, setup 0ms, import 90ms, tests 6ms, environment 0ms)
+
+EXIT=0
+```
+
+### Passo 3 -- `npx astro check`
+
+```
+﻿13:22:37 [content] Syncing content
+13:22:37 [content] Synced content
+13:22:37 [types] Generated 855ms
+13:22:37 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (69 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+EXIT=0
+```
+
+### Passo 3 -- `npm run lint`
+
+```
+﻿
+> haroldo-page@0.1.0 lint
+> eslint .
+
+EXIT=0
+```
+
+### Passo 3 -- `npm run format:check`
+
+```
+﻿
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+EXIT=0
+```
+
+### Passo 3 -- `npm run test:coverage`
+
+```
+﻿
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  20 passed (20)
+      Tests  355 passed (355)
+   Start at  13:23:14
+   Duration  2.24s (transform 5.75s, setup 0ms, import 14.76s, tests 403ms, environment 3ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 295/295 )
+Branches     : 100% ( 148/148 )
+Functions    : 100% ( 79/79 )
+Lines        : 100% ( 263/263 )
+================================================================================
+EXIT=0
+```
+
+### Notas e o que nao foi rodado
+
+- Implementacao e testes foram escritos juntos; o passo 1 nao teve execucao vermelha previa. A falsificacao esta nos canarios do passo 2 (arquivo novo, desfeitos editando de volta).
+- A tabela de cobertura do vitest omite arquivos a 100%; `fallback.ts` esta em `src/i18n/**` (include) e o resumo global marca 100% em statements, branches, functions e lines.
+- Nao rodados (do triage-runner): `build:pipeline`, `test:dist`, `npm audit`. Nenhuma view alterada; nada commitado; `Status:` segue `TODO`.
