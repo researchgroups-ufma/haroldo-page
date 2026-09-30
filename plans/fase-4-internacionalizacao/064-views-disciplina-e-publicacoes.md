@@ -1,6 +1,6 @@
 # Plano 064 — Views: Disciplina e Publicações
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** sabatina fase 4, Decisões 3 e 6; §10.4; RF-24, RF-37, F-06, F-13, RF-25, RN-02 sem mudança de comportamento
 **Depende de:** planos 055, 056, 058, 059
 **Modelo recomendado:** sonnet
@@ -487,3 +487,24 @@ baixado. Igual à linha de base em tudo.
 
 Contagem de U+FEFF neste plano, medida pelo orquestrador depois do ciclo 2
 (`grep -o $'\xEF\xBB\xBF' <plano> | wc -l`): `0`.
+
+### Verificação autoritativa e CI (orquestrador)
+
+Rodada do `triage-runner` em 2026-09-30, depois da última edição de código (o ciclo 2 de revisão
+mudou só o plano, que está no `.prettierignore`). Revisão: APROVADO no ciclo 2.
+
+```
+audit.txt:EXIT=0
+build.txt:EXIT=0
+coverage.txt:EXIT=0
+format.txt:EXIT=0
+lint.txt:EXIT=0
+test-dist.txt:EXIT=0
+```
+
+Check-runs do commit de trabalho `98d1014`, empurrado:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+```
