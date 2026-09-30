@@ -1,0 +1,148 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : TeachingView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View de `/ensino/` (e da rota EN, plano 067; sabatina fase
+ *                 4, Decisão 6): página Ensino (RF-23): disciplinas atuais
+ *                 em destaque — nome, descrição e atalho para a última aula —
+ *                 e, abaixo, as anteriores numa lista seca de uma linha por
+ *                 oferta (semestre · código · nome). Os dois grupos são
+ *                 sempre rotulados, com estado vazio explícito (RN-01).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : BaseLayout, PageHeader, ExternalLink, src/i18n (strings),
+ *                 src/lib/config.ts (`Locale`), src/lib/routes.ts (coursePath),
+ *                 src/lib/text.ts (toParagraphs), src/lib/date.ts (formatDate),
+ *                 src/lib/published.ts (filterPublished),
+ *                 src/lib/courses.ts (splitCourses, buildCourseSlugs, courseSlug),
+ *                 astro:content (getCollection)
+ *  Entradas     : prop `lang` (obrigatória); coleção `disciplinas`
+ *  Saídas       : HTML estático do corpo da página Ensino
+ *  Uso          : <TeachingView lang="pt" /> em `src/pages/ensino.astro`
+ *
+ *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
+ *                 sem fallback por campo aqui (plano 067).
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { strings } from '../i18n';
+import type { Locale } from '../lib/config';
+import { coursePath } from '../lib/routes';
+import { toParagraphs } from '../lib/text';
+import { formatDate } from '../lib/date';
+import { filterPublished } from '../lib/published';
+import { buildCourseSlugs, courseSlug, splitCourses } from '../lib/courses';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang);
+
+// RN-01: só disciplinas publicadas entram na página.
+const disciplinas = filterPublished(await getCollection('disciplinas'));
+// RN-03: a transição de atual para anterior é manual (campo `status`); nenhuma lógica de data.
+const { current, previous } = splitCourses(disciplinas);
+// Reprova o build, nomeando os dois caminhos, se duas disciplinas publicadas gerarem o mesmo slug.
+buildCourseSlugs(disciplinas);
+---
+
+<BaseLayout title={t.nav.teaching}>
+  <PageHeader slot="cabecalho" title={t.teaching.title} />
+
+  <section aria-labelledby="ensino-atuais" class="px-margem pt-8 pb-4">
+    <h2 id="ensino-atuais" class="text-rotulo text-secundario">{t.teaching.current}</h2>
+    {
+      current.length === 0 ? (
+        <p class="text-corpo text-secundario mt-4">{t.teaching.noCurrent}</p>
+      ) : (
+        current.map((course) => {
+          const { codigo, semestre, nome, descricao, aulas } = course.data;
+          const paragraph = toParagraphs(descricao)[0];
+          // RN-04: a ordem das aulas é a do professor — a "última" é a última da lista dele.
+          const latest = aulas?.at(-1);
+          return (
+            <article class="py-6">
+              <p class="text-pequeno text-secundario">
+                {codigo ? `${codigo} · ${semestre}` : semestre}
+              </p>
+              <div>
+                <h3 class="text-display-2 mt-1">
+                  <a href={coursePath(courseSlug(course.filePath), lang)} class="link-sublinhado">
+                    {nome}
+                  </a>
+                </h3>
+                {paragraph && (
+                  <p class="text-corpo text-secundario max-w-medida mt-2">{paragraph}</p>
+                )}
+                {latest && (
+                  <p class="text-pequeno mt-4">
+                    <span class="text-secundario">{t.teaching.latestLesson} ·</span>{' '}
+                    <ExternalLink href={latest.url} class="underline">
+                      {latest.numero}. {latest.titulo}
+                    </ExternalLink>
+                    {latest.data && (
+                      <span class="text-secundario"> · {formatDate(latest.data, lang)}</span>
+                    )}
+                  </p>
+                )}
+              </div>
+            </article>
+          );
+        })
+      )
+    }
+  </section>
+
+  <section aria-labelledby="ensino-anteriores" class="px-margem pt-6 pb-10">
+    <h2 id="ensino-anteriores" class="text-rotulo text-secundario">{t.teaching.previous}</h2>
+    {
+      previous.length === 0 ? (
+        <p class="text-corpo text-secundario mt-4">{t.teaching.noPrevious}</p>
+      ) : (
+        <ul class="mt-4">
+          {previous.map((course) => {
+            const { codigo, semestre, nome } = course.data;
+            return (
+              <li class="disciplina-anterior">
+                <a
+                  href={coursePath(courseSlug(course.filePath), lang)}
+                  class="group grid grid-cols-[1fr_auto] items-baseline gap-x-8 gap-y-1 py-3"
+                >
+                  {/* Mesmo formato da disciplina atual: código e semestre numa linha pequena acima do nome. */}
+                  <span class="text-pequeno text-secundario col-span-2">
+                    {codigo ? `${codigo} · ${semestre}` : semestre}
+                  </span>
+                  <span class="text-titulo-item decoration-1 underline-offset-[6px] group-hover:underline">
+                    {nome}
+                  </span>
+                  <span aria-hidden="true" class="text-secundario">
+                    ›
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .disciplina-anterior {
+    border-top: 1px solid var(--color-regua);
+  }
+  .disciplina-anterior:first-child {
+    border-top-color: var(--color-tinta);
+  }
+</style>

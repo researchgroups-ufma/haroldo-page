@@ -1,0 +1,73 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : ProjectItem.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Linha de um projeto na página Pesquisa (RF-22): período e
+ *                 status numa linha pequena, título, descrição, e financiador
+ *                 e colaboradores. Usada dentro das linhas de pesquisa e em
+ *                 "Outros projetos".
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
+ *                 src/lib/text.ts (toParagraphs), astro:content (CollectionEntry)
+ *  Entradas     : prop `project` (obrigatória): entrada da coleção `projetos`
+ *  Saídas       : `<li class="projeto-linha">` com régua fina acima
+ *  Uso          : <ProjectItem project={project} /> dentro de um `<ol>`
+ *
+ *  Notas        : o idioma vem do caminho (`localeFromPath`), como nos demais
+ *                 componentes compartilhados. A régua `.projeto-linha` mora aqui:
+ *                 estilo escopado não alcançaria o `<li>` a partir da view.
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import { strings } from '../i18n';
+import { localeFromPath } from '../lib/routes';
+import { toParagraphs } from '../lib/text';
+
+export interface Props {
+  /** Projeto publicado a exibir. Obrigatória. */
+  project: CollectionEntry<'projetos'>;
+}
+
+const { project } = Astro.props;
+const t = strings(localeFromPath(Astro.url.pathname));
+
+/** Linha de identificação do projeto: período ("inicio–fim", ou "inicio–" em aberto) · status. */
+const meta = [
+  project.data.periodo && `${project.data.periodo.inicio}–${project.data.periodo.fim ?? ''}`,
+  project.data.status && t.research.status[project.data.status],
+]
+  .filter(Boolean)
+  .join(' · ');
+---
+
+<li class="projeto-linha py-3">
+  {meta && <p class="text-pequeno text-secundario">{meta}</p>}
+  <div>
+    <h3 class="text-titulo-item">{project.data.titulo}</h3>
+    {
+      toParagraphs(project.data.descricao).map((paragraph) => (
+        <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
+      ))
+    }
+    {
+      (project.data.financiador || project.data.colaboradores?.length) && (
+        <p class="text-pequeno text-secundario mt-1">
+          {[project.data.financiador, project.data.colaboradores?.join(', ')]
+            .filter(Boolean)
+            .join(' · ')}
+        </p>
+      )
+    }
+  </div>
+</li>
+
+<style>
+  .projeto-linha {
+    border-top: 1px solid var(--color-regua);
+  }
+</style>

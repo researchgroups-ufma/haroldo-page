@@ -3,160 +3,22 @@
  * ============================================================================
  *  Arquivo      : pesquisa.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Página Pesquisa do site público (RF-22, RF-13, §6.3 da
- *                 identidade visual): linhas de pesquisa publicadas, na ordem
- *                 do professor, com resumo, corpo e imagem quando houver, e os
- *                 projetos de cada uma logo abaixo (em andamento antes de
- *                 concluídos), com período, status, descrição, financiador e
- *                 colaboradores; "Outros projetos" no fim reúne os sem linha ou
- *                 ligados a linha não publicada, sem revelá-la (RN-01).
+ *  Descrição    : Página fina da Pesquisa em português (RF-22): só chama
+ *                 `ResearchView` (sabatina fase 4, Decisão 6).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.4.0
  *
- *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
- *                 src/i18n/pt.ts, src/lib/text.ts (toParagraphs),
- *                 src/lib/published.ts (filterPublished),
- *                 src/lib/research.ts (sortResearchLines, sortProjects,
- *                 groupProjectsByLine), astro:content
- *                 (getCollection)
- *  Entradas     : coleções `linhas-pesquisa` e `projetos`, já validadas pelo Zod
+ *  Dependências : src/views/ResearchView.astro
+ *  Entradas     : nenhuma
  *  Saídas       : HTML estático da rota `/pesquisa/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/pesquisa.astro`
  *
- *  Notas        : nenhum texto de interface hardcoded — tudo vem de `pt`
- *                 (§10.4 do PRD); os dados vêm do conteúdo.
+ *  Notas        : o corpo da página vive em `ResearchView`.
  * ============================================================================
  */
-import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/PageHeader.astro';
-import { pt } from '../i18n/pt';
-import { toParagraphs } from '../lib/text';
-import { filterPublished } from '../lib/published';
-import { groupProjectsByLine, sortProjects, sortResearchLines } from '../lib/research';
-
-// RN-01: só linhas e projetos publicados entram na página.
-const lines = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')));
-const projects = sortProjects(filterPublished(await getCollection('projetos')));
-const { byLine, others } = groupProjectsByLine(new Set(lines.map((line) => line.id)), projects);
-
-/** Linha de identificação do projeto: período ("inicio–fim", ou "inicio–" em aberto) · status. */
-const projectMeta = (p: (typeof projects)[number]) =>
-  [
-    p.data.periodo && `${p.data.periodo.inicio}–${p.data.periodo.fim ?? ''}`,
-    p.data.status && pt.research.status[p.data.status],
-  ]
-    .filter(Boolean)
-    .join(' · ');
+import ResearchView from '../views/ResearchView.astro';
 ---
 
-<BaseLayout title={pt.nav.research}>
-  <PageHeader slot="cabecalho" title={pt.research.title} />
-
-  <div class="px-margem pb-10">
-    {
-      lines.map((line) => {
-        const paragraphs = [...toParagraphs(line.data.resumo), ...toParagraphs(line.data.corpo)];
-        const lineProjects = byLine.get(line.id) ?? [];
-        return (
-          <section id={line.id} aria-labelledby={`${line.id}-titulo`} class="linha-pesquisa py-8">
-            <div>
-              <div>
-                <h2 id={`${line.id}-titulo`} class="text-display-2">
-                  {line.data.titulo}
-                </h2>
-                {paragraphs.map((paragraph, i) => (
-                  <p class:list={['text-corpo max-w-medida mt-3', i === 0 && 'text-secundario']}>
-                    {paragraph}
-                  </p>
-                ))}
-                {line.data.imagem && (
-                  <img
-                    src={line.data.imagem}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    class="mt-4 w-full max-w-md object-cover grayscale"
-                  />
-                )}
-              </div>
-            </div>
-            {lineProjects.length > 0 && (
-              <ol class="mt-6">
-                {lineProjects.map((project) => (
-                  <li class="projeto-linha py-3">
-                    {projectMeta(project) && (
-                      <p class="text-pequeno text-secundario">{projectMeta(project)}</p>
-                    )}
-                    <div>
-                      <h3 class="text-titulo-item">{project.data.titulo}</h3>
-                      {toParagraphs(project.data.descricao).map((paragraph) => (
-                        <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
-                      ))}
-                      {(project.data.financiador || project.data.colaboradores?.length) && (
-                        <p class="text-pequeno text-secundario mt-1">
-                          {[project.data.financiador, project.data.colaboradores?.join(', ')]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </section>
-        );
-      })
-    }
-
-    {
-      others.length > 0 && (
-        <section aria-labelledby="outros-projetos" class="linha-pesquisa py-8">
-          <h2 id="outros-projetos" class="text-rotulo text-secundario">
-            {pt.research.otherProjects}
-          </h2>
-          <ol class="mt-4">
-            {others.map((project) => (
-              <li class="projeto-linha py-3">
-                {projectMeta(project) && (
-                  <p class="text-pequeno text-secundario">{projectMeta(project)}</p>
-                )}
-                <div>
-                  <h3 class="text-titulo-item">{project.data.titulo}</h3>
-                  {toParagraphs(project.data.descricao).map((paragraph) => (
-                    <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
-                  ))}
-                  {(project.data.financiador || project.data.colaboradores?.length) && (
-                    <p class="text-pequeno text-secundario mt-1">
-                      {[project.data.financiador, project.data.colaboradores?.join(', ')]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </p>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )
-    }
-  </div>
-</BaseLayout>
-
-<style>
-  /* Blocos de linha com régua forte; projetos com régua fina — padrão de lista do site. */
-  .linha-pesquisa {
-    border-top: 1px solid var(--color-tinta);
-  }
-  /* O primeiro bloco encosta na régua do cabeçalho, que já abre a lista — sem borda, para a linha
-     não dobrar de espessura. */
-  .linha-pesquisa:first-child {
-    border-top: 0;
-  }
-  .projeto-linha {
-    border-top: 1px solid var(--color-regua);
-  }
-</style>
+<ResearchView lang="pt" />

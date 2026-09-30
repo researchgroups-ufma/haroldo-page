@@ -1,0 +1,125 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : ResearchView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View de `/pesquisa/` (e da rota EN, plano 066; sabatina
+ *                 fase 4, Decisão 6): página Pesquisa (RF-22, RF-13, §6.3 da
+ *                 identidade visual): linhas de pesquisa publicadas, na ordem
+ *                 do professor, com resumo, corpo e imagem quando houver, e os
+ *                 projetos de cada uma logo abaixo (em andamento antes de
+ *                 concluídos); "Outros projetos" no fim reúne os sem linha ou
+ *                 ligados a linha não publicada, sem revelá-la (RN-01).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : BaseLayout, PageHeader, ProjectItem, src/i18n (strings),
+ *                 src/lib/config.ts (`Locale`), src/lib/text.ts (toParagraphs),
+ *                 src/lib/published.ts (filterPublished),
+ *                 src/lib/research.ts (sortResearchLines, sortProjects,
+ *                 groupProjectsByLine), astro:content (getCollection)
+ *  Entradas     : prop `lang` (obrigatória); coleções `linhas-pesquisa` e `projetos`
+ *  Saídas       : HTML estático do corpo da página Pesquisa
+ *  Uso          : <ResearchView lang="pt" /> em `src/pages/pesquisa.astro`
+ *
+ *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
+ *                 sem fallback por campo aqui (plano 066).
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ProjectItem from '../components/ProjectItem.astro';
+import { strings } from '../i18n';
+import type { Locale } from '../lib/config';
+import { toParagraphs } from '../lib/text';
+import { filterPublished } from '../lib/published';
+import { groupProjectsByLine, sortProjects, sortResearchLines } from '../lib/research';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang);
+
+// RN-01: só linhas e projetos publicados entram na página.
+const lines = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')));
+const projects = sortProjects(filterPublished(await getCollection('projetos')));
+const { byLine, others } = groupProjectsByLine(new Set(lines.map((line) => line.id)), projects);
+---
+
+<BaseLayout title={t.nav.research}>
+  <PageHeader slot="cabecalho" title={t.research.title} />
+
+  <div class="px-margem pb-10">
+    {
+      lines.map((line) => {
+        const paragraphs = [...toParagraphs(line.data.resumo), ...toParagraphs(line.data.corpo)];
+        const lineProjects = byLine.get(line.id) ?? [];
+        return (
+          <section id={line.id} aria-labelledby={`${line.id}-titulo`} class="linha-pesquisa py-8">
+            <div>
+              <div>
+                <h2 id={`${line.id}-titulo`} class="text-display-2">
+                  {line.data.titulo}
+                </h2>
+                {paragraphs.map((paragraph, i) => (
+                  <p class:list={['text-corpo max-w-medida mt-3', i === 0 && 'text-secundario']}>
+                    {paragraph}
+                  </p>
+                ))}
+                {line.data.imagem && (
+                  <img
+                    src={line.data.imagem}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    class="mt-4 w-full max-w-md object-cover grayscale"
+                  />
+                )}
+              </div>
+            </div>
+            {lineProjects.length > 0 && (
+              <ol class="mt-6">
+                {lineProjects.map((project) => (
+                  <ProjectItem project={project} />
+                ))}
+              </ol>
+            )}
+          </section>
+        );
+      })
+    }
+
+    {
+      others.length > 0 && (
+        <section aria-labelledby="outros-projetos" class="linha-pesquisa py-8">
+          <h2 id="outros-projetos" class="text-rotulo text-secundario">
+            {t.research.otherProjects}
+          </h2>
+          <ol class="mt-4">
+            {others.map((project) => (
+              <ProjectItem project={project} />
+            ))}
+          </ol>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  /* Blocos de linha com régua forte; a régua fina dos projetos vive em `ProjectItem`. */
+  .linha-pesquisa {
+    border-top: 1px solid var(--color-tinta);
+  }
+  /* O primeiro bloco encosta na régua do cabeçalho, que já abre a lista — sem borda, para a linha
+     não dobrar de espessura. */
+  .linha-pesquisa:first-child {
+    border-top: 0;
+  }
+</style>
