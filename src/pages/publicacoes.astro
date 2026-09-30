@@ -3,205 +3,22 @@
  * ============================================================================
  *  Arquivo      : publicacoes.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Página Publicações do site público (RF-25, RN-02, F-05):
- *                 publicações publicadas agrupadas por ano, do mais recente
- *                 ao mais antigo, em lista enxuta. A partir de `lg`, os anos
- *                 viram uma sanfona guiada pela rolagem: o bloco fica fixo,
- *                 a rolagem percorre os artigos do ano aberto e, ao fim
- *                 deles, o ano fecha e o seguinte abre (GSAP ScrollTrigger).
+ *  Descrição    : Página fina das Publicações em português (RF-25): só chama
+ *                 `PublicationsView` (sabatina fase 4, Decisão 6).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-22
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.4.0
  *
- *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
- *                 src/components/PublicationItem.astro, src/i18n/pt.ts,
- *                 src/lib/published.ts (filterPublished),
- *                 src/lib/publications.ts (groupByYear), astro:content (getCollection),
- *                 gsap (núcleo e ScrollTrigger, por import() só quando a sanfona roda)
- *  Entradas     : coleção `publicacoes`, já validada pelo Zod
+ *  Dependências : src/views/PublicationsView.astro
+ *  Entradas     : nenhuma
  *  Saídas       : HTML estático da rota `/publicacoes/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/publicacoes.astro`
  *
- *  Notas        : melhoria progressiva (RNF-02) — sem JS, abaixo de `lg` ou
- *                 com `prefers-reduced-motion: reduce`, todos os anos ficam
- *                 abertos e o link do ano é uma âncora comum. Nenhum texto de
- *                 interface hardcoded — tudo vem de `pt` (§10.4 do PRD).
+ *  Notas        : o corpo da página e a sanfona vivem em `PublicationsView`.
  * ============================================================================
  */
-import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHeader from '../components/PageHeader.astro';
-import PublicationItem from '../components/PublicationItem.astro';
-import { pt } from '../i18n/pt';
-import { filterPublished } from '../lib/published';
-import { groupByYear } from '../lib/publications';
-
-// RN-01: rascunhos (`publicado: false`) nunca aparecem na página pública.
-const published = filterPublished(await getCollection('publicacoes'));
-// RN-02: `groupByYear` já aplica a ordem inteira (ano decrescente; dentro do ano,
-// `compareWithinYear`, título alfabético pt-BR) — regra provisória que vale até existir um campo
-// de data de cadastro (Q-RN02, opção (c), decidida pelo stakeholder em 2026-09-14, README da
-// fase). Esta página não reordena nada por conta própria.
-const groups = groupByYear(published);
+import PublicationsView from '../views/PublicationsView.astro';
 ---
 
-<BaseLayout title={pt.nav.publications}>
-  <PageHeader slot="cabecalho" title={pt.publications.title} />
-
-  {
-    /* Pai em bloco: o ScrollTrigger desliga o `pinSpacing` quando o pai do pin é flex (o `#conteudo`). */
-  }
-  <div>
-    <div id="pub-anos" class="px-margem">
-      {
-        groups.map((group) => {
-          const sectionId = `ano-${group.year}`;
-          const headingId = `${sectionId}-titulo`;
-          return (
-            <section id={sectionId} aria-labelledby={headingId} class="pub-ano">
-              <div class="py-4">
-                <h2 id={headingId}>
-                  <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
-                    {group.year}
-                  </a>
-                </h2>
-              </div>
-              <div class="pub-ano-corpo">
-                <ol class="pub-ano-lista space-y-6 pb-8">
-                  {group.items.map((item) => (
-                    <li>
-                      <PublicationItem publication={item} />
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </section>
-          );
-        })
-      }
-    </div>
-  </div>
-</BaseLayout>
-
-<style>
-  .pub-ano {
-    border-top: 1px solid var(--color-regua);
-  }
-  /* O primeiro ano encosta na régua do cabeçalho, que já abre a lista — sem borda, para a linha
-     não dobrar de espessura. */
-  .pub-ano:first-child {
-    border-top: 0;
-  }
-</style>
-
-<script>
-  /** Rolagem (px) gasta para fechar um ano e abrir o seguinte. */
-  const TRANSITION = 400;
-
-  const scroller = document.getElementById('conteudo');
-  const wrapper = document.getElementById('pub-anos');
-  const sections = wrapper ? [...wrapper.querySelectorAll<HTMLElement>('.pub-ano')] : [];
-
-  /** Condição em que a sanfona roda — fora dela o GSAP nem é baixado. */
-  const QUERY = '(min-width: 64rem) and (prefers-reduced-motion: no-preference)';
-  const media = window.matchMedia(QUERY);
-  let started = false;
-
-  /** Baixa o GSAP e monta a sanfona, uma vez só, na primeira vez em que `QUERY` vale. */
-  async function startAccordion(scroller: HTMLElement, wrapper: HTMLElement) {
-    if (started) return;
-    started = true;
-    const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-      import('gsap'),
-      import('gsap/ScrollTrigger'),
-    ]);
-    gsap.registerPlugin(ScrollTrigger);
-
-    // Cabeçalho do ano = primeiro filho da seção (o bloco do <h2> do ano).
-    const headers = sections.map((section) => section.firstElementChild as HTMLElement);
-    const bodies = sections.map(
-      (section) => section.querySelector('.pub-ano-corpo') as HTMLElement,
-    );
-    const lists = sections.map((section) => section.querySelector('.pub-ano-lista') as HTMLElement);
-    const links = sections.map(
-      (section) => section.querySelector('.pub-ano-link') as HTMLAnchorElement,
-    );
-
-    // Com o bloco fixo, o corpo aberto ocupa a altura do cartão menos os cabeçalhos dos anos.
-    const available = () =>
-      scroller.clientHeight - headers.reduce((sum, header) => sum + header.offsetHeight, 0);
-    const openHeight = (i: number) => Math.min(lists[i].offsetHeight, available());
-    const overflow = (i: number) => Math.max(0, lists[i].offsetHeight - available());
-
-    gsap.matchMedia().add(QUERY, () => {
-      gsap.set(bodies, { overflow: 'hidden' });
-
-      const timeline = gsap.timeline({ defaults: { ease: 'none' } });
-      sections.forEach((_, i) => {
-        timeline.addLabel(`ano-${i}`);
-        const over = overflow(i);
-        if (over > 0) {
-          timeline.fromTo(lists[i], { y: 0 }, { y: () => -overflow(i), duration: over });
-        }
-        if (i < sections.length - 1) {
-          // `fromTo` com funções: a cada refresh (resize, fonte carregada) as alturas são
-          // medidas de novo, sem herdar o valor animado do momento.
-          timeline
-            .fromTo(
-              bodies[i],
-              { height: () => openHeight(i) },
-              { height: 0, duration: TRANSITION, ease: 'power1.inOut' },
-            )
-            .fromTo(
-              bodies[i + 1],
-              { height: 0 },
-              { height: () => openHeight(i + 1), duration: TRANSITION, ease: 'power1.inOut' },
-              '<',
-            );
-        }
-      });
-
-      // Ano fechado (altura 0) sai do Tab e do leitor de tela; volta ao abrir.
-      const syncInert = () => bodies.forEach((body) => (body.inert = body.offsetHeight < 1));
-
-      const trigger = ScrollTrigger.create({
-        trigger: wrapper,
-        scroller,
-        start: 'top top',
-        end: () => `+=${timeline.duration()}`,
-        pin: true,
-        scrub: 0.4,
-        animation: timeline,
-        invalidateOnRefresh: true,
-        onUpdate: syncInert,
-        onRefresh: syncInert,
-      });
-      syncInert();
-
-      // O link do ano leva a rolagem ao ponto em que aquele ano está aberto.
-      const onClick = (event: MouseEvent) => {
-        const i = links.indexOf(event.currentTarget as HTMLAnchorElement);
-        event.preventDefault();
-        scroller.scrollTo({
-          top: trigger.start + timeline.labels[`ano-${i}`],
-          behavior: 'smooth',
-        });
-      };
-      links.forEach((link) => link.addEventListener('click', onClick));
-
-      return () => {
-        links.forEach((link) => link.removeEventListener('click', onClick));
-        bodies.forEach((body) => (body.inert = false));
-      };
-    });
-  }
-
-  // Com um ano só não há o que sanfonar — a lista fica como está.
-  if (scroller && wrapper && sections.length > 1) {
-    if (media.matches) void startAccordion(scroller, wrapper);
-    media.addEventListener('change', () => {
-      if (media.matches) void startAccordion(scroller, wrapper);
-    });
-  }
-</script>
+<PublicationsView lang="pt" />

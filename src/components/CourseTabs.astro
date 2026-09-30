@@ -1,0 +1,110 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : CourseTabs.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Abas da página de disciplina (RF-24): marcação do `tablist` e
+ *                 estilo. Melhoria progressiva (RNF-02) — sem JS, ou com uma
+ *                 seção só, o `tablist` fica oculto e as seções ficam
+ *                 empilhadas com os títulos; o `#id` da URL escolhe a aba inicial.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/i18n (strings), src/lib/config.ts (`Locale`),
+ *                 src/lib/courses.ts (`SectionKey`)
+ *  Entradas     : props `lang` (obrigatória) e `tabs` (obrigatória: `{ id, key }[]`,
+ *                 já sem `syllabus`)
+ *  Saídas       : `#curso-abas` (oculto até o script rodar) e o estilo das abas
+ *  Uso          : <CourseTabs lang={lang} tabs={tabs} /> acima dos painéis da disciplina
+ *
+ *  Notas        : o script vive em `src/scripts/course-tabs.ts`, importado por
+ *                 `CourseView` (aqui ele seria emitido antes dos painéis); os
+ *                 painéis (`CoursePanel`, com o `id` de cada aba) ficam na view.
+ * ============================================================================
+ */
+import { strings } from '../i18n';
+import type { Locale } from '../lib/config';
+import type { SectionKey } from '../lib/courses';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+  /** Abas a mostrar, na ordem dos painéis. Obrigatória; com menos de duas, o script não age. */
+  tabs: { id: string; key: SectionKey }[];
+}
+
+const { lang, tabs } = Astro.props;
+const t = strings(lang);
+---
+
+<div
+  id="curso-abas"
+  role="tablist"
+  aria-label={t.course.tabsLabel}
+  hidden
+  class="flex [scrollbar-width:none] gap-6 overflow-x-auto overflow-y-hidden pt-6"
+>
+  {
+    tabs.map((tab) => (
+      <button
+        type="button"
+        role="tab"
+        id={`aba-${tab.id}`}
+        aria-controls={tab.id}
+        aria-selected="false"
+        tabindex="-1"
+        class="aba text-pequeno -mb-px shrink-0 border-b py-3 whitespace-nowrap"
+      >
+        {t.course[tab.key]}
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  .aba {
+    border-color: transparent;
+    color: var(--color-secundario);
+  }
+  .aba:hover,
+  .aba[aria-selected='true'] {
+    color: var(--color-tinta);
+  }
+  .aba[aria-selected='true'] {
+    border-color: var(--color-tinta);
+  }
+
+  /* Com as abas ativas, a régua forte da primeira linha do painel é a base das abas. */
+  :global([data-abas] .curso-painel) {
+    padding-top: 0;
+  }
+
+  /* Com as abas ativas, a aba mostra o título — o <h2> do painel fica só para leitor de tela. */
+  :global([data-abas] .painel-titulo) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aba {
+      transition:
+        color 150ms ease-out,
+        border-color 150ms ease-out;
+    }
+    :global([data-abas] .curso-painel:not([hidden])) {
+      animation: painel-entra 200ms ease-out;
+    }
+    @keyframes painel-entra {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+    }
+  }
+</style>

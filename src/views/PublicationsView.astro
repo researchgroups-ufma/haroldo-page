@@ -1,0 +1,108 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : PublicationsView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View da página Publicações (RF-25, RN-02, F-05; sabatina fase
+ *                 4, Decisão 6): publicações publicadas agrupadas por ano, do
+ *                 mais recente ao mais antigo, em lista enxuta. A partir de `lg`,
+ *                 os anos viram uma sanfona guiada pela rolagem
+ *                 (`src/scripts/publications-accordion.ts`).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : BaseLayout, PageHeader, PublicationItem, src/i18n (strings),
+ *                 src/lib/config.ts (`Locale`), src/lib/published.ts
+ *                 (filterPublished), src/lib/publications.ts (groupByYear),
+ *                 src/scripts/publications-accordion.ts, astro:content
+ *                 (getCollection)
+ *  Entradas     : prop `lang` (obrigatória); coleção `publicacoes`
+ *  Saídas       : HTML estático do corpo da página Publicações
+ *  Uso          : <PublicationsView lang="pt" /> em `src/pages/publicacoes.astro`
+ *
+ *  Notas        : melhoria progressiva (RNF-02) — sem JS, abaixo de `lg` ou
+ *                 com `prefers-reduced-motion: reduce`, todos os anos ficam
+ *                 abertos e o link do ano é uma âncora comum. Texto de interface
+ *                 só de `strings(lang)` (§10.4 do PRD).
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import { strings } from '../i18n';
+import type { Locale } from '../lib/config';
+import { filterPublished } from '../lib/published';
+import { groupByYear } from '../lib/publications';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang);
+
+// RN-01: rascunhos (`publicado: false`) nunca aparecem na página pública.
+const published = filterPublished(await getCollection('publicacoes'));
+// RN-02: `groupByYear` já aplica a ordem inteira (ano decrescente; dentro do ano,
+// `compareWithinYear`, título alfabético pt-BR) — regra provisória que vale até existir um campo
+// de data de cadastro (Q-RN02, opção (c), decidida pelo stakeholder em 2026-09-14, README da
+// fase). Esta página não reordena nada por conta própria.
+const groups = groupByYear(published);
+---
+
+<BaseLayout title={t.nav.publications}>
+  <PageHeader slot="cabecalho" title={t.publications.title} />
+
+  {
+    /* Pai em bloco: o ScrollTrigger desliga o `pinSpacing` quando o pai do pin é flex (o `#conteudo`). */
+  }
+  <div>
+    <div id="pub-anos" class="px-margem">
+      {
+        groups.map((group) => {
+          const sectionId = `ano-${group.year}`;
+          const headingId = `${sectionId}-titulo`;
+          return (
+            <section id={sectionId} aria-labelledby={headingId} class="pub-ano">
+              <div class="py-4">
+                <h2 id={headingId}>
+                  <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
+                    {group.year}
+                  </a>
+                </h2>
+              </div>
+              <div class="pub-ano-corpo">
+                <ol class="pub-ano-lista space-y-6 pb-8">
+                  {group.items.map((item) => (
+                    <li>
+                      <PublicationItem publication={item} />
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </section>
+          );
+        })
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .pub-ano {
+    border-top: 1px solid var(--color-regua);
+  }
+  /* O primeiro ano encosta na régua do cabeçalho, que já abre a lista — sem borda, para a linha
+     não dobrar de espessura. */
+  .pub-ano:first-child {
+    border-top: 0;
+  }
+</style>
+
+<script>
+  import '../scripts/publications-accordion';
+</script>

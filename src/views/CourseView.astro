@@ -1,0 +1,129 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : CourseView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View da página de disciplina (RF-24, F-06, RN-04, RF-37, F-13;
+ *                 sabatina fase 4, Decisão 6): seta de volta para Ensino,
+ *                 cabeçalho com código, semestre, status, descrição e ementa, e
+ *                 as seções da disciplina em abas — aulas na ordem do professor
+ *                 (estado vazio explícito, scripts por aula), "Scripts da
+ *                 disciplina" (sem aula correspondente), listas, materiais,
+ *                 bibliografia e links.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : BaseLayout, PageHeader, CoursePanel, LessonList, ScriptPanel,
+ *                 CourseResources, CourseTabs, src/scripts/course-tabs.ts,
+ *                 src/i18n (strings),
+ *                 src/lib/config.ts (`Locale`), src/lib/routes.ts (routePath),
+ *                 src/lib/text.ts (toParagraphs), src/lib/courses.ts
+ *                 (groupScriptsByLesson, presentSections), astro:content
+ *                 (`CollectionEntry`)
+ *  Entradas     : props `lang` e `course` (ambas obrigatórias)
+ *  Saídas       : HTML estático do corpo da página de disciplina
+ *  Uso          : <CourseView lang="pt" course={Astro.props.course} /> em
+ *                 `src/pages/ensino/[slug].astro`
+ *
+ *  Notas        : abas como melhoria progressiva (RNF-02): marcação em
+ *                 `CourseTabs`, script em `src/scripts/course-tabs.ts`.
+ *                 Scripts com `aula` correspondente aparecem dentro de
+ *                 `LessonList` (F-13); os de `general` (sem aula) têm aba
+ *                 própria, só se houver algum. Sem fallback por campo aqui
+ *                 (plano 067).
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import CoursePanel from '../components/CoursePanel.astro';
+import CourseTabs from '../components/CourseTabs.astro';
+import LessonList from '../components/LessonList.astro';
+import ScriptPanel from '../components/ScriptPanel.astro';
+import CourseResources from '../components/CourseResources.astro';
+import { strings } from '../i18n';
+import type { Locale } from '../lib/config';
+import { routePath } from '../lib/routes';
+import { toParagraphs } from '../lib/text';
+import { groupScriptsByLesson, presentSections } from '../lib/courses';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+  /** Entrada de `disciplinas` da rota, resolvida por `courseStaticPaths`. Obrigatória. */
+  course: CollectionEntry<'disciplinas'>;
+}
+
+const { lang, course } = Astro.props;
+const t = strings(lang);
+const data = course.data;
+
+// F-13/RF-37: agrupa os scripts sob a aula correspondente; general ganha aba própria.
+const { byLesson, general } = groupScriptsByLesson(data.aulas ?? [], data.scripts ?? []);
+// A ementa fica no cabeçalho; as demais seções viram abas, na ordem de `presentSections`.
+const tabs = presentSections(data, general.length).filter((section) => section.key !== 'syllabus');
+
+const meta = [data.codigo, data.semestre, t.course.status[data.status]].filter(Boolean).join(' · ');
+const descriptionParagraphs = toParagraphs(data.descricao);
+const syllabusParagraphs = toParagraphs(data.ementa);
+const lessons = data.aulas ?? [];
+---
+
+<BaseLayout title={data.nome}>
+  <PageHeader
+    slot="cabecalho"
+    title={data.nome}
+    meta={meta}
+    back={{ href: routePath('teaching', lang), label: t.course.back }}
+  >
+    <Fragment slot="aside">
+      {descriptionParagraphs.map((paragraph) => <p class="text-corpo">{paragraph}</p>)}
+      {
+        syllabusParagraphs.length > 0 && (
+          <div class="mt-4">
+            <p class="text-rotulo text-secundario">{t.course.syllabus}</p>
+            {syllabusParagraphs.map((paragraph) => (
+              <p class="text-pequeno text-secundario mt-1">{paragraph}</p>
+            ))}
+          </div>
+        )
+      }
+    </Fragment>
+  </PageHeader>
+
+  <div class="px-margem">
+    <CourseTabs lang={lang} tabs={tabs} />
+
+    <CoursePanel id="aulas" title={t.course.lessons}>
+      {
+        lessons.length === 0 ? (
+          // F-06: estado vazio explícito — a disciplina existe, mas nenhuma aula foi cadastrada.
+          <p class="text-corpo text-secundario">{t.course.noLessons}</p>
+        ) : (
+          <LessonList lessons={lessons} byLesson={byLesson} />
+        )
+      }
+    </CoursePanel>
+
+    {
+      // F-13: só os scripts sem aula correspondente — os demais já apareceram em LessonList.
+      general.length > 0 && (
+        <CoursePanel id="scripts" title={t.course.courseScripts}>
+          <div class="flex flex-col gap-4">
+            {general.map((script) => (
+              <ScriptPanel script={script} />
+            ))}
+          </div>
+        </CoursePanel>
+      )
+    }
+
+    <CourseResources data={data} />
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/course-tabs';
+</script>
