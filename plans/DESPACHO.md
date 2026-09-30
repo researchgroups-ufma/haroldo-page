@@ -77,6 +77,11 @@ Nenhum agente herda o contexto do orquestrador; todos leem arquivo barato.
     **não existe** `&&`, `||`, ternário nem `??`.
 20. **`plans/` e `PRD.md` estão no `.prettierignore`** (verificado por canário em 2026-09-18).
     Edição que só mexe em plano ou PRD **não** precisa de `format:check`.
+21. **Não regrave arquivo de código com `Get-Content | Set-Content`.** No PowerShell 5.1 isso lê e
+    grava no codepage ANSI: no plano 063 o `ResearchView.astro` saiu com BOM e todos os acentos
+    corrompidos (`AcadÃªmico`), e nem o comparador, nem o lint, nem o prettier viram, porque o
+    estrago estava só em comentários. Edite com a ferramenta de edição. Ao final, confira os
+    arquivos tocados com `file` (sem "with BOM") e `grep -c 'Ã\|â€\|Â'` (zero).
 
 ### Regras de código da fase 3
 
