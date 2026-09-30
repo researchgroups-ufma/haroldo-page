@@ -3,142 +3,22 @@
  * ============================================================================
  *  Arquivo      : index.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Home do site público, preenchendo o cartão do `BaseLayout`
- *                 (sem o cabeçalho das páginas internas, sem rolagem a partir
- *                 de `lg`) com o nome de exibição e a navegação no topo, o
- *                 retrato em p&b quando o perfil tiver `foto` (F-08) e, sob a
- *                 régua, dados do Lattes — cargo, instituição, `resumo_home`,
- *                 contato (e-mail e perfis, na sequência da Sobre), formação
- *                 e áreas.
+ *  Descrição    : Página fina da Home em português: só chama `HomeView`
+ *                 (sabatina fase 4, Decisão 6).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
- *  Atualizado em: 2026-09-25
- *  Versão       : 0.6.0
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.7.0
  *
- *  Dependências : src/layouts/BaseLayout.astro, src/components/ExternalLink.astro,
- *                 src/lib/config.ts (siteConfig), src/lib/profile.ts (profileLinks),
- *                 src/lib/navigation.ts (navItems), src/i18n/pt.ts,
- *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
- *  Entradas     : coleção `perfil` (singleton), já validada pelo Zod
+ *  Dependências : src/views/HomeView.astro
+ *  Entradas     : nenhuma
  *  Saídas       : HTML estático da rota `/`
  *  Uso          : servido automaticamente pelo Astro como `src/pages/index.astro`
  *
- *  Notas        : nenhum texto de interface hardcoded — tudo vem de `pt`
- *                 (§10.4 do PRD); os dados do perfil vêm do conteúdo.
+ *  Notas        : o corpo da página vive em `HomeView`.
  * ============================================================================
  */
-import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ExternalLink from '../components/ExternalLink.astro';
-import { pt } from '../i18n/pt';
-import { siteConfig } from '../lib/config';
-import { navItems as navItemsFor } from '../lib/navigation';
-import { profileLinks } from '../lib/profile';
-import { requireSingleton } from '../lib/published';
-
-// `perfil` é singleton (plano 039): `requireSingleton` estoura se o painel não tiver exatamente 1 item.
-const perfil = requireSingleton(await getCollection('perfil'), 'perfil').data;
-
-const formacao = perfil.formacao ?? [];
-const areas = perfil.areas ?? [];
-// Mesmo contato da Sobre: e-mail e perfis acadêmicos na ordem fixa do schema, CV por último.
-const links = profileLinks(perfil.links, perfil.cv_url, pt.about.links);
-// A Home não lista a si mesma no menu.
-const navItems = navItemsFor('pt').filter((item) => item.href !== '/');
+import HomeView from '../views/HomeView.astro';
 ---
 
-<BaseLayout title={undefined} bare>
-  <section
-    aria-labelledby="home-nome"
-    class="px-margem flex min-h-0 flex-1 flex-col pt-5 pb-6 lg:pt-7 lg:pb-7"
-  >
-    <div class="grid gap-x-8 gap-y-4 lg:grid-cols-12">
-      <h1 id="home-nome" class="vt-nome text-display-1 titulo-entrada lg:col-span-6">
-        {siteConfig.displayName}
-      </h1>
-      <nav aria-label={pt.site.mainNavLabel} class="vt-menu lg:col-span-6 lg:col-start-7 lg:pt-3">
-        <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
-          {
-            navItems.map((item) => (
-              <li>
-                <a href={item.href} class="link-traco">
-                  {pt.nav[item.key]}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-    </div>
-
-    <div
-      class="mt-10 grid min-h-0 flex-1 items-end lg:grid-cols-12 lg:grid-rows-[minmax(0,1fr)] lg:gap-x-8"
-    >
-      {
-        perfil.foto && (
-          <img
-            src={perfil.foto}
-            alt={pt.site.portraitAlt(siteConfig.displayName)}
-            width="960"
-            height="1280"
-            fetchpriority="high"
-            decoding="async"
-            class="aspect-[3/4] w-36 object-cover grayscale sm:w-44 lg:col-span-3 lg:col-start-7 lg:h-full lg:max-h-[24rem] lg:w-auto"
-          />
-        )
-      }
-    </div>
-
-    <div aria-hidden="true" class="regua-entrada bg-tinta mt-6 h-px"></div>
-
-    <div class="text-pequeno grid gap-x-8 gap-y-6 pt-4 sm:grid-cols-2 lg:grid-cols-12">
-      <div class="space-y-3 sm:col-span-2 lg:col-span-6">
-        <div class="text-secundario">
-          <p>{perfil.cargo}</p>
-          {perfil.departamento && <p>{perfil.departamento}</p>}
-          <p>{perfil.instituicao}</p>
-        </div>
-        <p class="max-w-[24rem]">{perfil.resumo_home}</p>
-        <div>
-          <h2 class="text-secundario">{pt.about.contact}</h2>
-          <p class="mt-1 flex flex-wrap gap-x-5 gap-y-1">
-            <a href={`mailto:${perfil.email}`} class="link-traco">{perfil.email}</a>
-            {
-              links.map((link) => (
-                <ExternalLink href={link.href} class="link-traco">
-                  {link.label}
-                </ExternalLink>
-              ))
-            }
-          </p>
-        </div>
-      </div>
-      {
-        formacao.length > 0 && (
-          <div class="lg:col-span-3">
-            <h2 class="text-secundario">{pt.about.education}</h2>
-            <ul class="mt-1">
-              {formacao.map((item) => (
-                <li>
-                  {item.ano} · {item.grau} — {item.curso}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )
-      }
-      {
-        areas.length > 0 && (
-          <div class="lg:col-span-3">
-            <h2 class="text-secundario">{pt.about.areas}</h2>
-            <ul class="mt-1">
-              {areas.map((area) => (
-                <li>{area.nome}</li>
-              ))}
-            </ul>
-          </div>
-        )
-      }
-    </div>
-  </section>
-</BaseLayout>
+<HomeView lang="pt" />

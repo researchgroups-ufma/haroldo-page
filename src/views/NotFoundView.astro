@@ -1,0 +1,80 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : NotFoundView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View de `/404` e da 404 de `/en/` (sabatina fase 4, Decisão 6;
+ *                 RF-27, §6.7 da identidade visual): cabeçalho compacto com
+ *                 "Erro 404" abaixo do título, texto explicativo e a lista
+ *                 "Todas as páginas" com as cinco rotas de `navItems`
+ *                 ("Início" primeiro), em linhas com régua. A página fina
+ *                 `404.astro` é gerada como `dist/404.html`, o corpo que o
+ *                 `not_found_handling = "404-page"` do `wrangler.toml`
+ *                 devolve para qualquer rota inexistente.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
+ *                 src/i18n/index.ts (strings), src/lib/config.ts (tipo `Locale`),
+ *                 src/lib/navigation.ts (navItems)
+ *  Entradas     : prop `lang` (obrigatória; sem ela o TypeScript reprova o build)
+ *  Saídas       : HTML estático do corpo da 404
+ *  Uso          : <NotFoundView lang="pt" /> em `src/pages/404.astro`
+ *
+ *  Notas        : nenhum `<script>` (o caminho digitado não é exibido, §6.7 —
+ *                 exigiria JS); nenhum texto de interface hardcoded, tudo vem
+ *                 de `strings(lang)` (§10.4 do PRD).
+ * ============================================================================
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { strings } from '../i18n';
+import type { Locale } from '../lib/config';
+import { navItems } from '../lib/navigation';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang);
+---
+
+<BaseLayout title={t.notFound.title}>
+  <PageHeader slot="cabecalho" title={t.notFound.title} meta={t.notFound.eyebrow} />
+
+  <div class="px-margem pt-6 pb-16">
+    <p class="text-corpo max-w-medida">{t.notFound.body}</p>
+
+    <h2 class="text-rotulo text-secundario mt-10">{t.notFound.allPages}</h2>
+    <ul class="mt-4">
+      {
+        // RF-27: as cinco rotas de navItems, sem CV; "Início" é a primeira.
+        navItems(lang).map((item) => (
+          <li class="pagina-linha">
+            <a href={item.href} class="group flex items-center justify-between py-3">
+              <span class="text-titulo-item decoration-1 underline-offset-[6px] group-hover:underline">
+                {t.nav[item.key]}
+              </span>
+              <span aria-hidden="true" class="text-secundario">
+                ›
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .pagina-linha {
+    border-top: 1px solid var(--color-regua);
+  }
+  .pagina-linha:first-child {
+    border-top-color: var(--color-tinta);
+  }
+</style>

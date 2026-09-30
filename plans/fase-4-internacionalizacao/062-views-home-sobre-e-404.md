@@ -81,13 +81,328 @@ com esse nome (o `dist/404/index.html` quebraria o Worker, plano 051).
 
 ## Critérios de aceitação
 
-- [ ] `HomeView`, `AboutView` e `NotFoundView` com `lang: Locale` obrigatória; páginas finas só chamam a view
-- [ ] Nenhuma view importa `pt` direto nem tem `href` interno fixo
-- [ ] Views e páginas abaixo de 150 linhas (contagem colada)
-- [ ] Páginas PT idênticas: comparador com toda rota `IGUAL`; `dist/404.html` presente
-- [ ] Navegador: sem rolagem horizontal nas três larguras e transição entre páginas funcionando (orquestrador)
-- [ ] `astro check`, `lint`, `format:check`, `test:coverage`, `build:pipeline`, `test:dist` verdes, com saída colada
+- [x] `HomeView`, `AboutView` e `NotFoundView` com `lang: Locale` obrigatória; páginas finas só chamam a view
+- [x] Nenhuma view importa `pt` direto nem tem `href` interno fixo
+- [x] Views e páginas abaixo de 150 linhas (contagem colada)
+- [x] Páginas PT idênticas: comparador com toda rota `IGUAL`; `dist/404.html` presente
+- [x] Navegador: sem rolagem horizontal nas três larguras e transição entre páginas funcionando (orquestrador)
+- [x] `astro check`, `lint`, `format:check`, `test:coverage`, `build:pipeline`, `test:dist` verdes, com saída colada
 
 ## Evidência
 
-<Preenchido pelo executor ao concluir: saídas literais coladas, por passo; o passo 6 é do orquestrador. Plano sem esta seção preenchida não é DONE.>
+Executado em 2026-09-30.
+
+### Passo 1 — build "antes" (antes de qualquer edição em `src/`), `build-antes.txt`
+
+```text
+
+> haroldo-page@0.1.0 build:pipeline
+> vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  4 passed (4)
+      Tests  124 passed (124)
+   Start at  11:53:44
+   Duration  2.22s (transform 2.32s, setup 0ms, import 4.61s, tests 115ms, environment 0ms)
+
+Starting Tina build
+│
+○  Tina build complete ───────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                 │
+│  🦙 Tina Config                                                                                                 │
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main  │
+│                                                                                                                 │
+│  🤖 Auto-generated files                                                                                        │
+│     GraphQL Client:     tina/__generated__/client.ts                                                            │
+│     Typescript Types:   tina/__generated__/types.ts                                                             │
+│     Static HTML file:   public/admin/index.html                                                                 │
+│                                                                                                                 │
+│                                                                                                                 │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+11:55:31 [content] Syncing content
+11:55:31 [content] Synced content
+11:55:31 [types] Generated 796ms
+11:55:31 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (69 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+11:55:43 [content] Syncing content
+11:55:43 [content] Synced content
+11:55:43 [types] Generated 569ms
+11:55:43 [build] output: "static"
+11:55:43 [build] mode: "static"
+11:55:43 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+11:55:43 [build] Collecting build info...
+11:55:43 [build] ✓ Completed in 613ms.
+11:55:43 [build] Building static entrypoints...
+11:55:44 [vite] ✓ built in 687ms
+11:55:44 [vite] ✓ built in 176ms
+11:55:44 [build] Rearranging server assets...
+
+ generating static routes 
+11:55:44   ├─ /404.html (+14ms) 
+11:55:44   ├─ /ensino/2025-1-mecanica-classica/index.html (+5ms) 
+11:55:44   ├─ /ensino/2026-2-relatividade-geral/index.html (+151ms) 
+11:55:45   ├─ /ensino/index.html (+6ms) 
+11:55:45   ├─ /pesquisa/index.html (+6ms) 
+11:55:45   ├─ /publicacoes/index.html (+11ms) 
+11:55:45   ├─ /sobre/index.html (+8ms) 
+11:55:45   ├─ /index.html (+6ms) 
+11:55:45 ✓ Completed in 253ms.
+
+11:55:45 [build] ✓ Completed in 1.20s.
+11:55:45 [build] 8 page(s) built in 1.84s
+11:55:45 [build] Complete!
+EXIT=0
+```
+
+### Passo 1 — retrato "antes", `retrato-antes.txt`
+
+```text
+retrato: 8 rota(s) de dist em C:\Users\andne\AppData\Local\Temp\claude\S--Projetos-academic-page-haroldo\18c65f1f-10a0-4ce2-9c55-67926d12ad96\scratchpad\062\antes.json
+```
+
+### Passo 2 — `npx astro check`, `check.txt`
+
+```text
+12:08:02 [content] Syncing content
+12:08:02 [content] Synced content
+12:08:02 [types] Generated 518ms
+12:08:02 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (72 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+EXIT=0
+```
+
+### Passo 2 — `wc -l`, `wc.txt`
+
+```text
+  149 src/views/AboutView.astro
+  148 src/views/HomeView.astro
+   80 src/views/NotFoundView.astro
+   24 src/pages/index.astro
+   24 src/pages/sobre.astro
+   27 src/pages/404.astro
+  452 total
+```
+
+### Passo 3 — build "depois", `build-depois.txt`
+
+```text
+
+> haroldo-page@0.1.0 build:pipeline
+> vitest run tests/content && tinacms build --skip-cloud-checks && astro check && astro build
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  4 passed (4)
+      Tests  124 passed (124)
+   Start at  12:08:11
+   Duration  1.19s (transform 1.91s, setup 0ms, import 3.10s, tests 82ms, environment 0ms)
+
+Starting Tina build
+│
+○  Tina build complete ───────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                 │
+│  🦙 Tina Config                                                                                                 │
+│     API url:            https://content.tinajs.io/2.4/content/8be98053-68c3-4262-b7bd-dd1286e1c7ad/github/main  │
+│                                                                                                                 │
+│  🤖 Auto-generated files                                                                                        │
+│     GraphQL Client:     tina/__generated__/client.ts                                                            │
+│     Typescript Types:   tina/__generated__/types.ts                                                             │
+│     Static HTML file:   public/admin/index.html                                                                 │
+│                                                                                                                 │
+│                                                                                                                 │
+├─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+12:08:47 [content] Syncing content
+12:08:47 [content] Synced content
+12:08:47 [types] Generated 530ms
+12:08:47 [check] Getting diagnostics for Astro files in S:\Projetos\academic_page\haroldo...
+Result (72 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+12:08:58 [content] Syncing content
+12:08:58 [content] Synced content
+12:08:58 [types] Generated 604ms
+12:08:58 [build] output: "static"
+12:08:58 [build] mode: "static"
+12:08:58 [build] directory: S:\Projetos\academic_page\haroldo\dist\
+12:08:58 [build] Collecting build info...
+12:08:58 [build] ✓ Completed in 648ms.
+12:08:58 [build] Building static entrypoints...
+12:08:58 [vite] ✓ built in 415ms
+12:08:58 [vite] ✓ built in 94ms
+12:08:58 [build] Rearranging server assets...
+
+ generating static routes 
+12:08:58   ├─ /404.html (+17ms) 
+12:08:58   ├─ /ensino/2025-1-mecanica-classica/index.html (+5ms) 
+12:08:58   ├─ /ensino/2026-2-relatividade-geral/index.html (+141ms) 
+12:08:59   ├─ /ensino/index.html (+8ms) 
+12:08:59   ├─ /pesquisa/index.html (+7ms) 
+12:08:59   ├─ /publicacoes/index.html (+6ms) 
+12:08:59   ├─ /sobre/index.html (+5ms) 
+12:08:59   ├─ /index.html (+4ms) 
+12:08:59 ✓ Completed in 233ms.
+
+12:08:59 [build] ✓ Completed in 827ms.
+12:08:59 [build] 8 page(s) built in 1.49s
+12:08:59 [build] Complete!
+EXIT=0
+```
+
+### Passo 3 — comparador e `dist/404.html`, `comparar.txt`
+
+```text
+IGUAL      404.html
+IGUAL      ensino/2025-1-mecanica-classica/index.html
+IGUAL      ensino/2026-2-relatividade-geral/index.html
+IGUAL      ensino/index.html
+IGUAL      index.html
+IGUAL      pesquisa/index.html
+IGUAL      publicacoes/index.html
+IGUAL      sobre/index.html
+resumo: IGUAL 8 · DIFERENTE 0 · SÓ ANTES 0 · SÓ DEPOIS 0 · IGNORADA 0
+EXIT=0
+
+FullName                                        Length
+--------                                        ------
+S:\Projetos\academic_page\haroldo\dist\404.html   9275
+```
+
+### Passo 4 — grep de `pt` direto e `href` fixo (vazio = `GREP_EXIT=1`), `grep.txt`
+
+```text
+GREP_EXIT=1
+```
+
+### Passo 5 — `npm run lint`, `lint.txt`
+
+```text
+
+> haroldo-page@0.1.0 lint
+> eslint .
+
+EXIT=0
+```
+
+### Passo 5 — `npm run format:check`, `format.txt`
+
+```text
+
+> haroldo-page@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+EXIT=0
+```
+
+### Passo 5 — `npm run test:coverage`, `coverage.txt`
+
+```text
+
+> haroldo-page@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+      Coverage enabled with v8
+
+
+ Test Files  20 passed (20)
+      Tests  355 passed (355)
+   Start at  12:09:06
+   Duration  1.80s (transform 5.34s, setup 0ms, import 9.57s, tests 411ms, environment 4ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 100% ( 295/295 )
+Branches     : 100% ( 148/148 )
+Functions    : 100% ( 79/79 )
+Lines        : 100% ( 263/263 )
+================================================================================
+EXIT=0
+```
+
+### Passo 5 — `npm run test:dist`, `test-dist.txt`
+
+```text
+
+> haroldo-page@0.1.0 test:dist
+> vitest run -c vitest.dist.config.ts
+
+
+ RUN  v4.1.11 S:/Projetos/academic_page/haroldo
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  12:09:09
+   Duration  363ms (transform 63ms, setup 0ms, import 140ms, tests 73ms, environment 0ms)
+
+EXIT=0
+```
+
+### Não rodado
+
+- **Passo 6 (navegador)**: é do orquestrador; não foi rodado porque o executor não tem navegador. Nenhum equivalente foi inventado.
+- `npm audit`, CI do GitHub e Workers Builds: não rodados (fora do escopo do executor).
+
+### Correções do ciclo de revisão
+
+- `AboutView.astro`: citação `(F-08)` trocada por `(RF-21)` na Descrição; `NotFoundView.astro`: Descrição reescrita como "View de `/404` e da 404 de `/en/`".
+- Blocos recapturados: `astro check`, `wc -l`, build "depois", comparador, grep, lint, format, coverage e test:dist.
+
+### Passo 6 — navegador (orquestrador)
+
+2026-09-30, Vivaldi pela extensão, `npx wrangler dev --port 8787` sobre o `dist/` do `triage2`
+(build 12:12:05). Medidas por `<iframe>` com `box-sizing:content-box` (`iw` = `innerWidth`),
+`sw` = `[scrollWidth, clientWidth]` e `v` = `[scrollHeight, clientHeight]` do `documentElement`.
+Saída literal do `javascript_tool`:
+
+```
+/ 360: iw=360 sw=[350,350] v=[1119,800] vt=0 lang=pt-BR
+/ 768: iw=768 sw=[768,768] v=[1000,1000] vt=0 lang=pt-BR
+/ 1440: iw=1440 sw=[1440,1440] v=[800,800] vt=0 lang=pt-BR
+/sobre/ 360: iw=360 sw=[350,350] v=[1494,800] vt=0 lang=pt-BR
+/sobre/ 768: iw=768 sw=[758,758] v=[1001,1000] vt=0 lang=pt-BR
+/sobre/ 1440: iw=1440 sw=[1440,1440] v=[800,800] vt=0 lang=pt-BR
+/rota-inexistente 360: iw=360 sw=[360,360] v=[800,800] vt=0 lang=pt-BR
+/rota-inexistente 768: iw=768 sw=[768,768] v=[1000,1000] vt=0 lang=pt-BR
+/rota-inexistente 1440: iw=1440 sw=[1440,1440] v=[800,800] vt=0 lang=pt-BR
+```
+
+`scrollWidth = clientWidth` em todas as medidas: nenhuma rolagem horizontal. Onde `clientWidth` é
+menor que `iw`, a diferença é a barra de rolagem vertical. A 1440×800, Home e Sobre dão
+`scrollHeight = clientHeight` (800): sem rolagem vertical. (`vt=0` conta um seletor por atributo
+que não se aplica aqui; a transição foi medida abaixo.) `fetch('/rota-inexistente')` deu
+`{"status404":404,"title404":"Página não encontrada — Haroldo Lima Junior"}`.
+
+Transição de página: um ouvinte de `pageswap` foi instalado na página de saída e o link foi
+clicado de verdade. Leitura na página de chegada:
+
+```
+{"here":"/sobre/","swap":"{\"from\":\"/\",\"hasVT\":true,\"to\":\"http://127.0.0.1:8787/sobre/\"}","vt":["nome","menu"]}
+{"here":"/","swap":"{\"from\":\"/sobre/\",\"hasVT\":true}"}
+```
+
+Home → Sobre (link "Sobre" do menu da Home) e Sobre → Home (nome no cabeçalho): as duas navegações
+abriram `viewTransition`, e `.vt-nome`/`.vt-menu` computam `view-transition-name` `nome` e `menu`.

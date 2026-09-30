@@ -1,0 +1,148 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : HomeView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View de `/` e `/en/` (sabatina fase 4, Decisão 6): corpo da
+ *                 Home, sem rolagem a partir de `lg`: nome e navegação no topo,
+ *                 retrato em p&b quando houver `foto` (F-08) e, sob a régua,
+ *                 cargo, instituição, `resumo_home`, contato, formação e áreas.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-09-30
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : BaseLayout, ExternalLink, src/lib/config.ts (siteConfig, `Locale`),
+ *                 src/lib/profile.ts, src/lib/navigation.ts, src/i18n/index.ts (strings),
+ *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
+ *  Entradas     : prop `lang` (obrigatória); coleção `perfil` (singleton)
+ *  Saídas       : HTML estático do corpo da Home
+ *  Uso          : <HomeView lang="pt" /> em `src/pages/index.astro`
+ *
+ *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
+ *                 sem fallback por campo aqui (plano 065).
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { strings } from '../i18n';
+import { siteConfig, type Locale } from '../lib/config';
+import { navItems as navItemsFor } from '../lib/navigation';
+import { profileLinks } from '../lib/profile';
+import { requireSingleton } from '../lib/published';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang);
+
+// `perfil` é singleton (plano 039): `requireSingleton` estoura se o painel não tiver exatamente 1 item.
+const perfil = requireSingleton(await getCollection('perfil'), 'perfil').data;
+
+const formacao = perfil.formacao ?? [];
+const areas = perfil.areas ?? [];
+// Mesmo contato da Sobre: e-mail e perfis acadêmicos na ordem fixa do schema, CV por último.
+const links = profileLinks(perfil.links, perfil.cv_url, t.about.links);
+// A Home não lista a si mesma no menu.
+const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
+---
+
+<BaseLayout title={undefined} bare>
+  <section
+    aria-labelledby="home-nome"
+    class="px-margem flex min-h-0 flex-1 flex-col pt-5 pb-6 lg:pt-7 lg:pb-7"
+  >
+    <div class="grid gap-x-8 gap-y-4 lg:grid-cols-12">
+      <h1 id="home-nome" class="vt-nome text-display-1 titulo-entrada lg:col-span-6">
+        {siteConfig.displayName}
+      </h1>
+      <nav aria-label={t.site.mainNavLabel} class="vt-menu lg:col-span-6 lg:col-start-7 lg:pt-3">
+        <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
+          {
+            navItems.map((item) => (
+              <li>
+                <a href={item.href} class="link-traco">
+                  {t.nav[item.key]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <div
+      class="mt-10 grid min-h-0 flex-1 items-end lg:grid-cols-12 lg:grid-rows-[minmax(0,1fr)] lg:gap-x-8"
+    >
+      {
+        perfil.foto && (
+          <img
+            src={perfil.foto}
+            alt={t.site.portraitAlt(siteConfig.displayName)}
+            width="960"
+            height="1280"
+            fetchpriority="high"
+            decoding="async"
+            class="aspect-[3/4] w-36 object-cover grayscale sm:w-44 lg:col-span-3 lg:col-start-7 lg:h-full lg:max-h-[24rem] lg:w-auto"
+          />
+        )
+      }
+    </div>
+
+    <div aria-hidden="true" class="regua-entrada bg-tinta mt-6 h-px"></div>
+
+    <div class="text-pequeno grid gap-x-8 gap-y-6 pt-4 sm:grid-cols-2 lg:grid-cols-12">
+      <div class="space-y-3 sm:col-span-2 lg:col-span-6">
+        <div class="text-secundario">
+          <p>{perfil.cargo}</p>
+          {perfil.departamento && <p>{perfil.departamento}</p>}
+          <p>{perfil.instituicao}</p>
+        </div>
+        <p class="max-w-[24rem]">{perfil.resumo_home}</p>
+        <div>
+          <h2 class="text-secundario">{t.about.contact}</h2>
+          <p class="mt-1 flex flex-wrap gap-x-5 gap-y-1">
+            <a href={`mailto:${perfil.email}`} class="link-traco">{perfil.email}</a>
+            {
+              links.map((link) => (
+                <ExternalLink href={link.href} class="link-traco">
+                  {link.label}
+                </ExternalLink>
+              ))
+            }
+          </p>
+        </div>
+      </div>
+      {
+        formacao.length > 0 && (
+          <div class="lg:col-span-3">
+            <h2 class="text-secundario">{t.about.education}</h2>
+            <ul class="mt-1">
+              {formacao.map((item) => (
+                <li>
+                  {item.ano} · {item.grau} — {item.curso}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+      {
+        areas.length > 0 && (
+          <div class="lg:col-span-3">
+            <h2 class="text-secundario">{t.about.areas}</h2>
+            <ul class="mt-1">
+              {areas.map((area) => (
+                <li>{area.nome}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
