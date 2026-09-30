@@ -8,13 +8,14 @@
  *                 branco, passo declarado "NÃO rodei" com seção preenchida,
  *                 `Status:` fora do vocabulário, texto de preenchimento do
  *                 fatiamento esquecido. Avisa, ainda, quando a promoção em
- *                 curso não toca `PRD.md` e `plans/README.md` — os dois da
- *                 convenção que têm caminho fixo (o plano e o README da fase
- *                 variam, e por isso não são conferidos aqui).
+ *                 curso não toca `PRD.md`, `plans/README.md` e
+ *                 `docs/historico-de-implementacao.md` — os três da convenção
+ *                 que têm caminho fixo (o plano e o README da fase variam, e
+ *                 por isso não são conferidos aqui).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-18
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-09-30
+ *  Versão       : 0.2.0
  *
  *  Dependências : node:fs, node:child_process, node:process, node:console
  *  Entradas     : caminho de um arquivo `plans/**\/NNN-*.md`
@@ -36,8 +37,12 @@ import { execFileSync } from 'node:child_process';
 import process from 'node:process';
 import console from 'node:console';
 
-/** Arquivos que o commit de promoção a DONE tem de tocar, por convenção do projeto. */
-const ARQUIVOS_DA_PROMOCAO = ['PRD.md', 'plans/README.md'];
+/**
+ * Arquivos que o commit de promoção a DONE tem de tocar, por convenção do projeto (plans/README.md,
+ * "Promoção de plano e o topo do PRD"). O PRD continua na lista mesmo sem subir versão: a linha da
+ * fase no "Estado da implementação" muda a cada plano.
+ */
+const ARQUIVOS_DA_PROMOCAO = ['PRD.md', 'plans/README.md', 'docs/historico-de-implementacao.md'];
 
 /**
  * Executa um comando git e devolve a saída, ou `null` se o comando falhar (ex.: fora de um
@@ -145,7 +150,7 @@ function conferir(caminho) {
     if (promocaoEmCurso && faltando.length > 0) {
       avisos.push(
         `promoção a DONE normalmente toca também: ${faltando.join(', ')} ` +
-          `(ver plans/README.md, "O topo do PRD tem de refletir a realidade")`,
+          `(ver plans/README.md, "Promoção de plano e o topo do PRD")`,
       );
     }
   }

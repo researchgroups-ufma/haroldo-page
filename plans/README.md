@@ -4,10 +4,7 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-09-30 (fase 4: **057 DONE** em `82a7947`, fechando o item "Dicionários" do
-§12, **058 DONE** em `0583324` e **059 DONE** em `102c8a8` e **060 DONE** em `122df25` (fecha o item do grupo `en` do perfil, 2/9), e em 2026-09-29 **061 DONE** em `835f188` (fecha o item do fallback por campo, 3/9), e em 2026-09-30 **062 DONE** em `156b130` (views de Home, Sobre e 404, sem fechar item do §12) e **063 DONE** em `a4a2f75` (views de Pesquisa e Ensino) e **064 DONE** em `98d1014` (views de Disciplina e Publicações); próximo, o 065. Em 2026-09-25, 055 e 056 DONE, promovidos em `53c057b`.
-Em 2026-09-24 a fase foi fatiada em 19 planos, 055–073; antes, o redesenho e o polimento do site
-público integrados à `main` em `00fdef9` — ver a seção abaixo)
+Última atualização: 2026-09-30 — **064 DONE** (`98d1014`); próximo, o 065. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../docs/historico-de-implementacao.md), §4.1.
 
 ## Fases
 
@@ -15,9 +12,9 @@ público integrados à `main` em `00fdef9` — ver a seção abaixo)
 |---|---|---|---|
 | [`fase-0-setup-e-provisionamento/`](fase-0-setup-e-provisionamento/README.md) | 0 — Setup e provisionamento | 🟢 **Concluída** | 001–014, todos DONE |
 | [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–022, todos DONE — o 021 promovido em `7d5b7e6`, com CI verde sobre `26de58a` |
-| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟢 **Concluída (5/5)** | 023, 024, 025, 026, 030 e 031 DONE — o pipeline publica sozinho desde `ab0d1f8`, desde `7ab84da` está provado que o `/admin` em produção é quem origina o push, e desde `4343e42`/`1de5d1d` conteúdo inválido e `tina-lock.json` defasado reprovam no CI e no build de deploy. o **033** fechou em `0c2bd02` e o **032** em `b992282`, os dois com os pipelines verdes — o CI passa a auditar dependências, reprovando em `high`/`critical`. O **028** fechou em `5528ad6`: falha do build de deploy chega ao ADMIN por um vigia agendado no GitHub Actions (ADR-0011), com uma pendência nomeada. **O 034 documentou o pipeline no README e fechou o checklist da fase em 5/5** — promovido a DONE, trabalho em `ef7f258`, com CI e Workers Builds verdes |
-| [`fase-3-site-publico/`](fase-3-site-publico/README.md) | 3 — Site público em português | 🟢 **Concluída (12/12)** | **fatiada em 2026-09-14** em 18 planos, **036–053**, mais o **054** (teste de citações do PRD, acrescentado e **DONE** em 2026-09-18, `23a003d` — portão de qualidade, não fecha item do §12). O 054 entregou a camada de **existência** — toda citação de identificador do PRD em `src/**` é conferida contra a fonte — e **refutou por medição** a camada de pertinência que ele próprio propunha: 32 das 236 citações reais pontuam zero na sobreposição de vocabulário, entre elas um `// RN-01` sozinho numa linha, de modo que nenhum limiar escalar separa citação certa de citação trocada. A questão que sobrou é do dono do produto: `F-08` é "Imagem ausente" no `PRD.md:298` e "Campo vazio não deixa rastro" no `docs/identidade-visual.md:32`. **18/18 DONE:** 036 (`fb117b6`), 037 (`23d1aa0`), 038 (`1d0d3a5`), 039 (`5705e73`), 040 (`6bf5aa4`), 041 (`a2e28b7`), 042 (`db96df3`), 043 (`dfdc0a3`), 044 (`4e48ce5`), 045 (`369637a`), 046 (`97e006d`), 047 (`4d90d92`), 048 (`5eaf30e`), 049 (`1a028ce`), 050 (`5b97655`), 051 (`8c6821c`), 052 (`9af755e`), 053 (`876d89c`). O 043 fecha, com o 036, o item "Identidade visual aplicada" do §12 — em 2026-09-17, quando fechou, nenhuma rota ainda usava os componentes; o 053 conferiu rota a rota sobre o `dist/` do triage e confirmou a assinatura do `PageHeader` (ou markup equivalente, na Home) nas 8 rotas. O **044** fechou o item "Home (RF-20)" do §12 e é a primeira rota com conteúdo real do professor. O **045** fechou o item "Sobre (RF-21)" do §12 e é a segunda rota de conteúdo real — biografia, formação na ordem do professor, áreas, contato e perfis acadêmicos, com cada bloco sem dado sumindo junto com a rubrica (RF-21). O **046** fechou o item "Pesquisa (RF-22)" do §12 e é a primeira rota com **componente extraído** (`ProjectCard.astro`), a primeira da onda a ficar abaixo do alvo de 150 linhas do §10.4. O **047** fechou o item "Ensino (RF-23)" do §12: os dois grupos sempre rotulados, "Atuais" antes de "Anteriores", com o estado vazio provado por falsificação — com `current = []` a caixa tracejada aparece e o `<h2>` "Atuais" **permanece**, que é o que o RF-23 exige. O **048** fechou o item "Página de disciplina (RF-24)" do §12 e é a **primeira rota dinâmica** da fase (`getStaticPaths`, uma página por disciplina publicada): trilha, cabeçalho com tags e "Nesta página", ementa, aulas na ordem do professor (RN-04), listas, materiais, bibliografia e links, com estado vazio explícito quando não há aula (F-06). Foi o primeiro plano da fase a **exigir dois ciclos de revisão**, e o segundo obrigatório do ciclo 1 gerou uma decisão de orquestração: autorizar um canário que toca `content/` — fora da lista de "Arquivos afetados" — para provar por comportamento que rascunho não gera página. O **049** fechou o item "Scripts da disciplina" (RF-37, F-13) do §12: destaque de sintaxe gerado no build pelo `<Code>` do Astro num tema de três tons de cinza, botão "Copiar código" como melhoria progressiva que anuncia "Copiado" por `aria-live`, e scripts sob a aula correspondente, com os órfãos numa seção geral — provado por canário com `aula: 99` em `content/`. O **050** fechou o item "Publicações agrupadas por ano" (RF-25) do §12: blocos por ano em ordem decrescente, o nome do professor destacado por cor e `<strong>`, links DOI/arXiv/PDF só quando preenchidos (F-05) e resumo recolhido em `<details>`. O **051** fechou o item "Página 404" (RF-27) do §12 e quitou a dívida da fase 2 do `not_found_handling`: em produção a rota inexistente responde `404` com o corpo byte a byte igual ao `dist/404.html` (versão `19c88528` do Worker), onde antes vinha `Content-Length: 0`. O **052** põe um teste Vitest sobre o `dist/` gerado (`npm run test:dist`, no CI depois do `build:pipeline`): rotas, rascunho ausente de todo HTML, um `<h1>` e `lang` por página, nenhuma fonte de terceiro e JS < 50 KB gzip por rota (hoje 259 a 606 bytes). Não fecha item do §12 sozinho. Execução um plano por vez; o **053** (verificação transversal e fechamento da fase) mediu as 8 rotas × 3 larguras sem rolagem horizontal (RF-26), confirmou o movimento e o texto visível sem CSS em `no-preference` (RF-32), corrigiu os comentários das dívidas 7(b) e 7(c), e levou o §12 do PRD a 12/12 — promovido a DONE, trabalho em `876d89c`, com CI e Workers Builds verdes. A Q-04 foi respondida e adaptada ao projeto em [`docs/identidade-visual.md`](../docs/identidade-visual.md), fonte única do visual, com os recortes da sabatina `identidade-visual`. A Q-RN02 (ordem dentro do ano em Publicações) foi respondida em 2026-09-14 com a opção (c) e não bloqueia mais nenhum plano |
-| [`fase-4-internacionalizacao/`](fase-4-internacionalizacao/README.md) | 4 — Internacionalização | 🟡 **Em andamento** (3/9 no §12) — sabatinada em 2026-09-24 ([`CHANGELOG_sabatina_fase-4-i18n.md`](../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md), 12 decisões) e **fatiada** na mesma data | **055–073** (19 planos); **055 e 056 DONE** em 2026-09-25 (`0ebf8ed`, `d44a874`); **057 DONE** em 2026-09-28 (`82a7947`, inglês aprovado pelo stakeholder); **058 DONE** no mesmo dia (`0583324`); **059 DONE** no mesmo dia (`102c8a8`); **060 DONE** no mesmo dia (`122df25`); **061 DONE** em 2026-09-29 (`835f188`); **062 DONE** em 2026-09-30 (`156b130`); **063 DONE** no mesmo dia (`a4a2f75`); **064 DONE** no mesmo dia (`98d1014`); o **065** é o próximo. As duas questões levantadas no fatiamento foram respondidas na mesma data (Decisões 13 e 14 da sabatina, PRD v0.1.59): texto em português sem campo em inglês recebe `lang="pt-BR"` sem ligar o aviso, e o 071 pode parear o sitemap por `serialize`. Nenhum plano bloqueado |
+| [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟢 **Concluída (5/5)** | 023–035, todos DONE (o 027 e o 029 migraram para a fase 5) |
+| [`fase-3-site-publico/`](fase-3-site-publico/README.md) | 3 — Site público em português | 🟢 **Concluída (12/12)** | 036–054, todos DONE |
+| [`fase-4-internacionalizacao/`](fase-4-internacionalizacao/README.md) | 4 — Internacionalização | 🟡 **Em andamento** (3/9 no §12) — sabatinada e fatiada em 2026-09-24 ([`CHANGELOG_sabatina_fase-4-i18n.md`](../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md)) | 055–074; DONE: 055–064; próximo, o **065** |
 | [`fase-5-polimento-e-entrega/`](fase-5-polimento-e-entrega/README.md) | 5 — Polimento e entrega | ⬜ Não iniciada | não fatiada; já contém os planos **027** e **029**, migrados da fase 2 em 2026-09-12 |
 
 A ordem do roadmap **não** é 0→1→2→3→4→5 linear: a fase 2 vem antes do site público de
@@ -122,20 +119,42 @@ ela em 2026-09-10, e **mudaram de pasta em 2026-09-12** sem mudar de número, po
 checklist que eles fecham: os itens correspondentes do §12 migraram para a fase 5 junto. É a regra
 "onde cada plano vai" sendo aplicada depois do fatiamento, não uma exceção a ela.
 
-## O topo do PRD tem de refletir a realidade
+**Terceira exceção registrada — planos transversais.** Plano que não fecha item do §12 fica na pasta da fase em curso quando foi escrito: o 054 (teste de citações do PRD) na fase 3 e o 074 (enxugar o PRD) na fase 4.
 
-Ao fechar um plano, uma fase ou qualquer marco, **atualize o cabeçalho §0 do `PRD.md` junto**:
-o `Status` do documento, a linha `Estado da implementação`, a `Última atualização`, a
-`Versão do PRD` e a linha correspondente no histórico §0.1.
+## Promoção de plano e o topo do PRD
 
-É o arquivo que responde "onde estamos" para quem chega sem contexto, e um topo desatualizado
-faz o documento mentir justamente para essa pessoa. Durante toda a fase 0 ele ficou em
-`🟡 Rascunho` com `Versão do PRD: v0.1`, enquanto o histórico já ia na v0.1.7.
+O `PRD.md` responde "onde estamos" para quem chega sem contexto; como se chegou lá fica em
+[`docs/historico-de-implementacao.md`](../docs/historico-de-implementacao.md). Convenção em vigor
+desde 2026-09-30 (sabatina
+[`CHANGELOG_sabatina_enxugar-prd.md`](../docs/sabatinas/CHANGELOG_sabatina_enxugar-prd.md), plano
+074).
 
-O vocabulário do `Status` vem do `PRD_TEMPLATE.md` e é **fechado**:
-`🟡 Rascunho · 🔵 Em revisão · 🟢 Aprovado · ⚫ Arquivado`. O progresso da implementação **não**
-vai nele — vai na linha `Estado da implementação`, que resume fase a fase e aponta para a §12
-(detalhe por item) e para este índice (execução).
+A promoção a DONE são dois commits: o de trabalho (`<tipo>: … (plano NNN)`, com tipo da lista da
+casa e o `Status:` ainda `TODO`) e o de promoção (`docs: NNN DONE -- …`). O hash citado nos índices
+e no §12 é o do commit de trabalho. O commit de promoção toca:
+
+1. o plano — `Status: DONE` e a Evidência completa;
+2. o README da fase — a linha do plano na tabela (`Status` e `Commits`) e a `Última atualização`,
+   que guarda **só o último evento** (substitui, não acumula);
+3. este arquivo — a `Última atualização` (só o último evento) e a célula da fase na tabela acima
+   (faixa de planos, DONE, próximo);
+4. `docs/historico-de-implementacao.md` — uma entrada nova no fim da §5: data, plano, hash e de uma a
+   três frases;
+5. o `PRD.md` — a linha da fase no `Estado da implementação` e a `Última atualização`; se o plano
+   fechar item do §12, também a caixa (`- [x] item — plano **NNN** (`hash`)`) e a contagem da tabela
+   de progresso.
+
+A promoção **não** sobe a `Versão do PRD` nem acrescenta linha no §0.1. A versão sobe, com uma linha
+de até 150 caracteres no §0.1, quando muda texto de §1–§11, §13–§17 ou dos apêndices, quando muda o
+`Status` do documento, ou quando uma sabatina, um recorte ou o fechamento de uma fase muda escopo,
+fase ou convenção. `node scripts/verificar-promocao.mjs <plano>` avisa quando a promoção não toca os
+três arquivos de caminho fixo: `PRD.md`, este e o histórico.
+
+O vocabulário do `Status` do PRD vem do `PRD_TEMPLATE.md` e é **fechado**:
+`🟡 Rascunho · 🔵 Em revisão · 🟢 Aprovado · ⚫ Arquivado`. O progresso da implementação **não** vai
+nele — vai no `Estado da implementação`. Durante toda a fase 0 ele ficou em `🟡 Rascunho` com
+`Versão do PRD: v0.1`, enquanto o histórico já ia na v0.1.7: topo desatualizado faz o documento mentir
+justamente para quem mais depende dele.
 
 ## Fluxo
 

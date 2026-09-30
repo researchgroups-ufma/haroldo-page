@@ -5,21 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-30 — **064 DONE** (`98d1014`, dois ciclos de revisão, o segundo por BOM colado na Evidência; escopo ampliado pelo stakeholder com `src/scripts/course-tabs.ts`, porque o `<script>` dentro do `CourseTabs` saía antes dos painéis; abas e sanfona comparadas à linha de base no navegador pelo orquestrador; não fecha item do §12, 3/9). Próximo: 065. Antes, no mesmo dia — **063 DONE** (`a4a2f75`, três ciclos de revisão: `ResearchView.astro` com BOM e mojibake por `Set-Content` do PowerShell 5.1, depois uma frase da Evidência; réguas e links no navegador pelo orquestrador; não fecha item do §12, 3/9). Próximo: 064. Antes, no mesmo dia — **062 DONE** (`156b130`, um ciclo de revisão por citação de F-08 no cabeçalho da `AboutView`; antes, `8e74700` subiu o `wrangler` para 4.145.0 pelo `npm audit`; navegador pelo orquestrador; não fecha item do §12, 3/9). Próximo: 063. Antes, em 2026-09-29 — **061 DONE** (`835f188`, um ciclo de revisão; antes, `e918303` atualizou o `fast-uri` no lock pelo `npm audit`; fecha o item do fallback por campo, 3/9). Próximo: 062. Antes, em 2026-09-28 — **060 DONE** (`122df25`, quatro ciclos de revisão, todos por texto; a
-reordenação no painel foi feita à mão pelo stakeholder, porque a extensão não arrasta a lista do Tina;
-fecha o item do grupo `en` do perfil, 2/9). Próximo: 061. Antes, no mesmo dia — **059 DONE** (`102c8a8`, dois ciclos de revisão, hover e larguras
-conferidos no navegador pelo orquestrador). Antes, no mesmo dia — **058 DONE** (`0583324`, dois ciclos de revisão; o escopo ganhou
-`tests/i18n/pt.test.ts` por autorização do orquestrador, porque o teste do 057 lia o
-`siteConfig.description` que o 058 removeu). Depois dele, o 059. Antes, no mesmo dia — **057 DONE** (`82a7947`, de volta ao setup da casa: implementer,
-triage e `code-reviewer`, três ciclos de revisão; inglês aprovado pelo stakeholder na nomenclatura
-de davidtong.org; CI e Workers Builds verdes). Fecha o item "Dicionários" do §12 (1/9). Próximo: 058.
-Antes, 2026-09-25 — **055 e 056 DONE** (trabalho em `0ebf8ed` e `d44a874`,
-executados em modo de teste com `superpowers:executing-plans`, depois triage e `code-reviewer` da
-casa; CI e Workers Builds verdes em `48b9a4f`). Antes, 2026-09-24: fase fatiada em 19 planos (**055–073**), a partir do PRD v0.1.58 e
-da sabatina [`CHANGELOG_sabatina_fase-4-i18n.md`](../../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md)
-(12 decisões; a 1 e a 2 substituídas pela 3). No mesmo dia, as duas questões abertas pelo fatiamento
-foram respondidas (Decisões 13 e 14, PRD v0.1.59) e incorporadas aos planos 061, 065, 066, 067, 071,
-072 e 073.
+Última atualização: 2026-09-30 — **064 DONE** (`98d1014`, não fecha item do §12, 3/9). Próximo: 065. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -142,6 +128,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 071 | Sitemap bilíngue com `@astrojs/sitemap` (RF-30, Decisão 10) | ⬜ TODO (ramo `serialize` autorizado, Decisão 14) | agente | implementer (sonnet) | — |
 | 072 | Testes i18n sobre o `dist/`: par EN de toda rota PT e M-07 (Decisão 12) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 073 | Verificação transversal e fechamento da fase 4 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
+| 074 | Enxugar o PRD: histórico de implementação em documento próprio | ⬜ TODO | orquestrador | nenhum (+ `code-reviewer`) | — |
 
 **Numeração é global e contínua e não é ordem de execução.** A ordem está abaixo.
 
@@ -190,6 +177,8 @@ Execução **um plano por vez**, com confirmação do usuário antes de cada um 
 Ordem sugerida: **055 → 056 → 057 → 058 → 059 → 060 → 061 → 062 → 063 → 064 → 065 → 066 → 067 → 068
 → 069 → 070 → 071 → 072 → 073.** A revisão do inglês pelo stakeholder (057) é um portão de DONE, não
 de início: enquanto ela não sai, 060 e 061 podem ser executados, porque não dependem do `en.ts`.
+
+**Intercalado em 2026-09-30:** o **074** (enxugar o PRD, só documentos e o `scripts/verificar-promocao.mjs`) roda entre o 064 e o 065. Não depende de nenhum plano da fase e não é pré-requisito de nenhum.
 
 **Entre o 065 e o 068 a árvore `/en` fica incompleta** (a Home em inglês aponta para rotas que ainda
 não existem), e **até o 069 ela não tem link de entrada** vindo das páginas PT. Aceito no fatiamento:

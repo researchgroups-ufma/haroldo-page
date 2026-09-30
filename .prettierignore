@@ -5,6 +5,8 @@ coverage/
 package-lock.json
 PRD.md
 PRD_TEMPLATE.md
+# Texto movido do PRD sem reescrita (plano 074): formatar quebraria a identidade com a origem.
+docs/historico-de-implementacao.md
 briefing.md
 plans/
 .firecrawl/

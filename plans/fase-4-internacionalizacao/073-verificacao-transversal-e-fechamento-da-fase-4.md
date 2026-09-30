@@ -56,8 +56,8 @@ aviso (Decisão 13).
 **Seletor em todas as rotas (passo 5):** de cada rota PT, o seletor leva à EN correspondente e volta
 (ida e volta nas 8 rotas); a transição entre páginas não aborta.
 
-**§0 do PRD:** vocabulário fechado do `Status` (`plans/README.md`, "O topo do PRD tem de refletir a
-realidade"); o progresso vai na linha "Estado da implementação". A tabela "Progresso Geral" do §12
+**§0 do PRD:** vocabulário fechado do `Status` (`plans/README.md`, "Promoção de plano e o topo do
+PRD"); o progresso vai na linha "Estado da implementação". A tabela "Progresso Geral" do §12
 passa a "Fase 4 — 9/9 — 🟢 Concluída".
 
 **"O que a fase 4 empurra adiante"** (no README da fase, padrão do README da fase 3): no mínimo — o
