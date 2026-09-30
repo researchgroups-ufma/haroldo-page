@@ -1,6 +1,6 @@
 # Plano 062 — Views: Home, Sobre e 404
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** sabatina fase 4, Decisão 6 (página fina + view); §10.4 (componentes < 150 linhas); RF-20, RF-21, RF-27 sem mudança de comportamento
 **Depende de:** planos 055 (comparador), 056 (`routePath`, `navItems`), 058 e 059 (dicionário por caminho), 060 (`areas[].nome`)
 **Modelo recomendado:** sonnet
@@ -406,3 +406,25 @@ clicado de verdade. Leitura na página de chegada:
 
 Home → Sobre (link "Sobre" do menu da Home) e Sobre → Home (nome no cabeçalho): as duas navegações
 abriram `viewTransition`, e `.vt-nome`/`.vt-menu` computam `view-transition-name` `nome` e `menu`.
+
+### Verificação autoritativa e CI (orquestrador)
+
+Segunda rodada do `triage-runner`, em 2026-09-30, depois da correção do ciclo de revisão e do commit
+`8e74700` (`wrangler` 4.145.0 e `brace-expansion`/`undici` no lock, para os avisos `high` do `npm audit`,
+sem relação com este plano). A primeira rodada reprovou só no `audit`. Revisão: APROVADO no ciclo 2.
+
+```
+audit.txt:EXIT=0
+build.txt:EXIT=0
+coverage.txt:EXIT=0
+format.txt:EXIT=0
+lint.txt:EXIT=0
+test-dist.txt:EXIT=0
+```
+
+Check-runs do commit de trabalho `156b130`, empurrado:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+```
