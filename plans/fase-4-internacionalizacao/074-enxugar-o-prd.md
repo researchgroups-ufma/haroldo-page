@@ -1,6 +1,6 @@
 # Plano 074 — Enxugar o PRD: histórico de implementação em documento próprio
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** nenhum — documentação e convenção de promoção. Sabatina "enxugar o PRD", Decisões 1 a 4 (`docs/sabatinas/CHANGELOG_sabatina_enxugar-prd.md`, PRD v0.1.69)
 **Depende de:** nada; intercalado entre o 064 e o 065, sem ser pré-requisito de nenhum plano
 **Modelo recomendado:** —
@@ -581,3 +581,14 @@ verdade é a da promoção, na qual ele deve **avisar** que o `PRD.md` não foi 
 plano, porque ele é intercalado: o "próximo" continua sendo o 065 e a data não muda. Não é defeito da
 convenção. As memórias fora do repositório (lista em "Arquivos afetados") são atualizadas pelo
 orquestrador depois da promoção.
+
+### Passo 7 — revisão e CI (orquestrador)
+
+Revisão pelo `code-reviewer`: REPROVADO no ciclo 1, com quatro obrigatórios (ver "Ciclo 2", no topo
+desta Evidência), e APROVADO no ciclo 2, sem obrigatório. Check-runs do commit de trabalho `ccf60ed`,
+empurrado:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+```

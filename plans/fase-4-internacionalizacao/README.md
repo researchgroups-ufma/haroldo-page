@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-30 — **064 DONE** (`98d1014`, não fecha item do §12, 3/9). Próximo: 065. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
+Última atualização: 2026-09-30 — **074 DONE** (`ccf60ed`, PRD enxuto e histórico em documento próprio; não fecha item do §12, 3/9). Próximo: 065. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -128,7 +128,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 071 | Sitemap bilíngue com `@astrojs/sitemap` (RF-30, Decisão 10) | ⬜ TODO (ramo `serialize` autorizado, Decisão 14) | agente | implementer (sonnet) | — |
 | 072 | Testes i18n sobre o `dist/`: par EN de toda rota PT e M-07 (Decisão 12) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 073 | Verificação transversal e fechamento da fase 4 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
-| 074 | Enxugar o PRD: histórico de implementação em documento próprio | ⬜ TODO | orquestrador | nenhum (+ `code-reviewer`) | — |
+| 074 | Enxugar o PRD: histórico de implementação em documento próprio | 🟢 DONE | orquestrador | nenhum (+ `code-reviewer`) | `ccf60ed` |
 
 **Numeração é global e contínua e não é ordem de execução.** A ordem está abaixo.
 

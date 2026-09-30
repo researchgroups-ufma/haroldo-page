@@ -219,3 +219,7 @@ foram respondidas (Decisões 13 e 14, PRD v0.1.59) e incorporadas aos planos 061
 ## 5. Registro de promoções
 
 Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta seção: data, plano, hash do commit de trabalho e de uma a três frases.
+
+- **2026-09-30 — 074 DONE** (`ccf60ed`): o PRD passa de 204 KB a 92 KB — histórico do §0.1, célula de
+  estado e anotações do §12 movidos sem reescrita para este arquivo (prova de identidade na Evidência do
+  plano). Plano DONE deixa de subir a versão do PRD. Dois ciclos de revisão; não fecha item do §12.
