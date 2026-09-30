@@ -82,6 +82,12 @@ Nenhum agente herda o contexto do orquestrador; todos leem arquivo barato.
     corrompidos (`AcadÃªmico`), e nem o comparador, nem o lint, nem o prettier viram, porque o
     estrago estava só em comentários. Edite com a ferramenta de edição. Ao final, confira os
     arquivos tocados com `file` (sem "with BOM") e `grep -c 'Ã\|â€\|Â'` (zero).
+22. **Os `.txt` capturados pelo PowerShell saem com BOM; o plano não pode sair.** No plano 064 o
+    script de inserção colou o conteúdo como estava, e cada bloco da Evidência ganhou um U+FEFF
+    invisível no início (10 no arquivo), o que custou um ciclo de revisão. O script que insere os
+    blocos tira o BOM ao ler o `.txt` (em Python, `encoding='utf-8-sig'`), e o verificador de
+    fidelidade faz o mesmo ao comparar. Ao final, `grep -o $'\xEF\xBB\xBF' <plano> | wc -l` tem de
+    dar `0`; cole essa saída na Evidência.
 
 ### Regras de código da fase 3
 
