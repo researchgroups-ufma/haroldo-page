@@ -1,6 +1,6 @@
 # Plano 063 — Views: Pesquisa e Ensino
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** sabatina fase 4, Decisão 6; §10.4; RF-22, RF-13, RF-23 sem mudança de comportamento; menor adiado do polimento (linha de projeto duplicada)
 **Depende de:** planos 055, 056, 058, 059
 **Modelo recomendado:** sonnet
@@ -431,4 +431,26 @@ atual "Relatividade Geral" -> /ensino/2026-2-relatividade-geral/ 200 h1="Relativ
 anterior "2025.1Mecânica Clássica›" -> /ensino/2025-1-mecanica-classica/ 200 h1="Mecânica Clássica"
 click=312,334
 /ensino/2026-2-relatividade-geral/ h1="Relatividade Geral"
+```
+
+### Verificação autoritativa e CI (orquestrador)
+
+Segunda rodada do `triage-runner`, em 2026-09-30, depois do ciclo 1 de correção (codificação do
+`ResearchView.astro`). O ciclo 2 mudou só uma frase do plano, que está no `.prettierignore`.
+Revisão: APROVADO no ciclo 3.
+
+```
+audit.txt:EXIT=0
+build.txt:EXIT=0
+coverage.txt:EXIT=0
+format.txt:EXIT=0
+lint.txt:EXIT=0
+test-dist.txt:EXIT=0
+```
+
+Check-runs do commit de trabalho `a4a2f75`, empurrado:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
 ```

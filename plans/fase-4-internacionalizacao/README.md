@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-30 — **062 DONE** (`156b130`, um ciclo de revisão por citação de F-08 no cabeçalho da `AboutView`; antes, `8e74700` subiu o `wrangler` para 4.145.0 pelo `npm audit`; navegador pelo orquestrador; não fecha item do §12, 3/9). Próximo: 063. Antes, em 2026-09-29 — **061 DONE** (`835f188`, um ciclo de revisão; antes, `e918303` atualizou o `fast-uri` no lock pelo `npm audit`; fecha o item do fallback por campo, 3/9). Próximo: 062. Antes, em 2026-09-28 — **060 DONE** (`122df25`, quatro ciclos de revisão, todos por texto; a
+Última atualização: 2026-09-30 — **063 DONE** (`a4a2f75`, três ciclos de revisão: `ResearchView.astro` com BOM e mojibake por `Set-Content` do PowerShell 5.1, depois uma frase da Evidência; réguas e links no navegador pelo orquestrador; não fecha item do §12, 3/9). Próximo: 064. Antes, no mesmo dia — **062 DONE** (`156b130`, um ciclo de revisão por citação de F-08 no cabeçalho da `AboutView`; antes, `8e74700` subiu o `wrangler` para 4.145.0 pelo `npm audit`; navegador pelo orquestrador; não fecha item do §12, 3/9). Próximo: 063. Antes, em 2026-09-29 — **061 DONE** (`835f188`, um ciclo de revisão; antes, `e918303` atualizou o `fast-uri` no lock pelo `npm audit`; fecha o item do fallback por campo, 3/9). Próximo: 062. Antes, em 2026-09-28 — **060 DONE** (`122df25`, quatro ciclos de revisão, todos por texto; a
 reordenação no painel foi feita à mão pelo stakeholder, porque a extensão não arrasta a lista do Tina;
 fecha o item do grupo `en` do perfil, 2/9). Próximo: 061. Antes, no mesmo dia — **059 DONE** (`102c8a8`, dois ciclos de revisão, hover e larguras
 conferidos no navegador pelo orquestrador). Antes, no mesmo dia — **058 DONE** (`0583324`, dois ciclos de revisão; o escopo ganhou
@@ -131,7 +131,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 060 | Tradução dentro do item: `formacao[]`, `atuacao[]` e `areas[]` (Decisões 7 e 8) | 🟢 DONE | agente + orquestrador (painel e cloud check) | implementer (sonnet) | `122df25` |
 | 061 | Fallback por campo (RN-06) | 🟢 DONE | agente | implementer (sonnet) | `835f188` |
 | 062 | Views: Home, Sobre e 404 | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `156b130` |
-| 063 | Views: Pesquisa e Ensino | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
+| 063 | Views: Pesquisa e Ensino | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `a4a2f75` |
 | 064 | Views: Disciplina e Publicações | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 065 | `/en/` e `/en/about/`, com o aviso de idioma (F-07) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 066 | `/en/research/` e `/en/publications/` | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
