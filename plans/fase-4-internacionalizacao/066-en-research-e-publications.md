@@ -1,6 +1,6 @@
 # Plano 066 — `/en/research/` e `/en/publications/`
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-28**, RF-22, RF-13, RF-25, RN-01, RN-02, RN-06, RN-07, **F-07**, RF-26; sabatina fase 4, Decisões 4, 6, 13 e 15
 **Depende de:** planos 065 (aviso, `LangText`, testes de `dist` por idioma), 063 (`ResearchView`, `ProjectItem`), 064 (`PublicationsView`)
 **Modelo recomendado:** sonnet

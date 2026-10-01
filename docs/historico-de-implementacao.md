@@ -227,3 +227,7 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
 - **2026-10-01 — 065 DONE** (`d96c659`): `/en/` e `/en/about/` servidos, com o perfil resolvido campo a campo e
   `lang="pt-BR"` no que ficou em português; rotas PT idênticas pelo comparador. O aviso F-07 fazia a Sobre EN
   rolar a 1366×650, e o stakeholder o tirou só da Sobre (Decisão 16, `ad8d51c`). Três ciclos de revisão.
+
+- **2026-10-01 — 066 DONE** (`f9181aa`): `/en/research/` e `/en/publications/` servidos; a linha de pesquisa com só
+  `en.titulo` é o exemplo real do RF-28, e Publicações EN fica sem aviso nem `lang` (Decisão 13). No navegador, achado
+  fora do escopo: o ano aberto da sanfona de Publicações fica `inert` (`f41556a`). Uma revisão, aprovada.
