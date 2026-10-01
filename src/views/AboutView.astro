@@ -10,25 +10,30 @@
  *                 órfão (RF-21). As áreas de atuação ficam na Home.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
+ *  Atualizado em: 2026-10-01
  *  Versão       : 0.1.0
  *
- *  Dependências : BaseLayout, ExternalLink, PageHeader, src/i18n/index.ts (strings),
+ *  Dependências : BaseLayout, ExternalLink, PageHeader, TimelineSection,
+ *                 src/i18n/fallback.ts, src/i18n/index.ts (strings),
  *                 src/lib/config.ts (siteConfig, `Locale`), src/lib/profile.ts,
  *                 src/lib/text.ts (toParagraphs), src/lib/published.ts (requireSingleton),
  *                 astro:content (getCollection)
  *  Entradas     : prop `lang` (obrigatória); coleção `perfil` (singleton)
  *  Saídas       : HTML estático do corpo da Sobre
- *  Uso          : <AboutView lang="pt" /> em `src/pages/sobre.astro`
+ *  Uso          : <AboutView lang="pt" /> em `src/pages/sobre.astro`;
+ *                 <AboutView lang="en" /> em `src/pages/en/about.astro`
  *
  *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
- *                 sem fallback por campo aqui (plano 065).
+ *                 campos do perfil com fallback por campo (RN-06); a Sobre EN não mostra o
+ *                 aviso de idioma (sabatina fase 4, Decisão 16), só o `lang`.
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import PageHeader from '../components/PageHeader.astro';
+import TimelineSection from '../components/TimelineSection.astro';
+import { localize, portugueseOnly, type LocalizedText } from '../i18n/fallback';
 import { siteConfig, type Locale } from '../lib/config';
 import { profileLinks } from '../lib/profile';
 import { strings } from '../i18n';
@@ -46,17 +51,22 @@ const t = strings(lang);
 // `perfil` é singleton (plano 039): `requireSingleton` estoura se o painel não tiver exatamente 1 item.
 const perfil = requireSingleton(await getCollection('perfil'), 'perfil').data;
 
-const bioParagraphs = toParagraphs(perfil.bio);
+// RN-06: `bio` resolvida por idioma; o `lang` vai no contêiner dos parágrafos.
+const bio = localize(perfil.bio, perfil.en?.bio, lang);
+const bioParagraphs = toParagraphs(bio.text);
 
 // RF-21: perfis acadêmicos na ordem fixa do schema, `cv_url` por último — a mesma lista da Home.
 const links = profileLinks(perfil.links, perfil.cv_url, t.about.links);
 
-/** Um bloco de timeline: rótulo e itens (período · título · instituição), na ordem do professor. */
+/** Um bloco de timeline: rótulo e itens (período · título em partes · instituição), na ordem do professor. */
 interface Timeline {
   id: string;
   label: string;
-  items: { period: string; title: string; place: string }[];
+  items: { period: LocalizedText; title: LocalizedText[]; place: LocalizedText }[];
 }
+
+// Campo factual (RN-07) entra sem `lang`; instituição e `periodo` são tipo "P" (Decisão 13): só `lang`.
+const factual = (text: string): LocalizedText => ({ text, fellBack: false });
 
 // RF-21: bloco sem item some inteiro, com o rótulo.
 const timelines: Timeline[] = [
@@ -64,18 +74,18 @@ const timelines: Timeline[] = [
     id: 'sobre-formacao',
     label: t.about.education,
     items: (perfil.formacao ?? []).map((item) => ({
-      period: item.ano,
-      title: `${item.grau} — ${item.curso}`,
-      place: item.instituicao,
+      period: factual(item.ano),
+      title: [localize(item.grau, item.en?.grau, lang), localize(item.curso, item.en?.curso, lang)],
+      place: portugueseOnly(item.instituicao, lang),
     })),
   },
   {
     id: 'sobre-atuacao',
     label: t.about.experience,
     items: (perfil.atuacao ?? []).map((item) => ({
-      period: item.periodo,
-      title: item.cargo,
-      place: item.instituicao,
+      period: portugueseOnly(item.periodo, lang),
+      title: [localize(item.cargo, item.en?.cargo, lang)],
+      place: portugueseOnly(item.instituicao, lang),
     })),
   },
 ].filter((timeline) => timeline.items.length > 0);
@@ -103,7 +113,7 @@ const timelines: Timeline[] = [
             />
           )
         }
-        <div class="text-pequeno max-w-[26rem] shrink-0 space-y-3 sm:shrink">
+        <div class="text-pequeno max-w-[26rem] shrink-0 space-y-3 sm:shrink" lang={bio.lang}>
           {bioParagraphs.map((paragraph) => <p>{paragraph}</p>)}
         </div>
       </div>
@@ -126,22 +136,7 @@ const timelines: Timeline[] = [
     <div class="flex flex-col gap-4 lg:col-span-6">
       {
         timelines.map((timeline) => (
-          <section aria-labelledby={timeline.id}>
-            <h2 id={timeline.id} class="text-rotulo text-secundario">
-              {timeline.label}
-            </h2>
-            <ol class="text-pequeno mt-2 space-y-1">
-              {timeline.items.map((item) => (
-                <li class="grid grid-cols-[6.5rem_1fr] gap-x-4 sm:grid-cols-[var(--coluna-rotulo)_1fr]">
-                  <span class="text-secundario">{item.period}</span>
-                  <div>
-                    <p>{item.title}</p>
-                    <p class="text-secundario">{item.place}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </section>
+          <TimelineSection id={timeline.id} label={timeline.label} items={timeline.items} />
         ))
       }
     </div>

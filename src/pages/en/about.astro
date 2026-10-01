@@ -1,0 +1,24 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : about.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina da Sobre em inglês (RF-28): só chama `AboutView`
+ *                 com `lang="en"` (sabatina fase 4, Decisão 6).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/AboutView.astro
+ *  Entradas     : nenhuma
+ *  Saídas       : HTML estático da rota `/en/about/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/en/about.astro`
+ *
+ *  Notas        : o corpo da página vive em `AboutView`.
+ * ============================================================================
+ */
+import AboutView from '../../views/AboutView.astro';
+---
+
+<AboutView lang="en" />

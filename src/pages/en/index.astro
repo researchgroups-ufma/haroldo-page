@@ -1,0 +1,24 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : index.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina da Home em inglês (RF-28): só chama `HomeView`
+ *                 com `lang="en"` (sabatina fase 4, Decisão 6).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/HomeView.astro
+ *  Entradas     : nenhuma
+ *  Saídas       : HTML estático da rota `/en/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/en/index.astro`
+ *
+ *  Notas        : o corpo da página vive em `HomeView`.
+ * ============================================================================
+ */
+import HomeView from '../../views/HomeView.astro';
+---
+
+<HomeView lang="en" />

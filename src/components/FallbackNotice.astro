@@ -1,0 +1,41 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : FallbackNotice.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Aviso único de idioma da página (F-07): aparece numa rota
+ *                 EN quando algum texto de conteúdo caiu no português (RN-06).
+ *                 Campo "P" não liga o aviso (sabatina fase 4, Decisão 13).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`)
+ *  Entradas     : props `show`, `class` (opcional)
+ *  Saídas       : `<p>` com `t.fallback.notice`, ou nada
+ *  Uso          : <FallbackNotice show={hasFallback([cargo, bio])} class="px-margem pt-4" />
+ *
+ *  Notas        : o idioma vem do caminho (decisão 2 do fatiamento da fase 4);
+ *                 em rota PT não renderiza nada, mesmo com `show`.
+ * ============================================================================
+ */
+import { strings } from '../i18n';
+import { localeFromPath } from '../lib/routes';
+
+export interface Props {
+  /** `true` quando algum texto exibido caiu no português (`hasFallback`). Obrigatória. */
+  show: boolean;
+  /** Classes extras do `<p>` (recuo e lugar na grade). Ausente = nenhuma. */
+  class?: string;
+}
+
+const { show, class: className } = Astro.props;
+const lang = localeFromPath(Astro.url.pathname);
+---
+
+{
+  show && lang === 'en' && (
+    <p class:list={['text-pequeno text-secundario', className]}>{strings(lang).fallback.notice}</p>
+  )
+}

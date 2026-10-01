@@ -1,0 +1,67 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : TimelineSection.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Bloco de timeline da Sobre (RF-21): rótulo e lista de itens
+ *                 (período · título · instituição). Cada texto leva o `lang`
+ *                 que o fallback (RN-06) ou o campo "P" (sabatina fase 4,
+ *                 Decisão 13) lhe deu; o título é composto de partes unidas por
+ *                 " — ".
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : LangText, src/i18n/fallback.ts (`LocalizedText`)
+ *  Entradas     : props `id`, `label`, `items`
+ *  Saídas       : `<section>` com `<h2>` e `<ol>`
+ *  Uso          : <TimelineSection id="sobre-formacao" label={t.about.education} items={items} />
+ *
+ *  Notas        : sem `lang` nos textos, o HTML é o mesmo das rotas PT.
+ * ============================================================================
+ */
+import LangText from './LangText.astro';
+import type { LocalizedText } from '../i18n/fallback';
+
+export interface Props {
+  /** `id` do `<h2>`, referenciado por `aria-labelledby`. Obrigatória. */
+  id: string;
+  /** Rótulo do bloco. Obrigatória. */
+  label: string;
+  /** Itens na ordem do professor. Vazia renderiza o bloco sem itens: quem chama filtra (RF-21). */
+  items: { period: LocalizedText; title: LocalizedText[]; place: LocalizedText }[];
+}
+
+const { id, label, items } = Astro.props;
+---
+
+<section aria-labelledby={id}>
+  <h2 id={id} class="text-rotulo text-secundario">
+    {label}
+  </h2>
+  <ol class="text-pequeno mt-2 space-y-1">
+    {
+      items.map((item) => (
+        <li class="grid grid-cols-[6.5rem_1fr] gap-x-4 sm:grid-cols-[var(--coluna-rotulo)_1fr]">
+          <span class="text-secundario" lang={item.period.lang}>
+            {item.period.text}
+          </span>
+          <div>
+            <p>
+              {item.title.map((part, index) => (
+                <>
+                  {index > 0 && ' — '}
+                  <LangText value={part} />
+                </>
+              ))}
+            </p>
+            <p class="text-secundario" lang={item.place.lang}>
+              {item.place.text}
+            </p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>

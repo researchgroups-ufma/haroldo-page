@@ -6,16 +6,17 @@
  *                 "Integração": rotas geradas, nenhum rascunho publicado), RN-01 (rascunho nunca
  *                 aparece no HTML), RNF-02 (JS < 50 KB gzip por rota, zero framework de UI), RF-10
  *                 (disciplina não publicada não gera página), RF-27 (existência de `dist/404.html`)
- *                 e §8.3 (um `<h1>` por página, `lang="pt-BR"`). Lê arquivos de `dist/`, não sobe
+ *                 e §8.3 (um `<h1>` por página, `lang` por árvore: pt-BR; en sob `dist/en/`). Lê arquivos de `dist/`, não sobe
  *                 servidor. Roda separado da suíte padrão (`vitest.dist.config.ts`, plano 052,
  *                 README da fase 3, decisão 9) porque depende de `npm run build:pipeline` já ter
  *                 rodado.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-23
- *  Atualizado em: 2026-09-23
+ *  Atualizado em: 2026-10-01
  *  Versão       : 0.2.0
  *
- *  Dependências : vitest, gray-matter, node:fs, node:path, node:zlib, src/lib/courses.ts
+ *  Dependências : vitest, gray-matter, node:fs, node:path, node:zlib, src/lib/courses.ts,
+ *                 src/i18n, src/lib/routes.ts
  *  Entradas     : os arquivos reais de `dist/` (gerado por `npm run build:pipeline`) e de
  *                 `content/{linhas-pesquisa,projetos,disciplinas,publicacoes}/`
  *  Saídas       : nenhuma — só asserções; a tabela rota → bytes gzip vai para `console.log`
@@ -40,6 +41,8 @@ import { gzipSync } from 'node:zlib';
 import matter from 'gray-matter';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { courseSlug } from '../../src/lib/courses';
+import { strings } from '../../src/i18n';
+import { HTML_LANG, localeFromPath } from '../../src/lib/routes';
 
 const repoRoot = join(__dirname, '../..');
 const distDir = join(repoRoot, 'dist');
@@ -88,6 +91,11 @@ function escapeLikeAstro(input: string): string {
   return input.replace(/[&<>'"]/g, (char) => table[char]);
 }
 
+/** Idioma da árvore a que o `.html` pertence (RF-28: `dist/en/**` é inglês; o resto, português). */
+function fileLocale(htmlAbsolutePath: string) {
+  return localeFromPath(htmlAbsolutePath.replace(distDir, '').replace(/\\/g, '/'));
+}
+
 /** Lista recursivamente os `.md` sob um diretório de coleção de `content/`. */
 function listMarkdownFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -106,6 +114,8 @@ describe('rotas fixas existem (§11)', () => {
       'ensino/index.html',
       'publicacoes/index.html',
       '404.html',
+      'en/index.html',
+      'en/about/index.html',
     ];
     for (const rota of rotasFixas) {
       expect(existsSync(join(distDir, rota)), `esperava dist/${rota}`).toBe(true);
@@ -181,7 +191,7 @@ describe('rascunho nunca aparece em HTML algum (RN-01)', () => {
   );
 });
 
-describe('um <h1> por página e lang="pt-BR" (§8.3)', () => {
+describe('um <h1> por página e `lang` por árvore (pt-BR; en sob dist/en/) (§8.3)', () => {
   const htmlFiles = listSiteHtmlFiles();
 
   it('todo .html de dist/ (fora de admin/) tem exatamente um <h1>', () => {
@@ -192,10 +202,38 @@ describe('um <h1> por página e lang="pt-BR" (§8.3)', () => {
     }
   });
 
-  it('todo .html de dist/ (fora de admin/) declara <html lang="pt-BR">', () => {
+  it('todo .html de dist/ (fora de admin/) declara o <html lang> da sua árvore (pt-BR; en sob dist/en/)', () => {
     for (const file of htmlFiles) {
       const conteudo = readFileSync(file, 'utf-8');
-      expect(conteudo, `${file} não declara <html lang="pt-BR">`).toMatch(/<html\s+lang="pt-BR">/);
+      const esperado = HTML_LANG[fileLocale(file)];
+      expect(conteudo, `${file} não declara <html lang="${esperado}">`).toContain(
+        `<html lang="${esperado}">`,
+      );
+    }
+  });
+});
+
+describe('aviso de idioma (F-07, RF-28)', () => {
+  /** Quantas vezes o aviso do dicionário en aparece no `<main>` do arquivo. */
+  const noticeCount = (rota: string, notice: string) => {
+    const html = readFileSync(join(distDir, rota), 'utf-8');
+    const main = html.match(/<main[\s\S]*<\/main>/)?.[0] ?? '';
+    return main.split(notice).length - 1;
+  };
+  const notice = strings('en').fallback.notice;
+
+  it('em /en/ o aviso aparece no máximo uma vez no <main>', () => {
+    expect(noticeCount('en/index.html', notice)).toBeLessThanOrEqual(1);
+  });
+
+  // Sabatina fase 4, Decisão 16: o aviso quebrava a Sobre EN a 1366x650; o `lang` continua.
+  it('em /en/about/ o aviso aparece exatamente 0 vezes no <main> (Decisão 16)', () => {
+    expect(noticeCount('en/about/index.html', notice)).toBe(0);
+  });
+
+  it('nenhuma rota fora de dist/en/ traz o aviso', () => {
+    for (const file of listSiteHtmlFiles().filter((f) => fileLocale(f) === 'pt')) {
+      expect(readFileSync(file, 'utf-8').includes(notice), `${file} traz o aviso`).toBe(false);
     }
   });
 });
@@ -379,9 +417,11 @@ describe('navegação principal sem "Início"', () => {
   it('em toda página, o <nav> principal não tem link para "/" — a volta à Home é o nome', () => {
     for (const file of htmlFiles) {
       const html = readFileSync(file, 'utf-8');
-      const nav = html.match(/<nav aria-label="Navegação principal"[\s\S]*?<\/nav>/)?.[0];
+      const label = strings(fileLocale(file)).site.mainNavLabel;
+      const nav = html.match(new RegExp(`<nav aria-label="${label}"[\\s\\S]*?</nav>`))?.[0];
       expect(nav, `${file} sem navegação principal`).toBeDefined();
       expect(nav?.includes('href="/"'), `${file}: menu com "Início"`).toBe(false);
+      expect(nav?.includes('href="/en/"'), `${file}: menu com "Início"`).toBe(false);
     }
   });
 });
@@ -420,6 +460,13 @@ describe('contato da Home igual ao da Sobre', () => {
     expect(sobre[0]).toMatch(/^mailto:/);
     expect(contactHrefs('')).toEqual(sobre);
   });
+
+  it('o mesmo vale em inglês (/en/ e /en/about/)', () => {
+    const about = contactHrefs('en/about');
+    expect(about.length).toBeGreaterThan(1);
+    expect(about[0]).toMatch(/^mailto:/);
+    expect(contactHrefs('en')).toEqual(about);
+  });
 });
 
 describe('cabeçalho de página fora da área que rola', () => {
@@ -428,7 +475,8 @@ describe('cabeçalho de página fora da área que rola', () => {
       const html = readFileSync(file, 'utf-8');
       const scroller = html.indexOf('id="conteudo"');
       expect(scroller, `${file} sem #conteudo`).toBeGreaterThan(-1);
-      if (file === join(distDir, 'index.html')) continue; // a Home não tem cabeçalho de página
+      // a Home (PT e EN) não tem cabeçalho de página
+      if (file === join(distDir, 'index.html') || file === join(distDir, 'en', 'index.html')) continue;
       expect(html.indexOf('<h1'), `${file}: <h1> dentro da área que rola`).toBeLessThan(scroller);
     }
   });
@@ -441,7 +489,8 @@ describe('sublinhado que segue o cursor (link-traco) no menu e no contato', () =
   it('todo link do menu principal usa link-traco', () => {
     for (const file of listSiteHtmlFiles()) {
       const html = readFileSync(file, 'utf-8');
-      const nav = html.match(/<nav aria-label="Navegação principal"[\s\S]*?<\/nav>/)?.[0] ?? '';
+      const label = strings(fileLocale(file)).site.mainNavLabel;
+      const nav = html.match(new RegExp(`<nav aria-label="${label}"[\\s\\S]*?</nav>`))?.[0] ?? '';
       const links = anchors(nav);
       expect(links.length, file).toBeGreaterThan(0);
       for (const link of links) expect(link, file).toContain('link-traco');
@@ -449,7 +498,7 @@ describe('sublinhado que segue o cursor (link-traco) no menu e no contato', () =
   });
 
   it('todo link do contato (Home e Sobre) usa link-traco', () => {
-    for (const rota of ['', 'sobre']) {
+    for (const rota of ['', 'sobre', 'en', 'en/about']) {
       const html = readFileSync(join(distDir, rota, 'index.html'), 'utf-8');
       const bloco = html.match(/<p[^>]*>(?:(?!<\/p>)[\s\S])*?mailto:[\s\S]*?<\/p>/)?.[0] ?? '';
       const links = anchors(bloco);

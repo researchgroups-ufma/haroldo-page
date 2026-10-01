@@ -1,0 +1,32 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : LangText.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Texto em linha que divide elemento com outro texto (ex.:
+ *                 `{ano} · {grau} — {curso}`) e leva `lang` só quando caiu no
+ *                 português numa rota EN (RN-06, sabatina fase 4, Decisão 4).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/i18n/fallback.ts (tipo `LocalizedText`)
+ *  Entradas     : prop `value`
+ *  Saídas       : o texto puro, ou `<span lang="pt-BR">` quando `value.lang` existe
+ *  Uso          : <LangText value={grau} />
+ *
+ *  Notas        : sem `lang`, o HTML é só o texto, idêntico ao das rotas PT.
+ * ============================================================================
+ */
+import type { LocalizedText } from '../i18n/fallback';
+
+export interface Props {
+  /** Texto resolvido por `localize`/`portugueseOnly`. Obrigatória. */
+  value: LocalizedText;
+}
+
+const { value } = Astro.props;
+---
+
+{value.lang ? <span lang={value.lang}>{value.text}</span> : value.text}

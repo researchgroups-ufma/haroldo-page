@@ -1,0 +1,65 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : ProfileLists.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : As duas colunas de listas da Home (RF-20): formação e áreas
+ *                 de atuação. Cada lista só aparece se tiver item (RF-21, sem
+ *                 rótulo órfão). Texto que caiu no português numa rota EN leva
+ *                 `lang="pt-BR"` (RN-06).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : LangText, src/i18n (`strings`), src/i18n/fallback.ts (`LocalizedText`),
+ *                 src/lib/routes.ts (`localeFromPath`)
+ *  Entradas     : props `formacao` e `areas`
+ *  Saídas       : até dois `<div class="lg:col-span-3">`, filhos diretos da grade da Home
+ *  Uso          : <ProfileLists formacao={formacao} areas={areas} />
+ *
+ *  Notas        : o idioma vem do caminho (decisão 2 do fatiamento da fase 4).
+ * ============================================================================
+ */
+import LangText from './LangText.astro';
+import { strings } from '../i18n';
+import type { LocalizedText } from '../i18n/fallback';
+import { localeFromPath } from '../lib/routes';
+
+export interface Props {
+  /** Itens de formação já resolvidos por idioma; `ano` é factual. Vazia = a lista some, com o rótulo. */
+  formacao: { ano: string; grau: LocalizedText; curso: LocalizedText }[];
+  /** Nomes das áreas já resolvidos por idioma. Vazia = a lista some, com o rótulo. */
+  areas: LocalizedText[];
+}
+
+const { formacao, areas } = Astro.props;
+const t = strings(localeFromPath(Astro.url.pathname));
+---
+
+{
+  formacao.length > 0 && (
+    <div class="lg:col-span-3">
+      <h2 class="text-secundario">{t.about.education}</h2>
+      <ul class="mt-1">
+        {formacao.map((item) => (
+          <li>
+            {item.ano} · <LangText value={item.grau} /> — <LangText value={item.curso} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+{
+  areas.length > 0 && (
+    <div class="lg:col-span-3">
+      <h2 class="text-secundario">{t.about.areas}</h2>
+      <ul class="mt-1">
+        {areas.map((area) => (
+          <li lang={area.lang}>{area.text}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}

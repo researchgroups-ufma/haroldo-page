@@ -173,9 +173,26 @@ A partir de `lg`, trilho de 1 px `--regua` e cursor fino `--tinta` ao lado do `<
 rolar ou sob o ponteiro e aceita arrasto e clique no trilho. Sem JS e no celular fica a barra
 nativa, fina, nas cores do site.
 
+### 5.6 Aviso de idioma (`FallbackNotice.astro`, F-07)
+
+Uma linha de `text-pequeno` em `--secundario`, com o texto de `t.fallback.notice` ("Some content on
+this page is only available in Portuguese."). Aparece **uma vez por página**, só nas rotas `/en`, e só
+quando algum texto traduzível (RN-06) caiu no português. **Exceção: a Sobre EN (`/en/about/`) não
+mostra o aviso** (sabatina fase 4, Decisão 16): ele fazia a área de conteúdo transbordar a
+1366×650, e o `lang="pt-BR"` dos trechos continua. Nas páginas internas que o mostram (as de pesquisa e ensino) é o primeiro filho do
+conteúdo, logo abaixo da régua do cabeçalho, com o mesmo recuo lateral e `pt-4`; na Home é a primeira
+linha sob a régua, na largura toda da grade. Em português nunca aparece. O `lang="pt-BR"` do elemento
+é independente do aviso: campo em português sem versão em inglês (instituições, `periodo`) leva
+`lang="pt-BR"` e **não** liga o aviso (sabatina fase 4, Decisão 13).
+
 ---
 
 ## 6. Rotas
+
+As rotas `/en/…` repetem o layout da rota em português (`/en/` ↔ `/`, `/en/about/` ↔ `/sobre/`). O
+texto de interface vem do dicionário `src/i18n/en.ts`; o conteúdo do professor é resolvido campo a
+campo, em inglês onde existe a versão e em português, com `lang="pt-BR"` e o aviso (5.6), onde não
+existe. Datas saem no formato do idioma, como "March 15, 2026".
 
 **Negrito** = campo do schema. Toda página interna começa pelo `PageHeader` (5.2).
 
