@@ -14,7 +14,7 @@
 | **Codinome / sigla** | `haroldo-page` |
 | **Versão do PRD** | v0.1.70 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 3/9 — próximo: plano 065** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 4/9 — próximo: plano 066** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -767,7 +767,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase 1 — Modelo de conteúdo | 10/10 | 🟢 Concluída |
 | Fase 2 — Pipeline de publicação | 5/5 | 🟢 Concluída |
 | Fase 3 — Site público (PT) | 12/12 | 🟢 Concluída |
-| Fase 4 — Internacionalização | 3/9 | 🟡 Em andamento |
+| Fase 4 — Internacionalização | 4/9 | 🟡 Em andamento |
 | Fase 5 — Polimento e entrega | 0/17 | ⬜ Não iniciada |
 
 Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqueada
@@ -820,7 +820,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Animações com `prefers-reduced-motion` honrado (RF-32); testes da fase passando — plano **053** (`876d89c`)
 
 ### Fase 4 — Internacionalização
-- [ ] Roteamento i18n configurado (PT na raiz, EN em `/en`)
+- [x] Roteamento i18n configurado (PT na raiz, EN em `/en`) — plano **065** (`d96c659`)
 - [x] Dicionários `src/i18n/` com todas as strings de interface — o `en.ts` revisado pelo stakeholder antes do DONE (sabatina fase 4, Decisão 11) — plano **057** (`82a7947`)
 - [ ] Nenhuma string de interface hardcoded em componente (§10.4)
 - [x] Utilitário de fallback por campo implementado e testado (RN-06) — plano **061** (`835f188`)

@@ -1,6 +1,6 @@
 # Plano 065 — `/en/` e `/en/about/`, com o aviso de idioma (F-07)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-28**, RF-14, RN-06, RN-09, **F-07**, RF-20, RF-21, RF-26, §8.3; sabatina fase 4, Decisões 4, 6, 7 e 13; sabatina fase 4, Decisão 16; §12 fase 4, item 1
 **Depende de:** planos 057 (**DONE**, com a revisão do stakeholder), 061 (fallback), 062 (views)
 **Modelo recomendado:** sonnet

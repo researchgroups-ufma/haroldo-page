@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-09-30 — **074 DONE** (`ccf60ed`, PRD enxuto e histórico em documento próprio; não fecha item do §12, 3/9). Próximo: 065. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
+Última atualização: 2026-10-01 — **065 DONE** (`d96c659`, `/en/` e `/en/about/`; fecha o item 1 do §12, 4/9; Decisão 16: a Sobre EN fica sem o aviso). Próximo: 066. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -119,7 +119,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 062 | Views: Home, Sobre e 404 | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `156b130` |
 | 063 | Views: Pesquisa e Ensino | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `a4a2f75` |
 | 064 | Views: Disciplina e Publicações | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `98d1014` |
-| 065 | `/en/` e `/en/about/`, com o aviso de idioma (F-07) | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
+| 065 | `/en/` e `/en/about/`, com o aviso de idioma (F-07) | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `d96c659` |
 | 066 | `/en/research/` e `/en/publications/` | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 067 | `/en/teaching/` e `/en/teaching/<slug>/` | ⬜ TODO | agente + orquestrador (navegador) | implementer (sonnet) | — |
 | 068 | 404 em inglês e a prova do Worker (RF-27, Decisão 9) | ⬜ TODO | agente + orquestrador (produção) | implementer (sonnet) | — |

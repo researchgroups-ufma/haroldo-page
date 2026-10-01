@@ -223,3 +223,7 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
 - **2026-09-30 — 074 DONE** (`ccf60ed`): o PRD passa de 204 KB a 92 KB — histórico do §0.1, célula de
   estado e anotações do §12 movidos sem reescrita para este arquivo (prova de identidade na Evidência do
   plano). Plano DONE deixa de subir a versão do PRD. Dois ciclos de revisão; não fecha item do §12.
+
+- **2026-10-01 — 065 DONE** (`d96c659`): `/en/` e `/en/about/` servidos, com o perfil resolvido campo a campo e
+  `lang="pt-BR"` no que ficou em português; rotas PT idênticas pelo comparador. O aviso F-07 fazia a Sobre EN
+  rolar a 1366×650, e o stakeholder o tirou só da Sobre (Decisão 16, `ad8d51c`). Três ciclos de revisão.
