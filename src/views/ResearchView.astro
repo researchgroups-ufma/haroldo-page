@@ -3,8 +3,8 @@
  * ============================================================================
  *  Arquivo      : ResearchView.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : View de `/pesquisa/` (e da rota EN, plano 066; sabatina
- *                 fase 4, Decisão 6): página Pesquisa (RF-22, RF-13, §6.3 da
+ *  Descrição    : View de `/pesquisa/` e `/en/research/` (sabatina fase 4,
+ *                 Decisão 6): página Pesquisa (RF-22, RF-13, §6.3 da
  *                 identidade visual): linhas de pesquisa publicadas, na ordem
  *                 do professor, com resumo, corpo e imagem quando houver, e os
  *                 projetos de cada uma logo abaixo (em andamento antes de
@@ -12,27 +12,30 @@
  *                 ligados a linha não publicada, sem revelá-la (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
+ *  Atualizado em: 2026-10-01
  *  Versão       : 0.1.0
  *
- *  Dependências : BaseLayout, PageHeader, ProjectItem, src/i18n (strings),
- *                 src/lib/config.ts (`Locale`), src/lib/text.ts (toParagraphs),
+ *  Dependências : BaseLayout, PageHeader, ProjectItem, FallbackNotice, src/i18n (strings),
+ *                 src/i18n/fallback.ts, src/lib/config.ts (`Locale`), src/lib/text.ts (toParagraphs),
  *                 src/lib/published.ts (filterPublished),
  *                 src/lib/research.ts (sortResearchLines, sortProjects,
  *                 groupProjectsByLine), astro:content (getCollection)
  *  Entradas     : prop `lang` (obrigatória); coleções `linhas-pesquisa` e `projetos`
  *  Saídas       : HTML estático do corpo da página Pesquisa
- *  Uso          : <ResearchView lang="pt" /> em `src/pages/pesquisa.astro`
+ *  Uso          : <ResearchView lang="pt" /> em `src/pages/pesquisa.astro`;
+ *                 <ResearchView lang="en" /> em `src/pages/en/research.astro`
  *
  *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
- *                 sem fallback por campo aqui (plano 066).
+ *                 fallback por campo (RN-06) e aviso único (F-07) das linhas e dos projetos.
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import ProjectItem from '../components/ProjectItem.astro';
+import FallbackNotice from '../components/FallbackNotice.astro';
 import { strings } from '../i18n';
+import { hasFallback, localize, localizeOptional } from '../i18n/fallback';
 import type { Locale } from '../lib/config';
 import { toParagraphs } from '../lib/text';
 import { filterPublished } from '../lib/published';
@@ -50,31 +53,52 @@ const t = strings(lang);
 const lines = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')));
 const projects = sortProjects(filterPublished(await getCollection('projetos')));
 const { byLine, others } = groupProjectsByLine(new Set(lines.map((line) => line.id)), projects);
+
+// RN-06: `titulo`, `resumo` e `corpo` de cada linha resolvidos por idioma; `lang` por parágrafo.
+const localizedLines = lines.map((line) => {
+  const { titulo, resumo, corpo, imagem } = line.data;
+  const title = localize(titulo, line.data.en?.titulo, lang);
+  const summary = localize(resumo, line.data.en?.resumo, lang);
+  const body = localizeOptional(corpo, line.data.en?.corpo, lang);
+  const paragraphs = [summary, ...(body ? [body] : [])].flatMap((field) =>
+    toParagraphs(field.text).map((text) => ({ text, lang: field.lang })),
+  );
+  return { id: line.id, title, paragraphs, imagem, fields: [title, summary, body] };
+});
+// F-07: `ProjectItem` resolve o fallback dos projetos; aqui só entra na conta do aviso.
+const projectFields = projects.flatMap(({ data }) => [
+  localize(data.titulo, data.en?.titulo, lang),
+  localize(data.descricao, data.en?.descricao, lang),
+]);
+const showNotice = hasFallback([...localizedLines.flatMap((l) => l.fields), ...projectFields]);
 ---
 
 <BaseLayout title={t.nav.research}>
   <PageHeader slot="cabecalho" title={t.research.title} />
 
+  <FallbackNotice show={showNotice} class="px-margem pt-4" />
   <div class="px-margem pb-10">
     {
-      lines.map((line) => {
-        const paragraphs = [...toParagraphs(line.data.resumo), ...toParagraphs(line.data.corpo)];
+      localizedLines.map((line) => {
         const lineProjects = byLine.get(line.id) ?? [];
         return (
           <section id={line.id} aria-labelledby={`${line.id}-titulo`} class="linha-pesquisa py-8">
             <div>
               <div>
-                <h2 id={`${line.id}-titulo`} class="text-display-2">
-                  {line.data.titulo}
+                <h2 id={`${line.id}-titulo`} class="text-display-2" lang={line.title.lang}>
+                  {line.title.text}
                 </h2>
-                {paragraphs.map((paragraph, i) => (
-                  <p class:list={['text-corpo max-w-medida mt-3', i === 0 && 'text-secundario']}>
-                    {paragraph}
+                {line.paragraphs.map((paragraph, i) => (
+                  <p
+                    class:list={['text-corpo max-w-medida mt-3', i === 0 && 'text-secundario']}
+                    lang={paragraph.lang}
+                  >
+                    {paragraph.text}
                   </p>
                 ))}
-                {line.data.imagem && (
+                {line.imagem && (
                   <img
-                    src={line.data.imagem}
+                    src={line.imagem}
                     alt=""
                     loading="lazy"
                     decoding="async"

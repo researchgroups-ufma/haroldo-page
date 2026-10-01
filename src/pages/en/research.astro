@@ -1,0 +1,24 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : research.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina de Pesquisa em inglês (RF-28, RF-22): só chama
+ *                 `ResearchView` com `lang="en"` (sabatina fase 4, Decisão 6).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/ResearchView.astro
+ *  Entradas     : nenhuma
+ *  Saídas       : HTML estático da rota `/en/research/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/en/research.astro`
+ *
+ *  Notas        : o corpo da página vive em `ResearchView`.
+ * ============================================================================
+ */
+import ResearchView from '../../views/ResearchView.astro';
+---
+
+<ResearchView lang="en" />

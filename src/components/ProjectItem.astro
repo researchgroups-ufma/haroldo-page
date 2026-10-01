@@ -6,13 +6,15 @@
  *  Descrição    : Linha de um projeto na página Pesquisa (RF-22): período e
  *                 status numa linha pequena, título, descrição, e financiador
  *                 e colaboradores. Usada dentro das linhas de pesquisa e em
- *                 "Outros projetos".
+ *                 "Outros projetos". Em `/en`, `titulo` e `descricao` seguem o
+ *                 fallback por campo (RN-06) e `financiador`/`colaboradores`
+ *                 saem em português marcado (sabatina fase 4, Decisão 13).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
+ *  Atualizado em: 2026-10-01
  *  Versão       : 0.1.0
  *
- *  Dependências : src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
+ *  Dependências : src/i18n (`strings`), src/i18n/fallback.ts, src/lib/routes.ts (`localeFromPath`),
  *                 src/lib/text.ts (toParagraphs), astro:content (CollectionEntry)
  *  Entradas     : prop `project` (obrigatória): entrada da coleção `projetos`
  *  Saídas       : `<li class="projeto-linha">` com régua fina acima
@@ -25,6 +27,7 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import { strings } from '../i18n';
+import { localize, portugueseOnly } from '../i18n/fallback';
 import { localeFromPath } from '../lib/routes';
 import { toParagraphs } from '../lib/text';
 
@@ -34,7 +37,17 @@ export interface Props {
 }
 
 const { project } = Astro.props;
-const t = strings(localeFromPath(Astro.url.pathname));
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
+
+// RN-06: texto traduzível por campo. O aviso (F-07) é da `ResearchView`, que conta estes campos.
+const title = localize(project.data.titulo, project.data.en?.titulo, lang);
+const description = localize(project.data.descricao, project.data.en?.descricao, lang);
+// Decisão 13 (sabatina fase 4): texto livre sem par em inglês leva `lang="pt-BR"` e não liga o aviso.
+const credits = portugueseOnly(
+  [project.data.financiador, project.data.colaboradores?.join(', ')].filter(Boolean).join(' · '),
+  lang,
+);
 
 /** Linha de identificação do projeto: período ("inicio–fim", ou "inicio–" em aberto) · status. */
 const meta = [
@@ -48,18 +61,18 @@ const meta = [
 <li class="projeto-linha py-3">
   {meta && <p class="text-pequeno text-secundario">{meta}</p>}
   <div>
-    <h3 class="text-titulo-item">{project.data.titulo}</h3>
+    <h3 class="text-titulo-item" lang={title.lang}>{title.text}</h3>
     {
-      toParagraphs(project.data.descricao).map((paragraph) => (
-        <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
+      toParagraphs(description.text).map((paragraph) => (
+        <p class="text-pequeno text-secundario max-w-medida mt-1" lang={description.lang}>
+          {paragraph}
+        </p>
       ))
     }
     {
-      (project.data.financiador || project.data.colaboradores?.length) && (
-        <p class="text-pequeno text-secundario mt-1">
-          {[project.data.financiador, project.data.colaboradores?.join(', ')]
-            .filter(Boolean)
-            .join(' · ')}
+      credits.text && (
+        <p class="text-pequeno text-secundario mt-1" lang={credits.lang}>
+          {credits.text}
         </p>
       )
     }

@@ -1,0 +1,24 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : publications.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina de Publicações em inglês (RF-28, RF-25): só chama
+ *                 `PublicationsView` com `lang="en"` (sabatina fase 4, Decisão 6).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-01
+ *  Atualizado em: 2026-10-01
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/PublicationsView.astro
+ *  Entradas     : nenhuma
+ *  Saídas       : HTML estático da rota `/en/publications/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/en/publications.astro`
+ *
+ *  Notas        : o corpo da página vive em `PublicationsView`.
+ * ============================================================================
+ */
+import PublicationsView from '../../views/PublicationsView.astro';
+---
+
+<PublicationsView lang="en" />

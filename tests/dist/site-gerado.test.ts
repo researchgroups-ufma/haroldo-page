@@ -116,6 +116,8 @@ describe('rotas fixas existem (§11)', () => {
       '404.html',
       'en/index.html',
       'en/about/index.html',
+      'en/research/index.html',
+      'en/publications/index.html',
     ];
     for (const rota of rotasFixas) {
       expect(existsSync(join(distDir, rota)), `esperava dist/${rota}`).toBe(true);
@@ -153,6 +155,12 @@ describe('disciplina publicada gera página; rascunho não gera página (§11, R
 });
 
 describe('rascunho nunca aparece em HTML algum (RN-01)', () => {
+  it('a varredura inclui as rotas de dist/en/ (o rascunho também some em /en/)', () => {
+    const rotas = listSiteHtmlFiles().map(routeLabel);
+    expect(rotas).toContain('/en/research/index.html');
+    expect(rotas).toContain('/en/publications/index.html');
+  });
+
   const colecoes: { pasta: string; campoTitulo: 'titulo' | 'nome' }[] = [
     { pasta: 'linhas-pesquisa', campoTitulo: 'titulo' },
     { pasta: 'projetos', campoTitulo: 'titulo' },
@@ -229,6 +237,19 @@ describe('aviso de idioma (F-07, RF-28)', () => {
   // Sabatina fase 4, Decisão 16: o aviso quebrava a Sobre EN a 1366x650; o `lang` continua.
   it('em /en/about/ o aviso aparece exatamente 0 vezes no <main> (Decisão 16)', () => {
     expect(noticeCount('en/about/index.html', notice)).toBe(0);
+  });
+
+  // F-07, RF-28: a Pesquisa EN mostra o aviso quando campo "T" caiu no PT (no máximo uma vez, sem
+  // contar o conteúdo exato); Publicações EN não exibe campo "T" nem "P" (Decisões 13 e 15).
+  it('em /en/research/ o aviso aparece no máximo uma vez no <main>', () => {
+    expect(noticeCount('en/research/index.html', notice)).toBeLessThanOrEqual(1);
+  });
+
+  it('em /en/publications/ não há aviso nem lang="pt-BR" no <main>', () => {
+    const html = readFileSync(join(distDir, 'en/publications/index.html'), 'utf-8');
+    const main = html.match(/<main[\s\S]*<\/main>/)?.[0] ?? '';
+    expect(noticeCount('en/publications/index.html', notice)).toBe(0);
+    expect(main.includes('lang="pt-BR"')).toBe(false);
   });
 
   it('nenhuma rota fora de dist/en/ traz o aviso', () => {
@@ -383,8 +404,8 @@ describe('View Transitions: nomes únicos por página', () => {
 describe('desempenho e metadados', () => {
   const htmlFiles = listSiteHtmlFiles();
 
-  it('HTML de /publicacoes/ não carrega o ScrollTrigger de saída (GSAP sob demanda)', () => {
-    const html = readFileSync(join(distDir, 'publicacoes', 'index.html'), 'utf-8');
+  it.each(['publicacoes', 'en/publications'])('HTML de /%s/ não carrega o ScrollTrigger de saída (GSAP sob demanda)', (rota) => {
+    const html = readFileSync(join(distDir, rota, 'index.html'), 'utf-8');
     const pending = [...html.matchAll(/<script[^>]+src="\/([^"]+)"/g)].map((m) => m[1]);
     const seen = new Set<string>();
     // Segue os imports estáticos: um chunk importado estaticamente também baixa de saída.
@@ -400,7 +421,7 @@ describe('desempenho e metadados', () => {
         pending.push(`${dirname(file)}/${m[1]}`);
       }
     }
-    expect(seen.size, 'nenhum script lido em /publicacoes/').toBeGreaterThan(0);
+    expect(seen.size, `nenhum script lido em /${rota}/`).toBeGreaterThan(0);
   });
 
   it('dist/favicon.svg existe e toda página o declara', () => {

@@ -3,14 +3,14 @@
  * ============================================================================
  *  Arquivo      : PublicationsView.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : View da página Publicações (RF-25, RN-02, F-05; sabatina fase
+ *  Descrição    : View de `/publicacoes/` e `/en/publications/` (RF-25, RN-02, F-05; sabatina fase
  *                 4, Decisão 6): publicações publicadas agrupadas por ano, do
  *                 mais recente ao mais antigo, em lista enxuta. A partir de `lg`,
  *                 os anos viram uma sanfona guiada pela rolagem
  *                 (`src/scripts/publications-accordion.ts`).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
+ *  Atualizado em: 2026-10-01
  *  Versão       : 0.1.0
  *
  *  Dependências : BaseLayout, PageHeader, PublicationItem, src/i18n (strings),
@@ -20,12 +20,15 @@
  *                 (getCollection)
  *  Entradas     : prop `lang` (obrigatória); coleção `publicacoes`
  *  Saídas       : HTML estático do corpo da página Publicações
- *  Uso          : <PublicationsView lang="pt" /> em `src/pages/publicacoes.astro`
+ *  Uso          : <PublicationsView lang="pt" /> em `src/pages/publicacoes.astro`;
+ *                 <PublicationsView lang="en" /> em `src/pages/en/publications.astro`
  *
  *  Notas        : melhoria progressiva (RNF-02) — sem JS, abaixo de `lg` ou
  *                 com `prefers-reduced-motion: reduce`, todos os anos ficam
  *                 abertos e o link do ano é uma âncora comum. Texto de interface
- *                 só de `strings(lang)` (§10.4 do PRD).
+ *                 só de `strings(lang)` (§10.4 do PRD). Sem aviso de idioma nem
+ *                 `lang="pt-BR"`: nenhum campo exibido é "T" nem "P" (RN-07; sabatina
+ *                 fase 4, Decisões 13 e 15) — `resumo` não é exibido.
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
