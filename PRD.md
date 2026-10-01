@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.69 |
+| **Versão do PRD** | v0.1.70 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 3/9 — próximo: plano 065** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-09-30 |
+| **Última atualização** | 2026-10-01 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav`; `docs/historico-de-implementacao.md` (histórico de implementação e versões antigas deste PRD) |
 
@@ -51,6 +51,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.59 | 2026-09-24 | Desenvolvedor | Decisões 13 a 15 da sabatina da fase 4: RF-28, RF-30 e F-07 emendados; fase 4 fatiada em 19 planos (055–073) |
 | v0.1.66 | 2026-09-30 | Desenvolvedor | §7.5 ganha `src/views/` (plano 062) |
 | v0.1.69 | 2026-09-30 | Desenvolvedor | Sabatina "enxugar o PRD" (4 decisões): histórico para `docs/historico-de-implementacao.md`; plano DONE não sobe a versão (plano 074) |
+| v0.1.70 | 2026-10-01 | Desenvolvedor | Decisão 16 da sabatina da fase 4: F-07 emendada, Sobre EN sem o aviso de idioma (mantém `lang="pt-BR"`) |
 
 ---
 
@@ -271,7 +272,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | F-04 | Link do Google Drive quebrado ou sem permissão pública | O site continua exibindo o link (não há como validar em build time sem chamada externa); o manual instrui o professor a conferir o compartilhamento como "qualquer pessoa com o link" | Instrução no manual e texto de ajuda sob o campo de link |
 | F-05 | Publicação sem DOI, sem arXiv e sem PDF | A entrada aparece apenas com metadados; nenhum botão de link vazio é renderizado | — |
 | F-06 | Disciplina sem nenhuma aula cadastrada | A página existe com ementa e bibliografia; a seção Aulas exibe estado vazio explícito | "Nenhuma aula publicada ainda." |
-| F-07 | Item (ou campo) sem versão em inglês na rota `/en` | Exibe o conteúdo em português, com `lang="pt-BR"` no elemento; a página mostra **um único** aviso se qualquer campo traduzível caiu no PT (sabatina fase 4, Decisão 4). Texto sem campo em inglês recebe `lang="pt-BR"` sem ligar o aviso (Decisão 13) | Aviso por página, do dicionário `en` (ex.: "Some content on this page is only available in Portuguese") |
+| F-07 | Item (ou campo) sem versão em inglês na rota `/en` | Exibe o conteúdo em português, com `lang="pt-BR"` no elemento; a página mostra **um único** aviso se qualquer campo traduzível caiu no PT (sabatina fase 4, Decisão 4). Texto sem campo em inglês recebe `lang="pt-BR"` sem ligar o aviso (Decisão 13). A Sobre (`/en/about/`) não mostra o aviso, mas mantém o `lang="pt-BR"` (Decisão 16) | Aviso por página, do dicionário `en` (ex.: "Some content on this page is only available in Portuguese") |
 | F-08 | Imagem ausente (perfil sem foto, notícia sem imagem) | Layout degrada sem quebrar; nenhum espaço reservado vazio ou ícone de imagem quebrada | — |
 | F-09 | Conteúdo salvo com formato inesperado que a validação Zod rejeita | O build falha de forma ruidosa e nomeia o arquivo e o campo problemático; cai em F-02 | Log de build: "content/publicacoes/x.md → campo `ano`: esperado número entre 1900 e 2100" |
 | F-10 | Dois itens gerando o mesmo nome de arquivo | O Tina impede a criação duplicada; o template de nome inclui discriminador suficiente (ano + slug do título) | "Já existe um item com este nome." |

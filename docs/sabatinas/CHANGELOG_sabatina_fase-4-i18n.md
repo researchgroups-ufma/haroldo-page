@@ -73,7 +73,7 @@ campo (RN-06): uma disciplina pode ter `en.nome` e não ter `en.ementa`. Onde fi
 por bloco de texto, por item ou por página?
 **Decisão:** **um aviso por página.** Se qualquer texto de conteúdo exibido numa rota `/en` caiu no
 português, a página mostra um único aviso discreto (texto do dicionário `en`, ex.: "Some content
-on this page is only available in Portuguese"). Independentemente do aviso, **todo elemento cujo
+on this page is only available in Portuguese"; a Sobre EN fica sem o aviso pela Decisão 16). Independentemente do aviso, **todo elemento cujo
 texto caiu no PT recebe `lang="pt-BR"`** (§8.3: `lang` correto, leitor de tela pronuncia certo).
 **Justificativa:** menos ruído visual. Numa página quase toda sem tradução, que é o caso mais
 provável no início (RN-09: o inglês é opcional), badges por bloco ou por item se repetiriam em
@@ -263,3 +263,24 @@ caso que já existe no conteúdo real. `/en/publications` não tem aviso nem `la
 **Justificativa:** decisão do stakeholder, 2026-09-25: a página deve ser simples. Alternativas
 descartadas: manter o exemplo (critério indemonstrável na fase 4); voltar a exibir o resumo.
 **Impacto no PRD:** RF-28 (exemplo e critério).
+
+## Decisão 16 — A Sobre em inglês não mostra o aviso de idioma (restringe a Decisão 4)
+
+**Data:** 2026-10-01
+**Questão:** (levantada durante o plano 065) na Sobre EN (`/en/about/`) a 1366×650, o aviso de
+idioma da F-07 (38 px, primeira linha sob a régua) faz a área `#conteudo` transbordar 17 px
+(`scrollHeight` 430 × `clientHeight` 413) e a barra de rolagem aparecer; sem o aviso, volta a
+413/413. Isso quebra a regra do §4 de `docs/identidade-visual.md` (Home e Sobre sem rolagem a
+1440×800 e 1366×650). Medido no navegador em 2026-10-01.
+**Decisão:** a Sobre EN **não mostra o aviso** "Some content on this page is only available in
+Portuguese." As demais rotas `/en` (a Home `/en/` e as dos planos 066–067) continuam com o aviso da
+Decisão 4, sem mudança. O `lang="pt-BR"` nos trechos em português continua em **todas** as rotas
+`/en`, inclusive na Sobre: só o aviso visível sai. A Decisão 4 (um aviso por página) passa a valer
+para todas as rotas `/en` exceto a Sobre; a Decisão 13 (`lang` em texto sem campo em inglês, sem
+ligar o aviso) não muda.
+**Justificativa:** decisão do stakeholder, 2026-10-01: "Vamos remover esse aviso de idioma, é
+desnecessário"; perguntado sobre o alcance, escolheu "só na Sobre". O `lang` por elemento mantém
+para tecnologia assistiva a informação de qual trecho está em português. Alternativa descartada:
+tirar o aviso de todas as rotas `/en` (não escolhida pelo stakeholder).
+**Impacto no PRD:** F-07 (a Sobre EN não mostra o aviso e mantém o `lang="pt-BR"`). RF-28 sem
+mudança: o exemplo dele é `/en/research`.
