@@ -231,3 +231,7 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
 - **2026-10-01 — 066 DONE** (`f9181aa`): `/en/research/` e `/en/publications/` servidos; a linha de pesquisa com só
   `en.titulo` é o exemplo real do RF-28, e Publicações EN fica sem aviso nem `lang` (Decisão 13). No navegador, achado
   fora do escopo: o ano aberto da sanfona de Publicações fica `inert` (`f41556a`). Uma revisão, aprovada.
+
+- **2026-10-02 — 067 DONE** (`141bea9`): `/en/teaching/` e uma `/en/teaching/<slug>/` por disciplina, com o mesmo slug
+  PT (Decisão 3); campos "P" com `lang="pt-BR"` sem ligar o aviso, provado por canário duplo. O `TeachingView` passou
+  de 150 linhas e o dono do produto aceitou (PRD v0.1.71, `feb7da5`); `devalue` subiu no lock (`914831f`). Dois ciclos de revisão.

@@ -14,7 +14,7 @@
 | **Codinome / sigla** | `haroldo-page` |
 | **Versão do PRD** | v0.1.71 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 4/9 — próximo: plano 067** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 4/9 — próximo: plano 068** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |

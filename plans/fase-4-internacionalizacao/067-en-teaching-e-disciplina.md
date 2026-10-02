@@ -1,6 +1,6 @@
 # Plano 067 — `/en/teaching/` e `/en/teaching/<slug>/`
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-28**, **RF-29** (slug igual nos dois idiomas), RF-23, RF-24, RF-37, F-06, F-13, RN-01, RN-03, RN-04, RN-06, **F-07**, RF-26, §8.3 (data); sabatina fase 4, Decisões 3, 4, 6 e 13
 **Depende de:** planos 065, 063 (`TeachingView`), 064 (`CourseView`, `course-paths.ts`)
 **Modelo recomendado:** sonnet
