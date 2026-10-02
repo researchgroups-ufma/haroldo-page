@@ -239,3 +239,7 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
 - **2026-10-02 — 068 DONE** (`292ed25`): `dist/en/404.html` gerada (o Astro só trata `/404` como página de status;
   uma integração no `astro.config.mjs` renomeia `en/404/index.html`) e servida pelo `404-page` do Worker em
   `/en/<inexistente>`, provada no `wrangler dev` e em produção por SHA-256 (Decisão 9). Fecha o item 5 do §12, 5/9. Dois ciclos de revisão.
+
+- **2026-10-02 — 069 DONE** (`2d93c8e`): seletor de idioma (`LanguageLink`) no cabeçalho e na Home, para a mesma página no
+  outro idioma, visível no celular fora do menu. Navegador medido antes da suíte; a correção da revisão (comentário HTML
+  publicado) foi provada sem efeito no layout por hash, 16/16. Fecha o item 6 do §12, 6/9. Dois ciclos de revisão.

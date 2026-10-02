@@ -4,7 +4,7 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-10-02 — **068 DONE** (`292ed25`): 404 em inglês em `/en/`, provada em produção; fase 4 em 5/9; próximo, o 069. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../docs/historico-de-implementacao.md), §4.1.
+Última atualização: 2026-10-02 — **069 DONE** (`2d93c8e`): seletor de idioma para a mesma página no outro idioma; fase 4 em 6/9; próximo, o 070. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../docs/historico-de-implementacao.md), §4.1.
 
 ## Fases
 
@@ -14,7 +14,7 @@ Este arquivo é só o mapa.
 | [`fase-1-modelo-de-conteudo/`](fase-1-modelo-de-conteudo/README.md) | 1 — Modelo de conteúdo | 🟢 **Concluída** (critério do §6.2 demonstrado) | 015–022, todos DONE — o 021 promovido em `7d5b7e6`, com CI verde sobre `26de58a` |
 | [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟢 **Concluída (5/5)** | 023–035, todos DONE (o 027 e o 029 migraram para a fase 5) |
 | [`fase-3-site-publico/`](fase-3-site-publico/README.md) | 3 — Site público em português | 🟢 **Concluída (12/12)** | 036–054, todos DONE |
-| [`fase-4-internacionalizacao/`](fase-4-internacionalizacao/README.md) | 4 — Internacionalização | 🟡 **Em andamento** (5/9 no §12) — sabatinada e fatiada em 2026-09-24 ([`CHANGELOG_sabatina_fase-4-i18n.md`](../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md)) | 055–074; DONE: 055–068 e 074; próximo, o **069** |
+| [`fase-4-internacionalizacao/`](fase-4-internacionalizacao/README.md) | 4 — Internacionalização | 🟡 **Em andamento** (6/9 no §12) — sabatinada e fatiada em 2026-09-24 ([`CHANGELOG_sabatina_fase-4-i18n.md`](../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md)) | 055–074; DONE: 055–069 e 074; próximo, o **070** |
 | [`fase-5-polimento-e-entrega/`](fase-5-polimento-e-entrega/README.md) | 5 — Polimento e entrega | ⬜ Não iniciada | não fatiada; já contém os planos **027** e **029**, migrados da fase 2 em 2026-09-12 |
 
 A ordem do roadmap **não** é 0→1→2→3→4→5 linear: a fase 2 vem antes do site público de

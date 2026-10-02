@@ -1,6 +1,6 @@
 # Plano 069 — Seletor de idioma (RF-29)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-29**, RF-26, §8.3 (troca explícita, sem detecção automática), RNF-15; sabatina fase 4, Decisões 3 e 5; §12 fase 4, item 6
 **Depende de:** planos 066, 067, 068 (todas as rotas EN existem — o seletor nunca aponta para página inexistente)
 **Modelo recomendado:** sonnet

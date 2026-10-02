@@ -14,7 +14,7 @@
 | **Codinome / sigla** | `haroldo-page` |
 | **Versão do PRD** | v0.1.71 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 5/9 — próximo: plano 069** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 6/9 — próximo: plano 070** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -768,7 +768,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase 1 — Modelo de conteúdo | 10/10 | 🟢 Concluída |
 | Fase 2 — Pipeline de publicação | 5/5 | 🟢 Concluída |
 | Fase 3 — Site público (PT) | 12/12 | 🟢 Concluída |
-| Fase 4 — Internacionalização | 5/9 | 🟡 Em andamento |
+| Fase 4 — Internacionalização | 6/9 | 🟡 Em andamento |
 | Fase 5 — Polimento e entrega | 0/17 | ⬜ Não iniciada |
 
 Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqueada
@@ -826,7 +826,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [ ] Nenhuma string de interface hardcoded em componente (§10.4)
 - [x] Utilitário de fallback por campo implementado e testado (RN-06) — plano **061** (`835f188`)
 - [x] Rotas EN espelhando as rotas PT, inclusive a 404 em `/en` (RF-27) — plano **068** (`292ed25`), com 065–067
-- [ ] Seletor de idioma preservando a página atual (RF-29)
+- [x] Seletor de idioma preservando a página atual (RF-29) — plano **069** (`2d93c8e`)
 - [ ] `hreflang`, canonical e sitemap bilíngue (RF-30)
 - [ ] M-07 verificada: zero strings PT de interface nas rotas EN
 - [x] Grupo `en` do `perfil` cobre `atuacao[]` (cargo), no Zod e no Tina, com o teste de paridade — plano **060** (`122df25`)
