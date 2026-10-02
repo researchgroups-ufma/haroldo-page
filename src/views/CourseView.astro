@@ -12,12 +12,13 @@
  *                 bibliografia e links.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.1.0
  *
  *  Dependências : BaseLayout, PageHeader, CoursePanel, LessonList, ScriptPanel,
- *                 CourseResources, CourseTabs, src/scripts/course-tabs.ts,
- *                 src/i18n (strings),
+ *                 CourseResources, CourseTabs, FallbackNotice,
+ *                 src/scripts/course-tabs.ts, src/i18n (`strings`),
+ *                 src/i18n/fallback.ts (`localize`, `localizeOptional`, `hasFallback`),
  *                 src/lib/config.ts (`Locale`), src/lib/routes.ts (routePath),
  *                 src/lib/text.ts (toParagraphs), src/lib/courses.ts
  *                 (groupScriptsByLesson, presentSections), astro:content
@@ -25,14 +26,16 @@
  *  Entradas     : props `lang` e `course` (ambas obrigatórias)
  *  Saídas       : HTML estático do corpo da página de disciplina
  *  Uso          : <CourseView lang="pt" course={Astro.props.course} /> em
- *                 `src/pages/ensino/[slug].astro`
+ *                 `src/pages/ensino/[slug].astro`; com `lang="en"` em
+ *                 `src/pages/en/teaching/[slug].astro`
  *
  *  Notas        : abas como melhoria progressiva (RNF-02): marcação em
  *                 `CourseTabs`, script em `src/scripts/course-tabs.ts`.
  *                 Scripts com `aula` correspondente aparecem dentro de
  *                 `LessonList` (F-13); os de `general` (sem aula) têm aba
- *                 própria, só se houver algum. Sem fallback por campo aqui
- *                 (plano 067).
+ *                 própria, só se houver algum. Fallback por campo (RN-06) de
+ *                 nome, descrição e ementa, e aviso único (F-07); campos "P"
+ *                 das listas embutidas ficam nos componentes (Decisão 13).
  * ============================================================================
  */
 import type { CollectionEntry } from 'astro:content';
@@ -43,7 +46,9 @@ import CourseTabs from '../components/CourseTabs.astro';
 import LessonList from '../components/LessonList.astro';
 import ScriptPanel from '../components/ScriptPanel.astro';
 import CourseResources from '../components/CourseResources.astro';
+import FallbackNotice from '../components/FallbackNotice.astro';
 import { strings } from '../i18n';
+import { hasFallback, localize, localizeOptional } from '../i18n/fallback';
 import type { Locale } from '../lib/config';
 import { routePath } from '../lib/routes';
 import { toParagraphs } from '../lib/text';
@@ -66,26 +71,40 @@ const { byLesson, general } = groupScriptsByLesson(data.aulas ?? [], data.script
 const tabs = presentSections(data, general.length).filter((section) => section.key !== 'syllabus');
 
 const meta = [data.codigo, data.semestre, t.course.status[data.status]].filter(Boolean).join(' · ');
-const descriptionParagraphs = toParagraphs(data.descricao);
-const syllabusParagraphs = toParagraphs(data.ementa);
+// RN-06: `nome`, `descricao` e `ementa` por idioma; os campos "P" não entram na conta do aviso.
+const nome = localize(data.nome, data.en?.nome, lang);
+const descricao = localizeOptional(data.descricao, data.en?.descricao, lang);
+const ementa = localizeOptional(data.ementa, data.en?.ementa, lang);
+const showNotice = hasFallback([nome, descricao, ementa]);
+const descriptionParagraphs = toParagraphs(descricao?.text);
+const syllabusParagraphs = toParagraphs(ementa?.text);
 const lessons = data.aulas ?? [];
 ---
 
-<BaseLayout title={data.nome}>
+<BaseLayout title={nome.text}>
   <PageHeader
     slot="cabecalho"
-    title={data.nome}
+    title={nome.text}
+    titleLang={nome.lang}
     meta={meta}
     back={{ href: routePath('teaching', lang), label: t.course.back }}
   >
     <Fragment slot="aside">
-      {descriptionParagraphs.map((paragraph) => <p class="text-corpo">{paragraph}</p>)}
+      {
+        descriptionParagraphs.map((paragraph) => (
+          <p class="text-corpo" lang={descricao?.lang}>
+            {paragraph}
+          </p>
+        ))
+      }
       {
         syllabusParagraphs.length > 0 && (
           <div class="mt-4">
             <p class="text-rotulo text-secundario">{t.course.syllabus}</p>
             {syllabusParagraphs.map((paragraph) => (
-              <p class="text-pequeno text-secundario mt-1">{paragraph}</p>
+              <p class="text-pequeno text-secundario mt-1" lang={ementa?.lang}>
+                {paragraph}
+              </p>
             ))}
           </div>
         )
@@ -93,6 +112,7 @@ const lessons = data.aulas ?? [];
     </Fragment>
   </PageHeader>
 
+  <FallbackNotice show={showNotice} class="px-margem pt-4" />
   <div class="px-margem">
     <CourseTabs lang={lang} tabs={tabs} />
 

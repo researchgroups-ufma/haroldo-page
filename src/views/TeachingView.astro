@@ -11,28 +11,34 @@
  *                 sempre rotulados, com estado vazio explícito (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.1.0
  *
- *  Dependências : BaseLayout, PageHeader, ExternalLink, src/i18n (strings),
- *                 src/lib/config.ts (`Locale`), src/lib/routes.ts (coursePath),
+ *  Dependências : BaseLayout, PageHeader, ExternalLink, FallbackNotice, LangText,
+ *                 src/i18n (`strings`), src/i18n/fallback.ts (`localize`, `localizeOptional`,
+ *                 `portugueseOnly`, `hasFallback`), src/lib/config.ts (`Locale`),
+ *                 src/lib/routes.ts (coursePath),
  *                 src/lib/text.ts (toParagraphs), src/lib/date.ts (formatDate),
  *                 src/lib/published.ts (filterPublished),
  *                 src/lib/courses.ts (splitCourses, buildCourseSlugs, courseSlug),
  *                 astro:content (getCollection)
  *  Entradas     : prop `lang` (obrigatória); coleção `disciplinas`
  *  Saídas       : HTML estático do corpo da página Ensino
- *  Uso          : <TeachingView lang="pt" /> em `src/pages/ensino.astro`
+ *  Uso          : <TeachingView lang="pt" /> em `src/pages/ensino.astro`;
+ *                 <TeachingView lang="en" /> em `src/pages/en/teaching.astro`
  *
  *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
- *                 sem fallback por campo aqui (plano 067).
+ *                 fallback por campo (RN-06) de nome e descrição, aviso único (F-07).
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import ExternalLink from '../components/ExternalLink.astro';
+import FallbackNotice from '../components/FallbackNotice.astro';
+import LangText from '../components/LangText.astro';
 import { strings } from '../i18n';
+import { hasFallback, localize, localizeOptional, portugueseOnly } from '../i18n/fallback';
 import type { Locale } from '../lib/config';
 import { coursePath } from '../lib/routes';
 import { toParagraphs } from '../lib/text';
@@ -54,20 +60,32 @@ const disciplinas = filterPublished(await getCollection('disciplinas'));
 const { current, previous } = splitCourses(disciplinas);
 // Reprova o build, nomeando os dois caminhos, se duas disciplinas publicadas gerarem o mesmo slug.
 buildCourseSlugs(disciplinas);
+// RN-06: `nome` e `descricao` resolvidos por idioma. O aviso (F-07) conta só o que a página exibe.
+const resolve = (course: (typeof disciplinas)[number]) => ({
+  nome: localize(course.data.nome, course.data.en?.nome, lang),
+  descricao: localizeOptional(course.data.descricao, course.data.en?.descricao, lang),
+});
+const currentView = current.map((course) => ({ course, ...resolve(course) }));
+const previousView = previous.map((course) => ({ course, ...resolve(course) }));
+const showNotice = hasFallback([
+  ...currentView.flatMap((v) => [v.nome, v.descricao]),
+  ...previousView.map((v) => v.nome),
+]);
 ---
 
 <BaseLayout title={t.nav.teaching}>
   <PageHeader slot="cabecalho" title={t.teaching.title} />
 
+  <FallbackNotice show={showNotice} class="px-margem pt-4" />
   <section aria-labelledby="ensino-atuais" class="px-margem pt-8 pb-4">
     <h2 id="ensino-atuais" class="text-rotulo text-secundario">{t.teaching.current}</h2>
     {
       current.length === 0 ? (
         <p class="text-corpo text-secundario mt-4">{t.teaching.noCurrent}</p>
       ) : (
-        current.map((course) => {
-          const { codigo, semestre, nome, descricao, aulas } = course.data;
-          const paragraph = toParagraphs(descricao)[0];
+        currentView.map(({ course, nome, descricao }) => {
+          const { codigo, semestre, aulas } = course.data;
+          const paragraph = toParagraphs(descricao?.text)[0];
           // RN-04: a ordem das aulas é a do professor — a "última" é a última da lista dele.
           const latest = aulas?.at(-1);
           return (
@@ -77,18 +95,25 @@ buildCourseSlugs(disciplinas);
               </p>
               <div>
                 <h3 class="text-display-2 mt-1">
-                  <a href={coursePath(courseSlug(course.filePath), lang)} class="link-sublinhado">
-                    {nome}
+                  <a
+                    href={coursePath(courseSlug(course.filePath), lang)}
+                    class="link-sublinhado"
+                    lang={nome.lang}
+                  >
+                    {nome.text}
                   </a>
                 </h3>
                 {paragraph && (
-                  <p class="text-corpo text-secundario max-w-medida mt-2">{paragraph}</p>
+                  <p class="text-corpo text-secundario max-w-medida mt-2" lang={descricao?.lang}>
+                    {paragraph}
+                  </p>
                 )}
                 {latest && (
                   <p class="text-pequeno mt-4">
                     <span class="text-secundario">{t.teaching.latestLesson} ·</span>{' '}
                     <ExternalLink href={latest.url} class="underline">
-                      {latest.numero}. {latest.titulo}
+                      {/* Decisão 13: título de aula é campo "P" — `lang` sem ligar o aviso. */}
+                      {latest.numero}. <LangText value={portugueseOnly(latest.titulo, lang)} />
                     </ExternalLink>
                     {latest.data && (
                       <span class="text-secundario"> · {formatDate(latest.data, lang)}</span>
@@ -110,8 +135,8 @@ buildCourseSlugs(disciplinas);
         <p class="text-corpo text-secundario mt-4">{t.teaching.noPrevious}</p>
       ) : (
         <ul class="mt-4">
-          {previous.map((course) => {
-            const { codigo, semestre, nome } = course.data;
+          {previousView.map(({ course, nome }) => {
+            const { codigo, semestre } = course.data;
             return (
               <li class="disciplina-anterior">
                 <a
@@ -122,8 +147,11 @@ buildCourseSlugs(disciplinas);
                   <span class="text-pequeno text-secundario col-span-2">
                     {codigo ? `${codigo} · ${semestre}` : semestre}
                   </span>
-                  <span class="text-titulo-item decoration-1 underline-offset-[6px] group-hover:underline">
-                    {nome}
+                  <span
+                    class="text-titulo-item decoration-1 underline-offset-[6px] group-hover:underline"
+                    lang={nome.lang}
+                  >
+                    {nome.text}
                   </span>
                   <span aria-hidden="true" class="text-secundario">
                     ›

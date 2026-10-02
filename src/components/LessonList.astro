@@ -10,11 +10,13 @@
  *                 correspondente (F-13, RF-37).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-28
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.5.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/ScriptPanel.astro,
- *                 src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
+ *                 src/components/LangText.astro, src/i18n (`strings`),
+ *                 src/i18n/fallback.ts (`portugueseOnly`),
+ *                 src/lib/routes.ts (`localeFromPath`),
  *                 src/lib/date.ts (formatDate), src/lib/text.ts (padCount, toParagraphs),
  *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
  *  Entradas     : props `lessons` (array de aulas, já validado pelo Zod) e
@@ -32,7 +34,9 @@
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
 import ScriptPanel from './ScriptPanel.astro';
+import LangText from './LangText.astro';
 import { strings } from '../i18n';
+import { portugueseOnly } from '../i18n/fallback';
 import { localeFromPath } from '../lib/routes';
 import { formatDate } from '../lib/date';
 import { padCount, toParagraphs } from '../lib/text';
@@ -61,7 +65,10 @@ const t = strings(lang);
 <ol class="flex list-none flex-col">
   {
     lessons.map((aula, index) => {
-      const paragraphs = toParagraphs(aula.descricao);
+      // Decisão 13 (sabatina fase 4): título e descrição de aula são "P" — `lang` sem ligar o aviso.
+      const titulo = portugueseOnly(aula.titulo, lang);
+      const descricao = portugueseOnly(aula.descricao ?? '', lang);
+      const paragraphs = toParagraphs(descricao.text);
       // byLesson tem o mesmo tamanho de lessons (groupScriptsByLesson) — sempre o mesmo array.
       const scripts = byLesson[index];
       return (
@@ -82,11 +89,13 @@ const t = strings(lang);
                 href={aula.url}
                 class="decoration-1 underline-offset-[6px] hover:underline"
               >
-                {aula.titulo}
+                <LangText value={titulo} />
               </ExternalLink>
             </h3>
             {paragraphs.map((paragraph) => (
-              <p class="text-pequeno text-secundario max-w-medida mt-1">{paragraph}</p>
+              <p class="text-pequeno text-secundario max-w-medida mt-1" lang={descricao.lang}>
+                {paragraph}
+              </p>
             ))}
             {scripts.length > 0 && (
               <div class="mt-4 flex flex-col gap-4">

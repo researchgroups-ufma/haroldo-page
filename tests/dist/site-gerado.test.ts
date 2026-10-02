@@ -118,6 +118,7 @@ describe('rotas fixas existem (§11)', () => {
       'en/about/index.html',
       'en/research/index.html',
       'en/publications/index.html',
+      'en/teaching/index.html',
     ];
     for (const rota of rotasFixas) {
       expect(existsSync(join(distDir, rota)), `esperava dist/${rota}`).toBe(true);
@@ -138,6 +139,27 @@ describe('disciplina publicada gera página; rascunho não gera página (§11, R
         existsSync(join(distDir, 'ensino', slug, 'index.html')),
         `esperava dist/ensino/${slug}/index.html`,
       ).toBe(true);
+    }
+  });
+
+  // RF-29, sabatina fase 4, Decisão 3: a disciplina EN usa o mesmo slug da rota PT.
+  it('toda disciplina publicada tem dist/en/teaching/<courseSlug>/index.html (mesmo slug)', () => {
+    for (const slug of slugsEsperados) {
+      expect(
+        existsSync(join(distDir, 'en', 'teaching', slug, 'index.html')),
+        `esperava dist/en/teaching/${slug}/index.html`,
+      ).toBe(true);
+    }
+  });
+
+  it('nenhuma pasta em dist/en/teaching/ sem disciplina publicada correspondente', () => {
+    const pastas = readdirSync(join(distDir, 'en', 'teaching'), { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+    for (const pasta of pastas) {
+      expect(slugsEsperados.has(pasta), `dist/en/teaching/${pasta}/ sem disciplina publicada`).toBe(
+        true,
+      );
     }
   });
 
@@ -243,6 +265,18 @@ describe('aviso de idioma (F-07, RF-28)', () => {
   // contar o conteúdo exato); Publicações EN não exibe campo "T" nem "P" (Decisões 13 e 15).
   it('em /en/research/ o aviso aparece no máximo uma vez no <main>', () => {
     expect(noticeCount('en/research/index.html', notice)).toBeLessThanOrEqual(1);
+  });
+
+  // Ensino e Disciplina EN: só `nome`/`descricao`/`ementa` ligam o aviso (Decisão 13: campos "P" não).
+  it('em /en/teaching/ e em cada disciplina EN o aviso aparece no máximo uma vez no <main>', () => {
+    expect(noticeCount('en/teaching/index.html', notice)).toBeLessThanOrEqual(1);
+    const dir = join(distDir, 'en', 'teaching');
+    for (const entry of readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory())) {
+      expect(
+        noticeCount(`en/teaching/${entry.name}/index.html`, notice),
+        entry.name,
+      ).toBeLessThanOrEqual(1);
+    }
   });
 
   it('em /en/publications/ não há aviso nem lang="pt-BR" no <main>', () => {
@@ -448,23 +482,33 @@ describe('navegação principal sem "Início"', () => {
 });
 
 describe('página de disciplina: seta de volta no lugar da trilha', () => {
-  it('sem "Trilha de navegação"; um link "Voltar para Ensino" para /ensino/ antes do <h1>', () => {
-    const ensinoDir = join(distDir, 'ensino');
-    const pages = readdirSync(ensinoDir, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => join(ensinoDir, entry.name, 'index.html'));
-    expect(pages.length).toBeGreaterThan(0);
-    for (const file of pages) {
-      const html = readFileSync(file, 'utf-8');
-      expect(html.includes('Trilha de navegação'), `${file} ainda tem a trilha`).toBe(false);
-      const backTag = html.match(/<a [^>]*aria-label="Voltar para Ensino"[^>]*>/)?.[0];
-      expect(backTag, `${file} sem a seta de volta`).toBeDefined();
-      expect(backTag, file).toContain('href="/ensino/"');
-      expect(html.indexOf(backTag as string), `${file}: a seta vem antes do <h1>`).toBeLessThan(
-        html.indexOf('<h1'),
-      );
-    }
-  });
+  // PT: dist/ensino/<slug>/ -> /ensino/; EN (RF-28): dist/en/teaching/<slug>/ -> /en/teaching/.
+  const arvores = [
+    { dir: join(distDir, 'ensino'), locale: 'pt', href: '/ensino/' },
+    { dir: join(distDir, 'en', 'teaching'), locale: 'en', href: '/en/teaching/' },
+  ] as const;
+
+  for (const { dir, locale, href } of arvores) {
+    const rotulo = strings(locale).course.back;
+    it(`${locale}: sem "Trilha de navegação"; um link "${rotulo}" para ${href} antes do <h1>`, () => {
+      const pages = readdirSync(dir, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => join(dir, entry.name, 'index.html'));
+      expect(pages.length).toBeGreaterThan(0);
+      for (const file of pages) {
+        const html = readFileSync(file, 'utf-8');
+        expect(html.includes('Trilha de navegação'), `${file} ainda tem a trilha`).toBe(false);
+        const backTag = html.match(
+          new RegExp(`<a [^>]*aria-label="${rotulo}"[^>]*>`),
+        )?.[0];
+        expect(backTag, `${file} sem a seta de volta`).toBeDefined();
+        expect(backTag, file).toContain(`href="${href}"`);
+        expect(html.indexOf(backTag as string), `${file}: a seta vem antes do <h1>`).toBeLessThan(
+          html.indexOf('<h1'),
+        );
+      }
+    });
+  }
 });
 
 describe('contato da Home igual ao da Sobre', () => {

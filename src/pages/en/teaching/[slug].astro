@@ -1,0 +1,31 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : [slug].astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina da disciplina em inglês (RF-28, RF-24): só chama
+ *                 `CourseView` com `lang="en"` (sabatina fase 4, Decisão 6).
+ *                 RF-29: o slug é o mesmo da rota PT, porque reusa
+ *                 `courseStaticPaths` (Decisão 3); rascunho não gera página (RN-01).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-02
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/CourseView.astro, src/views/course-paths.ts
+ *  Entradas     : prop `course`, gerada por `courseStaticPaths`
+ *  Saídas       : HTML estático de uma rota `/en/teaching/<slug>/` por disciplina publicada
+ *  Uso          : servido automaticamente pelo Astro para cada caminho de `getStaticPaths`
+ *
+ *  Notas        : o corpo da página vive em `CourseView`.
+ * ============================================================================
+ */
+import CourseView from '../../../views/CourseView.astro';
+import { courseStaticPaths } from '../../../views/course-paths';
+
+export const getStaticPaths = courseStaticPaths;
+
+const { course } = Astro.props;
+---
+
+<CourseView lang="en" course={course} />

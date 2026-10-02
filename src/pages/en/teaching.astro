@@ -1,0 +1,24 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : teaching.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina de Ensino em inglês (RF-28, RF-23): só chama
+ *                 `TeachingView` com `lang="en"` (sabatina fase 4, Decisão 6).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-02
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/TeachingView.astro
+ *  Entradas     : nenhuma
+ *  Saídas       : HTML estático da rota `/en/teaching/`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/en/teaching.astro`
+ *
+ *  Notas        : o corpo da página vive em `TeachingView`.
+ * ============================================================================
+ */
+import TeachingView from '../../views/TeachingView.astro';
+---
+
+<TeachingView lang="en" />

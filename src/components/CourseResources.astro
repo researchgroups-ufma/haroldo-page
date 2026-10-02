@@ -12,12 +12,13 @@
  *                 para manter os dois abaixo de 150 linhas (§10.4 do PRD).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-09-28
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.4.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/CoursePanel.astro,
- *                 src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
- *                 src/lib/date.ts (formatDate),
+ *                 src/components/LangText.astro, src/i18n (`strings`),
+ *                 src/i18n/fallback.ts (`portugueseOnly`),
+ *                 src/lib/routes.ts (`localeFromPath`), src/lib/date.ts (formatDate),
  *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
  *  Entradas     : prop `data` (dados de uma disciplina, já validados pelo Zod)
  *  Saídas       : até quatro `CoursePanel` (listas, materiais, bibliografia, links)
@@ -29,7 +30,9 @@
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
 import CoursePanel from './CoursePanel.astro';
+import LangText from './LangText.astro';
 import { strings } from '../i18n';
+import { portugueseOnly } from '../i18n/fallback';
 import { localeFromPath } from '../lib/routes';
 import { formatDate } from '../lib/date';
 
@@ -50,6 +53,8 @@ const links = data.links ?? [];
 // decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
 const lang = localeFromPath(Astro.url.pathname);
 const t = strings(lang);
+// Decisão 13 (sabatina fase 4): títulos, descrições e referências são "P" — `lang` sem ligar o aviso.
+const pt = (text: string) => portugueseOnly(text, lang);
 ---
 
 {
@@ -62,7 +67,7 @@ const t = strings(lang);
               href={lista.url}
               class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
             >
-              {lista.titulo}
+              <LangText value={pt(lista.titulo)} />
             </ExternalLink>
             {lista.data_entrega && (
               <span class="text-pequeno text-secundario">
@@ -87,10 +92,12 @@ const t = strings(lang);
                 href={material.url}
                 class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
               >
-                {material.titulo}
+                <LangText value={pt(material.titulo)} />
               </ExternalLink>
               {material.descricao && (
-                <p class="text-pequeno text-secundario mt-1">{material.descricao}</p>
+                <p class="text-pequeno text-secundario mt-1" lang={pt(material.descricao).lang}>
+                  {material.descricao}
+                </p>
               )}
             </div>
           </li>
@@ -105,7 +112,7 @@ const t = strings(lang);
       <ol class="max-w-medida flex list-decimal flex-col gap-3 pl-5">
         {bibliografia.map((referencia) => (
           <li class="text-corpo">
-            {referencia.referencia}{' '}
+            <LangText value={pt(referencia.referencia)} />{' '}
             {referencia.url && (
               <ExternalLink href={referencia.url} class="text-pequeno underline">
                 {t.course.access}
@@ -127,7 +134,7 @@ const t = strings(lang);
               href={link.url}
               class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
             >
-              {link.titulo}
+              <LangText value={pt(link.titulo)} />
             </ExternalLink>
           </li>
         ))}

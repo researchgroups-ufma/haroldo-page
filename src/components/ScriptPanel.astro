@@ -10,12 +10,13 @@
  *                 "Copiado" por `aria-live`, e "Abrir arquivo ↗" só com `url`.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-21
- *  Atualizado em: 2026-09-28
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.3.0
  *
  *  Dependências : astro:components (Code), astro:content (tipo
  *                 CollectionEntry<'disciplinas'>), src/components/ExternalLink.astro,
- *                 src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`),
+ *                 src/i18n (`strings`),
+ *                 src/i18n/fallback.ts (`portugueseOnly`), src/lib/routes.ts (`localeFromPath`),
  *                 src/lib/text.ts (toParagraphs),
  *                 src/lib/code-theme.ts (monochromeTheme, shikiLanguage)
  *  Entradas     : prop `script` (um item de `data.scripts`, já validado pelo Zod);
@@ -32,6 +33,7 @@ import { Code } from 'astro:components';
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
 import { strings } from '../i18n';
+import { portugueseOnly } from '../i18n/fallback';
 import { localeFromPath } from '../lib/routes';
 import { toParagraphs } from '../lib/text';
 import { monochromeTheme, shikiLanguage } from '../lib/code-theme';
@@ -48,11 +50,15 @@ export interface Props {
 
 const { script, headingLevel = 3 } = Astro.props;
 const Heading = headingLevel === 4 ? 'h4' : 'h3';
-const paragraphs = toParagraphs(script.descricao);
 
 // decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
 const lang = localeFromPath(Astro.url.pathname);
 const t = strings(lang);
+// Decisão 13 (sabatina fase 4): título e descrição de script são "P" — `lang` sem ligar o aviso.
+// `codigo` é factual e nunca leva `lang`.
+const titulo = portugueseOnly(script.titulo, lang);
+const descricao = portugueseOnly(script.descricao ?? '', lang);
+const paragraphs = toParagraphs(descricao.text);
 ---
 
 <article
@@ -63,8 +69,14 @@ const t = strings(lang);
     <p class="text-rotulo text-secundario">
       {t.script.eyebrow(t.script.language[script.linguagem])}
     </p>
-    <Heading class="text-titulo-item mt-2">{script.titulo}</Heading>
-    {paragraphs.map((paragraph) => <p class="text-corpo mt-2">{paragraph}</p>)}
+    <Heading class="text-titulo-item mt-2" lang={titulo.lang}>{titulo.text}</Heading>
+    {
+      paragraphs.map((paragraph) => (
+        <p class="text-corpo mt-2" lang={descricao.lang}>
+          {paragraph}
+        </p>
+      ))
+    }
     <div class="mt-4 flex flex-wrap items-center gap-4">
       {
         /* RF-37/§5.4: nasce hidden — melhoria progressiva, só aparece se a Clipboard API existir. */
