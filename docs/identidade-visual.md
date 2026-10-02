@@ -139,8 +139,19 @@ Todos em `src/components/`. Não existem mais botão pílula, tag nem rodapé: `
   não têm sublinhado em repouso. A página de disciplina marca "Ensino".
 - Abaixo de `lg`: botão "Menu" (alvo ≥ 44 px, `aria-expanded`/`aria-controls`) que abre a lista
   com réguas; sem JS, a lista aparece aberta.
-- **Fase 4:** o lugar do seletor de idioma (RF-29) está marcado por um comentário entre o nome e o
-  botão "Menu".
+- **Seletor de idioma** (`LanguageLink.astro`, RF-29): um link só, com o idioma de destino — "EN"
+  nas páginas PT, "PT" nas EN — em `text-nav` e com o traço que segue o cursor (`link-traco`). Leva
+  `hreflang` e `lang` do destino e o nome acessível por extenso ("EN (English version)", "PT
+  (Versão em português)"). Aponta para a **mesma página** no outro idioma: `/ensino/` ↔
+  `/en/teaching/`, `/ensino/<slug>/` ↔ `/en/teaching/<slug>/`; na 404 de um idioma, para a Home do
+  outro. Fica **fora do menu recolhível**: abaixo de `lg` está na linha do nome, ao lado do botão
+  "Menu", com alvo ≥ 44 px, e visível sem abrir o menu. A partir de `lg` a ordem é nome · navegação ·
+  seletor (o seletor no canto direito, como na Home). Sem classe `vt-*`. Medido pelo orquestrador em
+  2026-10-02, a 1024 e 1440 px o seletor fica na mesma linha da navegação. Abaixo de ~354 px úteis
+  (ex.: 360 px com barra de rolagem clássica) o par seletor + "Menu" desce para uma segunda linha sob
+  o nome, sem estouro; a 360 px reais fica na linha do nome. A partir de `lg` a ordem de Tab (nome,
+  seletor, navegação) difere da visual (nome, navegação, seletor): decisão de produto, com a
+  verificação de teclado a cargo do stakeholder.
 - A Home não usa este cabeçalho (`BaseLayout` com `bare`): ela mesma mostra o nome grande e o menu.
 
 ### 5.2 Cabeçalho de página (`PageHeader.astro`)
@@ -199,7 +210,10 @@ existe. Datas saem no formato do idioma, como "March 15, 2026".
 ### 6.1 Home `/` (RF-20)
 
 - Topo: **nome** de exibição em `display-1` (`<h1>`) à esquerda e a navegação à direita, sem
-  "Início".
+  "Início". O seletor de idioma (5.1, RF-29) vem **depois** da navegação, na mesma linha e com o
+  mesmo estilo dos itens (abaixo de `lg` o seletor ganha o alvo de toque de 44 px, `min-h-11 px-2`,
+  que os itens não têm), mas **fora** do `<nav>`: na Home EN ele aponta para `/`, e o menu
+  principal não tem link para a Home.
 - Meio: **foto** em p&b, 3:4, quando houver.
 - Régua forte e três blocos: **cargo** / **departamento** / **instituicao**, **resumo_home** e o
   contato (rubrica "Contato", **email** e os perfis acadêmicos na mesma sequência da Sobre —

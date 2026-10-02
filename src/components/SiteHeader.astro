@@ -10,20 +10,21 @@
  *                 progressiva (RNF-02) — sem JS a lista abre e o botão some.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.5.0
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.6.0
  *
- *  Dependências : src/i18n (strings), src/lib/config.ts (siteConfig),
+ *  Dependências : LanguageLink, src/i18n (strings), src/lib/config.ts (siteConfig),
  *                 src/lib/navigation.ts (navItems, isActivePath), src/lib/routes.ts
  *                 (localeFromPath, routePath)
  *  Entradas     : nenhuma
- *  Saídas       : `<header>` com nome, navegação e menu do celular
+ *  Saídas       : `<header>` com nome, seletor de idioma, navegação e menu do celular
  *  Uso          : import SiteHeader from '../components/SiteHeader.astro'
  *
- *  Notas        : espaço do seletor de idioma (RF-29) não renderiza nada — só o comentário no HTML.
+ *  Notas        : o seletor de idioma (RF-29) fica fora do menu recolhível, ao lado do botão "Menu".
  * ============================================================================
  */
 import { strings } from '../i18n';
+import LanguageLink from './LanguageLink.astro';
 import { siteConfig } from '../lib/config';
 import { navItems as navItemsFor, isActivePath } from '../lib/navigation';
 import { localeFromPath, routePath } from '../lib/routes';
@@ -43,22 +44,27 @@ const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
     >
       <a href={routePath('home', lang)} class="vt-nome text-display-2">{siteConfig.displayName}</a>
 
-      <!-- fase 4: seletor de idioma (RF-29) -->
-
-      <button
-        type="button"
-        id="menu-botao"
-        hidden
-        aria-expanded="false"
-        aria-controls="menu-lista"
-        class="text-nav inline-flex min-h-11 items-center px-2 lg:hidden"
-      >
-        {t.site.menu}
-      </button>
+      {
+        /* RF-29: fora de `#menu-caixa`, o seletor fica visível no celular sem abrir o menu. A partir
+           de `lg` ele vai para depois da navegação (`lg:order-last`), como na Home. */
+      }
+      <div class="flex items-center gap-2 lg:order-last lg:pt-3">
+        <LanguageLink />
+        <button
+          type="button"
+          id="menu-botao"
+          hidden
+          aria-expanded="false"
+          aria-controls="menu-lista"
+          class="text-nav inline-flex min-h-11 items-center px-2 lg:hidden"
+        >
+          {t.site.menu}
+        </button>
+      </div>
 
       <nav
         aria-label={t.site.mainNavLabel}
-        class="vt-menu order-last w-full lg:order-none lg:w-auto"
+        class="vt-menu order-last w-full lg:order-none lg:mr-4 lg:ml-auto lg:w-auto"
       >
         <div id="menu-caixa">
           <ul

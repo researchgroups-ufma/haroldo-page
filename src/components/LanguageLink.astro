@@ -1,0 +1,47 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : LanguageLink.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Seletor de idioma (RF-29): um link só, com o idioma de destino
+ *                 ("EN" nas páginas PT, "PT" nas EN), para a mesma página no outro
+ *                 idioma (sabatina fase 4, Decisões 3 e 5). Na 404 leva à Home do
+ *                 outro idioma (RF-27).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-02
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/i18n (`strings`), src/lib/routes.ts (`localeFromPath`,
+ *                 `counterpartPath`, `HTML_LANG`)
+ *  Entradas     : nenhuma — o idioma e o destino saem de `Astro.url.pathname`
+ *  Saídas       : `<a>` com `hreflang` e `lang` do destino, texto visível do
+ *                 dicionário da página e nome acessível por extenso
+ *  Uso          : <LanguageLink /> em `SiteHeader.astro` e `HomeView.astro`
+ *
+ *  Notas        : sem classe `vt-*` (no máximo um `vt-nome` e um `vt-menu` por
+ *                 página). Em rota fora do mapa, `counterpartPath` lança e o
+ *                 build reprova, em vez de gerar link quebrado.
+ * ============================================================================
+ */
+import { strings } from '../i18n';
+import { HTML_LANG, counterpartPath, localeFromPath } from '../lib/routes';
+
+// Decisão 2 do fatiamento da fase 4: o idioma vem do caminho, sem prop.
+const lang = localeFromPath(Astro.url.pathname);
+const target = lang === 'pt' ? 'en' : 'pt';
+// `language.code`/`language.name` do dicionário DA PÁGINA descrevem o destino (plano 057).
+const t = strings(lang);
+// RF-29: a mesma página no outro idioma; a 404 pareia com a Home (RF-27).
+const href = counterpartPath(Astro.url.pathname);
+---
+
+<a
+  href={href}
+  hreflang={HTML_LANG[target]}
+  lang={HTML_LANG[target]}
+  class="text-nav inline-flex min-h-11 items-center px-2 lg:min-h-0 lg:px-0"
+>
+  <span class="link-traco">{t.language.code}</span>
+  <span class="sr-only"> ({t.language.name})</span>
+</a>

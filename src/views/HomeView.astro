@@ -9,10 +9,10 @@
  *                 cargo, instituição, `resumo_home`, contato, formação e áreas.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-10-01
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.2.0
  *
- *  Dependências : BaseLayout, ExternalLink, ProfileLists, FallbackNotice, src/i18n/fallback.ts,
+ *  Dependências : BaseLayout, ExternalLink, ProfileLists, FallbackNotice, LanguageLink, src/i18n/fallback.ts,
  *                 src/lib/config.ts (siteConfig, `Locale`),
  *                 src/lib/profile.ts, src/lib/navigation.ts, src/i18n/index.ts (strings),
  *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
@@ -29,6 +29,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import FallbackNotice from '../components/FallbackNotice.astro';
+import LanguageLink from '../components/LanguageLink.astro';
 import ProfileLists from '../components/ProfileLists.astro';
 import { strings } from '../i18n';
 import { hasFallback, localize, localizeOptional } from '../i18n/fallback';
@@ -83,19 +84,26 @@ const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
       <h1 id="home-nome" class="vt-nome text-display-1 titulo-entrada lg:col-span-6">
         {siteConfig.displayName}
       </h1>
-      <nav aria-label={t.site.mainNavLabel} class="vt-menu lg:col-span-6 lg:col-start-7 lg:pt-3">
-        <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
-          {
-            navItems.map((item) => (
-              <li>
-                <a href={item.href} class="link-traco">
-                  {t.nav[item.key]}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
+      {
+        /* RF-29: o seletor fica na linha da navegação mas fora do `<nav>`: na Home EN ele aponta para
+          `/`, e o teste de `dist` proíbe `href="/"` no menu principal (a volta à Home é o nome). */
+      }
+      <div class="flex items-center gap-x-6 lg:col-span-6 lg:col-start-7 lg:items-start lg:pt-3">
+        <nav aria-label={t.site.mainNavLabel} class="vt-menu min-w-0 flex-1">
+          <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
+            {
+              navItems.map((item) => (
+                <li>
+                  <a href={item.href} class="link-traco">
+                    {t.nav[item.key]}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <LanguageLink />
+      </div>
     </div>
 
     <div

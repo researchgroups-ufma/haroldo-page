@@ -5,15 +5,16 @@
  *  Descrição    : Teste de integração sobre o `dist/` recém-gerado (§11 do PRD, nível
  *                 "Integração": rotas geradas, nenhum rascunho publicado), RN-01 (rascunho nunca
  *                 aparece no HTML), RNF-02 (JS < 50 KB gzip por rota, zero framework de UI), RF-10
- *                 (disciplina não publicada não gera página), RF-27 (existência de `dist/404.html` e `dist/en/404.html`)
+ *                 (disciplina não publicada não gera página), RF-27 (existência de `dist/404.html` e `dist/en/404.html`),
+ *                 RF-29 (um seletor de idioma por página, para o par da rota)
  *                 e §8.3 (um `<h1>` por página, `lang` por árvore: pt-BR; en sob `dist/en/`). Lê arquivos de `dist/`, não sobe
  *                 servidor. Roda separado da suíte padrão (`vitest.dist.config.ts`, plano 052,
  *                 README da fase 3, decisão 9) porque depende de `npm run build:pipeline` já ter
  *                 rodado.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-23
- *  Atualizado em: 2026-10-01
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.3.0
  *
  *  Dependências : vitest, gray-matter, node:fs, node:path, node:zlib, src/lib/courses.ts,
  *                 src/i18n, src/lib/routes.ts
@@ -42,7 +43,7 @@ import matter from 'gray-matter';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { courseSlug } from '../../src/lib/courses';
 import { strings } from '../../src/i18n';
-import { HTML_LANG, localeFromPath } from '../../src/lib/routes';
+import { HTML_LANG, counterpartPath, localeFromPath } from '../../src/lib/routes';
 
 const repoRoot = join(__dirname, '../..');
 const distDir = join(repoRoot, 'dist');
@@ -433,6 +434,51 @@ describe('View Transitions: nomes únicos por página', () => {
       }
       expect(conteudo.includes('vt-nome'), `${file} sem vt-nome`).toBe(true);
     }
+  });
+});
+
+describe('seletor de idioma (RF-29)', () => {
+  /** Rota servida por um `.html` de `dist/`: `index.html` vira `/x/`; `404.html` fica como está. */
+  const routeOf = (file: string) =>
+    '/' +
+    file
+      .replace(distDir, '')
+      .replace(/\\/g, '/')
+      .replace(/^\//, '')
+      .replace(/(^|\/)index\.html$/, '$1');
+
+  it('toda página tem um único link com hreflang, para o par da rota, com o texto do idioma de destino', () => {
+    for (const file of listSiteHtmlFiles()) {
+      const html = readFileSync(file, 'utf-8');
+      const route = routeOf(file);
+      const lang = localeFromPath(route);
+      const target = lang === 'pt' ? 'en' : 'pt';
+      const links = [...html.matchAll(/<a\s[^>]*\bhreflang="[^"]*"[^>]*>[\s\S]*?<\/a>/g)].map(
+        (m) => m[0],
+      );
+      expect(links.length, `${route}: ${links.length} links com hreflang`).toBe(1);
+      const link = links[0];
+      expect(link, `${route}: href`).toContain(`href="${counterpartPath(route)}"`);
+      expect(link, `${route}: hreflang`).toContain(`hreflang="${HTML_LANG[target]}"`);
+      expect(link, `${route}: lang`).toContain(` lang="${HTML_LANG[target]}"`);
+      expect(link, `${route}: texto visível`).toContain(`>${strings(lang).language.code}</span>`);
+      expect(link, `${route}: nome acessível`).toContain(strings(lang).language.name);
+      expect(link, `${route}: sem vt-*`).not.toMatch(/\bvt-/);
+    }
+  });
+
+  it('/ensino/ leva a /en/teaching/ e a disciplina troca só o prefixo e o segmento', () => {
+    const href = (rota: string) =>
+      readFileSync(join(distDir, rota, 'index.html'), 'utf-8').match(
+        /<a\s[^>]*\bhreflang="[^"]*"[^>]*>/,
+      )?.[0];
+    expect(href('ensino')).toContain('href="/en/teaching/"');
+    expect(href('en/teaching')).toContain('href="/ensino/"');
+    const slug = readdirSync(join(distDir, 'ensino'), { withFileTypes: true }).find((e) =>
+      e.isDirectory(),
+    )?.name as string;
+    expect(href(`ensino/${slug}`)).toContain(`href="/en/teaching/${slug}/"`);
+    expect(href(`en/teaching/${slug}`)).toContain(`href="/ensino/${slug}/"`);
   });
 });
 
