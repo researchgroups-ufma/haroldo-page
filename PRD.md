@@ -14,7 +14,7 @@
 | **Codinome / sigla** | `haroldo-page` |
 | **Versão do PRD** | v0.1.72 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073) — próximo: fase 5** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -829,7 +829,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Rotas EN espelhando as rotas PT, inclusive a 404 em `/en` (RF-27) — plano **068** (`292ed25`), com 065–067
 - [x] Seletor de idioma preservando a página atual (RF-29) — plano **069** (`2d93c8e`)
 - [x] `hreflang`, canonical e sitemap bilíngue (RF-30) — planos **070** (`96912de`) e **071** (`027f72a`)
-- [x] M-07 verificada: zero strings PT de interface nas rotas EN — plano **073**
+- [x] M-07 verificada: zero strings PT de interface nas rotas EN — plano **073** (`ead6056`)
 - [x] Grupo `en` do `perfil` cobre `atuacao[]` (cargo), no Zod e no Tina, com o teste de paridade — plano **060** (`122df25`)
 
 ### Fase 5 — Polimento e Entrega

@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-10-02 — **073** executado, à espera de promoção: M-07 verificada nas 8 rotas EN, fallback conferido item a item, §12 da fase 4 em 9/9 (PRD v0.1.72). Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
+Última atualização: 2026-10-02 — **073 DONE** (`ead6056`): M-07 verificada nas 8 rotas EN, fallback conferido item a item, seletor ida e volta nas 8 rotas; **fase 4 concluída, 9/9 no §12** (PRD v0.1.72); CI e Workers Builds verdes. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -127,7 +127,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 070 | `canonical` e `hreflang` com `x-default` (RF-30) | 🟢 DONE | agente | implementer (sonnet) | `96912de` |
 | 071 | Sitemap bilíngue com `@astrojs/sitemap` (RF-30, Decisão 10) | 🟢 DONE (ramo `serialize`, Decisão 14) | agente | implementer (sonnet) | `027f72a` |
 | 072 | Testes i18n sobre o `dist/`: par EN de toda rota PT e M-07 (Decisão 12) | 🟢 DONE | agente | implementer (sonnet) | `dd87a37` |
-| 073 | Verificação transversal e fechamento da fase 4 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
+| 073 | Verificação transversal e fechamento da fase 4 | 🟢 DONE | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | `ead6056` |
 | 074 | Enxugar o PRD: histórico de implementação em documento próprio | 🟢 DONE | orquestrador | nenhum (+ `code-reviewer`) | `ccf60ed` |
 
 **Numeração é global e contínua e não é ordem de execução.** A ordem está abaixo.

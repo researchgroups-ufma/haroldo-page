@@ -1,6 +1,6 @@
 # Plano 073 — Verificação transversal e fechamento da fase 4
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **M-07** (inspeção manual), critério de conclusão da fase 4 no §6.2 ("M-07 atingida; fallback verificado item a item"), RF-26, RF-28, RF-29; §12 fase 4, item 8
 **Depende de:** **todos os planos 055–072 em `DONE`** (Q-F4-1 e Q-F4-2 já respondidas: Decisões 13 e 14)
 **Modelo recomendado:** sonnet
@@ -86,7 +86,7 @@ quando".
 - [x] Seletor ida e volta nas 8 rotas (RF-29)
 - [x] README da fase com o estado final e o que a fase empurra adiante, cada item com "fecha quando"
 - [x] §12 da fase 4 em 9/9; §0, §0.1, §7.2 e §7.5 atualizados; `plans/README.md` com a fase 4 concluída
-- [ ] Portão local completo, CI e Workers Builds verdes no commit de fechamento, com saída colada
+- [x] Portão local completo, CI e Workers Builds verdes no commit de fechamento, com saída colada
 
 ## Evidência
 
@@ -958,11 +958,40 @@ manual (PRD §6.1, item 8; pedido específico no plano 073, linhas 65-66) e o "F
 dívidas da fase 3". `lint`, `test:coverage`, `build:pipeline` e `test:dist` não foram refeitos: o ciclo só
 mudou documentos, e o `dist/` e o código são os mesmos.
 
+### Passo 9 — CI e Workers Builds no commit de fechamento (orquestrador)
+
+Commit de trabalho `ead6056` empurrado para `main`; check-runs lidos pela API do GitHub com o SHA completo:
+
+```
+$ gh api repos/researchgroups-ufma/haroldo-page/commits/ead60567431d61da24581a70093a34154279237c/check-runs --jq '.check_runs[] | ...'
+Workers Builds: haroldo-page | id 111005500642 | completed | success | 2026-10-02T19:57:18Z
+qualidade | id 111004956913 | completed | success | 2026-10-02T19:57:14Z
+
+Version ID (Workers Builds, output.summary):
+Version ID: e4bce998-5f1c-407e-9e25-acac84168af3
+```
+
+Verificação autoritativa do `triage-runner` no ciclo 2 (depois da última edição; arquivos em
+`scratchpad/triage073b/`), linhas `EXIT=` dos seis `.txt`:
+
+```
+audit.txt:EXIT=0
+build.txt:EXIT=0
+coverage.txt:EXIT=0
+format.txt:EXIT=0
+lint.txt:EXIT=0
+test-dist.txt:EXIT=0
+```
+
+O `dist/` desse build é idêntico, por SHA-256 (16/16 HTML) e por `diff -rq` (129 arquivos, conferido pela revisão), ao
+medido no navegador nos passos 2–5. Revisão: REPROVADO no ciclo 1 (seis pontos, quatro deles na evidência do
+orquestrador), APROVADO no ciclo 2.
+
 ### O que NÃO rodei
 
 - Os passos 1–5 inteiros (são do orquestrador; os blocos acima são dele, sem edição minha além de BOM, CRLF e ANSI).
-- **CI do GitHub Actions e Workers Builds** no commit de fechamento: não rodei e não podia, porque não há
-  commit nem push. O critério correspondente do portão fica **vazio** e é do orquestrador, depois do push.
+- **CI do GitHub Actions e Workers Builds** no commit de fechamento: não rodei e não podia, porque não havia
+  commit nem push. Rodados pelo orquestrador depois do push — ver "Passo 9 — CI e Workers Builds" acima.
 - `npm audit --audit-level=high`: não está na lista do passo 9 e não rodei.
 - `node scripts/verificar-promocao.mjs`: não rodei, é do orquestrador na promoção; ele reprova pelo critério
   em branco do portão, o que é esperado.

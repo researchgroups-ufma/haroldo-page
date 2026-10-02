@@ -257,3 +257,7 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
   valor do dicionário `pt` em `/en/**` fora de `lang="pt-BR"` (M-07) e valor `en` nas rotas PT fora de `lang="en"` (§10.4),
   com extrator de texto próprio em `tests/dist/html-texto.ts`. Quatro canários vermelhos; nenhum falso positivo com o conteúdo
   real. Fecha o item 3 do §12, 8/9. Aprovado na primeira revisão.
+
+- **2026-10-02 — 073 DONE** (`ead6056`): **fase 4 concluída, 9/9.** No navegador, as 8 rotas EN em 360/768/1440 sem rolagem
+  horizontal (24/24), inspeção M-07 sem texto de interface em PT fora de `lang="pt-BR"`, fallback item a item (91 linhas, todo PT
+  marcado) e seletor ida e volta nas 8 rotas. PRD v0.1.72; README da fase com o que a fase empurra para a 5. Dois ciclos de revisão.
