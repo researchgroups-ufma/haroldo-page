@@ -7,7 +7,8 @@
  *                 aparece no HTML), RNF-02 (JS < 50 KB gzip por rota, zero framework de UI), RF-10
  *                 (disciplina não publicada não gera página), RF-27 (existência de `dist/404.html` e `dist/en/404.html`),
  *                 RF-29 (um seletor de idioma por página, para o par da rota),
- *                 RF-30 e RN-09 (canonical e `hreflang` com `x-default` no PT; as 404 sem eles)
+ *                 RF-30 e RN-09 (canonical e `hreflang` com `x-default` no PT; as 404 sem eles),
+ *                 RF-30 (sitemap bilíngue: mesmas rotas do `dist/`, sem 404, com os pares do `<head>`)
  *                 e §8.3 (um `<h1>` por página, `lang` por árvore: pt-BR; en sob `dist/en/`). Lê arquivos de `dist/`, não sobe
  *                 servidor. Roda separado da suíte padrão (`vitest.dist.config.ts`, plano 052,
  *                 README da fase 3, decisão 9) porque depende de `npm run build:pipeline` já ter
@@ -15,7 +16,7 @@
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-23
  *  Atualizado em: 2026-10-02
- *  Versão       : 0.3.0
+ *  Versão       : 0.4.0
  *
  *  Dependências : vitest, gray-matter, node:fs, node:path, node:zlib, src/lib/courses.ts,
  *                 src/i18n, src/lib/routes.ts
@@ -555,6 +556,88 @@ describe('canonical e hreflang (RF-30, RN-09)', () => {
     expect(canonicals(html).length).toBe(0);
     expect(alternates(html).length).toBe(0);
     expect(html.includes('rel="canonical"') || html.includes('rel="alternate"')).toBe(false);
+  });
+});
+
+describe('sitemap bilíngue (RF-30, RN-01)', () => {
+  const origin = new URL(siteConfig.siteUrl).origin;
+  /** Rota servida por um `.html`: `x/index.html` vira `/x/`; `404.html` fica como está. */
+  const routeOf = (file: string) =>
+    '/' +
+    file
+      .replace(distDir, '')
+      .replace(/\\/g, '/')
+      .replace(/^\//, '')
+      .replace(/(^|\/)index\.html$/, '$1');
+  const sitemap = readFileSync(join(distDir, 'sitemap-0.xml'), 'utf-8');
+  const entries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => ({
+    loc: m[1].match(/<loc>([^<]*)<\/loc>/)?.[1] as string,
+    links: [...m[1].matchAll(/<xhtml:link rel="alternate" hreflang="([^"]*)" href="([^"]*)"\s*\/>/g)].map(
+      (l) => ({ hreflang: l[1], href: l[2] }),
+    ),
+  }));
+  // O conjunto esperado vem das rotas `.html` do `dist/`, não do próprio sitemap.
+  const expected = listSiteHtmlFiles()
+    .map(routeOf)
+    .filter((route) => route !== '/404.html' && route !== '/en/404.html')
+    .map((route) => `${origin}${route}`);
+
+  it('o sitemap-index.xml aponta para o sitemap-0.xml', () => {
+    const index = readFileSync(join(distDir, 'sitemap-index.xml'), 'utf-8');
+    expect(index).toContain(`<loc>${origin}/sitemap-0.xml</loc>`);
+  });
+
+  it('o conjunto de <loc> é exatamente o das rotas .html de dist/ (fora de admin/ e das 404)', () => {
+    expect(expected.length).toBeGreaterThan(0);
+    expect(entries.map((e) => e.loc).sort()).toEqual([...expected].sort());
+  });
+
+  it('nenhum <loc> com /404 nem /admin, e nenhum duplicado', () => {
+    const locs = entries.map((e) => e.loc);
+    for (const loc of locs) {
+      expect(loc, loc).not.toMatch(/\/404|\/admin/);
+    }
+    expect(new Set(locs).size).toBe(locs.length);
+  });
+
+  // RN-01: rascunho não gera página, então a rota nunca entra no sitemap.
+  it('todo <loc> de disciplina tem o slug de uma disciplina publicada (nenhum rascunho)', () => {
+    const publicadas = new Set(
+      listMarkdownFiles(join(contentDir, 'disciplinas'))
+        .filter((file) => matter.read(file).data.publicado === true)
+        .map((file) => courseSlug(file)),
+    );
+    const courseLocs = entries
+      .map((e) => e.loc)
+      .filter((loc) => /\/(ensino|en\/teaching)\/[^/]+\/$/.test(loc));
+    expect(courseLocs.length, 'nenhum <loc> de disciplina conferido').toBeGreaterThan(0);
+    for (const loc of courseLocs) {
+      const slug = loc.split('/').at(-2) as string;
+      expect(publicadas.has(slug), `${loc}: slug fora das disciplinas publicadas`).toBe(true);
+    }
+  });
+
+  it('todo <loc> traz os alternates pt-BR, en e x-default, iguais aos do <head> da mesma página', () => {
+    const alternates = (html: string) =>
+      [...html.matchAll(/<link rel="alternate" hreflang="([^"]*)" href="([^"]*)"\s*\/?>/g)].map(
+        (m) => ({ hreflang: m[1], href: m[2] }),
+      );
+    for (const { loc, links } of entries) {
+      const route = loc.slice(origin.length);
+      const head = alternates(readFileSync(join(distDir, route, 'index.html'), 'utf-8'));
+      expect(head.length, `${route}: head sem alternates`).toBe(3);
+      expect(links, `${route}: alternates do sitemap × do <head>`).toEqual(head);
+    }
+  });
+
+  it('os pares são recíprocos: o par aponta para um <loc> que aponta de volta', () => {
+    const byLoc = new Map(entries.map((e) => [e.loc, e.links]));
+    for (const { loc, links } of entries) {
+      for (const link of links.filter((l) => l.hreflang !== 'x-default')) {
+        expect(byLoc.has(link.href), `${loc}: ${link.href} não está no sitemap`).toBe(true);
+        expect(byLoc.get(link.href), `${link.href} não aponta de volta`).toEqual(links);
+      }
+    }
   });
 });
 
