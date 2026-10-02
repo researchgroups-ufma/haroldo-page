@@ -252,3 +252,8 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
   `hreflang` iguais ao `<head>`, via `@astrojs/sitemap` 3.7.4. A opção `i18n` só pareou `/` com `/en/`, então os pares
   vêm do `serialize` com `alternateLinks` (Decisão 14, ramo B). Sitemap servido em produção igual ao `dist/` por SHA-256;
   `robots.txt` segue `Disallow`. Fecha o item 7 do §12 com o 070, 7/9. Dois ciclos de revisão.
+
+- **2026-10-02 — 072 DONE** (`dd87a37`): `test:dist` reprova rota sem par no outro idioma, rota do mapa ausente do `dist/`,
+  valor do dicionário `pt` em `/en/**` fora de `lang="pt-BR"` (M-07) e valor `en` nas rotas PT fora de `lang="en"` (§10.4),
+  com extrator de texto próprio em `tests/dist/html-texto.ts`. Quatro canários vermelhos; nenhum falso positivo com o conteúdo
+  real. Fecha o item 3 do §12, 8/9. Aprovado na primeira revisão.

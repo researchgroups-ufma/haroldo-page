@@ -1,6 +1,6 @@
 # Plano 072 — Testes i18n sobre o `dist/`: par EN de toda rota PT e M-07 (Decisão 12)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **M-07**, §10.4 (nenhuma string de interface hardcoded), §11 (integração: "toda rota PT tem par EN"; "nenhum valor do dicionário `pt` no HTML de `/en/**` fora de `lang="pt-BR"`"); sabatina fase 4, Decisão 12; dívida (e) da fase 3; §12 fase 4, item 3
 **Depende de:** planos 069 (seletor, cujo texto entra na conta), 070
 **Modelo recomendado:** sonnet
