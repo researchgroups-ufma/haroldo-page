@@ -100,6 +100,8 @@ inglês; sem `any`, `process.env` sob `src/`, `set:html` ou requisição a terce
 interface só em `src/i18n/pt.ts`; links internos com barra final; **componentes** < 150 linhas
 (é o que o §10.4 legisla, e como "Alvo", não invariante — arquivo de teste não entra:
 `tests/lib/courses.test.ts` tem 256 linhas e `tests/content/schemas.test.ts` 503, os dois aprovados).
+**Desde 2026-10-02 (PRD v0.1.71), passar de 150 é aceito sem extração:** não pare para perguntar;
+registre a contagem de linhas na Evidência e siga. Revisor: não reprove por tamanho.
 
 ---
 

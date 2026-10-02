@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.70 |
+| **Versão do PRD** | v0.1.71 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 4/9 — próximo: plano 067** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-10-01 |
+| **Última atualização** | 2026-10-02 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav`; `docs/historico-de-implementacao.md` (histórico de implementação e versões antigas deste PRD) |
 
@@ -52,6 +52,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.66 | 2026-09-30 | Desenvolvedor | §7.5 ganha `src/views/` (plano 062) |
 | v0.1.69 | 2026-09-30 | Desenvolvedor | Sabatina "enxugar o PRD" (4 decisões): histórico para `docs/historico-de-implementacao.md`; plano DONE não sobe a versão (plano 074) |
 | v0.1.70 | 2026-10-01 | Desenvolvedor | Decisão 16 da sabatina da fase 4: F-07 emendada, Sobre EN sem o aviso de idioma (mantém `lang="pt-BR"`) |
+| v0.1.71 | 2026-10-02 | Desenvolvedor | §10.4: componente acima de 150 linhas é aceito sem extração obrigatória (decisão do dono do produto, plano 067) |
 
 ---
 
@@ -718,7 +719,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Estilo | Prettier (com plugin Astro); lint com ESLint + `eslint-plugin-astro` |
 | Type hints | `strict: true` no `tsconfig`; `any` proibido em código de produção |
 | Idioma dos identificadores | **Código em inglês**; **conteúdo, rótulos de painel e textos de interface em português**. Campos de frontmatter em português, para casar com o vocabulário do painel. Não misturar dentro de uma mesma camada |
-| Tamanho de componentes | Alvo < 150 linhas; acima disso, extrair |
+| Tamanho de componentes | Alvo < 150 linhas. Passar do alvo é aceito, sem extração obrigatória; o plano registra a contagem na Evidência (decisão do dono do produto, 2026-10-02) |
 | Constantes mágicas | Proibidas — extrair para `src/lib/config.ts` ou dicionário i18n |
 | Strings de interface | Proibidas hardcoded em componente — sempre pelo dicionário `src/i18n/` (pré-requisito de M-07) |
 | Commits | Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `chore:`) |

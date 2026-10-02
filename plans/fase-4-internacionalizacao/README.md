@@ -343,7 +343,9 @@ empurrado.
   do Worker responde 307 sem ela).
 - **Identificadores em inglês**; campos de frontmatter em português. Sem `any`, sem `process.env` sob
   `src/`, sem `set:html` com conteúdo do professor, sem requisição a terceiro.
-- **Componentes e views < 150 linhas** (§10.4, "alvo"). Arquivo de teste não entra.
+- **Componentes e views < 150 linhas** (§10.4, "alvo"). Arquivo de teste não entra. **Desde
+  2026-10-02 (PRD v0.1.71, plano 067), passar do alvo é aceito sem extração e sem parar para
+  perguntar**: o executor registra a contagem de linhas na Evidência e segue.
 - **O schema só muda no 060.** Qualquer outro plano que precise, para e reporta.
 - **Canário que toca `content/` só com autorização no próprio plano**, listando o arquivo; revertido
   com `git checkout -- <arquivo>` (seguro: `content/` está commitado), reversão provada por
