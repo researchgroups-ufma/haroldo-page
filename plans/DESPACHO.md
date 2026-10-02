@@ -62,6 +62,11 @@ Nenhum agente herda o contexto do orquestrador; todos leem arquivo barato.
     caso apagaria seu trabalho inteiro. Desfaça editando o arquivo de volta.
 14. **Depois de desfazer um canário, rode o build de novo** e recapture os blocos que descrevem o
     `dist/`, para nenhum bloco descrever artefato que não existe mais.
+14a. **Teste verde não prova nada se for tautológico ou vazio.** O valor esperado vem de fonte
+    independente do artefato testado (`siteConfig`, `content/`), nunca do próprio `dist/`, e todo laço
+    tem um `expect` de que conferiu ao menos um item. Cada asserção nova tem o seu canário. No 070 a
+    origem do canonical vinha do canonical da Home; no 071 o teste de rascunho percorria um conjunto
+    vazio. Os dois passaram verdes e custaram um ciclo de revisão cada.
 
 ### Armadilhas medidas neste projeto
 
