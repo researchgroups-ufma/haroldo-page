@@ -1,6 +1,6 @@
 # Plano 070 — `canonical` e `hreflang` com `x-default` (RF-30)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-30** (canonical, `hreflang`), RN-09; sabatina fase 4, Decisões 6 e 10; §12 fase 4, item 7 (com o 071)
 **Depende de:** planos 066, 067, 068 (todas as rotas EN existem)
 **Modelo recomendado:** sonnet

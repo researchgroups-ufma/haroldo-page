@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-10-02 — **069 DONE** (`2d93c8e`, seletor de idioma `LanguageLink` no cabeçalho e na Home, para a mesma página no outro idioma; fecha o item 6 do §12, 6/9; a partir de `lg` a ordem de Tab difere da visual, decisão de produto registrada no §5.1 da identidade). Próximo: 070. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
+Última atualização: 2026-10-02 — **070 DONE** (`96912de`, `canonical` e três `hreflang` absolutos, `x-default` no PT, em toda página fora das 404; não fecha item do §12 sozinho, o item 7 fecha com o 071, 6/9; dívida para o 072: subir `routeOf` do teste de `dist` para o escopo do módulo). Próximo: 071. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -124,7 +124,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 067 | `/en/teaching/` e `/en/teaching/<slug>/` | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `141bea9` |
 | 068 | 404 em inglês e a prova do Worker (RF-27, Decisão 9) | 🟢 DONE | agente + orquestrador (produção) | implementer (sonnet) | `292ed25` |
 | 069 | Seletor de idioma (RF-29) | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `2d93c8e` |
-| 070 | `canonical` e `hreflang` com `x-default` (RF-30) | ⬜ TODO | agente | implementer (sonnet) | — |
+| 070 | `canonical` e `hreflang` com `x-default` (RF-30) | 🟢 DONE | agente | implementer (sonnet) | `96912de` |
 | 071 | Sitemap bilíngue com `@astrojs/sitemap` (RF-30, Decisão 10) | ⬜ TODO (ramo `serialize` autorizado, Decisão 14) | agente | implementer (sonnet) | — |
 | 072 | Testes i18n sobre o `dist/`: par EN de toda rota PT e M-07 (Decisão 12) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 073 | Verificação transversal e fechamento da fase 4 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |

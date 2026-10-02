@@ -243,3 +243,7 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
 - **2026-10-02 — 069 DONE** (`2d93c8e`): seletor de idioma (`LanguageLink`) no cabeçalho e na Home, para a mesma página no
   outro idioma, visível no celular fora do menu. Navegador medido antes da suíte; a correção da revisão (comentário HTML
   publicado) foi provada sem efeito no layout por hash, 16/16. Fecha o item 6 do §12, 6/9. Dois ciclos de revisão.
+
+- **2026-10-02 — 070 DONE** (`96912de`): `canonical` e os três `hreflang` (`pt-BR`, `en`, `x-default` no PT) absolutos e
+  recíprocos em toda página fora das 404, a partir de `alternateLinks` em `src/lib/routes.ts`. A revisão pegou um teste de
+  `dist` tautológico na origem do canonical, corrigido com canário de origem errada. Não fecha item do §12 sozinho (com o 071).
