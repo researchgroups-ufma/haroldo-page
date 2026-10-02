@@ -6,7 +6,8 @@
  *                 "Integração": rotas geradas, nenhum rascunho publicado), RN-01 (rascunho nunca
  *                 aparece no HTML), RNF-02 (JS < 50 KB gzip por rota, zero framework de UI), RF-10
  *                 (disciplina não publicada não gera página), RF-27 (existência de `dist/404.html` e `dist/en/404.html`),
- *                 RF-29 (um seletor de idioma por página, para o par da rota)
+ *                 RF-29 (um seletor de idioma por página, para o par da rota),
+ *                 RF-30 e RN-09 (canonical e `hreflang` com `x-default` no PT; as 404 sem eles)
  *                 e §8.3 (um `<h1>` por página, `lang` por árvore: pt-BR; en sob `dist/en/`). Lê arquivos de `dist/`, não sobe
  *                 servidor. Roda separado da suíte padrão (`vitest.dist.config.ts`, plano 052,
  *                 README da fase 3, decisão 9) porque depende de `npm run build:pipeline` já ter
@@ -44,6 +45,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { courseSlug } from '../../src/lib/courses';
 import { strings } from '../../src/i18n';
 import { HTML_LANG, counterpartPath, localeFromPath } from '../../src/lib/routes';
+import { siteConfig } from '../../src/lib/config';
 
 const repoRoot = join(__dirname, '../..');
 const distDir = join(repoRoot, 'dist');
@@ -479,6 +481,80 @@ describe('seletor de idioma (RF-29)', () => {
     )?.name as string;
     expect(href(`ensino/${slug}`)).toContain(`href="/en/teaching/${slug}/"`);
     expect(href(`en/teaching/${slug}`)).toContain(`href="/ensino/${slug}/"`);
+  });
+});
+
+describe('canonical e hreflang (RF-30, RN-09)', () => {
+  const is404 = (route: string) => route === '/404.html' || route === '/en/404.html';
+  /** Rota servida por um `.html`: `x/index.html` vira `/x/`; `404.html` fica como está. */
+  const routeOf = (file: string) =>
+    '/' +
+    file
+      .replace(distDir, '')
+      .replace(/\\/g, '/')
+      .replace(/^\//, '')
+      .replace(/(^|\/)index\.html$/, '$1');
+  const read = (route: string) =>
+    readFileSync(join(distDir, route.replace(/^\//, ''), 'index.html'), 'utf-8');
+  const canonicals = (html: string) => [...html.matchAll(/<link rel="canonical" href="([^"]*)"\s*\/?>/g)];
+  const alternates = (html: string) =>
+    [...html.matchAll(/<link rel="alternate" hreflang="([^"]*)" href="([^"]*)"\s*\/?>/g)].map(
+      (m) => ({ hreflang: m[1], href: m[2] }),
+    );
+  const origin = new URL(siteConfig.siteUrl).origin;
+  const pages = listSiteHtmlFiles()
+    .map((file) => ({ file, route: routeOf(file) }))
+    .filter(({ route }) => !is404(route));
+
+  it('a origem do canonical da Home é a de `siteConfig.siteUrl`', () => {
+    expect(new URL(canonicals(read('/'))[0][1]).origin).toBe(origin);
+  });
+
+  it('toda página (fora as 404) tem um canonical, igual à URL da própria rota', () => {
+    for (const { file, route } of pages) {
+      const found = canonicals(readFileSync(file, 'utf-8'));
+      expect(found.length, `${route}: ${found.length} canonicals`).toBe(1);
+      expect(found[0][1], `${route}: canonical`).toBe(`${origin}${route}`);
+    }
+  });
+
+  it('toda página tem os alternates pt-BR, en e x-default, absolutos, com x-default = pt-BR', () => {
+    for (const { file, route } of pages) {
+      const found = alternates(readFileSync(file, 'utf-8'));
+      expect(
+        found.map((a) => a.hreflang),
+        `${route}: hreflang`,
+      ).toEqual(['pt-BR', 'en', 'x-default']);
+      const [pt, en, xDefault] = found;
+      expect(pt.href, `${route}: pt-BR`).toBe(
+        `${origin}${localeFromPath(route) === 'pt' ? route : counterpartPath(route)}`,
+      );
+      expect(en.href, `${route}: en`).toBe(
+        `${origin}${localeFromPath(route) === 'en' ? route : counterpartPath(route)}`,
+      );
+      expect(xDefault.href, `${route}: x-default`).toBe(pt.href);
+    }
+  });
+
+  it('reciprocidade: a página apontada pelo alternate en existe e aponta de volta no pt-BR', () => {
+    for (const { file, route } of pages) {
+      const enHref = alternates(readFileSync(file, 'utf-8'))[1].href;
+      const enRoute = enHref.slice(origin.length);
+      expect(existsSync(join(distDir, enRoute, 'index.html')), `${route}: ${enRoute} não existe`).toBe(
+        true,
+      );
+      const back = alternates(read(enRoute));
+      const ptHref = back.find((a) => a.hreflang === 'pt-BR')?.href;
+      const own = alternates(readFileSync(file, 'utf-8'))[0].href;
+      expect(ptHref, `${enRoute} não aponta de volta para o pt-BR de ${route}`).toBe(own);
+    }
+  });
+
+  it.each(['404.html', 'en/404.html'])('dist/%s não tem canonical nem alternate', (rota) => {
+    const html = readFileSync(join(distDir, rota), 'utf-8');
+    expect(canonicals(html).length).toBe(0);
+    expect(alternates(html).length).toBe(0);
+    expect(html.includes('rel="canonical"') || html.includes('rel="alternate"')).toBe(false);
   });
 });
 

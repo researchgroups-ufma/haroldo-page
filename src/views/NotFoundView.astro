@@ -13,7 +13,7 @@
  *                 devolve para qualquer rota inexistente.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.1.0
  *
  *  Dependências : src/layouts/BaseLayout.astro, src/components/PageHeader.astro,
@@ -43,7 +43,7 @@ const { lang } = Astro.props;
 const t = strings(lang);
 ---
 
-<BaseLayout title={t.notFound.title}>
+<BaseLayout title={t.notFound.title} notFound>
   <PageHeader slot="cabecalho" title={t.notFound.title} meta={t.notFound.eyebrow} />
 
   <div class="px-margem pt-6 pb-16">

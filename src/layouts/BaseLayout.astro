@@ -13,23 +13,26 @@
  *                 de onde o sublinhado nasce e para onde recolhe.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-17
- *  Atualizado em: 2026-09-28
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.5.0
  *
  *  Dependências : src/lib/config.ts (siteConfig), src/lib/routes.ts (HTML_LANG,
- *                 localeFromPath), src/i18n (strings), src/components/SiteHeader.astro,
+ *                 localeFromPath, alternateLinks), src/i18n (strings), src/components/SiteHeader.astro,
  *                 src/components/ScrollBar.astro, src/styles/global.css,
  *                 @fontsource/archivo (preload do peso 300)
- *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`, `bare?`; conteúdo via `<slot />`; cabeçalho da página via `<slot name="cabecalho" />`
+ *  Entradas     : props `title` (obrigatória, aceita `undefined`), `description?`, `bare?`, `notFound?`; conteúdo via `<slot />`; cabeçalho da página via `<slot name="cabecalho" />`
  *  Saídas       : documento HTML completo da rota
  *  Uso          : import BaseLayout from '../layouts/BaseLayout.astro'
  *
- *  Notas        : favicon e `theme-color` já estão aqui; canonical, Open
- *                 Graph e `hreflang` ficam para as fases 4 e 5 (RF-30).
+ *  Notas        : favicon, `theme-color`, canonical e `hreflang` (com
+ *                 `x-default` na versão PT, RF-30 e RN-09) já estão aqui;
+ *                 só o Open Graph fica para a fase 5. As 404 não levam
+ *                 canonical nem `hreflang` (`notFound`, decisão 9 do
+ *                 fatiamento da fase 4).
  * ============================================================================
  */
 import { strings } from '../i18n';
-import { HTML_LANG, localeFromPath } from '../lib/routes';
+import { HTML_LANG, alternateLinks, localeFromPath } from '../lib/routes';
 import { siteConfig } from '../lib/config';
 import SiteHeader from '../components/SiteHeader.astro';
 import ScrollBar from '../components/ScrollBar.astro';
@@ -47,17 +50,32 @@ export interface Props {
   description?: string;
   /** Sem o cabeçalho — a Home traz o próprio topo (nome grande e menu) dentro do cartão. */
   bare?: boolean;
+  /** 404: sem canonical nem `hreflang` (a 404 é servida em qualquer caminho). Ausente: `false`. */
+  notFound?: boolean;
 }
 
 // decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
 const lang = localeFromPath(Astro.url.pathname);
 const t = strings(lang);
 
-const { title, description = t.site.description, bare = false } = Astro.props;
+const { title, description = t.site.description, bare = false, notFound = false } = Astro.props;
 
 // Home (sem `title`) não passa por `t.site.pageTitle` — o <title> é só o nome completo do site.
 const pageTitle =
   title !== undefined ? t.site.pageTitle(title, siteConfig.shortTitle) : siteConfig.title;
+
+// RF-30: URLs absolutas, a partir da origem do site; caminhos com barra final (o Worker responde
+// 307 sem ela). Decisão 9 do fatiamento da fase 4: a 404 não tem canonical nem `hreflang`.
+const absolute = (path: string) => new URL(path, siteConfig.siteUrl).href;
+const alternates = notFound
+  ? []
+  : alternateLinks(Astro.url.pathname).map(({ hreflang, path }) => ({
+      hreflang,
+      href: absolute(path),
+    }));
+const canonical = notFound
+  ? undefined
+  : absolute(Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`);
 ---
 
 <html lang={HTML_LANG[lang]}>
@@ -66,6 +84,12 @@ const pageTitle =
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {
+      alternates.map(({ hreflang, href }) => (
+        <link rel="alternate" hreflang={hreflang} href={href} />
+      ))
+    }
     <link rel="preload" href={archivo300} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#efedea" />

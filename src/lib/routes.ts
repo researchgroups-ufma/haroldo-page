@@ -8,12 +8,12 @@
  *                 idioma e do `hreflang` (sabatina fase 4, Decisão 6).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-25
- *  Atualizado em: 2026-09-25
+ *  Atualizado em: 2026-10-02
  *  Versão       : 0.1.0
  *
  *  Dependências : src/lib/config.ts (só o tipo `Locale`)
  *  Entradas     : chave de rota, slug de disciplina, `pathname`
- *  Saídas       : caminhos com barra final; `Locale`; `HTML_LANG`
+ *  Saídas       : caminhos com barra final; `Locale`; `HTML_LANG`; pares `hreflang`
  *  Uso          : routePath('teaching', 'en') → '/en/teaching/'
  *
  *  Notas        : só `import type` — o `astro.config.mjs` passa a importar
@@ -113,4 +113,24 @@ export function counterpartPath(pathname: string): string {
   }
 
   throw new Error(`counterpartPath: caminho sem par no outro idioma: ${pathname}`);
+}
+
+/**
+ * Pares `hreflang` → caminho de uma página (RF-30), aceitando o caminho com ou sem barra final.
+ * Devolve `pt-BR`, `en` e `x-default`, nessa ordem; RN-09: o `x-default` é a versão PT, o idioma
+ * canônico. Só caminho, sem origem — quem monta a URL absoluta é o layout.
+ *
+ * @param pathname Caminho da URL de uma rota fixa ou de disciplina, em qualquer dos dois idiomas.
+ * @returns Os três pares, com caminhos terminados em `/`.
+ * @throws Error nomeando o caminho quando ele não tem par (herdado de `counterpartPath`).
+ */
+export function alternateLinks(pathname: string): { hreflang: string; path: string }[] {
+  const own = pathname.endsWith('/') ? pathname : `${pathname}/`;
+  const other = counterpartPath(pathname);
+  const [pt, en] = localeFromPath(pathname) === 'pt' ? [own, other] : [other, own];
+  return [
+    { hreflang: HTML_LANG.pt, path: pt },
+    { hreflang: HTML_LANG.en, path: en },
+    { hreflang: 'x-default', path: pt },
+  ];
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   HTML_LANG,
+  alternateLinks,
   coursePath,
   counterpartPath,
   localeFromPath,
@@ -97,4 +98,38 @@ describe('counterpartPath', () => {
       expect(() => counterpartPath(path)).toThrow(path);
     },
   );
+});
+
+describe('alternateLinks (RF-30, RN-09)', () => {
+  it.each(MAP)(
+    '%s: pt-BR, en e x-default (PT) a partir de qualquer dos dois idiomas',
+    (_key, ptPath, enPath) => {
+      const expected = [
+        { hreflang: 'pt-BR', path: ptPath },
+        { hreflang: 'en', path: enPath },
+        { hreflang: 'x-default', path: ptPath },
+      ];
+      expect(alternateLinks(ptPath)).toEqual(expected);
+      expect(alternateLinks(enPath)).toEqual(expected);
+    },
+  );
+
+  it('disciplina: o slug passa intacto e o x-default é o caminho PT', () => {
+    const expected = [
+      { hreflang: 'pt-BR', path: '/ensino/2026-2-relatividade-geral/' },
+      { hreflang: 'en', path: '/en/teaching/2026-2-relatividade-geral/' },
+      { hreflang: 'x-default', path: '/ensino/2026-2-relatividade-geral/' },
+    ];
+    expect(alternateLinks('/ensino/2026-2-relatividade-geral/')).toEqual(expected);
+    expect(alternateLinks('/en/teaching/2026-2-relatividade-geral/')).toEqual(expected);
+  });
+
+  it('aceita o caminho sem barra final e devolve todos com barra final', () => {
+    expect(alternateLinks('/en/about')).toEqual(alternateLinks('/sobre/'));
+    expect(alternateLinks('/en')).toEqual(alternateLinks('/'));
+  });
+
+  it.each(['/cv/', '/en/cv/', '/enx/'])('caminho sem par (%s) lança nomeando o caminho', (path) => {
+    expect(() => alternateLinks(path)).toThrow(path);
+  });
 });
