@@ -12,7 +12,7 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.72 |
+| **Versão do PRD** | v0.1.73 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
@@ -54,6 +54,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.70 | 2026-10-01 | Desenvolvedor | Decisão 16 da sabatina da fase 4: F-07 emendada, Sobre EN sem o aviso de idioma (mantém `lang="pt-BR"`) |
 | v0.1.71 | 2026-10-02 | Desenvolvedor | §10.4: componente acima de 150 linhas é aceito sem extração obrigatória (decisão do dono do produto, plano 067) |
 | v0.1.72 | 2026-10-02 | Desenvolvedor | Fecha a fase 4 (plano 073): M-07 verificada, §7.2 fixa `@astrojs/sitemap` 3.7.4, §12 em 9/9 |
+| v0.1.73 | 2026-10-02 | Desenvolvedor | Fase 4 fechada (`/fechar-fase`): 365 testes, 100% de cobertura, 4 exceções de cobertura e 5 dívidas da revisão de integração |
 
 ---
 

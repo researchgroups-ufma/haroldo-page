@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-10-02 — **073 DONE** (`ead6056`): M-07 verificada nas 8 rotas EN, fallback conferido item a item, seletor ida e volta nas 8 rotas; **fase 4 concluída, 9/9 no §12** (PRD v0.1.72); CI e Workers Builds verdes. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
+Última atualização: 2026-10-02 — fase 4 fechada formalmente (`/fechar-fase`): 055–074 DONE, revisão de integração do fechamento aprovada, suíte executada (365 testes, 100% de cobertura em includes, build e dist verdes). Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -300,6 +300,33 @@ escrito.
 
 **Dívidas sem fase, criadas ou herdadas pela fase 4 (cada uma conferida contra o arquivo citado):**
 
+- **Testes de DOM** para `src/scripts/course-tabs.ts` e `src/scripts/publications-accordion.ts`. Hoje
+  têm 0% de cobertura e são exceção concedida no fechamento (2026-10-02); exigem um ambiente de DOM no
+  Vitest. A lógica veio inline da fase 3 e o 064 a moveu para módulo; hoje só é exercitada no navegador
+  (onde o 066 achou o defeito do `inert`, abaixo). **Fecha quando:** um plano adicionar suporte a DOM nos testes e
+  implementar a cobertura, ligando-se ao item já existente do `inert` da sanfona de Publicações
+  (dívida herdada);
+- **Nenhum teste automático prova que a view liga o aviso F-07 ou o `lang`.** `tests/dist/site-gerado.test.ts:260-285`
+  só testa o aviso com "≤ 1" e "= 0". Nenhum teste de `dist` exige `lang="pt-BR"` num campo T caído ou
+  num campo P. A ligação foi provada por canários no 065 e no 066 e pela verificação no navegador do
+  073. **Fecha quando:** um plano adicionar testes automáticos de cobertura do aviso e do `lang`;
+- **Resolução dupla na Pesquisa:** `src/views/ResearchView.astro:69-72` resolve de novo `titulo` e
+  `descricao` dos projetos só para contar o aviso, e `src/components/ProjectItem.astro:44-45` resolve
+  os mesmos campos para exibir. Um campo T novo no `ProjectItem` pode ficar fora da conta do aviso.
+  **Fecha quando:** a lógica de aviso migrar para uma função compartilhada em `src/lib/` ou a view
+  usar o resultado do componente para evitar duplicação;
+- **Cabeçalhos desatualizados**, só documentação — cada um conferido contra o arquivo citado:
+  - `src/components/LessonList.astro:29-31` atribui o estado vazio a `src/pages/ensino/[slug].astro`,
+    mas ele hoje está em `src/views/CourseView.astro` (criada no plano 064, `98d1014`);
+  - `src/components/SiteHeader.astro:7` (cabeçalho) diz "nome de exibição com link para `/`", mas o
+    código (`:45`, `routePath('home', lang)`) leva a `/en/` nas rotas EN;
+  - `src/views/NotFoundView.astro` cabeçalho "Uso" (linha 24) cita só a página PT
+    (`src/pages/404.astro`), não menciona `src/pages/en/404.astro`;
+  - **Fecha quando:** cada cabeçalho for revisado no próximo plano que tocar o arquivo;
+- **`src/components/CourseTabs.astro` recebe `lang` por prop** (linha 33) em vez de derivar do caminho,
+  como manda a Decisão 2 do fatiamento para componentes compartilhados. Hoje só a `CourseView` o usa e
+  sempre passa a prop. **Fecha quando:** componentes compartilhados que hoje recebem prop de `lang`
+  migrarem para derivar do caminho como `BaseLayout`, `SiteHeader` e `ProjectItem` fazem;
 - **`routeOf` (arquivo de `dist/` → rota) em quatro cópias** — três `describe` de
   `tests/dist/site-gerado.test.ts` (069, 070, 071) e `tests/dist/i18n.test.ts:84` (072), com
   `listSiteHtml` (`i18n.test.ts:75`) duplicando `listSiteHtmlFiles` (`site-gerado.test.ts:78`). Está na

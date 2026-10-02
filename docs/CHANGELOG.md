@@ -8,6 +8,87 @@ e o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+Fase 4 — internacionalização (planos 055 a 074; critério de conclusão da fase — M-07 atingida e
+fallback verificado item a item — demonstrado pelo plano 073: 8 rotas EN × 3 larguras sem rolagem
+horizontal, nenhum texto de interface em português fora de `lang="pt-BR"` nas 8 rotas EN, tabela do
+fallback com 91 linhas e todo texto em português marcado; checklist do §12 em 9/9):
+
+- Comparador do `dist/` normalizado, `scripts/comparar-dist.mjs`: retrato do HTML de cada rota antes
+  e depois, para provar que as páginas PT não mudam quando a marcação muda de arquivo (plano 055,
+  `0ebf8ed`).
+- Mapa de rotas PT/EN em `src/lib/routes.ts` (`routePath`, `localeFromPath`, `counterpartPath`) e
+  `navItems(locale)` (plano 056, `d44a874`).
+- Dicionário `src/i18n/en.ts` com o `UiStrings` inteiro, `strings(lang)` em `src/i18n/index.ts`,
+  chaves novas nos dois dicionários e teste de valor copiado com a lista de exceções
+  `tests/i18n/excecoes-m07.ts`; inglês revisado pelo stakeholder, na nomenclatura de davidtong.org
+  (Decisão 11, plano 057, `82a7947`).
+- `BaseLayout`, `SiteHeader` e `PageHeader` derivam o idioma do caminho: `<html lang>`, `<title>`,
+  meta description, menu e o nome apontando para a Home do idioma (plano 058, `0583324`).
+- Componentes de conteúdo derivam o idioma do caminho; `formatDate(value, lang)` formata a data pelo
+  dicionário, sem `Date` nem `Intl` ("September 14, 2026" em `/en`, §8.3) (plano 059, `102c8a8`).
+- Tradução dentro do próprio item do perfil: `formacao[i].en`, `atuacao[i].en.cargo` e
+  `areas[i].en.nome`, no Zod e no Tina, com o teste de paridade (Decisões 7 e 8, plano 060,
+  `122df25`).
+- Fallback por campo em `src/i18n/fallback.ts` (`localize`, `localizeOptional`, `portugueseOnly`,
+  `hasFallback`): o texto que caiu no português leva `lang="pt-BR"` e liga o aviso F-07; campo sem par
+  em inglês marca o idioma sem ligar o aviso (RN-06, Decisão 13, plano 061, `835f188`).
+- Páginas finas sobre views com `lang` obrigatória em `src/views/`: Home, Sobre e 404 (plano 062,
+  `156b130`); Pesquisa, Ensino e `ProjectItem` único (plano 063, `a4a2f75`); Disciplina, Publicações,
+  `CourseTabs`, os scripts de abas e sanfona em `src/scripts/` e `courseStaticPaths()` (plano 064,
+  `98d1014`). Páginas PT idênticas pelo comparador nos três planos (Decisão 6).
+- Rotas EN: `/en/` e `/en/about/`, a Sobre sem o aviso (Decisão 16, plano 065, `d96c659`);
+  `/en/research/` e `/en/publications/`, Publicações sem aviso nem `lang` (Decisão 13, plano 066,
+  `f9181aa`); `/en/teaching/` e `/en/teaching/<slug>/` com o slug PT (Decisão 3, plano 067,
+  `141bea9`); 404 em inglês em `dist/en/404.html`, servida pelo Worker em `/en/<inexistente>`
+  (Decisão 9, plano 068, `292ed25`).
+- Seletor de idioma `LanguageLink` para a mesma página no outro idioma, visível no celular fora do
+  menu (RF-29, plano 069, `2d93c8e`).
+- `canonical` e `hreflang` (`pt-BR`, `en`, `x-default` no PT) absolutos e recíprocos em toda página
+  fora das 404 (RF-30, plano 070, `96912de`).
+- `sitemap-index.xml` com as 14 rotas públicas dos dois idiomas e os pares `hreflang`, via
+  `@astrojs/sitemap` 3.7.4 com `serialize` (RF-30, Decisões 10 e 14, plano 071, `027f72a`).
+- Testes i18n sobre o `dist/` em `tests/dist/i18n.test.ts`: par EN/PT de toda rota, mapa × `dist/`,
+  M-07 e o simétrico (§10.4), com extrator de texto próprio em `tests/dist/html-texto.ts`
+  (Decisão 12, plano 072, `dd87a37`).
+- Verificação transversal e fechamento (plano 073, `ead6056`): larguras, inspeção M-07, fallback item
+  a item e seletor ida e volta nas 8 rotas EN, no navegador.
+- PRD enxugado de 204 KB para 92 KB, com o histórico movido para `docs/historico-de-implementacao.md`;
+  promoção de plano deixa de subir a versão do PRD (plano 074, `ccf60ed`).
+- Dependências atualizadas no lock por avisos `high` do `npm audit`: `fast-uri` 3.1.8 (`e918303`),
+  `wrangler` 4.145.0 com `brace-expansion` e `undici` (`8e74700`) e `devalue` 5.9.4 (`914831f`).
+- Suíte ao fechar a fase (2026-10-02, HEAD `2c79ce6`): 365 testes em 20 arquivos, cobertura 100% em
+  statements, branches, funções e linhas de `src/lib/`, `src/i18n/` e `src/content.config.ts`; mais
+  54 testes em `tests/dist/` (2 arquivos); `astro check` sem erro; `npm audit --audit-level=high` com
+  exit 0 (1 `low`, 8 `moderate`). Revisão de integração da fase aprovada.
+
+**Exceções de cobertura da fase 4** (arquivos fora do `include` do `vitest.config.ts`, medidos com
+`--coverage.include` no fechamento, 0% em todos):
+
+- `src/scripts/course-tabs.ts` e `src/scripts/publications-accordion.ts`: scripts de navegador (DOM,
+  GSAP, rolagem), hoje exercitados só no navegador; o código veio inline da fase 3 e o 064 só o moveu
+  para módulo. Exceção concedida pelo usuário em 2026-10-02, com os testes de DOM como dívida.
+- `src/views/course-paths.ts`: cola de `getCollection`; a lógica está em `src/lib/courses.ts` e
+  `src/lib/published.ts`, cobertos.
+- `scripts/comparar-dist.mjs`: ferramenta de desenvolvimento, exercitada nas Evidências dos planos que
+  a usaram.
+
+**Corrigido na fase 4:**
+
+- Texto de interface em inglês e em português fora do dicionário passa a reprovar o `test:dist`
+  (plano 072), o que fecha o item "Nenhuma string de interface hardcoded" do §12.
+- A dívida (e) da fase 3, rotas escritas à mão fora de `NAV_ITEMS` sem teste, fecha com o mapa de
+  rotas (056), os links por `routePath`/`coursePath` (062–064) e o teste mapa × `dist/` (072).
+
+**Pendências deliberadamente abertas da fase 4** — cada uma com destino e "fecha quando" na seção
+"O que a fase 4 empurra adiante, e as dívidas que ela criou" de
+`plans/fase-4-internacionalizacao/README.md`: `robots.txt` e `X-Robots-Tag: noindex`, Open Graph e o
+manual do grupo "Versão em inglês" (fase 5); `routeOf` em quatro cópias nos testes de `dist`; o
+comentário desatualizado em `src/i18n/pt.ts`; o ano aberto da sanfona de Publicações `inert`; a ordem
+de Tab do cabeçalho e a quebra abaixo de ~354 px, a conferir pelo stakeholder; foco por teclado nas
+rotas EN não observado; e as cinco dívidas da revisão de integração do fechamento (testes de DOM dos
+scripts, nenhum teste que prove a ligação do aviso e do `lang`, resolução dupla na Pesquisa,
+cabeçalhos desatualizados e `CourseTabs` recebendo `lang` por prop).
+
 Fase 3 — site público em português (planos 036 a 054; critério de conclusão da fase — todas as
 rotas navegáveis com o conteúdo, responsivas de 360 px a 1440 px — demonstrado pelo plano 053: 8
 rotas × 3 larguras, `scrollWidth = clientWidth` nas 24 medições; checklist do §12 em 12/12):
