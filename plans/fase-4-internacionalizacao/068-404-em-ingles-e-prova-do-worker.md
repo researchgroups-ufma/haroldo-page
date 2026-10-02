@@ -1,6 +1,6 @@
 # Plano 068 — 404 em inglês e a prova do Worker (RF-27, Decisão 9)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-27**, RNF-03, D-01; sabatina fase 4, Decisões 6 e 9; §12 fase 4, item 5 (fecha, com 065–067)
 **Depende de:** planos 065 (árvore `/en`, testes de `dist` por idioma), 062 (`NotFoundView`)
 **Modelo recomendado:** sonnet
@@ -104,8 +104,8 @@ já valem para ele pelos testes gerais.
 - [x] `dist/en/404.html` gerado (diretamente ou pela tática pré-autorizada, com o trecho do Astro colado)
 - [x] Local: `/en/<inexistente>` → `404` com corpo igual a `dist/en/404.html`; `/<inexistente>` → `404` com corpo igual a `dist/404.html`; `/en/about/` → `200`
 - [x] Canário: sem `dist/en/404.html`, `/en/<inexistente>` cai no que o Worker achar mais próximo (saída colada)
-- [ ] Produção: as mesmas duas respostas, com SHA-256, data, commit e versão (orquestrador)
-- [ ] Se a premissa cair: plano parado e devolvido, sem 404 bilíngue improvisada
+- [x] Produção: as mesmas duas respostas, com SHA-256, data, commit e versão (orquestrador)
+- [x] ~~Se a premissa cair: plano parado e devolvido, sem 404 bilíngue improvisada~~ — **não se aplica: premissa confirmada no `wrangler dev` e em produção**
 - [x] `astro check`, `lint`, `format:check`, `test:coverage`, `build:pipeline`, `test:dist` verdes, com saída colada
 
 ## Evidência
@@ -806,3 +806,46 @@ texto=Skip to contentHaroldo LimaMenuAbout›Research›Teaching›Publications�
 - **Lista "All pages":** tem as cinco rotas EN, com "Home" primeiro e barra final em todas.
 - **Texto em inglês:** a página não tem nenhum elemento `lang="pt-BR"`. O texto do documento inteiro, sem `script` e `style` (na linha `texto=`), está todo em inglês.
 - **Encerramento:** o `wrangler dev` foi encerrado com `taskkill /T /F`. Depois disso, nenhuma escuta nas portas 8787, 4321 e 9000 (`escutando=0`).
+
+### Passo 8 — Produção (orquestrador)
+
+Rodado pelo orquestrador em 2026-10-02. **Linha de base**, tirada às 10:19:56, antes de qualquer push, com produção no `6750ffd`: as duas rotas inexistentes respondiam `404` com o mesmo corpo, igual ao `dist/404.html` em português (`linha-de-base.txt`):
+
+```
+Fri Oct  2 10:19:56     2026
+HEAD 6750ffda9a3fb4a316a9556997d06b403ce18369
+/en/rota-que-nao-existe 404
+/rota-que-nao-existe 404
+0d4c75d0363e19f51907e3169055d3bf186dff4e8627cd257171a4ccdf89ad99 *base_en_rota-que-nao-existe.html
+0d4c75d0363e19f51907e3169055d3bf186dff4e8627cd257171a4ccdf89ad99 *base_rota-que-nao-existe.html
+0d4c75d0363e19f51907e3169055d3bf186dff4e8627cd257171a4ccdf89ad99 *dist/404.html
+```
+
+**Checks do commit `292ed25`**, o de trabalho deste plano. Foi o único push da janela. Os checks vieram de `gh api …/commits/<SHA>/check-runs`, e o Version ID do `output.summary` do check do Workers Builds:
+
+```
+Workers Builds: haroldo-page: completed / success
+qualidade: completed / success
+Version ID: a1f0e92f-750a-4cc7-8b86-f95425e00460
+```
+
+**Respostas de `https://haroldo-page.and-near.workers.dev`** depois do deploy (`producao.txt`). O SHA-256 dos corpos foi comparado com o do `dist/` revisado (triage2):
+
+```
+Fri Oct  2 10:41:45     2026
+commit 292ed25903defad61d8b4999c9f29da0523b4a93 · Version ID a1f0e92f-750a-4cc7-8b86-f95425e00460
+/en/rota-que-nao-existe 404
+/rota-que-nao-existe 404
+/en/about/ 200
+HTTP/1.1 404 Not Found
+Content-Type: text/html
+9ad925d6d6bb7145798b1757b9d2c00dad7d031056765f5c05b03b0f5f74f891 *prod_en_rota-que-nao-existe.html
+0d4c75d0363e19f51907e3169055d3bf186dff4e8627cd257171a4ccdf89ad99 *prod_rota-que-nao-existe.html
+9ad925d6d6bb7145798b1757b9d2c00dad7d031056765f5c05b03b0f5f74f891 *dist/en/404.html
+0d4c75d0363e19f51907e3169055d3bf186dff4e8627cd257171a4ccdf89ad99 *dist/404.html
+```
+
+- `/en/rota-que-nao-existe` responde `404`, e o corpo é idêntico byte a byte ao `dist/en/404.html` (`9ad925d6…f891`). Antes do push era a 404 em português.
+- `/rota-que-nao-existe` continua respondendo `404` com o `dist/404.html` (`0d4c75d0…ad99`), igual à linha de base.
+- `/en/about/` responde `200`.
+- A premissa da Decisão 9 está confirmada em produção. O modo `404-page` serve o `404.html` mais próximo na árvore, sem código no Worker (D-01).
