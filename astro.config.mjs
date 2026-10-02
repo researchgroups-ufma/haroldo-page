@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import { tinaAdminDevRedirect } from '@tinacms/astro/vite';
+import { existsSync, renameSync, rmdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 // astro.config.mjs roda em Node antes de o Astro/Vite aplicar `.env` ao
 // processo — `process.env.PUBLIC_SITE_URL` ficaria sempre `undefined` quando
@@ -14,6 +16,27 @@ import { tinaAdminDevRedirect } from '@tinacms/astro/vite';
 // nem as demais, que este arquivo não usa.
 const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), 'PUBLIC_');
 
+// RF-27 (sabatina fase 4, Decisão 9 e decisão de fatiamento 14): o Astro só grava
+// `/404` como `404.html` (`STATUS_CODE_PAGES` em `core/output-filename.js` e
+// `core/build/common.js` contém apenas `/404` e `/500`); `/en/404` sai como
+// `en/404/index.html`. O Worker (`not_found_handling = "404-page"`) procura
+// `404.html` subindo a árvore, então o arquivo é movido para `en/404.html` depois
+// do build. Tática estática, sem código no Worker (D-01); não muda `build.format`.
+/** @type {import('astro').AstroIntegration} */
+const english404FileName = {
+  name: 'english-404-file-name',
+  hooks: {
+    'astro:build:done': ({ dir }) => {
+      const outDir = fileURLToPath(dir);
+      const folder = `${outDir}en/404`;
+      const generated = `${folder}/index.html`;
+      if (!existsSync(generated)) return;
+      renameSync(generated, `${outDir}en/404.html`);
+      rmdirSync(folder);
+    },
+  },
+};
+
 /**
  * ============================================================================
  *  Arquivo      : astro.config.mjs
@@ -21,13 +44,15 @@ const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '
  *  Descrição    : Configuração do Astro em modo estático (D-01), sem adapter
  *                 e sem SSR, com o plugin Vite do Tailwind 4 (RNF-02, RNF-12)
  *                 e o plugin de dev do TinaCMS que resolve `/admin` sem sufixo
- *                 durante `astro dev`.
+ *                 durante `astro dev`, mais a integração inline que grava a
+ *                 404 em inglês como `dist/en/404.html` (RF-27, plano 068).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
- *  Atualizado em: 2026-09-02
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.3.0
  *
- *  Dependências : astro, @tailwindcss/vite, @tinacms/astro (tinaAdminDevRedirect), vite (loadEnv)
+ *  Dependências : astro, @tailwindcss/vite, @tinacms/astro (tinaAdminDevRedirect), vite (loadEnv),
+ *                 node:fs, node:url
  *  Entradas     : variável de ambiente PUBLIC_SITE_URL (opcional), lida via
  *                 `loadEnv` do `.env`/ambiente real — ver nota acima
  *  Saídas       : configuração consumida pelo CLI do Astro (`astro build`/`astro dev`)
@@ -44,6 +69,7 @@ const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV ?? '', process.cwd(), '
 export default defineConfig({
   output: 'static',
   site: PUBLIC_SITE_URL ?? 'https://haroldo-page.and-near.workers.dev',
+  integrations: [english404FileName],
   vite: {
     plugins: [tailwindcss(), tinaAdminDevRedirect()],
   },

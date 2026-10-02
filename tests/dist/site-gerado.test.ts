@@ -5,7 +5,7 @@
  *  Descrição    : Teste de integração sobre o `dist/` recém-gerado (§11 do PRD, nível
  *                 "Integração": rotas geradas, nenhum rascunho publicado), RN-01 (rascunho nunca
  *                 aparece no HTML), RNF-02 (JS < 50 KB gzip por rota, zero framework de UI), RF-10
- *                 (disciplina não publicada não gera página), RF-27 (existência de `dist/404.html`)
+ *                 (disciplina não publicada não gera página), RF-27 (existência de `dist/404.html` e `dist/en/404.html`)
  *                 e §8.3 (um `<h1>` por página, `lang` por árvore: pt-BR; en sob `dist/en/`). Lê arquivos de `dist/`, não sobe
  *                 servidor. Roda separado da suíte padrão (`vitest.dist.config.ts`, plano 052,
  *                 README da fase 3, decisão 9) porque depende de `npm run build:pipeline` já ter
@@ -106,7 +106,7 @@ function listMarkdownFiles(dir: string): string[] {
 }
 
 describe('rotas fixas existem (§11)', () => {
-  it('dist/index.html, dist/sobre, dist/pesquisa, dist/ensino, dist/publicacoes e dist/404.html existem', () => {
+  it('dist/index.html, dist/sobre, dist/pesquisa, dist/ensino, dist/publicacoes, dist/404.html e dist/en/404.html existem', () => {
     const rotasFixas = [
       'index.html',
       'sobre/index.html',
@@ -119,6 +119,7 @@ describe('rotas fixas existem (§11)', () => {
       'en/research/index.html',
       'en/publications/index.html',
       'en/teaching/index.html',
+      'en/404.html',
     ];
     for (const rota of rotasFixas) {
       expect(existsSync(join(distDir, rota)), `esperava dist/${rota}`).toBe(true);

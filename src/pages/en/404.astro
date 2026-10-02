@@ -1,0 +1,28 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : 404.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina da 404 em inglês (RF-27): só chama `NotFoundView`
+ *                 com `lang="en"` (sabatina fase 4, Decisão 6). O corpo que o
+ *                 `not_found_handling = "404-page"` do `wrangler.toml` devolve
+ *                 para `/en/<inexistente>` é o `dist/en/404.html` — premissa da
+ *                 Decisão 9, provada no `wrangler dev` e em produção (plano 068).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-02
+ *  Atualizado em: 2026-10-02
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/NotFoundView.astro
+ *  Entradas     : nenhuma (página estática, sem props nem conteúdo)
+ *  Saídas       : HTML estático da rota `/en/404`
+ *  Uso          : servido automaticamente pelo Astro como `src/pages/en/404.astro`
+ *
+ *  Notas        : o corpo da página vive em `NotFoundView`. Sem `canonical` nem
+ *                 `hreflang` (decisão de fatiamento 9; o plano 070 implementa).
+ * ============================================================================
+ */
+import NotFoundView from '../../views/NotFoundView.astro';
+---
+
+<NotFoundView lang="en" />
