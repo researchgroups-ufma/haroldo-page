@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-10-02 — **070 DONE** (`96912de`, `canonical` e três `hreflang` absolutos, `x-default` no PT, em toda página fora das 404; não fecha item do §12 sozinho, o item 7 fecha com o 071, 6/9; dívida para o 072: subir `routeOf` do teste de `dist` para o escopo do módulo). Próximo: 071. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
+Última atualização: 2026-10-02 — **071 DONE** (`027f72a`, sitemap bilíngue com `@astrojs/sitemap` 3.7.4, pares `hreflang` pelo `serialize` com `alternateLinks` (ramo B da Decisão 14) e sem as 404; fecha o item 7 do §12 com o 070, 7/9; a dívida do `routeOf` foi para a tabela de dívidas). Próximo: 072. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -125,7 +125,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | 068 | 404 em inglês e a prova do Worker (RF-27, Decisão 9) | 🟢 DONE | agente + orquestrador (produção) | implementer (sonnet) | `292ed25` |
 | 069 | Seletor de idioma (RF-29) | 🟢 DONE | agente + orquestrador (navegador) | implementer (sonnet) | `2d93c8e` |
 | 070 | `canonical` e `hreflang` com `x-default` (RF-30) | 🟢 DONE | agente | implementer (sonnet) | `96912de` |
-| 071 | Sitemap bilíngue com `@astrojs/sitemap` (RF-30, Decisão 10) | ⬜ TODO (ramo `serialize` autorizado, Decisão 14) | agente | implementer (sonnet) | — |
+| 071 | Sitemap bilíngue com `@astrojs/sitemap` (RF-30, Decisão 10) | 🟢 DONE (ramo `serialize`, Decisão 14) | agente | implementer (sonnet) | `027f72a` |
 | 072 | Testes i18n sobre o `dist/`: par EN de toda rota PT e M-07 (Decisão 12) | ⬜ TODO | agente | implementer (sonnet) | — |
 | 073 | Verificação transversal e fechamento da fase 4 | ⬜ TODO | orquestrador (navegador) + agente (documentos) | implementer (sonnet) | — |
 | 074 | Enxugar o PRD: histórico de implementação em documento próprio | 🟢 DONE | orquestrador | nenhum (+ `code-reviewer`) | `ccf60ed` |
@@ -272,6 +272,7 @@ Da seção "Entre a fase 3 e a 4" de [`plans/README.md`](../README.md) e do
 | (e) Rotas escritas à mão fora de `NAV_ITEMS` | **056** + **062–064** (todo `href` interno sai de `routePath`/`coursePath`); o teste de cruzamento com o `dist/` entra no **072** |
 | `perfil.atuacao[]` sem par no grupo `en` | **060** |
 | Comentário de `src/i18n/pt.ts:65-67` citando `siteConfig.description` "até o 058 remover o campo" — o 058 removeu e o comentário ficou desatualizado (achado da revisão do 058, 2026-09-28) | **Sem plano:** pela decisão 4 acima, só o 057 editava os dicionários. Cai no primeiro commit autorizado a tocar `pt.ts` (ex.: chave nova acrescentada pelo orquestrador) |
+| `routeOf` (arquivo de `dist/` → rota) repetida em três `describe` de `tests/dist/site-gerado.test.ts` (069, 070, 071), cada plano proibido de editar o bloco do anterior (achado das revisões do 070 e do 071, 2026-10-02) | **Sem plano:** o 072 não toca esse arquivo. Cai no primeiro plano autorizado a editá-lo, que sobe a função para o escopo do módulo |
 | Demais dívidas da fase 3 (F-08 com duas definições, Tailwind varrendo `plans/`, tag-link, `noPrevious` sem canário, …) | **Nenhum plano desta fase.** Continuam onde estão |
 
 ## Verificação no navegador (vale para todo plano marcado "orquestrador (navegador)")

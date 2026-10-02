@@ -1,6 +1,6 @@
 # Plano 071 — Sitemap bilíngue com `@astrojs/sitemap` (RF-30, Decisão 10)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-30** (sitemap bilíngue, nenhum rascunho), RF-10, RN-01; §7.2 (dependência nova); sabatina fase 4, Decisões 10 e 14; §12 fase 4, item 7 (fecha, com o 070)
 **Depende de:** plano 070 (`alternateLinks`)
 **Modelo recomendado:** sonnet

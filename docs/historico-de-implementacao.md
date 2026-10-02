@@ -247,3 +247,8 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
 - **2026-10-02 — 070 DONE** (`96912de`): `canonical` e os três `hreflang` (`pt-BR`, `en`, `x-default` no PT) absolutos e
   recíprocos em toda página fora das 404, a partir de `alternateLinks` em `src/lib/routes.ts`. A revisão pegou um teste de
   `dist` tautológico na origem do canonical, corrigido com canário de origem errada. Não fecha item do §12 sozinho (com o 071).
+
+- **2026-10-02 — 071 DONE** (`027f72a`): `sitemap-index.xml` com as 14 rotas públicas dos dois idiomas e os pares
+  `hreflang` iguais ao `<head>`, via `@astrojs/sitemap` 3.7.4. A opção `i18n` só pareou `/` com `/en/`, então os pares
+  vêm do `serialize` com `alternateLinks` (Decisão 14, ramo B). Sitemap servido em produção igual ao `dist/` por SHA-256;
+  `robots.txt` segue `Disallow`. Fecha o item 7 do §12 com o 070, 7/9. Dois ciclos de revisão.
