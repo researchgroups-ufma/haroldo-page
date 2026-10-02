@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, as decisões de fatiamento, as questões levadas ao stakeholder e as armadilhas.
 
-Última atualização: 2026-10-02 — **072 DONE** (`dd87a37`, testes i18n sobre o `dist/`: par EN/PT de toda rota, mapa × `dist/` e M-07 nos dois sentidos, com extrator de texto sem dependência nova; fecha o item 3 do §12, 8/9; a dívida do `routeOf` ganhou a quarta cópia). Próximo: 073. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
+Última atualização: 2026-10-02 — **073** executado, à espera de promoção: M-07 verificada nas 8 rotas EN, fallback conferido item a item, §12 da fase 4 em 9/9 (PRD v0.1.72). Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../../docs/historico-de-implementacao.md), §4.2.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *M-07 atingida; fallback verificado item a item.*
 Como nas fases anteriores, o critério não é "os testes passam": é abrir as rotas `/en` no navegador
@@ -143,7 +143,7 @@ Datas (`aulas[].data`, `listas[].data_entrega`) são factuais no valor e formata
 | Rotas EN espelhando as rotas PT, inclusive a 404 em `/en` (RF-27) | **068**, com 065, 066 e 067 — o 072 acrescenta o teste "toda rota PT tem par EN" |
 | Seletor de idioma preservando a página atual (RF-29) | **069** |
 | `hreflang`, canonical e sitemap bilíngue (RF-30) | **071**, com o 070 |
-| M-07 verificada: zero strings PT de interface nas rotas EN | **073** — teste do 072 mais a inspeção manual de todas as rotas EN |
+| M-07 verificada: zero strings PT de interface nas rotas EN | **073** — teste do 072 mais a inspeção manual de todas as rotas EN, feita em 2026-10-02: 8/8 rotas sem texto de interface em português fora de `lang="pt-BR"` (evidência no plano 073) |
 | Grupo `en` do `perfil` cobre `atuacao[]` (cargo), no Zod e no Tina, com o teste de paridade | **060** |
 
 Os planos 055, 056, 058, 059, 062, 063 e 064 **não** fecham item sozinhos: são pré-requisitos. **A
@@ -275,6 +275,78 @@ Da seção "Entre a fase 3 e a 4" de [`plans/README.md`](../README.md) e do
 | `routeOf` (arquivo de `dist/` → rota) repetida em três `describe` de `tests/dist/site-gerado.test.ts` (069, 070, 071), cada plano proibido de editar o bloco do anterior, e uma quarta cópia em `tests/dist/i18n.test.ts:84` (072), com `listSiteHtml` (`:75`) duplicando `listSiteHtmlFiles` (`site-gerado.test.ts:78`) (achado das revisões do 070, 071 e 072, 2026-10-02) | **Sem plano.** Cai no primeiro plano autorizado a editar os dois arquivos, que sobe as funções para um módulo auxiliar comum em `tests/dist/` |
 | Demais dívidas da fase 3 (F-08 com duas definições, Tailwind varrendo `plans/`, tag-link, `noPrevious` sem canário, …) | **Nenhum plano desta fase.** Continuam onde estão |
 
+## O que a fase 4 empurra adiante, e as dívidas que ela criou
+
+Igual ao README da fase 3: destino nomeado, não conserto de passagem. O 073 não edita `src/`, `tests/`
+nem `content/`, e nenhum item abaixo foi tocado por ele. Cada item cita o arquivo em que já estava
+escrito.
+
+**Para a fase 5 (Polimento e entrega):**
+
+- **`robots.txt` apontando o `sitemap-index.xml` e retirada do `X-Robots-Tag: noindex`.** Hoje
+  `public/robots.txt` tem `Disallow: /` e a linha `Sitemap` comentada, e `public/_headers` tem o bloco
+  `/*` com o `noindex`; os dois comentários dizem que a fase 5 (RF-30) os troca. O sitemap já é gerado
+  (`dist/sitemap-index.xml`, plano 071). **Fecha quando:** a Q-05 (domínio próprio) for respondida e o
+  plano de SEO da fase 5 publicar o robots definitivo e tirar o bloco `/*` de `public/_headers`;
+- **Open Graph (RF-30).** Item "SEO completo" do §12 da fase 5; a fase 4 entregou `canonical`,
+  `hreflang` e sitemap, não Open Graph. **Fecha quando:** o plano de SEO da fase 5 emitir as meta tags
+  Open Graph nas duas árvores;
+- **Manual do professor (§10.5) explicando o grupo "Versão em inglês" dentro de cada item** e que o
+  campo sem versão cai no português, marcado, com o aviso. O manual é o item 8 do §6.1 do PRD (Escopo do
+  MVP) e consta da linha da fase 5 do §6.2; o pedido específico (explicar o grupo "Versão em inglês" dentro
+  de cada item) só está escrito no plano 073, seção "Contexto necessário",
+  `plans/fase-4-internacionalizacao/073-verificacao-transversal-e-fechamento-da-fase-4.md:65-66`.
+  **Fecha quando:** o manual da fase 5 tiver essa seção.
+
+**Dívidas sem fase, criadas ou herdadas pela fase 4 (cada uma conferida contra o arquivo citado):**
+
+- **`routeOf` (arquivo de `dist/` → rota) em quatro cópias** — três `describe` de
+  `tests/dist/site-gerado.test.ts` (069, 070, 071) e `tests/dist/i18n.test.ts:84` (072), com
+  `listSiteHtml` (`i18n.test.ts:75`) duplicando `listSiteHtmlFiles` (`site-gerado.test.ts:78`). Está na
+  tabela "Dívidas herdadas" acima. **Fecha quando:** o primeiro plano autorizado a editar os dois
+  arquivos subir as funções para um módulo auxiliar comum em `tests/dist/`;
+- **Comentário de `src/i18n/pt.ts:65-67` desatualizado** — diz "até o 058 remover o campo do
+  `siteConfig`", e o 058 removeu (achado da revisão do 058, tabela "Dívidas herdadas" acima; o comentário
+  segue lá no `fc7c2ec`). **Fecha quando:** o primeiro commit autorizado a tocar `pt.ts` corrigir o
+  comentário;
+- **Sanfona de Publicações: o ano aberto fica `inert` no fim da rolagem.** O `syncInert`
+  (`src/scripts/publications-accordion.ts:92`) entrou no `f41556a` (2026-09-24), antes da fase 4. Achado
+  do 066, medido em `/publicacoes/` e reproduzido em `/en/publications/`: leituras `0`, `0i`, `87i` (o
+  `i` marca `inert`) e `elementFromPoint` no link "DOI" de 2023 não devolve o link. A causa provável
+  (`scrub: 0.4` termina a animação depois do último `onUpdate`) é dedução de leitura, não medida. Fontes:
+  `plans/fase-4-internacionalizacao/066-en-research-e-publications.md:574-579` e
+  `docs/historico-de-implementacao.md:231-233`. **Fecha quando:** o stakeholder decidir o tratamento e um
+  plano próprio corrigir o `syncInert`, com a medição repetida no navegador, aba visível;
+- **Seletor: ordem de Tab e quebra abaixo de ~354 px úteis — decisão do stakeholder pendente.** A partir
+  de `lg` a ordem de Tab (nome, seletor, navegação) difere da visual (nome, navegação, seletor); abaixo de
+  ~354 px úteis o par seletor + "Menu" desce para uma segunda linha (a 360 px reais fica na linha do
+  nome). Escrito em `docs/identidade-visual.md:150-154` ("decisão de produto, com a verificação de
+  teclado a cargo do stakeholder") e em `plans/fase-4-internacionalizacao/069-seletor-de-idioma.md:543`
+  e `:557`. **Fecha quando:** o stakeholder verificar o teclado, confirmar ou emendar a ordem e a quebra,
+  e a identidade visual acompanhar;
+- **Foco por teclado nas rotas EN não observado** — a tecla Tab enviada pela extensão não move o foco
+  nesta máquina (seção "Verificação no navegador" abaixo; `066-…:580`; `069-…:557`). **Fecha quando:** o
+  stakeholder fizer a verificação manual, como na fase 3 em 2026-09-23;
+- **Demais dívidas da fase 3** (F-08 com duas definições, Tailwind varrendo `plans/`, tag-link,
+  `noPrevious` sem canário, …) — a linha da tabela "Dívidas herdadas" não mudou: **nenhum plano desta
+  fase**, continuam onde estão. **Fecha quando:** cada uma fechar pelo destino que o README da fase 3
+  lhe dá, na seção "O que a fase 3 empurra adiante, e as dívidas que ela criou"
+  (`plans/fase-3-site-publico/README.md:179-315`).
+
+Fechadas pela fase 4, pelos planos que a tabela "Dívidas herdadas" nomeia: lugar do seletor (069),
+linha de projeto duplicada (063), `hover:underline` sem afastamento (059), páginas acima de 150 linhas
+(062–064), chave de `<title>` (057), rotas fora de `NAV_ITEMS` (056, 062–064 e o teste do 072),
+`atuacao[]` sem par no grupo `en` (060).
+
+### Observações do 073 (não são dívida de código)
+
+- **O `<title>` das disciplinas sai em português em `/en`.** `disciplinas.nome` é campo T com fallback, e
+  o elemento `<title>` não carrega `lang`; o corpo da página marca o nome com `lang="pt-BR"` e mostra o
+  aviso. Medido nos passos 3 e 4 do 073.
+- **`formacao[0].curso` = "Quantum Field Theory" sai marcado `lang="pt-BR"`.** O valor já está em inglês no
+  arquivo, mas sem `en.curso` cai no fallback: é o custo previsto na Decisão 4(b) ("um título escrito em
+  inglês seria marcado `pt-BR`"). Some quando o professor preencher `en.curso`.
+
 ## Verificação no navegador (vale para todo plano marcado "orquestrador (navegador)")
 
 Comportamento de UI se prova exercitando a interface (memória do projeto). O navegador com a
@@ -320,7 +392,7 @@ importar para a Evidência, rode `npm test -- --reporter=verbose`. Python no Git
 ## Portão de qualidade
 
 **Os blocos que todo despacho carrega estão em [`plans/DESPACHO.md`](../DESPACHO.md).** A seção
-"Regras de código da fase 3" daquele arquivo aponta para o README da fase 3; **nesta fase valem as
+"Regras de código da fase vigente" daquele arquivo aponta para o README da fase em curso (este, desde o 073); **nesta fase valem as
 regras abaixo**, que o despacho deve citar pelo caminho deste README.
 
 Antes do commit de promoção: `node scripts/verificar-promocao.mjs <plano>`. Um plano só vira `DONE`

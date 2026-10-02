@@ -94,15 +94,17 @@ Nenhum agente herda o contexto do orquestrador; todos leem arquivo barato.
     fidelidade faz o mesmo ao comparar. Ao final, `grep -o $'\xEF\xBB\xBF' <plano> | wc -l` tem de
     dar `0`; cole essa saída na Evidência.
 
-### Regras de código da fase 3
+### Regras de código da fase vigente (antes, "da fase 3")
 
-Estão em `plans/fase-3-site-publico/README.md`, seção "Regras de código que todo plano desta fase
-herda". Leia-a também. Em resumo: cabeçalho §10.1 do PRD em todo arquivo novo; TSDoc com o
+Estão no README da fase em curso, seção "Regras de código que todo plano desta fase herda": hoje,
+`plans/fase-4-internacionalizacao/README.md`. As da fase 3, de que o resumo abaixo partiu, ficam em
+`plans/fase-3-site-publico/README.md`. Leia a da fase vigente. Em resumo: cabeçalho §10.1 do PRD em todo arquivo novo; TSDoc com o
 comportamento de prop ausente; comentário com o identificador do PRD em toda regra de negócio —
 **citando a cláusula que de fato descreve a regra** (a exigência está no **§10.3**,
 "Comentários no Código", não no §10.4 — defeito já reincidente aqui, quatro vezes); identificadores em
 inglês; sem `any`, `process.env` sob `src/`, `set:html` ou requisição a terceiro; strings de
-interface só em `src/i18n/pt.ts`; links internos com barra final; **componentes** < 150 linhas
+interface só em `src/i18n/` (`pt.ts` e `en.ts`; regra vigente no README da fase 4, seção "Regras de
+código que todo plano desta fase herda"); links internos com barra final; **componentes** < 150 linhas
 (é o que o §10.4 legisla, e como "Alvo", não invariante — arquivo de teste não entra:
 `tests/lib/courses.test.ts` tem 256 linhas e `tests/content/schemas.test.ts` 503, os dois aprovados).
 **Desde 2026-10-02 (PRD v0.1.71), passar de 150 é aceito sem extração:** não pare para perguntar;

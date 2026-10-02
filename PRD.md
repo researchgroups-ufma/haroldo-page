@@ -12,9 +12,9 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.71 |
+| **Versão do PRD** | v0.1.72 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟡 8/9 — próximo: plano 073** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073) — próximo: fase 5** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -53,6 +53,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.69 | 2026-09-30 | Desenvolvedor | Sabatina "enxugar o PRD" (4 decisões): histórico para `docs/historico-de-implementacao.md`; plano DONE não sobe a versão (plano 074) |
 | v0.1.70 | 2026-10-01 | Desenvolvedor | Decisão 16 da sabatina da fase 4: F-07 emendada, Sobre EN sem o aviso de idioma (mantém `lang="pt-BR"`) |
 | v0.1.71 | 2026-10-02 | Desenvolvedor | §10.4: componente acima de 150 linhas é aceito sem extração obrigatória (decisão do dono do produto, plano 067) |
+| v0.1.72 | 2026-10-02 | Desenvolvedor | Fecha a fase 4 (plano 073): M-07 verificada, §7.2 fixa `@astrojs/sitemap` 3.7.4, §12 em 9/9 |
 
 ---
 
@@ -385,7 +386,7 @@ Três propriedades desta arquitetura merecem registro explícito:
 | Hospedagem | Cloudflare Workers (Static Assets) + Workers Builds | — | Deploy automático a partir do GitHub; assets estáticos ilimitados no plano gratuito |
 | Repositório/CI | GitHub + GitHub Actions | — | Versionamento do conteúdo; Actions roda testes e paridade de schema antes do merge |
 | Animações | `motion` (API vanilla) ou GSAP | a decidir na fase 3 | Movimento discreto sem introduzir React no bundle |
-| Sitemap | `@astrojs/sitemap` | fixar na fase 4 | Integração oficial; lista só as páginas geradas (rascunho fica fora sem lógica extra) e emite os pares `alternate` de idioma (sabatina fase 4, Decisão 10) |
+| Sitemap | `@astrojs/sitemap` | 3.7.4 (fixada na fase 4, plano 071) | Integração oficial; lista só as páginas geradas (rascunho fica fora sem lógica extra) e emite os pares `alternate` de idioma (sabatina fase 4, Decisão 10) |
 | Testes | Vitest + axe-core; Lighthouse na fase 5 | — | Ver §11 |
 | Armazenamento de arquivos | Google Drive | — | PDFs e slides fora do repositório (`briefing.md` §6) |
 | Node | LTS ativa | fixar na fase 0 (`.nvmrc`) | Fixada em `.nvmrc` e na configuração do Workers Builds |
@@ -768,7 +769,7 @@ Todo módulo `.ts` e componente `.astro` começa com:
 | Fase 1 — Modelo de conteúdo | 10/10 | 🟢 Concluída |
 | Fase 2 — Pipeline de publicação | 5/5 | 🟢 Concluída |
 | Fase 3 — Site público (PT) | 12/12 | 🟢 Concluída |
-| Fase 4 — Internacionalização | 8/9 | 🟡 Em andamento |
+| Fase 4 — Internacionalização | 9/9 | 🟢 Concluída |
 | Fase 5 — Polimento e entrega | 0/17 | ⬜ Não iniciada |
 
 Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqueada
@@ -828,7 +829,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 - [x] Rotas EN espelhando as rotas PT, inclusive a 404 em `/en` (RF-27) — plano **068** (`292ed25`), com 065–067
 - [x] Seletor de idioma preservando a página atual (RF-29) — plano **069** (`2d93c8e`)
 - [x] `hreflang`, canonical e sitemap bilíngue (RF-30) — planos **070** (`96912de`) e **071** (`027f72a`)
-- [ ] M-07 verificada: zero strings PT de interface nas rotas EN
+- [x] M-07 verificada: zero strings PT de interface nas rotas EN — plano **073**
 - [x] Grupo `en` do `perfil` cobre `atuacao[]` (cargo), no Zod e no Tina, com o teste de paridade — plano **060** (`122df25`)
 
 ### Fase 5 — Polimento e Entrega
