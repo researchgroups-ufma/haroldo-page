@@ -12,7 +12,7 @@
  *                 ligados a linha não publicada, sem revelá-la (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-10-01
+ *  Atualizado em: 2026-10-07
  *  Versão       : 0.1.0
  *
  *  Dependências : BaseLayout, PageHeader, ProjectItem, FallbackNotice, src/i18n (strings),
@@ -102,7 +102,7 @@ const showNotice = hasFallback([...localizedLines.flatMap((l) => l.fields), ...p
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    class="mt-4 w-full max-w-md object-cover grayscale"
+                    class="mt-4 w-full max-w-md object-cover"
                   />
                 )}
               </div>

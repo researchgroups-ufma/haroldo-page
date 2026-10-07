@@ -5,11 +5,11 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : View de `/` e `/en/` (sabatina fase 4, Decisão 6): corpo da
  *                 Home, sem rolagem a partir de `lg`: nome e navegação no topo,
- *                 retrato em p&b quando houver `foto` (F-08) e, sob a régua,
+ *                 retrato colorido quando houver `foto` (F-08) e, sob a régua,
  *                 cargo, instituição, `resumo_home`, contato, formação e áreas.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-10-02
+ *  Atualizado em: 2026-10-07
  *  Versão       : 0.2.0
  *
  *  Dependências : BaseLayout, ExternalLink, ProfileLists, FallbackNotice, LanguageLink, src/i18n/fallback.ts,
@@ -118,7 +118,7 @@ const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
             height="1280"
             fetchpriority="high"
             decoding="async"
-            class="aspect-[3/4] w-36 object-cover grayscale sm:w-44 lg:col-span-3 lg:col-start-7 lg:h-full lg:max-h-[24rem] lg:w-auto"
+            class="aspect-[3/4] w-36 object-cover sm:w-44 lg:col-span-3 lg:col-start-7 lg:h-full lg:max-h-[24rem] lg:w-auto"
           />
         )
       }

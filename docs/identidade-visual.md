@@ -214,7 +214,7 @@ existe. Datas saem no formato do idioma, como "March 15, 2026".
   mesmo estilo dos itens (abaixo de `lg` o seletor ganha o alvo de toque de 44 px, `min-h-11 px-2`,
   que os itens não têm), mas **fora** do `<nav>`: na Home EN ele aponta para `/`, e o menu
   principal não tem link para a Home.
-- Meio: **foto** em p&b, 3:4, quando houver.
+- Meio: **foto** colorida, 3:4, quando houver.
 - Régua forte e três blocos: **cargo** / **departamento** / **instituicao**, **resumo_home** e o
   contato (rubrica "Contato", **email** e os perfis acadêmicos na mesma sequência da Sobre —
   `profileLinks`); **formacao[]** (ano · grau — curso); **areas[]**.
@@ -236,7 +236,7 @@ existe. Datas saem no formato do idioma, como "March 15, 2026".
 - `<h1>` "Linhas e projetos".
 - Um bloco por **linhas-pesquisa** publicada, na ordem de **ordem** (sem `ordem` ao fim, por
   **titulo**), aberto por régua forte e com `id` âncora: **titulo** (`<h2>`, `display-2`),
-  **resumo** em cinza, **corpo** em parágrafos, **imagem** em p&b se houver (`alt=""`, porque o
+  **resumo** em cinza, **corpo** em parágrafos, **imagem** colorida se houver (`alt=""`, porque o
   título está logo acima).
 - Logo abaixo, os **projetos** daquela linha (`groupProjectsByLine`): linha pequena
   "**periodo.inicio**–**periodo.fim** · **status**", **titulo**, **descricao** em parágrafos e
