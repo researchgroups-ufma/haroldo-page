@@ -3,12 +3,13 @@
  *  Arquivo      : course-tabs.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Script das abas da página de disciplina (RF-24): alterna os
- *                 painéis, atualiza o `#id` da URL, escolhe a aba inicial pelo
- *                 `#id` e trata as setas, `Home` e `End` do teclado.
+ *                 painéis, atualiza o `#id` da URL, escolhe a aba pelo `#id`
+ *                 (do painel ou de um elemento dentro dele, rolando até ele) e
+ *                 trata as setas, `Home` e `End` do teclado.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.2.0
  *
  *  Dependências : nenhuma
  *  Entradas     : DOM de `CourseTabs` (`#curso-abas`) e dos painéis de `CourseView`
@@ -49,12 +50,27 @@ if (tablist && tabs.length > 1) {
   tablist.hidden = false;
   tablist.parentElement?.setAttribute('data-abas', '');
 
-  const fromHash = () => panels.findIndex((panel) => `#${panel.id}` === location.hash);
-  select(Math.max(0, fromHash()));
-  window.addEventListener('hashchange', () => {
+  // O `#id` escolhe a aba quando é o do painel ou o de algo dentro dele — o atalho da aula aponta
+  // para o script na aba Scripts (sabatina "Ensino modelo A", Decisão 12). Nesse caso, depois de
+  // mostrar a aba, rola até o alvo: antes ele estava num painel oculto e não tinha posição.
+  const target = () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    return id ? document.getElementById(id) : null;
+  };
+  const fromHash = () => {
+    const element = target();
+    return element ? panels.findIndex((panel) => panel.contains(element)) : -1;
+  };
+  const reveal = () => {
     const index = fromHash();
-    if (index >= 0) select(index);
-  });
+    if (index < 0) return false;
+    select(index);
+    const element = target();
+    if (element && element !== panels[index]) element.scrollIntoView({ block: 'start' });
+    return true;
+  };
+  if (!reveal()) select(0);
+  window.addEventListener('hashchange', reveal);
 
   tabs.forEach((tab, i) => {
     tab.addEventListener('click', () => select(i, { updateHash: true }));

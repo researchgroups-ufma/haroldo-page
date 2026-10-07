@@ -38,6 +38,8 @@ export const M07_EXCEPTIONS: string[] = [
   'about.links.github', // nome próprio da plataforma ("GitHub")
   'course.links', // palavra "Links" igual nos dois idiomas
   'course.materialType.slides', // empréstimo do inglês, também usado em português
+  'course.courseScripts', // "Scripts" é empréstimo do inglês (aba, sabatina "Ensino modelo A", Decisão 12)
+  'course.lessonScript', // "Script" é empréstimo do inglês, como em `script.eyebrow`
   'script.language.python', // nome próprio da linguagem
   'script.language.r', // nome/sigla da linguagem
   'script.language.matlab', // nome próprio da linguagem

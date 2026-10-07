@@ -12,9 +12,9 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.76 |
+| **Versão do PRD** | v0.1.77 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase, na branch `design`, em 2026-10-07**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase, na branch `design`, em 2026-10-07** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, na `design` em 2026-10-07, sem commit**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -58,6 +58,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.74 | 2026-10-07 | Desenvolvedor | Sabatina "Extensão" (3 decisões, `docs/sabatinas/CHANGELOG_sabatina_extensao.md`): RF-15 passa de notícias a Extensão (SHOULD), coleção `extensao` no lugar de `noticias` (§7.3), rotas `/extensao` e `/en/outreach` (§6.1); sai a linha de notícias do §6.3. Imagens do site passam a coloridas |
 | v0.1.75 | 2026-10-07 | Desenvolvedor | F-07 emendada: a Home EN (`/en/`) também fica sem o aviso de idioma (mantém `lang="pt-BR"`), a pedido do dono do produto |
 | v0.1.76 | 2026-10-07 | Desenvolvedor | Sabatina "Pesquisa modelo C" (10 decisões, `docs/sabatinas/CHANGELOG_sabatina_pesquisa-modelo-c.md`): RF-22 redesenhado com a imagem fixa por linha; `publicacoes` ganha `linha_relacionada` (§7.3) |
+| v0.1.77 | 2026-10-07 | Desenvolvedor | Sabatina "Ensino modelo A" (12 decisões, `docs/sabatinas/CHANGELOG_sabatina_ensino-modelo-a.md`): disciplina perene, sem semestre na página nem na URL; RF-23 com "Em curso" em cartões e "Encerradas" em lista, ordem alfabética; RF-24 com datas só em disciplina em curso; RF-37/F-13 com todos os scripts numa aba Scripts e atalho na aula; RN-03 com rótulos novos; `disciplinas` ganha `imagem`, perde `codigo` e `semestre` vira opcional (§7.3) |
 
 ---
 
@@ -209,7 +210,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-15 | SHOULD | Página Extensão: postagens com título, data, texto e até 5 fotos em carrossel (sabatina "Extensão", 2026-10-07) | Dado o professor em Extensão, quando cria uma postagem com título, data, texto e fotos (cada uma com descrição) e a publica, então ela aparece em `/extensao/` em ordem cronológica decrescente e ganha página própria em `/extensao/<slug>/` e `/en/outreach/<slug>/`; o painel escolhe a data num calendário em DD-MM-AAAA e não aceita a sexta foto nem foto sem imagem ou sem descrição | ⬜ |
 | RF-16 | WONT | Fluxo de aprovação por branch com preview antes de publicar | — (Editorial Workflow, plano pago do TinaCloud; ver NG-07 e R-05) | — |
 | RF-17 | WONT | Importação automática de publicações (ORCID/Crossref/OpenAlex/BibTeX) | — (ver NG-03) | — |
-| RF-37 | MUST | Gestão de scripts de código dentro da disciplina (lista `scripts[]`) | Dado o professor editando uma disciplina, quando acrescenta um script informando o título, colando o código no campo e escolhendo a linguagem (`python` por padrão), e salva, então o script aparece na página da disciplina com destaque de sintaxe e botão de copiar — agrupado sob a aula correspondente quando o campo `aula` casa com uma aula existente, e no grupo geral da disciplina quando `aula` está vazio ou não casa com nenhuma (F-13) | ⬜ |
+| RF-37 | MUST | Gestão de scripts de código dentro da disciplina (lista `scripts[]`) | Dado o professor editando uma disciplina, quando acrescenta um script informando o título, colando o código no campo e escolhendo a linguagem (`python` por padrão), e salva, então o script aparece na página da disciplina com destaque de sintaxe e botão de copiar — numa aba Scripts com todos os scripts da disciplina: primeiro os da aula correspondente, na ordem das aulas e marcados "Aula N", quando o campo `aula` casa com uma aula existente — e a aula mostra um atalho para o script —, depois os gerais, quando `aula` está vazio ou não casa com nenhuma (F-13; sabatina "Ensino modelo A", Decisão 12) | ⬜ |
 
 #### Site público
 
@@ -218,8 +219,8 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-20 | MUST | Home com identificação do professor, resumo de atuação e caminhos para Pesquisa, Ensino e Publicações | Dado um visitante na raiz, quando a página carrega, então vê nome, cargo, instituição, foto, uma síntese e links para as três seções principais | ⬜ |
 | RF-21 | MUST | Página Sobre com biografia, formação, atuação profissional, contato e links acadêmicos (as áreas de atuação ficam na Home desde o redesenho de 2026-09-23) | Dado o perfil preenchido, quando o visitante abre Sobre, então vê todos os campos preenchidos e apenas eles — campos vazios não deixam rótulo órfão na página | ⬜ |
 | RF-22 | MUST | Página Pesquisa listando linhas de pesquisa (e projetos, se houver). Desde a sabatina "Pesquisa modelo C" (2026-10-07): a partir de `lg`, a imagem da linha fica parada à esquerda e troca enquanto o texto rola; linha sem imagem mostra um bloco neutro com o número; cada linha lista os seus projetos e as publicações ligadas a ela; projetos sem linha ficam em "Outros projetos", último bloco do ensaio, com imagem fixa e o próximo número | Dado duas linhas publicadas, quando o visitante abre Pesquisa, então vê as duas na ordem definida; dado uma linha sem projeto ou sem publicação ligada, então a seção correspondente não aparece | ⬜ |
-| RF-23 | MUST | Página Ensino separando disciplinas atuais e anteriores | Dado disciplinas com status distintos, quando o visitante abre Ensino, então vê dois grupos rotulados, atuais primeiro | ⬜ |
-| RF-24 | MUST | Página de disciplina com ementa, bibliografia, aulas, listas e materiais | Dada uma disciplina com 3 aulas e 2 listas, quando o visitante abre a página, então vê as 5 entradas com título, data (quando houver) e link que abre o arquivo no Drive em nova aba | ⬜ |
+| RF-23 | MUST | Página Ensino separando disciplinas em curso e encerradas, sem semestre (sabatina "Ensino modelo A") | Dado disciplinas com status distintos, quando o visitante abre Ensino, então vê primeiro "Em curso", em cartões com imagem (ou bloco `tinta` com a inicial do nome), e depois "Encerradas", em lista; cada disciplina num grupo só, ordem alfabética pelo nome; grupo vazio some, e sem nenhuma disciplina publicada a página mostra uma frase só; nenhum semestre aparece | ⬜ |
+| RF-24 | MUST | Página de disciplina com ementa, bibliografia, aulas, listas e materiais | Dada uma disciplina com 3 aulas e 2 listas, quando o visitante abre a página, então vê as 5 entradas com título, data (quando houver e a disciplina estiver em curso — sabatina "Ensino modelo A", Decisão 8) e link que abre o arquivo no Drive em nova aba | ⬜ |
 | RF-25 | MUST | Página Publicações agrupada por ano, decrescente | Dadas publicações de 2024 e 2026, quando o visitante abre a página, então vê 2026 antes de 2024, cada uma com autores, veículo e os links disponíveis (DOI, arXiv, PDF) | ⬜ |
 | RF-26 | MUST | Site responsivo | Dado qualquer rota, quando aberta em 360 px de largura, então não há rolagem horizontal nem elemento cortado | ⬜ |
 | RF-27 | MUST | Página 404 no idioma da rota, com caminho de volta | Dada uma URL inexistente, quando acessada, então a resposta é uma página 404 com navegação; sob `/en`, a 404 em inglês (`dist/en/404.html`, servida pelo modo `404-page` do Worker — premissa a provar por artefato; sabatina fase 4, Decisão 9) | ⬜ |
@@ -260,7 +261,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 |---|---|---|
 | RN-01 | Conteúdo com `publicado = false` não aparece em nenhuma página pública, sitemap ou feed | Substitui o Editorial Workflow ausente no plano gratuito (D-04). A regra vale para o site — **não** para o repositório, que é público (ver D-04) |
 | RN-02 | Publicações são ordenadas por ano decrescente; dentro do mesmo ano, pela ordem de cadastro invertida (mais recente primeiro) — **parcial:** dentro do ano, a ordem é alfabética por título em pt-BR até existir campo de data de cadastro (Q-RN02, 2026-09-14) | `briefing.md` §10 |
-| RN-03 | Uma disciplina é "atual" ou "anterior"; a transição é manual, feita pelo professor no campo `status` | Evita lógica de data que erraria a cada calendário acadêmico atípico |
+| RN-03 | Uma disciplina está "Em curso" (`status: atual`) ou "Encerrada" (`status: anterior`); a transição é manual, feita pelo professor no campo `status`. A disciplina é perene: não há uma por semestre (sabatina "Ensino modelo A") | Evita lógica de data que erraria a cada calendário acadêmico atípico |
 | RN-04 | Aulas, listas e materiais são ordenados pela posição definida pelo professor na lista, não por data | Aula 12 pode ser reagendada sem virar a ordem do curso |
 | RN-05 | Todo material didático é referenciado por URL externa, sem restrição de hospedeiro; o site não hospeda o arquivo — **exceto código-fonte, que fica no próprio conteúdo justamente para poder ser exibido** (`disciplinas.scripts[]`, RF-37) | NG-02, D-07 |
 | RN-06 | Se um campo do grupo "Versão em inglês" estiver vazio, a rota `/en` exibe o valor em português correspondente | D-03; padrão herdado de `../docs/plano-i18n.md` |
@@ -284,7 +285,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | F-10 | Dois itens gerando o mesmo nome de arquivo | O Tina impede a criação duplicada; o template de nome inclui discriminador suficiente (ano + slug do título) | "Já existe um item com este nome." |
 | F-11 | Professor exclui conteúdo por engano | O conteúdo permanece recuperável no histórico do Git pelo ADMIN | Manual: "conteúdo apagado pode ser recuperado — avise o responsável técnico" |
 | F-12 | Cota do plano gratuito excedida (builds ou requisições) | O ADMIN é notificado; ver R-04 e R-06 | — |
-| F-13 | Script com `aula` apontando para uma aula que não existe na disciplina | A página agrupa sob a aula os scripts cujo número casa e reúne os demais — os órfãos e os que nunca tiveram `aula` — num grupo geral da disciplina. O build não falha e nenhum script some da página; o script aparecer fora do lugar é o próprio aviso ao professor (RF-37) | — |
+| F-13 | Script com `aula` apontando para uma aula que não existe na disciplina | A aba Scripts põe primeiro, com "Aula N", os scripts cujo número casa (e a aula ganha o atalho para eles) e reúne depois os demais — os órfãos e os que nunca tiveram `aula` — num grupo geral da disciplina. O build não falha e nenhum script some da página; o script aparecer fora do lugar é o próprio aviso ao professor (RF-37) | — |
 
 ---
 
@@ -443,9 +444,9 @@ Conteúdo em arquivos Markdown com frontmatter, em `content/` na raiz do projeto
 | Campo | Tipo | Obrig. | Observação |
 |---|---|---|---|
 | `nome` | string | ✔ | ex.: Mecânica Clássica |
-| `codigo` | string | | ex.: FIS0123 |
-| `semestre` | string | ✔ | formato livre, ex.: 2026.2 |
-| `status` | enum `atual` \| `anterior` | ✔ | transição manual (RN-03) |
+| `semestre` | string | | formato livre, ex.: 2026.2; anotação do professor, **não exibida** (sabatina "Ensino modelo A", Decisão 1) |
+| `status` | enum `atual` \| `anterior` | ✔ | transição manual (RN-03); rótulos "Em curso" e "Encerrada" |
+| `imagem` | image | | cartão "Em curso"; ausente = bloco `tinta` com a inicial do nome (sabatina "Ensino modelo A", Decisões 7 e 11) |
 | `descricao` | string | | resumo curto para a listagem |
 | `ementa` | rich-text | | |
 | `bibliografia[]` | lista de objetos | | `{ referencia, url? }` |
@@ -457,7 +458,7 @@ Conteúdo em arquivos Markdown com frontmatter, em `content/` na raiz do projeto
 | `publicado` | boolean | ✔ | |
 | `en` | grupo | | `nome`, `descricao`, `ementa` |
 
-Nome de arquivo gerado por template: `{semestre}-{slug(nome)}.md` (RN-08). O slug da página é o mesmo nos dois idiomas: `/ensino/<slug>` e `/en/teaching/<slug>` (sabatina fase 4, Decisão 3).
+Nome de arquivo gerado por template: `{slug(nome)}.md` (RN-08; sabatina "Ensino modelo A", Decisão 2). O slug da página é o mesmo nos dois idiomas: `/ensino/<slug>` e `/en/teaching/<slug>` (sabatina fase 4, Decisão 3).
 
 **`publicacoes` — pasta (`content/publicacoes/*.md`)**
 

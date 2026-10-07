@@ -123,10 +123,11 @@ export const pt = {
   },
   teaching: {
     title: 'Disciplinas',
-    current: 'Atuais',
-    previous: 'Anteriores',
-    noCurrent: 'Nenhuma disciplina neste semestre.',
-    noPrevious: 'Nenhuma disciplina anterior.',
+    // Sabatina "Ensino modelo A" (2026-10-07), Decisões 4 e 10: grupos sem semestre; grupo vazio
+    // some, e a frase única cobre a página sem nenhuma disciplina.
+    current: 'Em curso',
+    previous: 'Encerradas',
+    empty: 'Nenhuma disciplina publicada ainda.',
     latestLesson: 'Última aula',
   },
   // Sabatina "Extensão" (2026-10-07): índice e página da postagem.
@@ -142,13 +143,15 @@ export const pt = {
   course: {
     back: 'Voltar para Ensino',
     status: {
-      atual: 'Atual',
-      anterior: 'Anterior',
+      atual: 'Em curso',
+      anterior: 'Encerrada',
     } satisfies Record<DisciplinaStatus, string>,
     tabsLabel: 'Seções da disciplina',
     syllabus: 'Ementa',
     lessons: 'Aulas',
-    courseScripts: 'Scripts da disciplina',
+    courseScripts: 'Scripts',
+    // Atalho da aula para o script dela na aba Scripts (sabatina "Ensino modelo A", Decisão 12).
+    lessonScript: 'Script',
     problemSets: 'Listas de exercícios',
     materials: 'Materiais complementares',
     bibliography: 'Bibliografia',

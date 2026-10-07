@@ -7,6 +7,7 @@ import {
   courseSlug,
   groupScriptsByLesson,
   presentSections,
+  scriptsForTab,
   splitCourses,
 } from '../../src/lib/courses';
 
@@ -57,52 +58,52 @@ describe('buildCourseSlugs', () => {
 });
 
 describe('splitCourses', () => {
-  const course = (semestre: string, nome: string, status: 'atual' | 'anterior') => ({
-    data: { semestre, nome, status },
+  // Sabatina "Ensino modelo A", Decisão 6: ordem alfabética pelo nome; `semestre` não influi.
+  const course = (nome: string, status: 'atual' | 'anterior', semestre?: string) => ({
+    data: { nome, status, semestre },
   });
 
-  it('ordena por semestre decrescente dentro do grupo — fixture do plano (2025.1, 2026.2, 2025.2)', () => {
+  it('ordena por nome pt-BR dentro do grupo, com acento no lugar certo', () => {
     const entries = [
-      course('2025.1', 'Mecânica Clássica', 'anterior'),
-      course('2026.2', 'Relatividade Geral', 'anterior'),
-      course('2025.2', 'Eletromagnetismo', 'anterior'),
+      course('Relatividade Geral', 'anterior'),
+      course('Óptica', 'anterior'),
+      course('Mecânica Clássica', 'anterior'),
+      course('Eletromagnetismo', 'anterior'),
     ];
     const { current, previous } = splitCourses(entries);
-    expect(previous.map((e) => e.data.semestre)).toEqual(['2026.2', '2025.2', '2025.1']);
+    expect(previous.map((e) => e.data.nome)).toEqual([
+      'Eletromagnetismo',
+      'Mecânica Clássica',
+      'Óptica',
+      'Relatividade Geral',
+    ]);
     expect(current).toEqual([]);
   });
 
+  it('ignora o semestre: o mais recente não vem antes por isso', () => {
+    const entries = [
+      course('Zebra', 'anterior', '2026.2'),
+      course('Abelha', 'anterior', '2020.1'),
+      course('Meio', 'anterior'),
+    ];
+    const { previous } = splitCourses(entries);
+    expect(previous.map((e) => e.data.nome)).toEqual(['Abelha', 'Meio', 'Zebra']);
+  });
+
   it('separa status mistos, com toEqual exato em current e em previous', () => {
-    const atualRecente = course('2026.2', 'Relatividade Geral', 'atual');
-    const atualAntigo = course('2026.1', 'Mecânica Quântica', 'atual');
-    const anteriorRecente = course('2025.2', 'Eletromagnetismo', 'anterior');
-    const anteriorAntigo = course('2025.1', 'Mecânica Clássica', 'anterior');
-    // Ordem embaralhada de propósito, com a atual mais antiga ANTES da mais recente: se
-    // `splitCourses` não ordenasse `current`, o resultado sairia na ordem de entrada
-    // (`[atualAntigo, atualRecente]`), diferente do esperado abaixo.
-    const entries = [anteriorAntigo, atualAntigo, anteriorRecente, atualRecente];
+    const atualA = course('Física Matemática', 'atual');
+    const atualB = course('Relatividade Geral', 'atual');
+    const anteriorA = course('Eletromagnetismo', 'anterior');
+    const anteriorB = course('Mecânica Clássica', 'anterior');
+    // Ordem embaralhada de propósito: sem ordenação, `current` sairia `[atualB, atualA]`.
+    const entries = [anteriorB, atualB, anteriorA, atualA];
     const { current, previous } = splitCourses(entries);
-    expect(current).toEqual([atualRecente, atualAntigo]);
-    expect(previous).toEqual([anteriorRecente, anteriorAntigo]);
-  });
-
-  it('ordena semestre por colação numérica: 2026.10 vem antes de 2026.9', () => {
-    const entries = [course('2026.9', 'A', 'anterior'), course('2026.10', 'B', 'anterior')];
-    const { previous } = splitCourses(entries);
-    expect(previous.map((e) => e.data.semestre)).toEqual(['2026.10', '2026.9']);
-  });
-
-  it('desempata semestres iguais por nome crescente pt-BR', () => {
-    const entries = [course('2025.1', 'Zebra', 'anterior'), course('2025.1', 'Abelha', 'anterior')];
-    const { previous } = splitCourses(entries);
-    expect(previous.map((e) => e.data.nome)).toEqual(['Abelha', 'Zebra']);
+    expect(current).toEqual([atualA, atualB]);
+    expect(previous).toEqual([anteriorA, anteriorB]);
   });
 
   it('não muta o array de entrada', () => {
-    const entries = [
-      course('2025.1', 'Zebra', 'anterior'),
-      course('2026.2', 'Relatividade Geral', 'atual'),
-    ];
+    const entries = [course('Zebra', 'anterior'), course('Relatividade Geral', 'atual')];
     const original = [...entries];
     splitCourses(entries);
     expect(entries).toEqual(original);
@@ -180,19 +181,20 @@ describe('groupScriptsByLesson', () => {
 
 describe('presentSections', () => {
   it('disciplina só com os campos obrigatórios: só Aulas, com count 0 (F-06)', () => {
-    expect(presentSections({}, 0)).toEqual([{ id: 'aulas', key: 'lessons', count: 0 }]);
+    expect(presentSections({})).toEqual([{ id: 'aulas', key: 'lessons', count: 0 }]);
   });
 
   it('disciplina completa: todas as seções, na ordem fixa do §6.5', () => {
     const data = {
       ementa: 'Uma ementa qualquer.',
       aulas: [{}, {}],
+      scripts: [{}, {}],
       listas: [{}],
       materiais: [{}, {}],
       bibliografia: [{}],
       links: [{}],
     };
-    expect(presentSections(data, 2)).toEqual([
+    expect(presentSections(data)).toEqual([
       { id: 'ementa', key: 'syllabus', count: 1 },
       { id: 'aulas', key: 'lessons', count: 2 },
       { id: 'scripts', key: 'courseScripts', count: 2 },
@@ -204,15 +206,52 @@ describe('presentSections', () => {
   });
 
   it('ementa só em branco não conta como presente', () => {
-    expect(presentSections({ ementa: '   ' }, 0)).toEqual([
-      { id: 'aulas', key: 'lessons', count: 0 },
+    expect(presentSections({ ementa: '   ' })).toEqual([{ id: 'aulas', key: 'lessons', count: 0 }]);
+  });
+
+  it('aba Scripts aparece com qualquer script, inclusive os ligados a uma aula (Decisão 12)', () => {
+    expect(presentSections({ aulas: [{}], scripts: [{ aula: 1 }] })).toEqual([
+      { id: 'aulas', key: 'lessons', count: 1 },
+      { id: 'scripts', key: 'courseScripts', count: 1 },
     ]);
   });
 
-  it('scripts só aparece se houver script geral (ligados a aula ficam dentro de Aulas)', () => {
-    expect(presentSections({ aulas: [{}] }, 0)).toEqual([
+  it('sem script, sem aba Scripts', () => {
+    expect(presentSections({ aulas: [{}], scripts: [] })).toEqual([
       { id: 'aulas', key: 'lessons', count: 1 },
     ]);
+  });
+});
+
+describe('scriptsForTab', () => {
+  const lessons = [{ numero: 1 }, { numero: 4 }, { numero: 2 }];
+  const s = (titulo: string, aula?: number) => ({ titulo, aula });
+
+  it('ordena pelos da aula, na ordem das aulas, e depois os gerais; âncora pela posição original', () => {
+    const scripts = [
+      s('geral'),
+      s('da aula 2', 2),
+      s('órfão', 9),
+      s('da aula 4', 4),
+      s('aula 1', 1),
+    ];
+    expect(
+      scriptsForTab(lessons, scripts).map(({ script, lesson, anchor }) => [
+        script.titulo,
+        lesson,
+        anchor,
+      ]),
+    ).toEqual([
+      ['aula 1', 1, 'script-5'],
+      ['da aula 4', 4, 'script-4'],
+      ['da aula 2', 2, 'script-2'],
+      ['geral', undefined, 'script-1'],
+      ['órfão', undefined, 'script-3'],
+    ]);
+  });
+
+  it('sem scripts, lista vazia', () => {
+    expect(scriptsForTab(lessons, [])).toEqual([]);
   });
 });
 

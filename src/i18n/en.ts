@@ -114,10 +114,9 @@ export const en: UiStrings = {
   },
   teaching: {
     title: 'Courses',
-    current: 'Current',
-    previous: 'Previous',
-    noCurrent: 'No courses this semester.',
-    noPrevious: 'No previous courses.',
+    current: 'Ongoing',
+    previous: 'Past courses',
+    empty: 'No courses yet.',
     latestLesson: 'Latest lecture',
   },
   outreach: {
@@ -132,13 +131,14 @@ export const en: UiStrings = {
   course: {
     back: 'All courses',
     status: {
-      atual: 'Current',
-      anterior: 'Previous',
+      atual: 'Ongoing',
+      anterior: 'Past',
     },
     tabsLabel: 'Course sections',
     syllabus: 'Syllabus',
     lessons: 'Lectures',
-    courseScripts: 'Course scripts',
+    courseScripts: 'Scripts',
+    lessonScript: 'Script',
     problemSets: 'Problem sheets',
     materials: 'Additional materials',
     bibliography: 'Bibliography',

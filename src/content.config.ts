@@ -418,13 +418,18 @@ const disciplinasEnSchema = z
  * `aulas`, `listas` e `materiais` são listas embutidas no arquivo da
  * disciplina (D-05), não coleções separadas. `publicado` obrigatório: RN-01,
  * é coleção de listagem.
+ *
+ * A disciplina é perene (sabatina "Ensino modelo A", 2026-10-07): `semestre` é
+ * anotação opcional do professor, não exibida (Decisão 1), e `imagem` é a do
+ * cartão "Em curso" (Decisão 7). Não há campo de código da disciplina
+ * (Decisão 11).
  */
 export const disciplinasSchema = z.object({
   nome: z.string(),
-  codigo: z.string().optional(),
-  semestre: z.string(),
+  semestre: z.string().optional(),
   status: z.enum(['atual', 'anterior']),
   descricao: z.string().optional(),
+  imagem: z.string().optional(),
   ementa: z.string().optional(),
   bibliografia: z.array(bibliografiaSchema).optional(),
   aulas: z.array(aulaSchema).optional(),

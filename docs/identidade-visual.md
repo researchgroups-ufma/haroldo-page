@@ -268,25 +268,40 @@ Modelo C, "ensaio com imagem parada" (sabatina "Pesquisa modelo C", 2026-10-07).
 
 ### 6.4 Ensino `/ensino` (RF-23)
 
-- `<h1>` "Disciplinas". Rubricas "Atuais" antes de "Anteriores", **sempre presentes**; grupo vazio
-  mostra "Nenhuma disciplina neste semestre." ou "Nenhuma disciplina anterior.".
-- Atual: linha pequena "**codigo** · **semestre**", **nome** em `display-2` (link), primeiro
-  parágrafo da **descricao** e "Última aula · N. título ↗ · data".
-- Anterior: linha pequena "**codigo** · **semestre**", **nome** em `titulo-item` e `›`; a linha
-  inteira é o link.
+Modelo A (sabatina "Ensino modelo A", 2026-10-07). A disciplina é perene: **nenhum semestre aparece**.
+
+- `<h1>` "Disciplinas". Rubrica "Em curso" (`status: atual`) e depois "Encerradas" (`anterior`); cada
+  disciplina num grupo só, ordem alfabética pelo **nome** em português. Grupo vazio **some**, rubrica
+  incluída; sem nenhuma disciplina publicada, uma frase só: "Nenhuma disciplina publicada ainda.".
+- Em curso: cartão `--papel` arredondado, dois por linha a partir de `lg`. A **imagem** fica à
+  esquerda em 4:5 a partir de `sm` e em cima em 16:9 abaixo (sem imagem, bloco `--tinta` com a
+  inicial do **nome** em `display-1`). No texto: **nome** em `display-2` (link, com a área de clique
+  estendida ao cartão), primeiro parágrafo da **descricao**, "Última aula · N. título ↗ · data" e
+  uma marca por aula, a última cheia em `--tinta`. No hover a imagem aproxima devagar.
+- Encerradas: linhas com régua fina, a primeira com régua forte; **nome** em display 300. No hover
+  ou foco o fundo `--tinta` sobe de baixo, o texto vira `--papel` e o primeiro parágrafo da
+  **descricao** entra à direita. Abaixo de `sm` só o nome. A linha inteira é o link.
+- Entrada dos cartões e das linhas com `animation-timeline: view()`, só sem movimento reduzido.
 
 ### 6.5 Disciplina `/ensino/[slug]` (RF-24, RF-37, F-06, F-13)
 
 - `PageHeader` com a seta de volta para `/ensino/`, o **nome** na mesma posição do título das outras
-  páginas e meta "**codigo** · **semestre** · Atual/Anterior"; à direita **descricao** e **ementa**.
+  páginas e meta "Em curso" ou "Encerrada", sem semestre nem código; à direita **descricao** e **ementa**.
   Sem trilha de navegação.
 - As seções viram **abas** (melhoria progressiva: sem JS ficam empilhadas com os títulos; o `#id`
-  da URL escolhe a aba): Aulas, Scripts da disciplina, Listas de exercícios, Materiais
+  da URL escolhe a aba, também quando é o de um elemento dentro dela, e rola até ele): Aulas,
+  Scripts, Listas de exercícios, Materiais
   complementares, Bibliografia, Links — só as presentes, **sem contagem** no rótulo.
+- **Datas de aula e de entrega só em disciplina em curso**: na encerrada não aparecem, mesmo
+  preenchidas (sabatina "Ensino modelo A", Decisão 8).
 - **Aulas**, na ordem do professor (RN-04): linha pequena "**numero** · **data**" (o leitor de
-  tela ouve "Aula N"), **titulo** ↗, **descricao** e os **scripts** cuja **aula** casa (5.4). Sem
-  aulas: "Nenhuma aula publicada ainda." (F-06).
-- **Scripts da disciplina**: os sem **aula** ou com aula inexistente (F-13).
+  tela ouve "Aula N"), **titulo** ↗, **descricao** e, para cada script cuja **aula** casa, um
+  atalho "Script · **titulo** →" para o painel dele na aba Scripts. Sem aulas: "Nenhuma aula
+  publicada ainda." (F-06).
+- **Scripts** (sabatina "Ensino modelo A", Decisão 12): **todos** os scripts da disciplina, nos
+  painéis da 5.4 — primeiro os ligados a uma aula, na ordem das aulas, com "Aula N ·" antes de
+  "Script · linguagem"; depois os sem **aula** ou com aula inexistente (F-13). A aba aparece com
+  qualquer script.
 - **Listas**: **titulo** ↗ e "Entrega dd/mm/aaaa"; **Materiais**: linha pequena com o **tipo**
   ("Slides", "Notas", "Complementar") acima do **titulo** ↗; **Bibliografia**; **Links**.
 - Toda seção exceto Aulas some quando vazia.

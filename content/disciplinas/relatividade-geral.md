@@ -1,9 +1,9 @@
 ---
 publicado: true
 nome: Relatividade Geral
-codigo: FIS0000
 semestre: '2026.2'
 status: atual
+imagem: /uploads/extensao-exemplo-1.jpg
 descricao: 'Curso de pós-graduação em relatividade geral, da geometria diferencial às soluções de buraco negro. [CONTEÚDO DE EXEMPLO]'
 ementa: Variedades e tensores; conexão e curvatura; equações de campo de Einstein; soluções de Schwarzschild e Kerr; ondas gravitacionais no regime linear.
 bibliografia:

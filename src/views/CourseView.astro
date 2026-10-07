@@ -5,15 +5,17 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : View da página de disciplina (RF-24, F-06, RN-04, RF-37, F-13;
  *                 sabatina fase 4, Decisão 6): seta de volta para Ensino,
- *                 cabeçalho com código, semestre, status, descrição e ementa, e
+ *                 cabeçalho com status, descrição e ementa (sem semestre nem código:
+ *                 a disciplina é perene, sabatina "Ensino modelo A"), e
  *                 as seções da disciplina em abas — aulas na ordem do professor
  *                 (estado vazio explícito, scripts por aula), "Scripts da
  *                 disciplina" (sem aula correspondente), listas, materiais,
- *                 bibliografia e links.
+ *                 bibliografia e links. Datas de aula e de entrega só em
+ *                 disciplina em curso (Decisão 8 da mesma sabatina).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-10-02
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.2.0
  *
  *  Dependências : BaseLayout, PageHeader, CoursePanel, LessonList, ScriptPanel,
  *                 CourseResources, CourseTabs, FallbackNotice,
@@ -31,9 +33,9 @@
  *
  *  Notas        : abas como melhoria progressiva (RNF-02): marcação em
  *                 `CourseTabs`, script em `src/scripts/course-tabs.ts`.
- *                 Scripts com `aula` correspondente aparecem dentro de
- *                 `LessonList` (F-13); os de `general` (sem aula) têm aba
- *                 própria, só se houver algum. Fallback por campo (RN-06) de
+ *                 Todos os scripts ficam na aba Scripts, os da aula com
+ *                 "Aula N" e um atalho na própria aula (sabatina "Ensino
+ *                 modelo A", Decisão 12; F-13 para os sem aula). Fallback por campo (RN-06) de
  *                 nome, descrição e ementa, e aviso único (F-07); campos "P"
  *                 das listas embutidas ficam nos componentes (Decisão 13).
  * ============================================================================
@@ -52,7 +54,7 @@ import { hasFallback, localize, localizeOptional } from '../i18n/fallback';
 import type { Locale } from '../lib/config';
 import { routePath } from '../lib/routes';
 import { toParagraphs } from '../lib/text';
-import { groupScriptsByLesson, presentSections } from '../lib/courses';
+import { groupScriptsByLesson, presentSections, scriptAnchor, scriptsForTab } from '../lib/courses';
 
 export interface Props {
   /** Idioma da rota. Obrigatória. */
@@ -65,12 +67,23 @@ const { lang, course } = Astro.props;
 const t = strings(lang);
 const data = course.data;
 
-// F-13/RF-37: agrupa os scripts sob a aula correspondente; general ganha aba própria.
-const { byLesson, general } = groupScriptsByLesson(data.aulas ?? [], data.scripts ?? []);
+// Decisão 12 (sabatina "Ensino modelo A"): todo script vai para a aba Scripts; a aula só leva o
+// atalho para o seu. F-13: o agrupamento por aula continua o de `groupScriptsByLesson`.
+const scripts = data.scripts ?? [];
+const tabScripts = scriptsForTab(data.aulas ?? [], scripts);
+const lessonScripts = groupScriptsByLesson(data.aulas ?? [], scripts).byLesson.map((group) =>
+  group.map((script) => ({
+    titulo: script.titulo,
+    anchor: scriptAnchor(scripts.indexOf(script)),
+  })),
+);
 // A ementa fica no cabeçalho; as demais seções viram abas, na ordem de `presentSections`.
-const tabs = presentSections(data, general.length).filter((section) => section.key !== 'syllabus');
+const tabs = presentSections(data).filter((section) => section.key !== 'syllabus');
 
-const meta = [data.codigo, data.semestre, t.course.status[data.status]].filter(Boolean).join(' · ');
+// Sabatina "Ensino modelo A": sem semestre nem código (Decisões 1 e 11); datas só em disciplina em
+// curso (Decisão 8).
+const meta = t.course.status[data.status];
+const showDates = data.status === 'atual';
 // RN-06: `nome`, `descricao` e `ementa` por idioma; os campos "P" não entram na conta do aviso.
 const nome = localize(data.nome, data.en?.nome, lang);
 const descricao = localizeOptional(data.descricao, data.en?.descricao, lang);
@@ -122,18 +135,17 @@ const lessons = data.aulas ?? [];
           // F-06: estado vazio explícito — a disciplina existe, mas nenhuma aula foi cadastrada.
           <p class="text-corpo text-secundario">{t.course.noLessons}</p>
         ) : (
-          <LessonList lessons={lessons} byLesson={byLesson} />
+          <LessonList lessons={lessons} scripts={lessonScripts} showDates={showDates} />
         )
       }
     </CoursePanel>
 
     {
-      // F-13: só os scripts sem aula correspondente — os demais já apareceram em LessonList.
-      general.length > 0 && (
+      tabScripts.length > 0 && (
         <CoursePanel id="scripts" title={t.course.courseScripts}>
           <div class="flex flex-col gap-4">
-            {general.map((script) => (
-              <ScriptPanel script={script} />
+            {tabScripts.map(({ script, lesson, anchor }) => (
+              <ScriptPanel script={script} id={anchor} lesson={lesson} />
             ))}
           </div>
         </CoursePanel>

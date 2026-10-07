@@ -12,8 +12,8 @@
  *                 para manter os dois abaixo de 150 linhas (§10.4 do PRD).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-10-02
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.5.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/CoursePanel.astro,
  *                 src/components/LangText.astro, src/i18n (`strings`),
@@ -49,6 +49,8 @@ const listas = data.listas ?? [];
 const materiais = data.materiais ?? [];
 const bibliografia = data.bibliografia ?? [];
 const links = data.links ?? [];
+// Sabatina "Ensino modelo A", Decisão 8: data de entrega só em disciplina em curso.
+const showDates = data.status === 'atual';
 
 // decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
 const lang = localeFromPath(Astro.url.pathname);
@@ -69,7 +71,7 @@ const pt = (text: string) => portugueseOnly(text, lang);
             >
               <LangText value={pt(lista.titulo)} />
             </ExternalLink>
-            {lista.data_entrega && (
+            {showDates && lista.data_entrega && (
               <span class="text-pequeno text-secundario">
                 {t.course.dueDate(formatDate(lista.data_entrega, lang))}
               </span>

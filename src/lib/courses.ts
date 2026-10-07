@@ -18,8 +18,9 @@
  *                 tipadas estruturalmente — este módulo não importa
  *                 `astro:content`
  *  Saídas       : slugs (`courseSlug`, `buildCourseSlugs`), grupos
- *                 (`splitCourses`), agrupamento de scripts (`groupScriptsByLesson`) e a lista
- *                 de seções presentes (`presentSections`)
+ *                 (`splitCourses`), agrupamento de scripts (`groupScriptsByLesson`), ordem e
+ *                 âncora da aba Scripts (`scriptsForTab`, `scriptAnchor`) e a lista de seções
+ *                 presentes (`presentSections`)
  *  Uso          : const slug = courseSlug(entry.filePath)
  *
  *  Notas        : funções puras, sem efeitos colaterais, testáveis sem a content layer do Astro
@@ -33,10 +34,10 @@ import { slugify } from './slug';
  * Deriva o slug de URL de uma disciplina a partir do **nome do arquivo**, nunca de `entry.id`
  * nem de `semestre` + `nome` dos dados (README da fase, decisão 3).
  *
- * O Tina grava o arquivo como `${semestre}-${slugify(nome)}` sem passar o `semestre` por
- * `slugify` (`tina/config.ts:488-489`), então o ponto do semestre (`2026.2`) sobrevive no nome do
- * arquivo. Aplicar `slugify` ao nome do arquivo sem a extensão `.md` reproduz esse ponto como
- * hífen (`2026.2-relatividade-geral.md` → `2026-2-relatividade-geral`), de forma estável mesmo se
+ * O Tina grava o arquivo como `${slugify(nome)}` (sabatina "Ensino modelo A", Decisão 2; até
+ * 2026-10-07 era `${semestre}-${slugify(nome)}`). Aplicar `slugify` ao nome do arquivo sem a
+ * extensão `.md` dá o slug (`relatividade-geral.md` → `relatividade-geral`), e um arquivo antigo
+ * com ponto vira hífen (`2026.2-relatividade-geral.md` → `2026-2-relatividade-geral`), de forma estável mesmo se
  * o professor corrigir um erro de digitação no `nome` depois (RN-08: o nome do arquivo não muda
  * com a edição). `entry.id` é rejeitado porque o loader `glob()` do Astro passa cada segmento por
  * `githubSlug`, que remove o ponto (`node_modules/astro/dist/content/utils.js:272`).
@@ -94,25 +95,19 @@ export function buildCourseSlugs(entries: { filePath?: string }[]): Map<string, 
 }
 
 /** Entrada de `disciplinas` com os campos usados em `splitCourses` (§6.4, RN-03). */
-type CourseGroupLike = { data: { status: 'atual' | 'anterior'; semestre: string; nome: string } };
+type CourseGroupLike = { data: { status: 'atual' | 'anterior'; nome: string } };
 
-/**
- * Compara duas disciplinas por `semestre` decrescente (colação numérica `pt-BR`, para que
- * `'2026.10'` venha antes de `'2026.9'`), com empate por `nome` crescente `pt-BR`.
- */
+/** Compara duas disciplinas por `nome` crescente, colação `pt-BR` (acento no lugar certo). */
 function compareCourseGroup(a: CourseGroupLike, b: CourseGroupLike): number {
-  const semesterDiff = b.data.semestre.localeCompare(a.data.semestre, 'pt-BR', { numeric: true });
-  if (semesterDiff !== 0) return semesterDiff;
   return a.data.nome.localeCompare(b.data.nome, 'pt-BR');
 }
 
 /**
- * Separa disciplinas em "atuais" e "anteriores" para `/ensino` (RF-23, §6.4).
+ * Separa disciplinas em "Em curso" e "Encerradas" para `/ensino` (RF-23, §6.4).
  *
- * // RN-03: a transição de atual para anterior é manual (campo `status`); nenhuma lógica de data.
- * Dentro de cada grupo, ordena por `semestre` decrescente, empate por `nome` — a identidade só
- * fixa a ordem das anteriores; a das atuais segue a mesma regra por decisão deste plano, para as
- * duas listas se comportarem igual.
+ * // RN-03: a transição de em curso para encerrada é manual (campo `status`); nenhuma lógica de data.
+ * Dentro de cada grupo, ordem alfabética pelo `nome` em português, nas duas línguas; `semestre` não
+ * influi (sabatina "Ensino modelo A", Decisão 6).
  *
  * @param entries Entradas de `disciplinas`, na forma devolvida por `getCollection`.
  * @returns `{ current, previous }`, cada um novo array ordenado; não muta `entries`.
@@ -162,6 +157,42 @@ export function groupScriptsByLesson<S extends { aula?: number }>(
   return { byLesson, general };
 }
 
+/**
+ * Âncora HTML de um script na aba Scripts, pela posição dele em `data.scripts` (1 em diante).
+ * Estável enquanto o professor não reordena a lista; não depende do título, que pode repetir.
+ *
+ * @param index Posição do script em `data.scripts`, a partir de 0.
+ * @returns O `id` do painel do script (ex.: `'script-3'`).
+ */
+export function scriptAnchor(index: number): string {
+  return `script-${index + 1}`;
+}
+
+/**
+ * Ordena os scripts para a aba Scripts da disciplina (sabatina "Ensino modelo A", Decisão 12):
+ * primeiro os ligados a uma aula, na ordem das aulas do professor (RN-04), cada um com o número
+ * da aula; depois os gerais — sem `aula` ou com `aula` que não casa (F-13) —, na ordem da lista.
+ * O agrupamento é o de `groupScriptsByLesson`.
+ *
+ * @param lessons Aulas da disciplina, na ordem do professor.
+ * @param scripts Scripts da disciplina, na ordem de `data.scripts`.
+ * @returns `{ script, lesson, anchor }` na ordem da aba; `lesson` é o `numero` da aula, ausente nos
+ *   gerais; `anchor` vem de `scriptAnchor` pela posição original.
+ */
+export function scriptsForTab<S extends { aula?: number }>(
+  lessons: { numero: number }[],
+  scripts: S[],
+): { script: S; lesson?: number; anchor: string }[] {
+  const { byLesson, general } = groupScriptsByLesson(lessons, scripts);
+  const anchor = (script: S) => scriptAnchor(scripts.indexOf(script));
+  return [
+    ...byLesson.flatMap((group, i) =>
+      group.map((script) => ({ script, lesson: lessons[i].numero, anchor: anchor(script) })),
+    ),
+    ...general.map((script) => ({ script, anchor: anchor(script) })),
+  ];
+}
+
 /** União literal das chaves de `pt.course` referenciadas por `presentSections` (§6.5). */
 export type SectionKey =
   'syllabus' | 'lessons' | 'courseScripts' | 'problemSets' | 'materials' | 'bibliography' | 'links';
@@ -170,6 +201,7 @@ export type SectionKey =
 type CourseSectionsLike = {
   ementa?: string;
   aulas?: unknown[];
+  scripts?: unknown[];
   listas?: unknown[];
   materiais?: unknown[];
   bibliografia?: unknown[];
@@ -181,19 +213,16 @@ type CourseSectionsLike = {
  * bloco "Nesta página".
  *
  * `aulas` está **sempre** presente, mesmo com `count: 0` (F-06 exige estado vazio explícito).
- * `scripts` só aparece se houver script sem aula correspondente (`generalScriptsCount`): os
- * ligados a uma aula aparecem dentro da própria seção Aulas. As demais seções só aparecem se não
- * vazias.
+ * `scripts` aparece com qualquer script, ligado a uma aula ou não: todos ficam na aba Scripts, e a
+ * aula só aponta para o seu (sabatina "Ensino modelo A", Decisão 12). As demais seções só aparecem
+ * se não vazias.
  *
  * @param data Campos de uma entrada de `disciplinas` (`entry.data`).
- * @param generalScriptsCount Quantidade de scripts sem aula correspondente (`general.length` de
- *   `groupScriptsByLesson`).
  * @returns Lista ordenada de `{ id, key, count }`; `id` é o id da âncora HTML da seção, `key` a
  *   chave de `pt.course` correspondente.
  */
 export function presentSections(
   data: CourseSectionsLike,
-  generalScriptsCount: number,
 ): { id: string; key: SectionKey; count: number }[] {
   const sections: { id: string; key: SectionKey; count: number }[] = [];
 
@@ -204,8 +233,9 @@ export function presentSections(
   // F-06: seção Aulas sempre presente, para o estado vazio explícito.
   sections.push({ id: 'aulas', key: 'lessons', count: data.aulas?.length ?? 0 });
 
-  if (generalScriptsCount > 0) {
-    sections.push({ id: 'scripts', key: 'courseScripts', count: generalScriptsCount });
+  const scriptsCount = data.scripts?.length ?? 0;
+  if (scriptsCount > 0) {
+    sections.push({ id: 'scripts', key: 'courseScripts', count: scriptsCount });
   }
 
   const listasCount = data.listas?.length ?? 0;

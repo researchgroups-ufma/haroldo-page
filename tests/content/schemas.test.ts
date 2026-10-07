@@ -330,6 +330,17 @@ describe('coleção disciplinas', () => {
     expect(disciplinasSchema.safeParse(valido).success).toBe(true);
   });
 
+  it('aceita disciplina sem `semestre` — anotação opcional (sabatina "Ensino modelo A", Decisão 1)', () => {
+    expect(disciplinasSchema.safeParse(omit(valido, 'semestre')).success).toBe(true);
+  });
+
+  it('aceita `imagem` opcional e rejeita `imagem` que não é texto (Decisão 7)', () => {
+    expect(
+      disciplinasSchema.safeParse({ ...valido, imagem: '/uploads/rg.jpg' }).success,
+    ).toBe(true);
+    expect(disciplinasSchema.safeParse({ ...valido, imagem: 3 }).success).toBe(false);
+  });
+
   it('rejeita `status` fora do enum `atual` | `anterior`', () => {
     const resultado = disciplinasSchema.safeParse({ ...valido, status: 'futura' });
     expect(resultado.success).toBe(false);

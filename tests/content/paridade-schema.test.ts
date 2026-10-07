@@ -257,7 +257,12 @@ function classifyTina(campo: TinaFieldLike): NormField {
     return { required, kind: 'reference' };
   }
   if (campo.type === 'string' && Array.isArray(campo.options) && campo.options.length > 0) {
-    return { required, kind: 'enum', enumValues: [...(campo.options as string[])].sort() };
+    // O Tina aceita a opção como texto ou como `{ value, label }` (rótulo do painel diferente do
+    // valor gravado, sabatina "Ensino modelo A", Decisão 5); o Zod só conhece o valor.
+    const values = campo.options.map((o) =>
+      typeof o === 'string' ? o : (o as { value: string }).value,
+    );
+    return { required, kind: 'enum', enumValues: values.sort() };
   }
   return { required, kind: mapScalarKind(campo.type) };
 }

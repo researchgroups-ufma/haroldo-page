@@ -518,8 +518,8 @@ export default defineConfig({
 
       // `disciplinas` — pasta (content/disciplinas/*.md, §7.3). `aulas`,
       // `listas` e `materiais` embutidos como listas de objeto (D-05) — sem
-      // coleção separada. Nome de arquivo prescrito: `{semestre}-{slug(nome)}`
-      // (RN-08).
+      // coleção separada. Nome de arquivo prescrito: `{slug(nome)}` (RN-08; sabatina
+      // "Ensino modelo A", Decisão 2: a disciplina é perene, sem semestre na URL).
       {
         name: 'disciplinas',
         label: 'Disciplinas',
@@ -531,9 +531,8 @@ export default defineConfig({
         ui: {
           filename: {
             readonly: true,
-            slugify: (values) =>
-              `${String(values?.semestre ?? '')}-${slugify(String(values?.nome ?? ''))}`,
-            description: 'Gerado automaticamente a partir do semestre e do nome — não é digitado.',
+            slugify: (values) => slugify(String(values?.nome ?? '')),
+            description: 'Gerado automaticamente a partir do nome — não é digitado.',
           },
         },
         fields: [
@@ -553,25 +552,22 @@ export default defineConfig({
           },
           {
             type: 'string',
-            name: 'codigo',
-            label: 'Código',
-            description: 'Ex.: FIS0123.',
-          },
-          {
-            type: 'string',
             name: 'semestre',
             label: 'Semestre',
-            required: true,
-            description: 'Formato livre, ex.: 2026.2.',
+            description: 'Anotação sua, em formato livre (ex.: 2026.2). Não aparece no site.',
           },
           {
             type: 'string',
             name: 'status',
             label: 'Status',
             required: true,
-            options: ['atual', 'anterior'],
+            // Rótulos novos, valores gravados de sempre (sabatina "Ensino modelo A", Decisão 5).
+            options: [
+              { value: 'atual', label: 'Em curso' },
+              { value: 'anterior', label: 'Encerrada' },
+            ],
             description:
-              'A transição de "Atual" para "Anterior" é manual — o painel não faz isso sozinho.',
+              'Em curso aparece em destaque no topo da página Ensino; Encerrada vai para a lista. A troca é manual — o painel não faz isso sozinho.',
           },
           {
             type: 'string',
@@ -579,6 +575,13 @@ export default defineConfig({
             label: 'Descrição',
             ui: { component: 'textarea' },
             description: 'Resumo curto exibido na listagem de disciplinas.',
+          },
+          {
+            type: 'image',
+            name: 'imagem',
+            label: 'Imagem',
+            description:
+              'Aparece no cartão da disciplina em curso. Sem imagem, o cartão mostra um bloco escuro com a inicial do nome.',
           },
           {
             type: 'string',

@@ -135,7 +135,11 @@ function extractSignature(field: DeclarativeField): FieldSignature {
     list: field.list === true,
   };
   if (field.options) {
-    signature.options = [...(field.options as string[])];
+    // Opção `{ value, label }` vira "valor=rótulo": trocar só o rótulo no config sem regenerar o
+    // lock também diverge.
+    signature.options = field.options.map((o) =>
+      typeof o === 'string' ? o : `${(o as { value: string }).value}=${(o as { label: string }).label}`,
+    );
   }
   if (field.collections) {
     signature.collections = [...field.collections];

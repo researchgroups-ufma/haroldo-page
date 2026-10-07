@@ -5,25 +5,27 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Lista de aulas de uma disciplina (RF-24, RN-04), em linhas
  *                 enxutas: número, título como link para o arquivo da aula,
- *                 descrição, data no formato do locale da rota quando houver
- *                 (§8.3 do PRD) e os painéis de script agrupados sob a aula
- *                 correspondente (F-13, RF-37).
+ *                 descrição, data no formato do locale da rota quando houver e a
+ *                 disciplina estiver em curso (sabatina "Ensino modelo A", Decisão 8)
+ *                 (§8.3 do PRD) e, sob a aula, um atalho "Script · título →"
+ *                 para cada script dela, que fica na aba Scripts (Decisão 12
+ *                 da mesma sabatina; F-13, RF-37).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
- *  Atualizado em: 2026-10-02
- *  Versão       : 0.5.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.7.0
  *
- *  Dependências : src/components/ExternalLink.astro, src/components/ScriptPanel.astro,
+ *  Dependências : src/components/ExternalLink.astro,
  *                 src/components/LangText.astro, src/i18n (`strings`),
  *                 src/i18n/fallback.ts (`portugueseOnly`),
  *                 src/lib/routes.ts (`localeFromPath`),
  *                 src/lib/date.ts (formatDate), src/lib/text.ts (padCount, toParagraphs),
  *                 astro:content (tipo `CollectionEntry<'disciplinas'>`)
  *  Entradas     : props `lessons` (array de aulas, já validado pelo Zod) e
- *                 `byLesson` (scripts de cada aula, mesmo índice de `lessons`,
- *                 de `groupScriptsByLesson`)
+ *                 `scripts` (título e âncora dos scripts de cada aula, mesmo
+ *                 índice de `lessons`, de `groupScriptsByLesson`) e `showDates`
  *  Saídas       : `<ol>` com um `<li>` por aula, na ordem recebida, com os
- *                 painéis de script de `byLesson[i]` sob cada aula
+ *                 atalhos de `scripts[i]` sob cada aula
  *  Uso          : import LessonList from '../components/LessonList.astro'
  *
  *  Notas        : a página só chama este componente quando `lessons.length >
@@ -33,7 +35,6 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from './ExternalLink.astro';
-import ScriptPanel from './ScriptPanel.astro';
 import LangText from './LangText.astro';
 import { strings } from '../i18n';
 import { portugueseOnly } from '../i18n/fallback';
@@ -49,13 +50,19 @@ export interface Props {
    */
   lessons: NonNullable<CollectionEntry<'disciplinas'>['data']['aulas']>;
   /**
-   * Scripts de cada aula, na posição `i` alinhada a `lessons[i]` (`groupScriptsByLesson`, F-13).
-   * Prop obrigatória, mesmo padrão de `lessons`: a página sempre agrupa antes de chamar.
+   * Atalhos para os scripts de cada aula, na posição `i` alinhada a `lessons[i]`
+   * (`groupScriptsByLesson`, F-13): título e âncora do painel na aba Scripts. O código fica só na
+   * aba (sabatina "Ensino modelo A", Decisão 12). Obrigatória: a página sempre agrupa antes.
    */
-  byLesson: NonNullable<CollectionEntry<'disciplinas'>['data']['scripts']>[number][][];
+  scripts: { titulo: string; anchor: string }[][];
+  /**
+   * Mostra a data das aulas. Obrigatória: só a disciplina em curso exibe datas (sabatina "Ensino
+   * modelo A", Decisão 8), e quem chama decide pelo `status`.
+   */
+  showDates: boolean;
 }
 
-const { lessons, byLesson } = Astro.props;
+const { lessons, scripts: scriptsByLesson, showDates } = Astro.props;
 
 // decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
 const lang = localeFromPath(Astro.url.pathname);
@@ -69,8 +76,9 @@ const t = strings(lang);
       const titulo = portugueseOnly(aula.titulo, lang);
       const descricao = portugueseOnly(aula.descricao ?? '', lang);
       const paragraphs = toParagraphs(descricao.text);
-      // byLesson tem o mesmo tamanho de lessons (groupScriptsByLesson) — sempre o mesmo array.
-      const scripts = byLesson[index];
+      // Mesmo tamanho de lessons (groupScriptsByLesson) — sempre o mesmo array.
+      const scripts = scriptsByLesson[index];
+      const data = showDates ? aula.data : undefined;
       return (
         // RN-04: ordem do professor, não por número nem data — `lessons` nunca é reordenado aqui.
         <li class="aula-item py-4">
@@ -79,10 +87,10 @@ const t = strings(lang);
             <p class="text-pequeno text-secundario">
               <span aria-hidden="true">
                 {padCount(aula.numero)}
-                {aula.data && ' · '}
+                {data && ' · '}
               </span>
               <span class="sr-only">{t.course.lessonNumber(aula.numero)}</span>
-              {aula.data && formatDate(aula.data, lang)}
+              {data && formatDate(data, lang)}
             </p>
             <h3 class="text-titulo-item mt-1">
               <ExternalLink
@@ -97,13 +105,15 @@ const t = strings(lang);
                 {paragraph}
               </p>
             ))}
-            {scripts.length > 0 && (
-              <div class="mt-4 flex flex-col gap-4">
-                {scripts.map((script) => (
-                  <ScriptPanel script={script} headingLevel={4} />
-                ))}
-              </div>
-            )}
+            {scripts.map((script) => (
+              <p class="text-pequeno mt-2">
+                <span class="text-secundario">{t.course.lessonScript} ·</span>{' '}
+                {/* Decisão 13 (sabatina fase 4): título de script é "P". */}
+                <a href={`#${script.anchor}`} class="underline underline-offset-4">
+                  <LangText value={portugueseOnly(script.titulo, lang)} /> →
+                </a>
+              </p>
+            ))}
           </div>
         </li>
       );

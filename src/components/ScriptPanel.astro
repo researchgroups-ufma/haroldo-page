@@ -10,8 +10,8 @@
  *                 "Copiado" por `aria-live`, e "Abrir arquivo ↗" só com `url`.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-21
- *  Atualizado em: 2026-10-02
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.4.0
  *
  *  Dependências : astro:components (Code), astro:content (tipo
  *                 CollectionEntry<'disciplinas'>), src/components/ExternalLink.astro,
@@ -20,7 +20,8 @@
  *                 src/lib/text.ts (toParagraphs),
  *                 src/lib/code-theme.ts (monochromeTheme, shikiLanguage)
  *  Entradas     : prop `script` (um item de `data.scripts`, já validado pelo Zod);
- *                 prop `headingLevel` (3 ou 4, padrão 3)
+ *                 props `id` (âncora na aba Scripts) e `lesson` (número da
+ *                 aula do script, quando houver)
  *  Saídas       : `<article data-script>` com o painel e o `<script>` do botão copiar
  *  Uso          : import ScriptPanel from '../components/ScriptPanel.astro'
  *
@@ -44,12 +45,16 @@ export interface Props {
    * não há o que renderizar (nenhum comportamento de prop ausente definido, §10.2).
    */
   script: NonNullable<CollectionEntry<'disciplinas'>['data']['scripts']>[number];
-  /** Nível do título do script; 4 quando o painel está dentro de uma aula (que já é `h3`). Padrão 3. */
-  headingLevel?: 3 | 4;
+  /** `id` do painel, alvo do atalho da aula (`scriptAnchor`). Obrigatória: todo painel é alvo. */
+  id: string;
+  /**
+   * Número da aula do script, mostrado antes de "Script · linguagem" (sabatina "Ensino modelo A",
+   * Decisão 12). Ausente nos scripts gerais (F-13).
+   */
+  lesson?: number;
 }
 
-const { script, headingLevel = 3 } = Astro.props;
-const Heading = headingLevel === 4 ? 'h4' : 'h3';
+const { script, id, lesson } = Astro.props;
 
 // decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
 const lang = localeFromPath(Astro.url.pathname);
@@ -62,14 +67,16 @@ const paragraphs = toParagraphs(descricao.text);
 ---
 
 <article
+  id={id}
   data-script
-  class="bg-bloco border-regua grid grid-cols-1 gap-6 border p-6 lg:grid-cols-2 lg:items-start"
+  class="bg-bloco border-regua grid scroll-mt-6 grid-cols-1 gap-6 border p-6 lg:grid-cols-2 lg:items-start"
 >
   <div>
     <p class="text-rotulo text-secundario">
+      {lesson !== undefined && `${t.course.lessonNumber(lesson)} · `}
       {t.script.eyebrow(t.script.language[script.linguagem])}
     </p>
-    <Heading class="text-titulo-item mt-2" lang={titulo.lang}>{titulo.text}</Heading>
+    <h3 class="text-titulo-item mt-2" lang={titulo.lang}>{titulo.text}</h3>
     {
       paragraphs.map((paragraph) => (
         <p class="text-corpo mt-2" lang={descricao.lang}>
