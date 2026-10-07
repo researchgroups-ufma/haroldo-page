@@ -8,8 +8,8 @@
  *                 e monta os URLs de DOI e arXiv.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
- *  Atualizado em: 2026-09-16
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.2.0
  *
  *  Dependências : nenhuma
  *  Entradas     : arrays de entradas de coleção, na forma devolvida por
@@ -66,13 +66,15 @@ export function groupByYear<T extends PublicationLike>(
 }
 
 /**
- * Normaliza um nome de autor para comparação: `trim`, espaços múltiplos colapsados em um,
- * diacríticos removidos (`normalize('NFD')`) e minúsculas.
+ * Normaliza um nome de autor para comparação: `trim`, espaços múltiplos colapsados em um, espaço
+ * depois de ponto removido (`C. D.` e `C.D.` ficam iguais), diacríticos removidos
+ * (`normalize('NFD')`) e minúsculas.
  */
 function normalizeAuthorName(name: string): string {
   return name
     .trim()
     .replace(/\s+/g, ' ')
+    .replace(/\. /g, '.')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
@@ -88,11 +90,12 @@ function normalizeAuthorName(name: string): string {
  * os dois casos sem abrir mão da precisão.
  *
  * @param author Nome do autor, como aparece em `autores` no conteúdo.
- * @param citationName Nome de citação do professor (`siteConfig.author.citationName`).
- * @returns `true` se, normalizados, os dois nomes forem idênticos.
+ * @param citationNames Formas do nome de citação do professor (`siteConfig.author.citationNames`).
+ * @returns `true` se, normalizado, o autor for idêntico a alguma das formas normalizadas.
  */
-export function isProfessorAuthor(author: string, citationName: string): boolean {
-  return normalizeAuthorName(author) === normalizeAuthorName(citationName);
+export function isProfessorAuthor(author: string, citationNames: readonly string[]): boolean {
+  const normalized = normalizeAuthorName(author);
+  return citationNames.some((name) => normalizeAuthorName(name) === normalized);
 }
 
 /** Prefixos aceitos em `doi`, removidos (sem diferenciar maiúsculas) antes de montar o URL. */

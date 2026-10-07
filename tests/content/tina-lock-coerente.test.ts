@@ -229,7 +229,7 @@ const configCollections = tinaConfig.schema.collections as unknown as Declarativ
 const lockCollections = loadLockCollections();
 
 describe('coerência entre tina/config.ts e tina/tina-lock.json (RNF-09, dívida 2 da fase 1)', () => {
-  it('as cinco coleções existem nos dois lados, com os mesmos nomes', () => {
+  it('as seis coleções existem nos dois lados, com os mesmos nomes', () => {
     const nomesConfig = configCollections.map((c) => c.name).sort();
     const nomesLock = lockCollections.map((c) => c.name).sort();
     expect(nomesLock).toEqual(nomesConfig);

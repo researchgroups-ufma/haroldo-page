@@ -91,6 +91,7 @@ import {
   projetosSchema,
   disciplinasSchema,
   publicacoesSchema,
+  extensaoSchema,
 } from '../../src/content.config';
 
 // `defineConfig` real só valida o schema e devolve o `config` inalterado (ver Notas do
@@ -228,9 +229,12 @@ interface TinaFieldLike {
   fields?: TinaFieldLike[];
 }
 
-/** Mapeia `type` de campo do Tina para `Kind` — `image` (foto, imagem) equivale a `string` no Zod. */
+/**
+ * Mapeia `type` de campo do Tina para `Kind` — `image` (foto, imagem) e `datetime` (data da
+ * Extensão, gravada como texto ISO) equivalem a `string` no Zod.
+ */
 function mapScalarKind(tipo: string): Kind {
-  if (tipo === 'string' || tipo === 'image') return 'string';
+  if (tipo === 'string' || tipo === 'image' || tipo === 'datetime') return 'string';
   if (tipo === 'number') return 'number';
   if (tipo === 'boolean') return 'boolean';
   throw new Error(`mapScalarKind: tipo Tina não tratado pelo normalizador de paridade: "${tipo}"`);
@@ -332,6 +336,7 @@ const zodSchemas: Record<string, ZodIntrospectable> = {
   projetos: projetosSchema as unknown as ZodIntrospectable,
   disciplinas: disciplinasSchema as unknown as ZodIntrospectable,
   publicacoes: publicacoesSchema as unknown as ZodIntrospectable,
+  extensao: extensaoSchema as unknown as ZodIntrospectable,
 };
 
 const tinaCollections = tinaConfig.schema.collections as unknown as (TinaFieldLike & {
@@ -359,7 +364,7 @@ function extrairBasesDoZod(): Record<string, string> {
 }
 
 describe('paridade de schema — Zod (src/content.config.ts) × Tina (tina/config.ts)', () => {
-  it('as cinco coleções existem dos dois lados, com o mesmo mapeamento de nome', () => {
+  it('as seis coleções existem dos dois lados, com o mesmo mapeamento de nome', () => {
     const nomesTina = tinaCollections.map((c) => normalizeCollectionName(c.name)).sort();
     const nomesZod = Object.keys(zodSchemas).sort();
     expect(nomesTina).toEqual(nomesZod);
@@ -383,7 +388,7 @@ describe('paridade de schema — Zod (src/content.config.ts) × Tina (tina/confi
 });
 
 describe('dívida 7(a): path do Tina × base: do glob() do Zod, por coleção', () => {
-  it('a extração por regex encontra o base: das cinco coleções em content.config.ts', () => {
+  it('a extração por regex encontra o base: das seis coleções em content.config.ts', () => {
     const basesZod = extrairBasesDoZod();
     expect(Object.keys(basesZod).sort()).toEqual(Object.keys(zodSchemas).sort());
   });

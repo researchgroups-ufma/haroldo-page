@@ -2,21 +2,22 @@
  * ============================================================================
  *  Arquivo      : config.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Configuração completa do TinaCMS — as cinco coleções do MVP
+ *  Descrição    : Configuração completa do TinaCMS — as seis coleções
  *                 (§7.3 do PRD: `perfil`, `linhas-pesquisa`, `projetos`,
- *                 `disciplinas`, `publicacoes`), com rótulos e textos de ajuda
+ *                 `disciplinas`, `publicacoes` e `extensao`), com rótulos e textos de ajuda
  *                 em vocabulário acadêmico (RF-03), templates de nome de
  *                 arquivo (RN-08) e o interruptor Rascunho/Publicado (RN-01,
- *                 D-04) nas quatro coleções de listagem. Esta é a interface de
+ *                 D-04) nas cinco coleções de listagem. Esta é a interface de
  *                 entrada do professor — quem valida o dado é o Zod
  *                 (`src/content.config.ts`, D-06).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.5.0
  *
  *  Dependências : tinacms (defineConfig), src/lib/slug.ts (slugify, reusado
- *                 nos templates de nome de arquivo — ver nota abaixo)
+ *                 nos templates de nome de arquivo — ver nota abaixo),
+ *                 src/lib/outreach.ts (toCalendarDate, data da Extensão)
  *  Entradas     : TINA_CLIENT_ID, TINA_TOKEN, TINA_BRANCH — variáveis de
  *                 ambiente lidas do `.env` local pelo `@tinacms/cli`
  *  Saídas       : configuração consumida por `tinacms dev` / `tinacms build`,
@@ -90,6 +91,7 @@
  */
 import { defineConfig } from 'tinacms';
 import { slugify } from '../src/lib/slug';
+import { toCalendarDate } from '../src/lib/outreach';
 
 export default defineConfig({
   branch: process.env.TINA_BRANCH || 'main',
@@ -785,8 +787,11 @@ export default defineConfig({
         path: 'content/publicacoes',
         format: 'md',
         // Ver nota equivalente em `linhas_pesquisa` — mesmo mecanismo, verificado pelo mesmo
-        // teste do orquestrador em 2026-09-03 (Evidência do plano 017).
-        defaultItem: { publicado: false },
+        // teste do orquestrador em 2026-09-03 (Evidência do plano 017). Publicação nova já vem com o
+        // professor como primeiro autor (pedido de 2026-10-07): ele acrescenta os demais e arrasta
+        // para a ordem da citação. É a primeira forma de `siteConfig.author.citationNames`, copiada
+        // à mão: `src/lib/config.ts` lê `import.meta.env`, que não existe no bundle do Tina.
+        defaultItem: { publicado: false, autores: ['LIMA JUNIOR, HAROLDO C. D.'] },
         ui: {
           filename: {
             readonly: true,
@@ -816,7 +821,8 @@ export default defineConfig({
             list: true,
             required: true,
             description:
-              'Um autor por item, na ordem da citação — toque em "+" para adicionar outro; o nome do professor é destacado automaticamente na exibição.',
+              // As formas do nome que ganham destaque estão em `siteConfig.author.citationNames`.
+              'Toque em "+" para cada coautor e arraste para a ordem da citação.',
           },
           {
             type: 'number',
@@ -885,6 +891,124 @@ export default defineConfig({
                 type: 'string',
                 name: 'resumo',
                 label: 'Resumo (EN)',
+                ui: { component: 'textarea' },
+              },
+            ],
+          },
+        ],
+      },
+
+      // `extensao` — pasta (content/extensao/*.md; sabatina "Extensão", 2026-10-07). Nome de
+      // arquivo `{data}-{slug(titulo)}` (RN-08): a data separa duas ações de mesmo título.
+      {
+        name: 'extensao',
+        label: 'Extensão',
+        path: 'content/extensao',
+        format: 'md',
+        // O seletor de data mostra hoje num item novo, mas não grava o valor: sem esta data o Save
+        // acusava "Required" sob uma data visível (medido no painel em 2026-10-07). Função, para ser
+        // o instante de cada criação e não o da carga do painel.
+        defaultItem: () => ({ publicado: false, data: new Date().toISOString() }),
+        ui: {
+          filename: {
+            readonly: true,
+            slugify: (values) =>
+              // O seletor grava o instante em UTC; o nome usa a data de São Luís (`aaaa-mm-dd`).
+              `${String(toCalendarDate(values?.data) ?? '')}-${slugify(String(values?.titulo ?? ''))}`,
+            description: 'Gerado automaticamente a partir da data e do título — não é digitado.',
+          },
+          // O `required` de `imagem` e `alt` não bloqueia o Save de uma foto recém-criada e nunca aberta,
+          // e um `validate` na lista trava o formulário ("Cannot navigate away from an invalid form")
+          // antes de o professor conseguir preenchê-la (ambos medidos no painel em 2026-10-07). A
+          // checagem fica no salvamento: foto vazia (o "+" clicado à toa) sai em silêncio; foto pela
+          // metade recusa o salvamento, que senão quebraria o build no Zod (F-09).
+          beforeSubmit: async ({ values, cms }) => {
+            const fotos = (values.fotos ?? []) as { imagem?: string; alt?: string }[];
+            const filled = fotos.filter((foto) => foto?.imagem || foto?.alt);
+            if (filled.some((foto) => !foto.imagem || !foto.alt)) {
+              // O erro lançado só impede o salvamento; quem avisa o professor é o alerta.
+              const message = 'Não salvo: cada foto precisa de uma imagem e de uma descrição.';
+              cms.alerts.error(message);
+              throw new Error(message);
+            }
+            return { ...values, fotos: filled };
+          },
+        },
+        fields: [
+          {
+            type: 'boolean',
+            name: 'publicado',
+            label: 'Publicado',
+            required: true,
+            description: 'Quando desmarcado, a postagem fica invisível no site (RN-01).',
+          },
+          {
+            type: 'string',
+            name: 'titulo',
+            label: 'Título',
+            required: true,
+          },
+          {
+            type: 'datetime',
+            name: 'data',
+            label: 'Data',
+            required: true,
+            description:
+              'Escolha no calendário. Ordena a lista, da mais recente para a mais antiga.',
+            // Calendário em DD-MM-AAAA, sem hora. O valor gravado é o instante em UTC, que o Zod
+            // converte na data de São Luís (`toCalendarDate`).
+            ui: { dateFormat: 'DD-MM-YYYY', timeFormat: false },
+          },
+          {
+            type: 'string',
+            name: 'corpo',
+            label: 'Texto',
+            required: true,
+            ui: { component: 'textarea' },
+            description: 'Separe os parágrafos com uma linha em branco.',
+          },
+          {
+            type: 'object',
+            name: 'fotos',
+            label: 'Fotos',
+            list: true,
+            // O Tina não abre um item da lista enquanto algum campo obrigatório da postagem estiver
+            // vazio ("Cannot navigate away from an invalid form", reproduzido em 2026-10-07).
+            description:
+              'Até 5 fotos, na ordem do carrossel. Preencha antes o título e o texto. O "+" cria uma foto vazia; clique nela para escolher a imagem e escrever a descrição.',
+            ui: {
+              max: 5,
+              itemProps: (item) => ({ label: item?.alt || 'Foto' }),
+            },
+            fields: [
+              {
+                type: 'image',
+                name: 'imagem',
+                label: 'Imagem',
+                required: true,
+              },
+              {
+                type: 'string',
+                name: 'alt',
+                label: 'Descrição da foto',
+                required: true,
+                description:
+                  'O que a foto mostra, para quem não pode vê-la. Ex.: "Estudantes montando lentes de água".',
+              },
+            ],
+          },
+          {
+            type: 'object',
+            name: 'en',
+            label: 'Versão em inglês (opcional)',
+            description:
+              'Traduções opcionais — deixe em branco o que não for traduzir; o site usa o texto em português como reserva (RN-06).',
+            fields: [
+              { type: 'string', name: 'titulo', label: 'Título (EN)' },
+              {
+                type: 'string',
+                name: 'corpo',
+                label: 'Texto (EN)',
                 ui: { component: 'textarea' },
               },
             ],

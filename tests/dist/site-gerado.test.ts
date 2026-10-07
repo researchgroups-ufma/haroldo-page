@@ -193,6 +193,7 @@ describe('rascunho nunca aparece em HTML algum (RN-01)', () => {
     { pasta: 'projetos', campoTitulo: 'titulo' },
     { pasta: 'disciplinas', campoTitulo: 'nome' },
     { pasta: 'publicacoes', campoTitulo: 'titulo' },
+    { pasta: 'extensao', campoTitulo: 'titulo' },
   ];
 
   const rascunhos: { arquivo: string; titulo: string }[] = colecoes.flatMap(({ pasta, campoTitulo }) =>

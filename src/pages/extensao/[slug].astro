@@ -1,0 +1,29 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : [slug].astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Página fina da postagem de extensão em português: só chama
+ *                 `PostView`; rascunho não gera página (RN-01).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-07
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/views/PostView.astro, src/views/outreach-paths.ts
+ *  Entradas     : prop `post`, gerada por `postStaticPaths`
+ *  Saídas       : HTML estático de uma rota `/extensao/<slug>/` por postagem publicada
+ *  Uso          : servido automaticamente pelo Astro para cada caminho de `getStaticPaths`
+ *
+ *  Notas        : o corpo da página vive em `PostView`.
+ * ============================================================================
+ */
+import PostView from '../../views/PostView.astro';
+import { postStaticPaths } from '../../views/outreach-paths';
+
+export const getStaticPaths = postStaticPaths;
+
+const { post } = Astro.props;
+---
+
+<PostView lang="pt" post={post} />

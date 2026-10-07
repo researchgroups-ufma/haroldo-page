@@ -2,27 +2,28 @@
  * ============================================================================
  *  Arquivo      : content.config.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Schemas Zod das cinco coleções de conteúdo do MVP (§7.3 do
- *                 PRD), usando a Content Layer API do Astro 7 com o loader
+ *  Descrição    : Schemas Zod das seis coleções de conteúdo (§7.3 do PRD: as
+ *                 cinco do MVP e `extensao`, de 2026-10-07), usando a Content Layer API do Astro 7 com o loader
  *                 `glob()`. É o portão de validação (D-06): todo arquivo em
  *                 `content/` passa por aqui antes de virar página. O painel
  *                 TinaCMS (`tina/config.ts`, plano 017) é só a interface de
  *                 entrada — quem decide o que é um dado válido é este arquivo.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.4.0
  *
  *  Dependências : astro:content (defineCollection, reference), astro/loaders
- *                 (glob), astro/zod (z)
+ *                 (glob), astro/zod (z), src/lib/outreach.ts (toCalendarDate)
  *  Entradas     : arquivos Markdown com frontmatter em `content/perfil/`,
  *                 `content/linhas-pesquisa/`, `content/projetos/`,
- *                 `content/disciplinas/`, `content/publicacoes/`
+ *                 `content/disciplinas/`, `content/publicacoes/`,
+ *                 `content/extensao/`
  *  Saídas       : `collections` — mapa consumido automaticamente pelo Astro
  *                 (`getCollection`, `getEntry`) e usado para gerar os tipos de
  *                 `astro:content`. Cada schema Zod (`perfilSchema`,
  *                 `linhasPesquisaSchema`, `projetosSchema`,
- *                 `disciplinasSchema`, `publicacoesSchema`) também é
+ *                 `disciplinasSchema`, `publicacoesSchema`, `extensaoSchema`) também é
  *                 exportado nomeadamente, para quem precisar do `ZodObject`
  *                 concreto sem passar pelo tipo união de `collections.*.schema`
  *                 (`ZodObject | ((context: SchemaContext) => ZodObject) |
@@ -36,8 +37,8 @@
  *                 não existe mais, e `schema` como função de topo (fora da
  *                 Content Layer) também não. `z` vem de `astro/zod` (Zod 4);
  *                 `astro:schema` e o `z` antes exportado por `astro:content`
- *                 não existem mais. A coleção `noticias` (v1.1, NG-01 desta
- *                 fase) fica de fora de propósito.
+ *                 não existem mais. A coleção `noticias` prevista para a v1.1
+ *                 virou `extensao` (sabatina "Extensão", 2026-10-07).
  *
  *                 O grupo `en` (RN-06, RN-09, plano 018) foi acrescentado às
  *                 cinco coleções, sempre `.optional()` e `.strict()`: opcional
@@ -83,6 +84,7 @@
  */
 import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { toCalendarDate } from './lib/outreach';
 import { z } from 'astro/zod';
 
 /**
@@ -481,10 +483,48 @@ const publicacoes = defineCollection({
   schema: publicacoesSchema,
 });
 
+/** Grupo `en` da coleção `extensao` (RN-06, RN-09): só o texto; data e fotos são factuais (RN-07). */
+const extensaoEnSchema = z
+  .object({
+    titulo: z.string().optional(),
+    corpo: z.string().optional(),
+  })
+  .strict();
+
+/** Foto de uma postagem de extensão: o arquivo gravado pelo painel (RF-12) e o texto alternativo. */
+const fotoExtensaoSchema = z.object({
+  imagem: z.string(),
+  // Obrigatório: a foto é conteúdo da postagem, não decoração (RNF-15).
+  alt: z.string(),
+});
+
+/**
+ * Schema Zod da coleção `extensao` — `content/extensao/*.md` (sabatina "Extensão", 2026-10-07,
+ * Decisão 2).
+ *
+ * `data` é `aaaa-mm-dd` estrito, ao contrário da `data` livre das aulas: ela ordena a listagem e
+ * entra no nome do arquivo. O painel escolhe a data num calendário (`DD-MM-AAAA` na tela) e grava o
+ * instante em UTC; `toCalendarDate` o converte na data de São Luís antes da checagem. `fotos` vai de 0 a 5 — o painel desabilita o "+" na
+ * quinta. `publicado` obrigatório: RN-01, é coleção de listagem.
+ */
+export const extensaoSchema = z.object({
+  titulo: z.string(),
+  data: z.preprocess(toCalendarDate, z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
+  corpo: z.string(),
+  fotos: z.array(fotoExtensaoSchema).max(5).optional(),
+  publicado: z.boolean(),
+  en: extensaoEnSchema.optional(),
+});
+
+const extensao = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './content/extensao' }),
+  schema: extensaoSchema,
+});
+
 /**
  * Mapa de coleções consumido pelo Astro (`getCollection`, `getEntry`) e usado
- * para gerar os tipos de `astro:content`. As cinco coleções do MVP (§6.1) —
- * `noticias` fica fora de propósito, é v1.1 (NG-01).
+ * para gerar os tipos de `astro:content`. As cinco coleções do MVP (§6.1) e
+ * `extensao` (2026-10-07), no lugar da `noticias` prevista para a v1.1.
  */
 export const collections = {
   perfil,
@@ -492,4 +532,5 @@ export const collections = {
   projetos,
   disciplinas,
   publicacoes,
+  extensao,
 };

@@ -8,8 +8,8 @@
  *                 pelos componentes.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-01
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.3.0
  *
  *  Dependências : nenhuma
  *  Entradas     : variável de ambiente `PUBLIC_SITE_URL` (opcional), lida via
@@ -44,7 +44,11 @@ export const siteConfig = {
   displayName: 'Haroldo Lima',
   author: {
     name: 'Haroldo Cilas Duarte Lima Junior',
-    citationName: 'LIMA JUNIOR, HAROLDO C. D.',
+    /**
+     * Formas do nome em citações, como o Lattes as lista. Um autor de publicação que bata com
+     * qualquer uma, depois da normalização de `isProfessorAuthor`, sai destacado.
+     */
+    citationNames: ['LIMA JUNIOR, HAROLDO C. D.', 'LIMA, HAROLDO C.D.'],
   },
   institution: 'Universidade Federal do Maranhão (UFMA), Campus São Luís',
   department: 'Centro Tecnológico — Departamento de Física',

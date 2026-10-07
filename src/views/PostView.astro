@@ -1,0 +1,179 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : PostView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View de `/extensao/<slug>/` e `/en/outreach/<slug>/`
+ *                 (sabatina "Extensão", 2026-10-07): cabeçalho com a seta de
+ *                 volta e a data; a partir de `lg`, texto nas 5 colunas da
+ *                 esquerda e, nas 7 da direita, a foto grande (3:2, sem corte)
+ *                 com as miniaturas embaixo. Abaixo de `lg`, fotos primeiro.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-07
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : BaseLayout, PageHeader, FallbackNotice, src/scripts/carousel.ts,
+ *                 src/i18n/index.ts (strings), src/i18n/fallback.ts,
+ *                 src/lib/routes.ts (routePath), src/lib/date.ts, src/lib/text.ts
+ *  Entradas     : props `lang` e `post` (obrigatórias)
+ *  Saídas       : HTML estático da página da postagem
+ *  Uso          : <PostView lang="pt" post={post} /> em `src/pages/extensao/[slug].astro`;
+ *                 <PostView lang="en" post={post} /> em `src/pages/en/outreach/[slug].astro`
+ *
+ *  Notas        : modelo D dos protótipos de 2026-10-07. O carrossel é uma
+ *                 faixa com `scroll-snap` que funciona sem JS (RNF-02); o script
+ *                 só liga as miniaturas. Postagem sem foto: o texto fica sozinho,
+ *                 sem moldura vazia (F-08); com uma foto, sem miniaturas. A
+ *                 descrição da foto não tem versão em inglês: nas rotas `/en`
+ *                 ela leva `lang="pt-BR"` sem ligar o aviso (Decisão 13 da fase 4).
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import FallbackNotice from '../components/FallbackNotice.astro';
+import { strings } from '../i18n';
+import { hasFallback, localize, portugueseOnly } from '../i18n/fallback';
+import type { Locale } from '../lib/config';
+import { routePath } from '../lib/routes';
+import { formatDate } from '../lib/date';
+import { toParagraphs } from '../lib/text';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+  /** Entrada de `extensao` da rota, resolvida por `postStaticPaths`. Obrigatória. */
+  post: CollectionEntry<'extensao'>;
+}
+
+const { lang, post } = Astro.props;
+const t = strings(lang);
+const data = post.data;
+
+// RN-06: título e texto por idioma.
+const titulo = localize(data.titulo, data.en?.titulo, lang);
+const corpo = localize(data.corpo, data.en?.corpo, lang);
+const showNotice = hasFallback([titulo, corpo]);
+const paragraphs = toParagraphs(corpo.text);
+const photos = (data.fotos ?? []).map((foto) => ({
+  src: foto.imagem,
+  alt: portugueseOnly(foto.alt, lang),
+}));
+---
+
+<BaseLayout title={titulo.text}>
+  <PageHeader
+    slot="cabecalho"
+    title={titulo.text}
+    titleLang={titulo.lang}
+    meta={formatDate(data.data, lang)}
+    back={{ href: routePath('outreach', lang), label: t.outreach.back }}
+  />
+
+  <FallbackNotice show={showNotice} class="px-margem pt-4" />
+  <div
+    class:list={[
+      'px-margem grid gap-x-8 pt-6 pb-10 lg:pt-8',
+      photos.length > 0 && 'lg:grid-cols-12',
+    ]}
+  >
+    {
+      photos.length > 0 && (
+        <div
+          class="carrossel lg:order-2 lg:col-span-7"
+          data-carrossel
+          role="region"
+          aria-roledescription="carrossel"
+          aria-label={t.outreach.photos}
+        >
+          <ul data-trilho class="trilho flex snap-x snap-mandatory overflow-x-auto" tabindex="0">
+            {photos.map((photo, i) => (
+              <li
+                id={`foto-${i + 1}`}
+                data-slide
+                class="bg-papel aspect-[3/2] w-full shrink-0 snap-start"
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.alt.text}
+                  lang={photo.alt.lang}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  class="h-full w-full object-contain"
+                />
+              </li>
+            ))}
+          </ul>
+
+          {photos.length > 1 && (
+            <ul class="mt-3 grid grid-cols-5 gap-2">
+              {photos.map((photo, i) => (
+                <li>
+                  <a
+                    href={`#foto-${i + 1}`}
+                    data-marca={i}
+                    class="miniatura block aspect-[3/2]"
+                    aria-label={t.outreach.photoLabel(i + 1, photo.alt.text)}
+                  >
+                    <img
+                      src={photo.src}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      class="h-full w-full object-cover"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )
+    }
+
+    <div class:list={[photos.length > 0 && 'mt-8 lg:order-1 lg:col-span-5 lg:mt-0']}>
+      {
+        paragraphs.map((paragraph) => (
+          <p class="text-corpo max-w-medida mt-4 first:mt-0" lang={corpo.lang}>
+            {paragraph}
+          </p>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/carousel';
+</script>
+
+<style>
+  .carrossel:global(.pronto) .trilho {
+    scrollbar-width: none;
+  }
+  .trilho:focus-visible {
+    outline-offset: 4px;
+  }
+  /* Miniatura fora da foto visível fica esmaecida; a visível leva uma régua de tinta embaixo. */
+  .miniatura {
+    position: relative;
+    opacity: 0.55;
+    transition: opacity 150ms;
+  }
+  .miniatura:hover,
+  .miniatura[aria-current] {
+    opacity: 1;
+  }
+  .miniatura[aria-current]::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -6px;
+    height: 1px;
+    background: var(--color-tinta);
+  }
+  /* Sem JS nenhuma miniatura está marcada: todas aparecem inteiras. */
+  .carrossel:not(:global(.pronto)) .miniatura {
+    opacity: 1;
+  }
+</style>

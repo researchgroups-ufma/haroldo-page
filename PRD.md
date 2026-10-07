@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.73 |
+| **Versão do PRD** | v0.1.74 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase, na branch `design`, em 2026-10-07**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-10-02 |
+| **Última atualização** | 2026-10-07 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav`; `docs/historico-de-implementacao.md` (histórico de implementação e versões antigas deste PRD) |
 
@@ -55,6 +55,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.71 | 2026-10-02 | Desenvolvedor | §10.4: componente acima de 150 linhas é aceito sem extração obrigatória (decisão do dono do produto, plano 067) |
 | v0.1.72 | 2026-10-02 | Desenvolvedor | Fecha a fase 4 (plano 073): M-07 verificada, §7.2 fixa `@astrojs/sitemap` 3.7.4, §12 em 9/9 |
 | v0.1.73 | 2026-10-02 | Desenvolvedor | Fase 4 fechada (`/fechar-fase`): 365 testes, 100% de cobertura, 4 exceções de cobertura e 5 dívidas da revisão de integração |
+| v0.1.74 | 2026-10-07 | Desenvolvedor | Sabatina "Extensão" (3 decisões, `docs/sabatinas/CHANGELOG_sabatina_extensao.md`): RF-15 passa de notícias a Extensão (SHOULD), coleção `extensao` no lugar de `noticias` (§7.3), rotas `/extensao` e `/en/outreach` (§6.1); sai a linha de notícias do §6.3. Imagens do site passam a coloridas |
 
 ---
 
@@ -191,7 +192,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 |---|---|---|---|---|
 | RF-01 | MUST | O professor autentica-se em `/admin` com credenciais do TinaCloud | Dado um professor cadastrado como EDITOR, quando acessa `/admin` e faz login, então vê o painel com as coleções e nenhuma opção de alterar código ou configuração | ⬜ |
 | RF-02 | MUST | Um visitante não autenticado não consegue editar nada | Dado um usuário sem sessão, quando acessa `/admin`, então recebe a tela de login e nenhuma operação de escrita é aceita pela API do TinaCloud | ⬜ |
-| RF-03 | MUST | O painel apresenta as coleções em vocabulário acadêmico | Dado o painel aberto, quando o professor olha o menu, então lê "Perfil", "Linhas de pesquisa", "Projetos", "Disciplinas", "Publicações" — e nenhuma menção a arquivo, pasta, commit ou branch | ⬜ |
+| RF-03 | MUST | O painel apresenta as coleções em vocabulário acadêmico | Dado o painel aberto, quando o professor olha o menu, então lê "Perfil", "Linhas de pesquisa", "Projetos", "Disciplinas", "Publicações", "Extensão" — e nenhuma menção a arquivo, pasta, commit ou branch | ⬜ |
 | RF-04 | MUST | Editar o perfil | Dado o professor no item Perfil, quando altera a biografia e salva, então a mudança é commitada e aparece no site após o deploy | ⬜ |
 | RF-05 | MUST | CRUD de publicações | Dado o professor em Publicações, quando cria uma entrada com título, autores, ano, veículo e DOI e salva, então ela aparece na página pública agrupada sob o ano informado | ⬜ |
 | RF-06 | MUST | CRUD de disciplinas | Dado o professor em Disciplinas, quando cria "Mecânica Clássica / 2026.2 / atual" e salva, então a disciplina aparece na listagem de disciplinas atuais | ⬜ |
@@ -203,7 +204,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-12 | MUST | Upload de imagem pelo painel (foto de perfil, imagem de linha de pesquisa) | Dado o professor no campo de imagem, quando envia um arquivo, então ele é gravado no repositório e exibido no site | ⬜ |
 | RF-13 | SHOULD | CRUD de projetos de pesquisa | Dado o professor em Projetos, quando cria um projeto com título, período e financiador, então ele aparece na página Pesquisa | ⬜ |
 | RF-14 | SHOULD | Campos em inglês opcionais por item (grupo recolhível "Versão em inglês") | Dado um item com o grupo EN preenchido, quando o visitante acessa a rota `/en` correspondente, então vê o conteúdo em inglês; quando o grupo está vazio, vê o conteúdo em português (decisão D-03) | ⬜ |
-| RF-15 | COULD | CRUD de notícias | Dado o professor em Notícias, quando cria uma postagem com título, data, resumo e corpo, então ela aparece na listagem em ordem cronológica decrescente | ⬜ |
+| RF-15 | SHOULD | Página Extensão: postagens com título, data, texto e até 5 fotos em carrossel (sabatina "Extensão", 2026-10-07) | Dado o professor em Extensão, quando cria uma postagem com título, data, texto e fotos (cada uma com descrição) e a publica, então ela aparece em `/extensao/` em ordem cronológica decrescente e ganha página própria em `/extensao/<slug>/` e `/en/outreach/<slug>/`; o painel escolhe a data num calendário em DD-MM-AAAA e não aceita a sexta foto nem foto sem imagem ou sem descrição | ⬜ |
 | RF-16 | WONT | Fluxo de aprovação por branch com preview antes de publicar | — (Editorial Workflow, plano pago do TinaCloud; ver NG-07 e R-05) | — |
 | RF-17 | WONT | Importação automática de publicações (ORCID/Crossref/OpenAlex/BibTeX) | — (ver NG-03) | — |
 | RF-37 | MUST | Gestão de scripts de código dentro da disciplina (lista `scripts[]`) | Dado o professor editando uma disciplina, quando acrescenta um script informando o título, colando o código no campo e escolhendo a linguagem (`python` por padrão), e salva, então o script aparece na página da disciplina com destaque de sintaxe e botão de copiar — agrupado sob a aula correspondente quando o campo `aula` casa com uma aula existente, e no grupo geral da disciplina quando `aula` está vazio ou não casa com nenhuma (F-13) | ⬜ |
@@ -226,7 +227,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-31 | SHOULD | Página CV com formação, experiência e link para o PDF do currículo | Dado o CV preenchido, quando o visitante abre a página, então vê o histórico e um link para o arquivo no Drive | ⬜ |
 | RF-32 | SHOULD | Animações discretas de entrada e transição | Dadas as animações ativas, quando o visitante tem `prefers-reduced-motion` habilitado, então nenhuma animação de movimento é executada | ⬜ |
 | RF-33 | COULD | Renderização de fórmulas matemáticas (LaTeX) em ementas e descrições | Dado um texto com `$E = mc^2$`, quando a página é construída, então a fórmula aparece renderizada | ⬜ |
-| RF-34 | COULD | Feed RSS de notícias | — | ⬜ |
+| RF-34 | COULD | Feed RSS da Extensão | — | ⬜ |
 | RF-35 | WONT | Busca global no site | — (ver NG-06) | — |
 | RF-36 | WONT | Modo escuro | — (avaliar após a entrega; não é requisito do MVP) | — |
 
@@ -276,7 +277,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | F-05 | Publicação sem DOI, sem arXiv e sem PDF | A entrada aparece apenas com metadados; nenhum botão de link vazio é renderizado | — |
 | F-06 | Disciplina sem nenhuma aula cadastrada | A página existe com ementa e bibliografia; a seção Aulas exibe estado vazio explícito | "Nenhuma aula publicada ainda." |
 | F-07 | Item (ou campo) sem versão em inglês na rota `/en` | Exibe o conteúdo em português, com `lang="pt-BR"` no elemento; a página mostra **um único** aviso se qualquer campo traduzível caiu no PT (sabatina fase 4, Decisão 4). Texto sem campo em inglês recebe `lang="pt-BR"` sem ligar o aviso (Decisão 13). A Sobre (`/en/about/`) não mostra o aviso, mas mantém o `lang="pt-BR"` (Decisão 16) | Aviso por página, do dicionário `en` (ex.: "Some content on this page is only available in Portuguese") |
-| F-08 | Imagem ausente (perfil sem foto, notícia sem imagem) | Layout degrada sem quebrar; nenhum espaço reservado vazio ou ícone de imagem quebrada | — |
+| F-08 | Imagem ausente (perfil sem foto, postagem de extensão sem foto) | Layout degrada sem quebrar; nenhum espaço reservado vazio ou ícone de imagem quebrada | — |
 | F-09 | Conteúdo salvo com formato inesperado que a validação Zod rejeita | O build falha de forma ruidosa e nomeia o arquivo e o campo problemático; cai em F-02 | Log de build: "content/publicacoes/x.md → campo `ano`: esperado número entre 1900 e 2100" |
 | F-10 | Dois itens gerando o mesmo nome de arquivo | O Tina impede a criação duplicada; o template de nome inclui discriminador suficiente (ano + slug do título) | "Já existe um item com este nome." |
 | F-11 | Professor exclui conteúdo por engano | O conteúdo permanece recuperável no histórico do Git pelo ADMIN | Manual: "conteúdo apagado pode ser recuperado — avise o responsável técnico" |
@@ -291,9 +292,9 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 
 Lista fechada:
 
-1. Site público em Astro estático com as rotas: Home, Sobre, Pesquisa, Ensino, página de disciplina, Publicações, 404.
+1. Site público em Astro estático com as rotas: Home, Sobre, Pesquisa, Ensino, página de disciplina, Extensão, página de postagem, Publicações, 404.
 2. Versão em inglês sob `/en` com fallback por item para o português.
-3. Painel TinaCMS em `/admin`, autenticado por TinaCloud, com as coleções: Perfil, Linhas de pesquisa, Projetos, Disciplinas (com aulas, listas e materiais embutidos) e Publicações.
+3. Painel TinaCMS em `/admin`, autenticado por TinaCloud, com as coleções: Perfil, Linhas de pesquisa, Projetos, Disciplinas (com aulas, listas e materiais embutidos), Publicações e Extensão.
 4. Interruptor Rascunho/Publicado em todo conteúdo de listagem.
 5. Deploy automático GitHub → Cloudflare Workers a cada commit na branch principal.
 6. Materiais didáticos referenciados por link do Google Drive.
@@ -319,7 +320,6 @@ Lista fechada:
 
 | Item | Versão-alvo |
 |---|---|
-| Notícias/postagens | v1.1 (schema já previsto) |
 | Página de CV completa | v1.1 |
 | Importação ORCID/Crossref/OpenAlex/BibTeX; exportação BibTeX | v2 |
 | Filtros e busca em publicações | v1.2 |
@@ -477,7 +477,7 @@ Nome de arquivo gerado por template: `{semestre}-{slug(nome)}.md` (RN-08). O slu
 
 Nome de arquivo: `{ano}-{slug(titulo)}.md`.
 
-**`noticias` — pasta (v1.1, schema previsto):** `titulo` · `data` · `imagem` · `resumo` · `corpo` · `tags[]` · `publicado` · grupo `en`.
+**`extensao` — pasta (`content/extensao/*.md`; sabatina "Extensão", 2026-10-07, substitui o `noticias` previsto para a v1.1):** `titulo` ✔ · `data` ✔ (calendário DD-MM-AAAA no painel, que grava o instante em UTC; o Zod o converte na data de São Luís, `aaaa-mm-dd`) · `corpo` ✔ (texto em parágrafos) · `fotos[]` (0 a 5, cada uma `{ imagem ✔, alt ✔ }`) · `publicado` ✔ · grupo `en` (`titulo`, `corpo`). Nome de arquivo `{data}-{slug(titulo)}.md` (RN-08); o slug da página é o mesmo nos dois idiomas: `/extensao/<slug>` e `/en/outreach/<slug>`.
 
 **Ciclo de vida dos dados:** criação pelo painel → commit no GitHub → build → publicação. Exclusão remove o arquivo da branch principal, mas o conteúdo permanece no histórico do Git indefinidamente (F-11, M-08). Não há arquivamento automático: disciplinas antigas mudam para `status: anterior` e continuam públicas — é justamente o acervo que se quer preservar.
 
@@ -939,7 +939,7 @@ Legenda: ⬜ Não iniciada · 🟡 Em andamento · 🟢 Concluída · 🔴 Bloqu
 | ~~Q-06~~ | ~~Qual e-mail do professor será usado como EDITOR no TinaCloud?~~ | Fase 2 | Stakeholder | Fase 2 | ✅ **2026-09-03:** `haroldo.lima@ufma.br` — o mesmo e-mail institucional publicado no site (Q-07). O professor entra no TinaCloud com ele, e a fase 2 deixa de ter bloqueio de stakeholder |
 | ~~Q-07~~ | ~~O e-mail exibido publicamente é institucional? (§9, LGPD)~~ | Fase 3 | Professor | Fase 3 | ✅ **2026-09-03:** sim — `haroldo.lima@ufma.br`, e-mail institucional da UFMA, informado pelo stakeholder. Substituiu o `PLACEHOLDER@ufma.br` em `content/perfil/index.md`. **A-06 confirmada**; a §9 (LGPD) fica satisfeita sem formulário de contato |
 | ~~Q-08~~ | ~~A conta Google do Drive é do professor ou institucional?~~ | R-08 e a convenção de pastas | Stakeholder | Fase 0 | ✅ **2026-09-01:** questão dissolvida. O campo de material é uma **URL livre** — o professor cola o link de onde tiver hospedado (Drive, repositório institucional, arXiv, YouTube). O Google Drive passa de dependência a recomendação do manual. Ver D-07 |
-| Q-09 | Notícias e CV entram na v1.1 logo após a entrega, ou ficam indefinidos? | Planejamento pós-entrega | Stakeholder | Após a fase 5 | |
+| Q-09 | O CV entra na v1.1 logo após a entrega, ou fica indefinido? (Notícias saiu da questão: virou a Extensão, RF-15, em 2026-10-07) | Planejamento pós-entrega | Stakeholder | Após a fase 5 | |
 
 > Nenhuma fase que dependa de uma questão aberta deve começar antes de resolvê-la. **Nenhuma questão bloqueia a fase 0** — Q-01, Q-03 e Q-08 foram resolvidas em 2026-09-01. Bloqueia adiante: Q-05 (fase 5). **Q-04 foi resolvida em 2026-09-14** — a fase 3 não tem mais bloqueio de stakeholder. **Q-06 e Q-07 foram resolvidas em 2026-09-03**, ambas pelo mesmo e-mail institucional `haroldo.lima@ufma.br`: ele é o que o site publica (Q-07, já gravado em `content/perfil/index.md`) e também a conta com que o professor entra no TinaCloud (Q-06). **A fase 2 não tem mais bloqueio de stakeholder** — a fase 1 fechou em 2026-09-10 e a fase 2 começou. **Q-02 foi resolvida em 2026-09-01** — o painel em inglês é aceitável, o TinaCMS fica, e a fase 1 pode construir `tina/config.ts` sem risco de descarte.
 

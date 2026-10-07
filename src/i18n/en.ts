@@ -11,8 +11,8 @@
  *                 do conteúdo não se traduz.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-28
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/i18n/pt.ts (só o tipo `UiStrings`)
  *  Entradas     : nenhuma
@@ -65,6 +65,7 @@ export const en: UiStrings = {
     about: 'About',
     research: 'Research',
     teaching: 'Teaching',
+    outreach: 'Outreach',
     publications: 'Publications',
   },
   language: {
@@ -115,6 +116,15 @@ export const en: UiStrings = {
     noCurrent: 'No courses this semester.',
     noPrevious: 'No previous courses.',
     latestLesson: 'Latest lecture',
+  },
+  outreach: {
+    title: 'Outreach',
+    empty: 'No posts yet.',
+    back: 'All posts',
+    photos: 'Photos',
+    previousPhoto: 'Previous photo',
+    nextPhoto: 'Next photo',
+    photoLabel: (n: number, alt: string) => `Photo ${n}: ${alt}`,
   },
   course: {
     back: 'All courses',

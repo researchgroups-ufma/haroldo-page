@@ -8,11 +8,11 @@
  *                 idioma e do `hreflang` (sabatina fase 4, Decisão 6).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-25
- *  Atualizado em: 2026-10-02
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/lib/config.ts (só o tipo `Locale`)
- *  Entradas     : chave de rota, slug de disciplina, `pathname`
+ *  Entradas     : chave de rota, slug de disciplina ou de postagem, `pathname`
  *  Saídas       : caminhos com barra final; `Locale`; `HTML_LANG`; pares `hreflang`
  *  Uso          : routePath('teaching', 'en') → '/en/teaching/'
  *
@@ -29,7 +29,7 @@ import type { Locale } from './config';
 export const HTML_LANG = { pt: 'pt-BR', en: 'en' } as const satisfies Record<Locale, string>;
 
 /** Rotas fixas do site, as mesmas nos dois idiomas. */
-export type RouteKey = 'home' | 'about' | 'research' | 'teaching' | 'publications';
+export type RouteKey = 'home' | 'about' | 'research' | 'teaching' | 'outreach' | 'publications';
 
 /** Segmento de cada rota fixa por idioma, sem prefixo de idioma nem barras (`''` é a Home). */
 const SEGMENTS: Record<RouteKey, Record<Locale, string>> = {
@@ -38,6 +38,8 @@ const SEGMENTS: Record<RouteKey, Record<Locale, string>> = {
   research: { pt: 'pesquisa', en: 'research' },
   // RF-29: `/ensino` ↔ `/en/teaching`.
   teaching: { pt: 'ensino', en: 'teaching' },
+  // Sabatina "Extensão" (2026-10-07), Decisão 2: `/extensao` ↔ `/en/outreach`.
+  outreach: { pt: 'extensao', en: 'outreach' },
   publications: { pt: 'publicacoes', en: 'publications' },
 };
 
@@ -74,6 +76,18 @@ export function coursePath(slug: string, locale: Locale): string {
 }
 
 /**
+ * Caminho da página de uma postagem de extensão num idioma — mesma regra da disciplina: o slug
+ * é o mesmo nos dois idiomas, só o segmento da seção muda (sabatina "Extensão", Decisão 2).
+ *
+ * @param slug Slug da postagem.
+ * @param locale Idioma.
+ * @returns Caminho com barra final (ex.: `'/en/outreach/2026-09-12-oficinas-de-optica/'`).
+ */
+export function postPath(slug: string, locale: Locale): string {
+  return `${routePath('outreach', locale)}${slug}/`;
+}
+
+/**
  * Idioma de um caminho: `'en'` quando o primeiro segmento é exatamente `en` (`'/en'`,
  * `'/en/…'`); `'pt'` em todo o resto (RN-09) — `'/enx/'` e `'/ensino/'` são português.
  *
@@ -86,7 +100,7 @@ export function localeFromPath(pathname: string): Locale {
 
 /**
  * Par de um caminho no outro idioma (RF-29), aceitando o caminho com ou sem barra final. As
- * rotas fixas e a disciplina trocam pelo mapa, com o slug intacto; a 404 de um idioma pareia com
+ * rotas fixas, a disciplina e a postagem trocam pelo mapa, com o slug intacto; a 404 pareia com
  * a Home do outro, porque não há "mesma página" a oferecer.
  *
  * @param pathname Caminho da URL.
@@ -111,6 +125,9 @@ export function counterpartPath(pathname: string): string {
   if (section === SEGMENTS.teaching[from] && slug && extra.length === 0) {
     return coursePath(slug, to);
   }
+  if (section === SEGMENTS.outreach[from] && slug && extra.length === 0) {
+    return postPath(slug, to);
+  }
 
   throw new Error(`counterpartPath: caminho sem par no outro idioma: ${pathname}`);
 }
@@ -120,7 +137,7 @@ export function counterpartPath(pathname: string): string {
  * Devolve `pt-BR`, `en` e `x-default`, nessa ordem; RN-09: o `x-default` é a versão PT, o idioma
  * canônico. Só caminho, sem origem — quem monta a URL absoluta é o layout.
  *
- * @param pathname Caminho da URL de uma rota fixa ou de disciplina, em qualquer dos dois idiomas.
+ * @param pathname Caminho da URL de uma rota fixa, disciplina ou postagem, em qualquer idioma.
  * @returns Os três pares, com caminhos terminados em `/`.
  * @throws Error nomeando o caminho quando ele não tem par (herdado de `counterpartPath`).
  */

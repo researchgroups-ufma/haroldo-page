@@ -49,6 +49,7 @@ import {
   projetosSchema,
   disciplinasSchema,
   publicacoesSchema,
+  extensaoSchema,
 } from '../../src/content.config';
 
 const contentDir = join(__dirname, '../../content');
@@ -77,6 +78,7 @@ const COLECOES: Colecao[] = [
   { pasta: 'projetos', schema: projetosSchema },
   { pasta: 'disciplinas', schema: disciplinasSchema },
   { pasta: 'publicacoes', schema: publicacoesSchema },
+  { pasta: 'extensao', schema: extensaoSchema },
 ];
 
 /**

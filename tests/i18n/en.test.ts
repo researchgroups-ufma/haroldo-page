@@ -32,6 +32,7 @@ const FUNCTION_SAMPLES: Record<string, unknown[]> = {
   'course.lessonNumber': [3],
   'course.dueDate': ['15/08/2026'],
   'script.eyebrow': ['Python'],
+  'outreach.photoLabel': [2, 'Lentes de água'],
   'date.format': ['2026', '03', '15'],
 };
 

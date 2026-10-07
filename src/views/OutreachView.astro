@@ -1,0 +1,124 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : OutreachView.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : View de `/extensao/` e `/en/outreach/` (sabatina "Extensão",
+ *                 2026-10-07): lista das postagens publicadas, da mais recente
+ *                 para a mais antiga. Cada linha tem a data, o título, o começo
+ *                 do texto e a primeira foto à direita; a linha inteira leva à
+ *                 postagem. Sem postagem, a página mostra o estado vazio.
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-07
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : BaseLayout, PageHeader, FallbackNotice, src/i18n/index.ts (strings),
+ *                 src/i18n/fallback.ts, src/lib/routes.ts (postPath),
+ *                 src/lib/courses.ts (courseSlug), src/lib/outreach.ts (sortPosts),
+ *                 src/lib/published.ts, src/lib/date.ts, src/lib/text.ts,
+ *                 astro:content (getCollection)
+ *  Entradas     : prop `lang` (obrigatória); coleção `extensao`
+ *  Saídas       : HTML estático do corpo da página Extensão
+ *  Uso          : <OutreachView lang="pt" /> em `src/pages/extensao.astro`;
+ *                 <OutreachView lang="en" /> em `src/pages/en/outreach.astro`
+ *
+ *  Notas        : modelo D dos protótipos de 2026-10-07. A miniatura tem
+ *                 `alt=""`: o link já se chama pelo título, e a foto aparece
+ *                 descrita na página da postagem.
+ * ============================================================================
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import FallbackNotice from '../components/FallbackNotice.astro';
+import { strings } from '../i18n';
+import { hasFallback, localize } from '../i18n/fallback';
+import type { Locale } from '../lib/config';
+import { postPath } from '../lib/routes';
+import { courseSlug } from '../lib/courses';
+import { sortPosts } from '../lib/outreach';
+import { filterPublished } from '../lib/published';
+import { formatDate } from '../lib/date';
+import { toParagraphs } from '../lib/text';
+
+export interface Props {
+  /** Idioma da rota. Obrigatória. */
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang);
+
+// RN-01: só postagens publicadas entram na página.
+const posts = sortPosts(filterPublished(await getCollection('extensao'))).map((post) => {
+  // RN-06: título e texto resolvidos por idioma.
+  const titulo = localize(post.data.titulo, post.data.en?.titulo, lang);
+  const corpo = localize(post.data.corpo, post.data.en?.corpo, lang);
+  return {
+    href: postPath(courseSlug(post.filePath), lang),
+    date: formatDate(post.data.data, lang),
+    titulo,
+    corpo,
+    firstParagraph: toParagraphs(corpo.text)[0],
+    cover: post.data.fotos?.[0]?.imagem,
+  };
+});
+const showNotice = hasFallback(posts.flatMap((post) => [post.titulo, post.corpo]));
+---
+
+<BaseLayout title={t.nav.outreach}>
+  <PageHeader slot="cabecalho" title={t.outreach.title} />
+
+  <FallbackNotice show={showNotice} class="px-margem pt-4" />
+  {
+    posts.length === 0 ? (
+      <p class="px-margem text-corpo text-secundario pt-8 pb-10">{t.outreach.empty}</p>
+    ) : (
+      <ol class="px-margem pb-10">
+        {posts.map((post) => (
+          <li class="postagem">
+            <a href={post.href} class="group grid grid-cols-[1fr_auto] items-start gap-x-6 py-5">
+              <div>
+                <p class="text-pequeno text-secundario">{post.date}</p>
+                <h2
+                  class="text-titulo-item mt-1 decoration-1 underline-offset-[6px] group-hover:underline group-focus-visible:underline"
+                  lang={post.titulo.lang}
+                >
+                  {post.titulo.text}
+                </h2>
+                {post.firstParagraph && (
+                  <p
+                    class="text-pequeno text-secundario max-w-medida mt-2 line-clamp-2"
+                    lang={post.corpo.lang}
+                  >
+                    {post.firstParagraph}
+                  </p>
+                )}
+              </div>
+              {post.cover && (
+                <img
+                  src={post.cover}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  class="aspect-[3/2] w-24 object-cover sm:w-40"
+                />
+              )}
+            </a>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .postagem {
+    border-top: 1px solid var(--color-regua);
+  }
+  /* A primeira linha encosta na régua forte do cabeçalho — sem borda, para a linha não dobrar. */
+  .postagem:first-child {
+    border-top: 0;
+  }
+</style>

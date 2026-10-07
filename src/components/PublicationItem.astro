@@ -10,8 +10,8 @@
  *                 DOI/arXiv/PDF que estiverem preenchidos.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-22
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.4.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/i18n (`strings`),
  *                 src/lib/routes.ts (`localeFromPath`), src/lib/config.ts (siteConfig),
@@ -60,7 +60,7 @@ const links = [
   <p class="text-pequeno text-secundario mt-1">
     {
       autores.map((autor, index) => {
-        const isProfessor = isProfessorAuthor(autor, siteConfig.author.citationName);
+        const isProfessor = isProfessorAuthor(autor, siteConfig.author.citationNames);
         return (
           <>
             {index > 0 && ', '}

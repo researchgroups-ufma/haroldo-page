@@ -60,6 +60,7 @@ const ROUTE_KEYS: Record<RouteKey, true> = {
   about: true,
   research: true,
   teaching: true,
+  outreach: true,
   publications: true,
 };
 

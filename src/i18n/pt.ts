@@ -12,8 +12,8 @@
  *                 se um enum mudar sem o dicionário acompanhar.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.4.0
  *
  *  Dependências : src/content.config.ts (projetosSchema, disciplinasSchema,
  *                 publicacoesSchema — só para os tipos dos mapas de enum)
@@ -75,6 +75,7 @@ export const pt = {
     about: 'Sobre',
     research: 'Pesquisa',
     teaching: 'Ensino',
+    outreach: 'Extensão',
     publications: 'Publicações',
   },
   // sabatina fase 4, Decisão 5: o link do seletor mostra o idioma de destino — nas páginas PT, o
@@ -123,6 +124,16 @@ export const pt = {
     noCurrent: 'Nenhuma disciplina neste semestre.',
     noPrevious: 'Nenhuma disciplina anterior.',
     latestLesson: 'Última aula',
+  },
+  // Sabatina "Extensão" (2026-10-07): índice e página da postagem.
+  outreach: {
+    title: 'Extensão',
+    empty: 'Nenhuma postagem publicada ainda.',
+    back: 'Voltar para Extensão',
+    photos: 'Fotos',
+    previousPhoto: 'Foto anterior',
+    nextPhoto: 'Próxima foto',
+    photoLabel: (n: number, alt: string) => `Foto ${n}: ${alt}`,
   },
   course: {
     back: 'Voltar para Ensino',

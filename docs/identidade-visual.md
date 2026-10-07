@@ -274,7 +274,7 @@ existe. Datas saem no formato do idioma, como "March 15, 2026".
 - `<h1>` "Publicações". Um bloco por **ano**, decrescente, com o ano em `display-2` (`<h2>`, link
   para a âncora do ano), sem contagem.
 - Item: **titulo** (`titulo-item`); numa linha, **autores** com o nome do professor em `--tinta` e
-  `<strong>` (casamento por `siteConfig.author.citationName`), **veiculo** em itálico e os links
+  `<strong>` (casamento exato, após normalizar espaços, acentos, caixa e o espaço entre as iniciais, com qualquer das formas de `siteConfig.author.citationNames` — as do Lattes), **veiculo** em itálico e os links
   **DOI ↗**, **arXiv ↗**, **PDF ↗** que estiverem preenchidos (F-05).
 - **Não aparecem** hoje: **tipo** (o texto `pt.publications.type` e o teste de paridade ficam, por
   decisão do stakeholder), **destaque**, **resumo** e **palavras_chave[]**.
@@ -285,8 +285,29 @@ existe. Datas saem no formato do idioma, como "March 15, 2026".
 
 `PageHeader` "Página não encontrada" com meta "Erro 404", o texto "O endereço pode ter mudado de
 semestre. Materiais de disciplinas anteriores continuam na página de Ensino." e a lista "Todas as
-páginas" com as cinco rotas de `NAV_ITEMS`, "Início" primeiro. Gerado como `404.html` para o
+páginas" com as seis rotas de `NAV_ITEMS`, "Início" primeiro. Gerado como `404.html` para o
 `not_found_handling = "404-page"` do `wrangler.toml`.
+
+### 6.8 Extensão `/extensao` (RF-15)
+
+Sabatina "Extensão" (2026-10-07), modelo D dos protótipos. Em inglês, `/en/outreach/`.
+
+- `<h1>` "Extensão". Lista das **extensao** publicadas, por **data** decrescente (empate por
+  **titulo**): régua fina entre linhas, como as disciplinas anteriores; data pequena, **titulo** em
+  `titulo-item`, o primeiro parágrafo do **corpo** em `pequeno`/`--secundario` cortado em duas
+  linhas e, à direita, a primeira foto (3:2, `alt=""`). A linha inteira é o link.
+- Sem postagem publicada: "Nenhuma postagem publicada ainda."
+- **Postagem** `/extensao/[slug]`: `PageHeader` com a seta de volta para `/extensao/`, o
+  **titulo** e a **data** como meta. A partir de `lg`, dobra 5/7: **corpo** em parágrafos à
+  esquerda; à direita, a foto grande numa moldura 3:2 que mostra a foto inteira, sem corte, sobre
+  `--papel`, e embaixo as miniaturas das **fotos[]** (até 5). Abaixo de `lg`, fotos antes do texto.
+- O carrossel é uma faixa com `scroll-snap`: sem JS rola com o dedo, a roda ou o teclado, e cada
+  miniatura é um link para a âncora da foto. Com JS, a miniatura rola só a faixa, a foto visível
+  marca a miniatura (`aria-current`: opacidade cheia e traço de 1 px embaixo; as outras ficam a 55%)
+  e a barra de rolagem da faixa some. Uma foto só: sem miniaturas. Nenhuma foto: o texto fica
+  sozinho (F-08).
+- A descrição da foto (**alt**, obrigatória) não tem versão em inglês: nas rotas `/en` leva
+  `lang="pt-BR"` sem ligar o aviso.
 
 ---
 

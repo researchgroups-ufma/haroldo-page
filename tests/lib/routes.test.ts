@@ -5,6 +5,7 @@ import {
   coursePath,
   counterpartPath,
   localeFromPath,
+  postPath,
   routePath,
   type RouteKey,
 } from '../../src/lib/routes';
@@ -14,6 +15,7 @@ const MAP: [RouteKey, string, string][] = [
   ['about', '/sobre/', '/en/about/'],
   ['research', '/pesquisa/', '/en/research/'],
   ['teaching', '/ensino/', '/en/teaching/'],
+  ['outreach', '/extensao/', '/en/outreach/'],
   ['publications', '/publicacoes/', '/en/publications/'],
 ];
 
@@ -38,6 +40,13 @@ describe('coursePath', () => {
     expect(coursePath('2026-2-relatividade-geral', 'en')).toBe(
       '/en/teaching/2026-2-relatividade-geral/',
     );
+  });
+});
+
+describe('postPath', () => {
+  it('mesmo slug nos dois idiomas, como a disciplina (sabatina "Extensão", Decisão 2)', () => {
+    expect(postPath('2026-09-12-oficinas', 'pt')).toBe('/extensao/2026-09-12-oficinas/');
+    expect(postPath('2026-09-12-oficinas', 'en')).toBe('/en/outreach/2026-09-12-oficinas/');
   });
 });
 
@@ -84,6 +93,18 @@ describe('counterpartPath', () => {
     );
   });
 
+  it('postagem de extensão: o slug passa intacto, com ou sem barra', () => {
+    expect(counterpartPath('/extensao/2026-09-12-oficinas/')).toBe(
+      '/en/outreach/2026-09-12-oficinas/',
+    );
+    expect(counterpartPath('/extensao/2026-09-12-oficinas')).toBe(
+      '/en/outreach/2026-09-12-oficinas/',
+    );
+    expect(counterpartPath('/en/outreach/2026-09-12-oficinas/')).toBe(
+      '/extensao/2026-09-12-oficinas/',
+    );
+  });
+
   it.each(['/404', '/404/', '/404.html'])('404 PT (%s) → Home EN', (path) => {
     expect(counterpartPath(path)).toBe('/en/');
   });
@@ -92,7 +113,7 @@ describe('counterpartPath', () => {
     expect(counterpartPath(path)).toBe('/');
   });
 
-  it.each(['/cv/', '/en/cv/', '/ensino/a/b/', '/enx/', '/sobre.html'])(
+  it.each(['/cv/', '/en/cv/', '/ensino/a/b/', '/extensao/a/b/', '/enx/', '/sobre.html'])(
     'caminho sem par (%s) lança nomeando o caminho',
     (path) => {
       expect(() => counterpartPath(path)).toThrow(path);

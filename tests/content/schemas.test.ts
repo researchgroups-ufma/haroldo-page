@@ -47,6 +47,7 @@ import {
   projetosSchema,
   disciplinasSchema,
   publicacoesSchema,
+  extensaoSchema,
 } from '../../src/content.config';
 
 /** Devolve uma cópia de `obj` sem a chave `chave`, para testar campo obrigatório ausente. */
@@ -597,7 +598,7 @@ describe('coleção publicacoes', () => {
 });
 
 describe('coleção noticias', () => {
-  it('não existe no schema — v1.1, fora do MVP (NG-01)', () => {
+  it('não existe no schema — virou `extensao` (sabatina "Extensão", 2026-10-07)', () => {
     expect(Object.keys(collections)).not.toContain('noticias');
     expect(Object.keys(collections)).toEqual([
       'perfil',
@@ -605,6 +606,48 @@ describe('coleção noticias', () => {
       'projetos',
       'disciplinas',
       'publicacoes',
+      'extensao',
     ]);
+  });
+});
+
+describe('extensaoSchema', () => {
+  const valida = {
+    titulo: 'Oficinas de óptica',
+    data: '2026-09-12',
+    corpo: 'Texto.',
+    publicado: true,
+  };
+  const foto = { imagem: '/uploads/a.jpg', alt: 'Estudantes na bancada' };
+
+  it('aceita o instante gravado pelo seletor de data e guarda a data de São Luís', () => {
+    const resultado = extensaoSchema.safeParse({ ...valida, data: '2026-09-12T03:00:00.000Z' });
+    expect(resultado.success && resultado.data.data).toBe('2026-09-12');
+  });
+
+  it('aceita postagem sem fotos (F-08)', () => {
+    expect(extensaoSchema.safeParse(valida).success).toBe(true);
+  });
+
+  it('aceita até 5 fotos e rejeita a sexta', () => {
+    expect(extensaoSchema.safeParse({ ...valida, fotos: Array(5).fill(foto) }).success).toBe(true);
+    expect(extensaoSchema.safeParse({ ...valida, fotos: Array(6).fill(foto) }).success).toBe(false);
+  });
+
+  it('rejeita foto sem descrição (alt obrigatório)', () => {
+    expect(extensaoSchema.safeParse({ ...valida, fotos: [{ imagem: '/uploads/a.jpg' }] }).success).toBe(
+      false,
+    );
+  });
+
+  it.each(['12/09/2026', '2026-9-12', '2026-09-12 ', ''])('rejeita data fora de aaaa-mm-dd (%j)', (data) => {
+    expect(extensaoSchema.safeParse({ ...valida, data }).success).toBe(false);
+  });
+
+  it('grupo en é estrito: data e fotos não se traduzem (RN-07)', () => {
+    expect(extensaoSchema.safeParse({ ...valida, en: { titulo: 'Optics', corpo: 'Text.' } }).success).toBe(
+      true,
+    );
+    expect(extensaoSchema.safeParse({ ...valida, en: { data: '2026-09-12' } }).success).toBe(false);
   });
 });

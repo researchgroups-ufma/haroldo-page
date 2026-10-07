@@ -79,34 +79,47 @@ describe('compareWithinYear', () => {
 });
 
 describe('isProfessorAuthor', () => {
-  const citationName = 'LIMA JUNIOR, HAROLDO C. D.';
+  const citationNames = ['LIMA JUNIOR, HAROLDO C. D.', 'LIMA, HAROLDO C.D.'];
 
   it('casa o nome exato', () => {
-    expect(isProfessorAuthor('LIMA JUNIOR, HAROLDO C. D.', citationName)).toBe(true);
+    expect(isProfessorAuthor('LIMA JUNIOR, HAROLDO C. D.', citationNames)).toBe(true);
   });
 
   it('casa com espaços extras', () => {
-    expect(isProfessorAuthor('LIMA  JUNIOR,   HAROLDO C. D.', citationName)).toBe(true);
+    expect(isProfessorAuthor('LIMA  JUNIOR,   HAROLDO C. D.', citationNames)).toBe(true);
   });
 
   it('casa só com espaço nas pontas (trim)', () => {
-    expect(isProfessorAuthor('  LIMA JUNIOR, HAROLDO C. D. ', citationName)).toBe(true);
+    expect(isProfessorAuthor('  LIMA JUNIOR, HAROLDO C. D. ', citationNames)).toBe(true);
   });
 
   it('casa em minúsculas', () => {
-    expect(isProfessorAuthor('lima junior, haroldo c. d.', citationName)).toBe(true);
+    expect(isProfessorAuthor('lima junior, haroldo c. d.', citationNames)).toBe(true);
   });
 
   it('casa com acento diferente (JÚNIOR com acento agudo, sem normalize)', () => {
-    expect(isProfessorAuthor('LIMA JÚNIOR, HAROLDO C. D.', citationName)).toBe(true);
+    expect(isProfessorAuthor('LIMA JÚNIOR, HAROLDO C. D.', citationNames)).toBe(true);
+  });
+
+  it('casa a segunda forma do Lattes', () => {
+    expect(isProfessorAuthor('LIMA, HAROLDO C.D.', citationNames)).toBe(true);
+  });
+
+  it('aceita as iniciais com e sem espaço nas duas formas', () => {
+    expect(isProfessorAuthor('LIMA, HAROLDO C. D.', citationNames)).toBe(true);
+    expect(isProfessorAuthor('LIMA JUNIOR, HAROLDO C.D.', citationNames)).toBe(true);
+  });
+
+  it('ponto sem espaço não junta palavras: "LIMA JUNIOR,HAROLDO C.D." não casa', () => {
+    expect(isProfessorAuthor('LIMA JUNIOR,HAROLDO C.D.', citationNames)).toBe(false);
   });
 
   it("não casa 'LIMA, J.' (sem casamento parcial)", () => {
-    expect(isProfessorAuthor('LIMA, J.', citationName)).toBe(false);
+    expect(isProfessorAuthor('LIMA, J.', citationNames)).toBe(false);
   });
 
   it("não casa 'LIMA JUNIOR, HAROLDO C. D., et al.' (sem casamento parcial)", () => {
-    expect(isProfessorAuthor('LIMA JUNIOR, HAROLDO C. D., et al.', citationName)).toBe(false);
+    expect(isProfessorAuthor('LIMA JUNIOR, HAROLDO C. D., et al.', citationNames)).toBe(false);
   });
 });
 
