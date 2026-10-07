@@ -44,23 +44,25 @@ describe('isActivePath', () => {
 });
 
 describe('navItems', () => {
-  it('pt: as cinco rotas na ordem do menu, com os caminhos PT', () => {
+  it('pt: as seis rotas na ordem do menu, com os caminhos PT', () => {
     expect(navItems('pt')).toEqual([
       { key: 'home', href: '/' },
-      { key: 'about', href: '/sobre/' },
+      { key: 'publications', href: '/publicacoes/' },
       { key: 'research', href: '/pesquisa/' },
       { key: 'teaching', href: '/ensino/' },
-      { key: 'publications', href: '/publicacoes/' },
+      { key: 'outreach', href: '/extensao/' },
+      { key: 'about', href: '/sobre/' },
     ]);
   });
 
   it('en: mesma ordem, com os caminhos EN', () => {
     expect(navItems('en').map((item) => item.href)).toEqual([
       '/en/',
-      '/en/about/',
+      '/en/publications/',
       '/en/research/',
       '/en/teaching/',
-      '/en/publications/',
+      '/en/outreach/',
+      '/en/about/',
     ]);
   });
 

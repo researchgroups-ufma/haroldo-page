@@ -7,7 +7,7 @@
  *                 componente de cabeçalho.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
- *  Atualizado em: 2026-09-25
+ *  Atualizado em: 2026-10-07
  *  Versão       : 0.2.0
  *
  *  Dependências : src/lib/routes.ts (caminhos por idioma), src/lib/config.ts
@@ -24,8 +24,18 @@
 import type { Locale } from './config';
 import { localeFromPath, routePath, type RouteKey } from './routes';
 
-/** Ordem de exibição da navegação principal (§5.1). */
-const NAV_ORDER: readonly RouteKey[] = ['home', 'about', 'research', 'teaching', 'publications'];
+/**
+ * Ordem de exibição da navegação principal (§5.1). Pedido do stakeholder em 2026-10-07: Publicações,
+ * Pesquisa, Ensino, Extensão, Sobre. `home` fica em primeiro só para a lista da 404 ("Início").
+ */
+const NAV_ORDER: readonly RouteKey[] = [
+  'home',
+  'publications',
+  'research',
+  'teaching',
+  'outreach',
+  'about',
+];
 
 /**
  * Rotas da navegação principal num idioma, na ordem de exibição (§5.1). `key` é a

@@ -75,7 +75,9 @@ const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
               navItems.map((item) => {
                 const active = isActivePath(item.href, Astro.url.pathname);
                 return (
-                  <li>
+                  // `lg:flex`: sem ele o `<li>` herda a linha de 24 px do corpo e baixa o link ~4 px
+                  // em relação ao seletor de idioma (medido em 2026-10-07).
+                  <li class="lg:flex">
                     <a
                       href={item.href}
                       aria-current={active ? 'page' : undefined}

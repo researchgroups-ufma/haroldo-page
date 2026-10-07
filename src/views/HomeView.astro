@@ -80,17 +80,22 @@ const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
     aria-labelledby="home-nome"
     class="px-margem flex min-h-0 flex-1 flex-col pt-5 pb-6 lg:pt-7 lg:pb-7"
   >
-    <div class="grid gap-x-8 gap-y-4 lg:grid-cols-12">
-      <h1 id="home-nome" class="vt-nome text-display-1 titulo-entrada lg:col-span-6">
+    {
+      /* Nome à esquerda e menu à direita, como no cabeçalho das páginas internas (pedido de
+      2026-10-07): o menu não fica preso à metade da grade, e os 32 px entre os itens cabem a 1024 px. */
+    }
+    <div class="flex flex-col gap-y-4 lg:flex-row lg:items-start lg:justify-between lg:gap-x-8">
+      <h1 id="home-nome" class="vt-nome text-display-1 titulo-entrada">
         {siteConfig.displayName}
       </h1>
       {
         /* RF-29: o seletor fica na linha da navegação mas fora do `<nav>`: na Home EN ele aponta para
           `/`, e o teste de `dist` proíbe `href="/"` no menu principal (a volta à Home é o nome). */
       }
-      <div class="flex items-center gap-x-6 lg:col-span-6 lg:col-start-7 lg:items-start lg:pt-3">
+      <div class="flex items-center gap-x-6 lg:items-start lg:gap-x-8 lg:pt-3">
         <nav aria-label={t.site.mainNavLabel} class="vt-menu min-w-0 flex-1">
-          <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-between">
+          {/* A partir de `lg`, 32 px entre os itens e até o seletor, como nas páginas internas. */}
+          <ul class="text-nav flex flex-wrap gap-x-6 gap-y-2 lg:justify-end lg:gap-x-8">
             {
               navItems.map((item) => (
                 <li>

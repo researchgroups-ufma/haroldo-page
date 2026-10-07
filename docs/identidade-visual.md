@@ -131,8 +131,12 @@ Todos em `src/components/`. Não existem mais botão pílula, tag nem rodapé: `
 ### 5.1 Cabeçalho (`SiteHeader.astro`)
 
 - Nome de exibição (`siteConfig.displayName`, "Haroldo Lima") em `display-2`, link para `/`; à
-  direita a navegação em `text-nav` (Sobre, Pesquisa, Ensino, Publicações — `NAV_ITEMS` sem
-  "Início", como na Home: a volta para `/` é sempre o nome).
+  direita a navegação em `text-nav` (Publicações, Pesquisa, Ensino, Extensão, Sobre — `NAV_ITEMS`
+  sem "Início", como na Home: a volta para `/` é sempre o nome). Itens e seletor de idioma
+  ficam à direita com **32 px** entre todos, na Home e nas páginas internas: a Home monta a linha
+  como o cabeçalho (nome à esquerda, menu à direita), sem prender o menu à metade da grade, e o `<li>`
+  do cabeçalho é `flex` a partir de `lg` para o link não descer ~4 px em relação ao seletor
+  (medido em 2026-10-07).
 - Página ativa: traço de 1 px sob o rótulo e `aria-current="page"`. No hover, o traço **segue o
   cursor** (`link-traco`): nasce no ponto por onde o ponteiro entrou e recolhe em direção ao ponto
   por onde saiu. O mesmo vale para o menu da Home e para os links de contato (Home e Sobre), que
