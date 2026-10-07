@@ -92,6 +92,25 @@ Este projeto já aprovou uma correção que não funcionava porque a prova foi l
 **5. A Q-05 (domínio próprio) bloqueia esta fase.** Continua aberta no §16, com o stakeholder como
 responsável e prazo "antes da fase 5". Ela decide URL canônica, sitemap e indexação (A-07).
 
+   **Roteiro da migração, levantado em 2026-10-07** (exemplo: `haroldolima.com`; ainda sem plano —
+   vira plano com sabatina curta quando o domínio existir):
+   1. Domínio como zona na Cloudflare (nameservers do registrador apontados para ela, ou registro
+      pela própria Cloudflare) — pré-requisito de *Custom Domain* em Worker.
+   2. *Custom Domain* no Worker `haroldo-page` (painel ou `routes = [{ pattern = "...",
+      custom_domain = true }]` no `wrangler.toml`); `www` redirecionado por regra da zona.
+   3. URL do site nos três lugares: `DEFAULT_SITE_URL` (`src/lib/config.ts`), `site`
+      (`astro.config.mjs`) e `PUBLIC_SITE_URL` nas variáveis de **build** do Workers Builds.
+      Canonical, `hreflang` e sitemap derivam daí.
+   4. `/admin` no domínio novo: conferir no app.tina.io se o projeto precisa do endereço novo na
+      lista de URLs do site (não verificado) e testar o login antes de avisar o professor.
+   5. Indexação: tirar `Disallow: /` do `public/robots.txt` e o `X-Robots-Tag: noindex` do
+      `public/_headers`, reativar a linha `Sitemap` (RF-30); cadastrar no Search Console.
+   6. `*.workers.dev`: Worker só de assets não redireciona; desligar (`workers_dev = false`, conferir
+      antes o efeito nas prévias da `design`) ou mantê-lo com `noindex`.
+
+   Decisões a sabatinar: `www` ou raiz como canônico, destino do `workers.dev`, e se o convite do
+   plano 027 espera o domínio (o professor guardaria já o endereço definitivo do `/admin`).
+
 ## Insumos que outras fases deixaram para cá
 
 - **`docs/avisos-do-painel-para-o-manual.md`** — entrega do plano 033 (fase 2): o que o painel deixa

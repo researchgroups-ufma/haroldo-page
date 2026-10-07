@@ -121,6 +121,18 @@ perde:
 - Os botões estruturais do painel (Save, Delete, Add) estão **em inglês** — é o esperado (A-08,
   Q-02), não um defeito.
 
+## Antes do convite (nota de 2026-10-07)
+
+- O TinaCloud anunciou a troca do sistema de autenticação para outubro de 2026, exigindo TinaCMS
+  ≥ 3.12 (README da fase 2). O projeto está na 3.12.1; mesmo assim, **o ADMIN entra no `/admin` de
+  produção logo antes de criar o convite** — se o login quebrou, o professor não deve ser o
+  primeiro a descobrir.
+- Se o domínio próprio (Q-05) estiver perto, convidar **depois** da migração, para o professor
+  guardar o endereço definitivo do painel; a conta dele sobrevive à troca de endereço de qualquer
+  forma. Roteiro da migração no README da fase, item 5.
+- Desde 2026-10-07 a disciplina é perene (sabatina "Ensino modelo A"): o roteiro e o manual falam
+  em "Em curso / Encerrada", não em semestre, e os scripts ficam na aba Scripts.
+
 ## Passos
 
 1. 🧑 **(orquestrador)** No painel do TinaCloud, convidar `haroldo.lima@ufma.br` com papel
