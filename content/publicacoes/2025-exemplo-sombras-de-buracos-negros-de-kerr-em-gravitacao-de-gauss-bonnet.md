@@ -14,5 +14,6 @@ palavras_chave:
   - conteudo-de-exemplo
   - sombras de buracos negros
 destaque: true
+linha_relacionada: content/linhas-pesquisa/sombras-de-buracos-negros.md
 ---
 

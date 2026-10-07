@@ -12,7 +12,7 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.75 |
+| **Versão do PRD** | v0.1.76 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase, na branch `design`, em 2026-10-07**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
@@ -57,6 +57,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.73 | 2026-10-02 | Desenvolvedor | Fase 4 fechada (`/fechar-fase`): 365 testes, 100% de cobertura, 4 exceções de cobertura e 5 dívidas da revisão de integração |
 | v0.1.74 | 2026-10-07 | Desenvolvedor | Sabatina "Extensão" (3 decisões, `docs/sabatinas/CHANGELOG_sabatina_extensao.md`): RF-15 passa de notícias a Extensão (SHOULD), coleção `extensao` no lugar de `noticias` (§7.3), rotas `/extensao` e `/en/outreach` (§6.1); sai a linha de notícias do §6.3. Imagens do site passam a coloridas |
 | v0.1.75 | 2026-10-07 | Desenvolvedor | F-07 emendada: a Home EN (`/en/`) também fica sem o aviso de idioma (mantém `lang="pt-BR"`), a pedido do dono do produto |
+| v0.1.76 | 2026-10-07 | Desenvolvedor | Sabatina "Pesquisa modelo C" (10 decisões, `docs/sabatinas/CHANGELOG_sabatina_pesquisa-modelo-c.md`): RF-22 redesenhado com a imagem fixa por linha; `publicacoes` ganha `linha_relacionada` (§7.3) |
 
 ---
 
@@ -216,7 +217,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 |---|---|---|---|---|
 | RF-20 | MUST | Home com identificação do professor, resumo de atuação e caminhos para Pesquisa, Ensino e Publicações | Dado um visitante na raiz, quando a página carrega, então vê nome, cargo, instituição, foto, uma síntese e links para as três seções principais | ⬜ |
 | RF-21 | MUST | Página Sobre com biografia, formação, atuação profissional, contato e links acadêmicos (as áreas de atuação ficam na Home desde o redesenho de 2026-09-23) | Dado o perfil preenchido, quando o visitante abre Sobre, então vê todos os campos preenchidos e apenas eles — campos vazios não deixam rótulo órfão na página | ⬜ |
-| RF-22 | MUST | Página Pesquisa listando linhas de pesquisa (e projetos, se houver) | Dado duas linhas publicadas, quando o visitante abre Pesquisa, então vê as duas na ordem definida | ⬜ |
+| RF-22 | MUST | Página Pesquisa listando linhas de pesquisa (e projetos, se houver). Desde a sabatina "Pesquisa modelo C" (2026-10-07): a partir de `lg`, a imagem da linha fica parada à esquerda e troca enquanto o texto rola; linha sem imagem mostra um bloco neutro com o número; cada linha lista os seus projetos e as publicações ligadas a ela; projetos sem linha ficam em "Outros projetos", último bloco do ensaio, com imagem fixa e o próximo número | Dado duas linhas publicadas, quando o visitante abre Pesquisa, então vê as duas na ordem definida; dado uma linha sem projeto ou sem publicação ligada, então a seção correspondente não aparece | ⬜ |
 | RF-23 | MUST | Página Ensino separando disciplinas atuais e anteriores | Dado disciplinas com status distintos, quando o visitante abre Ensino, então vê dois grupos rotulados, atuais primeiro | ⬜ |
 | RF-24 | MUST | Página de disciplina com ementa, bibliografia, aulas, listas e materiais | Dada uma disciplina com 3 aulas e 2 listas, quando o visitante abre a página, então vê as 5 entradas com título, data (quando houver) e link que abre o arquivo no Drive em nova aba | ⬜ |
 | RF-25 | MUST | Página Publicações agrupada por ano, decrescente | Dadas publicações de 2024 e 2026, quando o visitante abre a página, então vê 2026 antes de 2024, cada uma com autores, veículo e os links disponíveis (DOI, arXiv, PDF) | ⬜ |
@@ -473,6 +474,7 @@ Nome de arquivo gerado por template: `{semestre}-{slug(nome)}.md` (RN-08). O slu
 | `resumo` | rich-text | | |
 | `palavras_chave[]` | lista de string | | |
 | `destaque` | boolean | | exibida na Home |
+| `linha_relacionada` | referência a `linhas-pesquisa` | | uma só; a publicação aparece na seção da linha na página Pesquisa (sabatina "Pesquisa modelo C", Decisões 4 a 6) |
 | `publicado` | boolean | ✔ | |
 | `en` | grupo | | `resumo` (título e autores não se traduzem — RN-07) |
 

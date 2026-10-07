@@ -104,6 +104,9 @@ export const en: UiStrings = {
   research: {
     title: 'Research areas and projects',
     otherProjects: 'Other projects',
+    projects: 'Projects',
+    publications: 'Publications',
+    line: (numero: string) => `Line ${numero}`,
     status: {
       'em andamento': 'In progress',
       concluído: 'Completed',

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { groupProjectsByLine, sortProjects, sortResearchLines } from '../../src/lib/research';
+import {
+  groupProjectsByLine,
+  groupPublicationsByLine,
+  sortProjects,
+  sortResearchLines,
+} from '../../src/lib/research';
 
 describe('sortResearchLines', () => {
   it('ordena por ordem crescente, sem ordem ao fim', () => {
@@ -111,5 +116,44 @@ describe('groupProjectsByLine', () => {
   it('linha sem projetos não aparece no mapa', () => {
     const { byLine } = groupProjectsByLine(new Set(['l1', 'l2']), [project('A', 'l1')]);
     expect(byLine.has('l2')).toBe(false);
+  });
+});
+
+// Sabatina "Pesquisa modelo C", Decisões 4 a 6: só as publicações ligadas à linha, mais recente primeiro.
+describe('groupPublicationsByLine', () => {
+  const pub = (titulo: string, ano: number, linha?: string) => ({
+    data: { titulo, ano, linha_relacionada: linha ? { id: linha } : undefined },
+  });
+
+  it('agrupa por linha, do ano mais recente ao mais antigo, empate por título', () => {
+    const pubs = [
+      pub('B', 2023, 'l1'),
+      pub('Óptica', 2025, 'l1'),
+      pub('Ondas', 2025, 'l1'),
+      pub('C', 2024, 'l2'),
+    ];
+    const byLine = groupPublicationsByLine(new Set(['l1', 'l2']), pubs);
+    expect(byLine.get('l1')?.map((p) => p.data.titulo)).toEqual(['Ondas', 'Óptica', 'B']);
+    expect(byLine.get('l2')?.map((p) => p.data.titulo)).toEqual(['C']);
+  });
+
+  it('publicação sem linha, ou com linha fora da página, não entra', () => {
+    const byLine = groupPublicationsByLine(new Set(['l1']), [
+      pub('Solta', 2024),
+      pub('X', 2024, 'rascunho'),
+    ]);
+    expect(byLine.size).toBe(0);
+  });
+
+  it('linha sem publicação não tem chave (Decisão 6: a seção some)', () => {
+    const byLine = groupPublicationsByLine(new Set(['l1', 'l2']), [pub('A', 2024, 'l1')]);
+    expect(byLine.has('l2')).toBe(false);
+  });
+
+  it('não muta a lista recebida', () => {
+    const pubs = [pub('A', 2020, 'l1'), pub('B', 2024, 'l1')];
+    const original = [...pubs];
+    groupPublicationsByLine(new Set(['l1']), pubs);
+    expect(pubs).toEqual(original);
   });
 });

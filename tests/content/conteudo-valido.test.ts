@@ -29,7 +29,7 @@
  *                 portão de verdade em vez de uma simulação.
  *
  *                 **`safeParse` não verifica se uma referência existe.**
- *                 `projetos.linha_relacionada` passa por `normalizeLinhaRelacionadaId` e por
+ *                 `linha_relacionada` (de `projetos` e de `publicacoes`) passa por `normalizeLinhaRelacionadaId` e por
  *                 `reference('linhas-pesquisa')` (`src/content.config.ts`): o `preprocess`
  *                 normaliza o formato do id e o `reference()` só o transforma na forma
  *                 `{ id, collection }` — nenhum dos dois consulta o sistema de arquivos. Quem
@@ -135,7 +135,10 @@ describe('conteúdo real de content/ — validação Zod com referência resolvi
           }
         }
 
-        if (pasta === 'projetos' && Object.prototype.hasOwnProperty.call(frontmatter, 'linha_relacionada')) {
+        if (
+          (pasta === 'projetos' || pasta === 'publicacoes') &&
+          Object.prototype.hasOwnProperty.call(frontmatter, 'linha_relacionada')
+        ) {
           const bruto = frontmatter.linha_relacionada;
           if (typeof bruto === 'string') {
             const idNormalizado = bruto.replace(/^content\/linhas-pesquisa\//, '').replace(/\.md$/, '');

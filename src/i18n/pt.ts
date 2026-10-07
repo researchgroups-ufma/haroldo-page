@@ -112,6 +112,10 @@ export const pt = {
   research: {
     title: 'Linhas e projetos',
     otherProjects: 'Outros projetos',
+    // Sabatina "Pesquisa modelo C": rótulos das seções de cada linha e do número dela.
+    projects: 'Projetos',
+    publications: 'Publicações',
+    line: (numero: string) => `Linha ${numero}`,
     status: {
       'em andamento': 'Em andamento',
       concluído: 'Concluído',

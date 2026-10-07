@@ -3,26 +3,30 @@
  * ============================================================================
  *  Arquivo      : ProjectItem.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
- *  Descrição    : Linha de um projeto na página Pesquisa (RF-22): período e
- *                 status numa linha pequena, título, descrição, e financiador
- *                 e colaboradores. Usada dentro das linhas de pesquisa e em
- *                 "Outros projetos". Em `/en`, `titulo` e `descricao` seguem o
- *                 fallback por campo (RN-06) e `financiador`/`colaboradores`
- *                 saem em português marcado (sabatina fase 4, Decisão 13).
+ *  Descrição    : Linha de um projeto na página Pesquisa (RF-22), no modelo C
+ *                 (sabatina "Pesquisa modelo C", 2026-10-07): número, título e
+ *                 período, com um ponto que pulsa quando o projeto está em
+ *                 andamento; a descrição, o status, o financiador e os
+ *                 colaboradores abrem sob o cursor ou o foco. Em `/en`,
+ *                 `titulo` e `descricao` seguem o fallback por campo (RN-06) e
+ *                 `financiador`/`colaboradores` saem em português marcado
+ *                 (sabatina fase 4, Decisão 13).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-10-01
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/i18n (`strings`), src/i18n/fallback.ts, src/lib/routes.ts (`localeFromPath`),
  *                 src/lib/text.ts (toParagraphs), astro:content (CollectionEntry)
- *  Entradas     : prop `project` (obrigatória): entrada da coleção `projetos`
- *  Saídas       : `<li class="projeto-linha">` com régua fina acima
- *  Uso          : <ProjectItem project={project} /> dentro de um `<ol>`
+ *  Entradas     : props `project` (entrada da coleção `projetos`) e `index` (posição na lista,
+ *                 a partir de 0), obrigatórias
+ *  Saídas       : `<li class="projeto">` com régua fina acima
+ *  Uso          : <ProjectItem project={project} index={i} /> dentro de um `<ol>`
  *
  *  Notas        : o idioma vem do caminho (`localeFromPath`), como nos demais
- *                 componentes compartilhados. A régua `.projeto-linha` mora aqui:
- *                 estilo escopado não alcançaria o `<li>` a partir da view.
+ *                 componentes compartilhados. A descrição recolhida continua no
+ *                 HTML e na árvore de acessibilidade; só a altura visível é zero.
+ *                 Sem ponteiro fino (celular), ela fica sempre aberta.
  * ============================================================================
  */
 import type { CollectionEntry } from 'astro:content';
@@ -34,9 +38,11 @@ import { toParagraphs } from '../lib/text';
 export interface Props {
   /** Projeto publicado a exibir. Obrigatória. */
   project: CollectionEntry<'projetos'>;
+  /** Posição do projeto na lista, a partir de 0; vira o número "01", "02"… Obrigatória. */
+  index: number;
 }
 
-const { project } = Astro.props;
+const { project, index } = Astro.props;
 const lang = localeFromPath(Astro.url.pathname);
 const t = strings(lang);
 
@@ -48,39 +54,97 @@ const credits = portugueseOnly(
   [project.data.financiador, project.data.colaboradores?.join(', ')].filter(Boolean).join(' · '),
   lang,
 );
-
-/** Linha de identificação do projeto: período ("inicio–fim", ou "inicio–" em aberto) · status. */
-const meta = [
-  project.data.periodo && `${project.data.periodo.inicio}–${project.data.periodo.fim ?? ''}`,
-  project.data.status && t.research.status[project.data.status],
-]
-  .filter(Boolean)
-  .join(' · ');
+const { periodo, status } = project.data;
+/** "inicio–fim", ou "inicio–" em aberto. */
+const period = periodo && `${periodo.inicio}–${periodo.fim ?? ''}`;
 ---
 
-<li class="projeto-linha py-3">
-  {meta && <p class="text-pequeno text-secundario">{meta}</p>}
-  <div>
-    <h3 class="text-titulo-item" lang={title.lang}>{title.text}</h3>
-    {
-      toParagraphs(description.text).map((paragraph) => (
-        <p class="text-pequeno text-secundario max-w-medida mt-1" lang={description.lang}>
-          {paragraph}
-        </p>
-      ))
-    }
-    {
-      credits.text && (
-        <p class="text-pequeno text-secundario mt-1" lang={credits.lang}>
-          {credits.text}
-        </p>
-      )
-    }
+<li class="projeto border-regua border-t" tabindex="0">
+  <div class="grid grid-cols-[2rem_1fr] items-baseline py-4">
+    <span class="text-pequeno text-secundario tabular-nums"
+      >{String(index + 1).padStart(2, '0')}</span
+    >
+    <div>
+      <div class="flex flex-wrap items-baseline justify-between gap-x-6">
+        <h3 class="projeto-titulo text-titulo-item" lang={title.lang}>{title.text}</h3>
+        {
+          period && (
+            <span class="text-pequeno text-secundario whitespace-nowrap tabular-nums">
+              {period}
+              {status === 'em andamento' && <span class="pulso" aria-hidden="true" />}
+            </span>
+          )
+        }
+      </div>
+      <div class="projeto-corpo">
+        <div>
+          {
+            toParagraphs(description.text).map((paragraph) => (
+              <p class="text-pequeno text-secundario max-w-medida pt-2" lang={description.lang}>
+                {paragraph}
+              </p>
+            ))
+          }
+          {
+            (status || credits.text) && (
+              <p class="text-pequeno mt-1">
+                {status && <span>{t.research.status[status]}</span>}
+                {status && credits.text && ' · '}
+                {credits.text && <span lang={credits.lang}>{credits.text}</span>}
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </div>
   </div>
 </li>
 
 <style>
-  .projeto-linha {
-    border-top: 1px solid var(--color-regua);
+  /* Descrição recolhida; abre sob o cursor ou o foco (grid 0fr → 1fr). */
+  .projeto-corpo {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 350ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .projeto-corpo > div {
+    overflow: hidden;
+  }
+  .projeto:is(:hover, :focus-visible) .projeto-corpo {
+    grid-template-rows: 1fr;
+  }
+  .projeto:is(:hover, :focus-visible) .projeto-titulo {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+  }
+  .projeto:focus-visible {
+    outline-offset: 2px;
+  }
+  @media (hover: none) {
+    .projeto-corpo {
+      grid-template-rows: 1fr;
+    }
+  }
+
+  /* Ponto de "em andamento": o status por extenso está na linha que abre. */
+  .pulso {
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-left: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-tinta);
+    vertical-align: middle;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulso {
+      animation: pulso 2.4s ease-in-out infinite;
+    }
+    @keyframes pulso {
+      50% {
+        opacity: 0.25;
+      }
+    }
   }
 </style>

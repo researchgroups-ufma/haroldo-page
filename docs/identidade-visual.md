@@ -196,7 +196,8 @@ quando algum texto traduzível (RN-06) caiu no português. **Exceções: a Sobre
 Home EN (`/en/`) não mostram o aviso** (a Sobre pela sabatina fase 4, Decisão 16, porque ele fazia a
 área de conteúdo transbordar a 1366×650; a Home por pedido de 2026-10-07), e o `lang="pt-BR"` dos
 trechos continua. Nas páginas internas que o mostram (as de pesquisa e ensino) é o primeiro filho do
-conteúdo, logo abaixo da régua do cabeçalho, com o mesmo recuo lateral e `pt-4`. Em português nunca aparece. O `lang="pt-BR"` do elemento
+conteúdo, logo abaixo da régua do cabeçalho, com o mesmo recuo lateral e `pt-4`; na Pesquisa, fica no
+topo da coluna de texto, para não empurrar a imagem parada para baixo (6.3). Em português nunca aparece. O `lang="pt-BR"` do elemento
 é independente do aviso: campo em português sem versão em inglês (instituições, `periodo`) leva
 `lang="pt-BR"` e **não** liga o aviso (sabatina fase 4, Decisão 13).
 
@@ -237,16 +238,33 @@ existe. Datas saem no formato do idioma, como "March 15, 2026".
 
 ### 6.3 Pesquisa `/pesquisa` (RF-22, RF-13)
 
+Modelo C, "ensaio com imagem parada" (sabatina "Pesquisa modelo C", 2026-10-07).
+
 - `<h1>` "Linhas e projetos".
-- Um bloco por **linhas-pesquisa** publicada, na ordem de **ordem** (sem `ordem` ao fim, por
-  **titulo**), aberto por régua forte e com `id` âncora: **titulo** (`<h2>`, `display-2`),
-  **resumo** em cinza, **corpo** em parágrafos, **imagem** colorida se houver (`alt=""`, porque o
-  título está logo acima).
-- Logo abaixo, os **projetos** daquela linha (`groupProjectsByLine`): linha pequena
-  "**periodo.inicio**–**periodo.fim** · **status**", **titulo**, **descricao** em parágrafos e
-  "**financiador** · **colaboradores[]**". Linha sem projetos não tem lista.
-- "Outros projetos" no fim: projetos sem **linha_relacionada** ou ligados a linha não publicada
-  (RN-01 — o rascunho nunca é revelado). Some se vazio.
+- A partir de `lg`, grade 5/7. À esquerda, o **palco**: a **imagem** da linha que está na tela,
+  parada (`sticky`) e da altura da área que rola; linha sem imagem mostra um bloco `tinta`. Sobre ele,
+  em branco, o número da linha em `display-1` e o índice "01 02" com a atual sublinhada, sobre um
+  degradê escuro na base do palco que mantém o branco legível em imagem clara. Cada número do índice
+  é um link para a sua seção (`#id`): com JS, a rolagem é suave dentro da área que rola (instantânea
+  com movimento reduzido); sem JS, o link pula direto. A troca é um
+  fade de 700 ms com um leve recuo de escala, disparada quando a linha cruza a faixa entre 40% e 45%
+  da altura (`IntersectionObserver`). Abaixo de `lg` não há palco: a **imagem** vai para o topo da
+  linha, em 16:9.
+- À direita, um bloco por **linhas-pesquisa** publicada, na ordem de **ordem** (sem `ordem` ao fim,
+  por **titulo**), com `id` âncora e régua forte entre um e outro: "Linha 01" em `pequeno`,
+  **titulo** (`<h2>`, `display-2`), **resumo** em cinza e **corpo** em parágrafos. O bloco sobe e
+  aparece ao entrar na tela (`animation-timeline: view()`, só sem movimento reduzido).
+- Depois, só se houver: rubrica "Projetos" com os **projetos** da linha (`groupProjectsByLine`) e
+  rubrica "Publicações" com as **publicacoes** ligadas por **linha_relacionada**
+  (`groupPublicationsByLine`), "**titulo** · **ano**", do mais recente ao mais antigo, sem link.
+  Uma linha só com texto é uma linha completa.
+- Projeto: número "01", **titulo** em `titulo-item` e "**periodo.inicio**–**periodo.fim**" à direita,
+  com um ponto que pulsa quando em andamento. **descricao**, **status** e "**financiador** ·
+  **colaboradores[]**" ficam recolhidos e abrem sob o cursor ou o foco (sem ponteiro fino, abertos).
+- "Outros projetos" é o último bloco do ensaio, no mesmo modelo: o próximo número no palco e no
+  índice ("03" com duas linhas), uma imagem fixa no código (`extensao-exemplo-4.jpg`, sem campo no
+  painel), o número pequeno, o título em `display-2` e os projetos sem **linha_relacionada** ou
+  ligados a linha não publicada (RN-01 — o rascunho nunca é revelado). Some se vazio.
 
 ### 6.4 Ensino `/ensino` (RF-23)
 

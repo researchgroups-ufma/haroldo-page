@@ -4,29 +4,33 @@
  *  Arquivo      : ResearchView.astro
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : View de `/pesquisa/` e `/en/research/` (sabatina fase 4,
- *                 Decisão 6): página Pesquisa (RF-22, RF-13, §6.3 da
- *                 identidade visual): linhas de pesquisa publicadas, na ordem
- *                 do professor, com resumo, corpo e imagem quando houver, e os
- *                 projetos de cada uma logo abaixo (em andamento antes de
- *                 concluídos); "Outros projetos" no fim reúne os sem linha ou
- *                 ligados a linha não publicada, sem revelá-la (RN-01).
+ *                 Decisão 6): página Pesquisa (RF-22, RF-13) no modelo C
+ *                 (sabatina "Pesquisa modelo C", 2026-10-07). A partir de `lg`,
+ *                 a imagem da linha fica parada à esquerda e troca enquanto o
+ *                 texto rola; linha sem imagem mostra um bloco `tinta`. Cada
+ *                 linha traz resumo e corpo e, só se houver, os seus projetos e
+ *                 as publicações ligadas a ela. "Outros projetos", último bloco,
+ *                 com imagem fixa, reúne os sem linha ou ligados a linha não
+ *                 publicada, sem revelá-la (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
  *  Atualizado em: 2026-10-07
- *  Versão       : 0.1.0
+ *  Versão       : 0.2.0
  *
  *  Dependências : BaseLayout, PageHeader, ProjectItem, FallbackNotice, src/i18n (strings),
  *                 src/i18n/fallback.ts, src/lib/config.ts (`Locale`), src/lib/text.ts (toParagraphs),
  *                 src/lib/published.ts (filterPublished),
- *                 src/lib/research.ts (sortResearchLines, sortProjects,
- *                 groupProjectsByLine), astro:content (getCollection)
- *  Entradas     : prop `lang` (obrigatória); coleções `linhas-pesquisa` e `projetos`
+ *                 src/lib/research.ts (sortResearchLines, sortProjects, groupProjectsByLine,
+ *                 groupPublicationsByLine), astro:content (getCollection)
+ *  Entradas     : prop `lang` (obrigatória); coleções `linhas-pesquisa`, `projetos` e `publicacoes`
  *  Saídas       : HTML estático do corpo da página Pesquisa
  *  Uso          : <ResearchView lang="pt" /> em `src/pages/pesquisa.astro`;
  *                 <ResearchView lang="en" /> em `src/pages/en/research.astro`
  *
  *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
  *                 fallback por campo (RN-06) e aviso único (F-07) das linhas e dos projetos.
+ *                 Título de publicação não se traduz (RN-07) e sai sem `lang`, como na página
+ *                 Publicações EN (sabatina fase 4, Decisões 13 e 15).
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
@@ -39,7 +43,12 @@ import { hasFallback, localize, localizeOptional } from '../i18n/fallback';
 import type { Locale } from '../lib/config';
 import { toParagraphs } from '../lib/text';
 import { filterPublished } from '../lib/published';
-import { groupProjectsByLine, sortProjects, sortResearchLines } from '../lib/research';
+import {
+  groupProjectsByLine,
+  groupPublicationsByLine,
+  sortProjects,
+  sortResearchLines,
+} from '../lib/research';
 
 export interface Props {
   /** Idioma da rota. Obrigatória. */
@@ -49,13 +58,18 @@ export interface Props {
 const { lang } = Astro.props;
 const t = strings(lang);
 
-// RN-01: só linhas e projetos publicados entram na página.
+// RN-01: só linhas, projetos e publicações publicados entram na página.
 const lines = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')));
 const projects = sortProjects(filterPublished(await getCollection('projetos')));
-const { byLine, others } = groupProjectsByLine(new Set(lines.map((line) => line.id)), projects);
+const lineIds = new Set(lines.map((line) => line.id));
+const { byLine, others } = groupProjectsByLine(lineIds, projects);
+const publicationsByLine = groupPublicationsByLine(
+  lineIds,
+  filterPublished(await getCollection('publicacoes')),
+);
 
 // RN-06: `titulo`, `resumo` e `corpo` de cada linha resolvidos por idioma; `lang` por parágrafo.
-const localizedLines = lines.map((line) => {
+const localizedLines = lines.map((line, i) => {
   const { titulo, resumo, corpo, imagem } = line.data;
   const title = localize(titulo, line.data.en?.titulo, lang);
   const summary = localize(resumo, line.data.en?.resumo, lang);
@@ -63,7 +77,16 @@ const localizedLines = lines.map((line) => {
   const paragraphs = [summary, ...(body ? [body] : [])].flatMap((field) =>
     toParagraphs(field.text).map((text) => ({ text, lang: field.lang })),
   );
-  return { id: line.id, title, paragraphs, imagem, fields: [title, summary, body] };
+  return {
+    id: line.id,
+    number: String(i + 1).padStart(2, '0'),
+    title,
+    paragraphs,
+    imagem,
+    projects: byLine.get(line.id) ?? [],
+    publications: publicationsByLine.get(line.id) ?? [],
+    fields: [title, summary, body],
+  };
 });
 // F-07: `ProjectItem` resolve o fallback dos projetos; aqui só entra na conta do aviso.
 const projectFields = projects.flatMap(({ data }) => [
@@ -71,79 +94,279 @@ const projectFields = projects.flatMap(({ data }) => [
   localize(data.descricao, data.en?.descricao, lang),
 ]);
 const showNotice = hasFallback([...localizedLines.flatMap((l) => l.fields), ...projectFields]);
+
+// Sabatina "Pesquisa modelo C", Decisão 10: "Outros projetos" é o último bloco do ensaio, com o
+// próximo número e uma imagem fixa (não há campo no painel para ela).
+const OTHERS_IMAGE = '/uploads/extensao-exemplo-4.jpg';
+const othersScene =
+  others.length > 0
+    ? {
+        id: 'outros-projetos',
+        number: String(localizedLines.length + 1).padStart(2, '0'),
+        imagem: OTHERS_IMAGE,
+      }
+    : undefined;
+/** O que o palco mostra, na ordem da coluna de texto: as linhas e, se houver, "Outros projetos". */
+const scenes = [
+  ...localizedLines.map((line) => ({ ...line, label: line.title.text })),
+  ...(othersScene ? [{ ...othersScene, label: t.research.otherProjects }] : []),
+];
 ---
 
 <BaseLayout title={t.nav.research}>
   <PageHeader slot="cabecalho" title={t.research.title} />
 
-  <FallbackNotice show={showNotice} class="px-margem pt-4" />
-  <div class="px-margem pb-10">
+  <div class="px-margem grid gap-x-12 lg:grid-cols-12">
     {
-      localizedLines.map((line) => {
-        const lineProjects = byLine.get(line.id) ?? [];
-        return (
-          <section id={line.id} aria-labelledby={`${line.id}-titulo`} class="linha-pesquisa py-8">
-            <div>
-              <div>
-                <h2 id={`${line.id}-titulo`} class="text-display-2" lang={line.title.lang}>
-                  {line.title.text}
-                </h2>
-                {line.paragraphs.map((paragraph, i) => (
-                  <p
-                    class:list={['text-corpo max-w-medida mt-3', i === 0 && 'text-secundario']}
-                    lang={paragraph.lang}
-                  >
-                    {paragraph.text}
-                  </p>
-                ))}
-                {line.imagem && (
-                  <img
-                    src={line.imagem}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    class="mt-4 w-full max-w-md object-cover"
-                  />
-                )}
-              </div>
-            </div>
-            {lineProjects.length > 0 && (
-              <ol class="mt-6">
-                {lineProjects.map((project) => (
-                  <ProjectItem project={project} />
-                ))}
-              </ol>
+      scenes.length > 0 && (
+        <div class="hidden lg:col-span-5 lg:block">
+          <div class="palco sticky top-6 mt-6">
+            {scenes.map((scene, i) =>
+              scene.imagem ? (
+                <img
+                  src={scene.imagem}
+                  alt=""
+                  data-linha={scene.id}
+                  class:list={['cena', i === 0 && 'visivel']}
+                  decoding="async"
+                />
+              ) : (
+                // Sabatina "Pesquisa modelo C", Decisão 1: sem imagem, um bloco `tinta` com o número.
+                <div data-linha={scene.id} class:list={['cena bg-tinta', i === 0 && 'visivel']} />
+              ),
             )}
-          </section>
-        );
-      })
-    }
-
-    {
-      others.length > 0 && (
-        <section aria-labelledby="outros-projetos" class="linha-pesquisa py-8">
-          <h2 id="outros-projetos" class="text-rotulo text-secundario">
-            {t.research.otherProjects}
-          </h2>
-          <ol class="mt-4">
-            {others.map((project) => (
-              <ProjectItem project={project} />
-            ))}
-          </ol>
-        </section>
+            <div class="palco-legenda">
+              <span class="palco-numero text-display-1 tabular-nums" aria-hidden="true">
+                {scenes[0].number}
+              </span>
+              {/* O índice leva à seção (`#id`); com JS, a rolagem é suave dentro de `#conteudo`. */}
+              <nav aria-label={t.research.title}>
+                <ol class="text-pequeno mt-3 flex gap-4">
+                  {scenes.map((scene, i) => (
+                    <li>
+                      <a
+                        href={`#${scene.id}`}
+                        aria-label={`${scene.number} · ${scene.label}`}
+                        class:list={['palco-indice tabular-nums', i === 0 && 'atual']}
+                        data-linha={scene.id}
+                      >
+                        {scene.number}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            </div>
+          </div>
+        </div>
       )
     }
+
+    {/* A folga no fim deixa o último bloco chegar à faixa que troca a imagem. */}
+    <div class="pb-12 lg:col-span-7 lg:pb-[30svh]">
+      {
+        /* Na coluna de texto, o aviso não empurra o palco para baixo (ele já ocupa a altura útil). */
+      }
+      <FallbackNotice show={showNotice} class="pt-4" />
+      {
+        localizedLines.map((line, i) => (
+          <section
+            id={line.id}
+            data-linha={line.id}
+            aria-labelledby={`${line.id}-titulo`}
+            class:list={['linha pt-6', i > 0 && 'border-tinta mt-12 border-t']}
+          >
+            {line.imagem && (
+              <img
+                src={line.imagem}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                class="mb-6 aspect-[16/9] w-full object-cover lg:hidden"
+              />
+            )}
+            <p class="text-pequeno text-secundario tabular-nums">{t.research.line(line.number)}</p>
+            <h2 id={`${line.id}-titulo`} class="text-display-2 mt-2" lang={line.title.lang}>
+              {line.title.text}
+            </h2>
+            {line.paragraphs.map((paragraph, j) => (
+              <p
+                class:list={['text-corpo max-w-medida', j === 0 ? 'text-secundario mt-5' : 'mt-3']}
+                lang={paragraph.lang}
+              >
+                {paragraph.text}
+              </p>
+            ))}
+
+            {line.projects.length > 0 && (
+              <>
+                <p class="text-rotulo text-secundario mt-10">{t.research.projects}</p>
+                <ol class="mt-3">
+                  {line.projects.map((project, j) => (
+                    <ProjectItem project={project} index={j} />
+                  ))}
+                </ol>
+              </>
+            )}
+
+            {line.publications.length > 0 && (
+              <>
+                <p class="text-rotulo text-secundario mt-10">{t.research.publications}</p>
+                <ul class="mt-3 space-y-2">
+                  {line.publications.map((publication) => (
+                    <li class="text-corpo">
+                      {publication.data.titulo}
+                      <span class="text-pequeno text-secundario tabular-nums">
+                        {' '}
+                        · {publication.data.ano}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </section>
+        ))
+      }
+
+      {
+        othersScene && (
+          <section
+            id={othersScene.id}
+            data-linha={othersScene.id}
+            aria-labelledby="outros-projetos-titulo"
+            class:list={['linha pt-6', localizedLines.length > 0 && 'border-tinta mt-12 border-t']}
+          >
+            <img
+              src={othersScene.imagem}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class="mb-6 aspect-[16/9] w-full object-cover lg:hidden"
+            />
+            <p class="text-pequeno text-secundario tabular-nums">{othersScene.number}</p>
+            <h2 id="outros-projetos-titulo" class="text-display-2 mt-2">
+              {t.research.otherProjects}
+            </h2>
+            <ol class="mt-6">
+              {others.map((project, j) => (
+                <ProjectItem project={project} index={j} />
+              ))}
+            </ol>
+          </section>
+        )
+      }
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  /* Blocos de linha com régua forte; a régua fina dos projetos vive em `ProjectItem`. */
-  .linha-pesquisa {
-    border-top: 1px solid var(--color-tinta);
+  .palco {
+    /* Cabe na área que rola: janela menos cartão, cabeçalho e régua (~17rem). */
+    height: min(40rem, calc(100svh - 17rem));
+    width: 100%;
+    overflow: hidden;
   }
-  /* O primeiro bloco encosta na régua do cabeçalho, que já abre a lista — sem borda, para a linha
-     não dobrar de espessura. */
-  .linha-pesquisa:first-child {
-    border-top: 0;
+  .cena {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.08);
+    transition:
+      opacity 700ms ease-out,
+      transform 2400ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .cena.visivel {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* Degradê na base: o número branco fica legível mesmo sobre imagem clara. */
+  .palco::after {
+    content: '';
+    position: absolute;
+    inset: 55% 0 0 0;
+    background: linear-gradient(to bottom, transparent, rgb(17 17 18 / 0.45));
+    pointer-events: none;
+  }
+  .palco-legenda {
+    z-index: 1;
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1.25rem;
+    color: white;
+  }
+  .palco-indice {
+    opacity: 0.55;
+    transition: opacity 300ms ease-out;
+  }
+  .palco-indice:is(:hover, :focus-visible) {
+    opacity: 1;
+  }
+  /* O contorno de foco padrão é `tinta`, que some sobre a imagem escura. */
+  .palco-indice:focus-visible {
+    outline-color: white;
+  }
+  .palco-indice.atual {
+    opacity: 1;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .linha {
+      animation: linha-entra linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+    @keyframes linha-entra {
+      from {
+        opacity: 0.2;
+        transform: translateY(16px);
+      }
+    }
   }
 </style>
+
+<script>
+  // Troca a imagem parada (só a partir de `lg`, onde o palco existe) conforme a linha que cruza a
+  // faixa entre 40% e 45% da altura da área que rola.
+  const cenas = [...document.querySelectorAll<HTMLElement>('.cena')];
+  const indices = [...document.querySelectorAll<HTMLElement>('.palco-indice')];
+  const numero = document.querySelector<HTMLElement>('.palco-numero');
+  const conteudo = document.getElementById('conteudo');
+
+  if (numero && conteudo) {
+    const ativar = (id: string) => {
+      for (const cena of cenas) cena.classList.toggle('visivel', cena.dataset.linha === id);
+      for (const indice of indices) indice.classList.toggle('atual', indice.dataset.linha === id);
+      numero.textContent = indices.find((i) => i.dataset.linha === id)?.textContent?.trim() ?? '';
+    };
+    // A partir de `lg` quem rola é o `#conteudo`; abaixo, a janela.
+    const rolaSozinho = getComputedStyle(conteudo).overflowY === 'auto';
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas)
+          if (e.isIntersecting) ativar((e.target as HTMLElement).dataset.linha!);
+      },
+      { root: rolaSozinho ? conteudo : null, rootMargin: '-40% 0px -55% 0px' },
+    );
+    for (const secao of document.querySelectorAll('.linha')) observador.observe(secao);
+
+    // Clique no índice: rolagem suave até a seção (instantânea com movimento reduzido); a troca de
+    // imagem fica com o observador, que dispara quando a seção chega à faixa.
+    const suave = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (const indice of indices) {
+      indice.addEventListener('click', (evento) => {
+        const secao = document.getElementById(indice.dataset.linha!);
+        if (!secao) return;
+        evento.preventDefault();
+        secao.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+        history.replaceState(null, '', `#${secao.id}`);
+      });
+    }
+  }
+</script>

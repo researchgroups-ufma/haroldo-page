@@ -474,6 +474,10 @@ export const publicacoesSchema = z.object({
   resumo: z.string().optional(),
   palavras_chave: z.array(z.string()).optional(),
   destaque: z.boolean().optional(),
+  // Sabatina "Pesquisa modelo C", Decisões 4 e 5: uma linha só, mesmo formato de `projetos`.
+  linha_relacionada: z
+    .preprocess(normalizeLinhaRelacionadaId, reference('linhas-pesquisa'))
+    .optional(),
   publicado: z.boolean(),
   en: publicacoesEnSchema.optional(),
 });

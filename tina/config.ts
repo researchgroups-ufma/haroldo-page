@@ -372,14 +372,16 @@ export default defineConfig({
             label: 'Resumo',
             required: true,
             ui: { component: 'textarea' },
-            description: 'Texto curto exibido na listagem de linhas de pesquisa.',
+            description:
+              'Frase de abertura da linha, em destaque (cinza) na página Pesquisa. Uma ou duas frases.',
           },
           {
             type: 'string',
             name: 'corpo',
             label: 'Texto completo',
             ui: { component: 'textarea' },
-            description: 'Texto completo da linha de pesquisa, opcional.',
+            description:
+              'Desenvolvimento da linha, logo abaixo do resumo. Opcional: continue o resumo, sem repeti-lo.',
           },
           {
             type: 'image',
@@ -879,6 +881,15 @@ export default defineConfig({
             name: 'destaque',
             label: 'Destaque',
             description: 'Quando marcado, a publicação aparece em destaque na Home.',
+          },
+          {
+            // Mesmo formato de `projetos.linha_relacionada`: o Zod normaliza o id que o Tina grava.
+            type: 'reference',
+            name: 'linha_relacionada',
+            label: 'Linha de pesquisa',
+            collections: ['linhas_pesquisa'],
+            description:
+              'Se escolher uma linha, a publicação aparece na seção dessa linha na página Pesquisa.',
           },
           {
             type: 'object',

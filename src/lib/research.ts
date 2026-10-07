@@ -3,19 +3,19 @@
  *  Arquivo      : research.ts
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Ordena linhas de pesquisa e projetos (§6.3 da identidade
- *                 visual) e agrupa projetos por linha publicada, sem revelar
- *                 linha em rascunho (RN-01).
+ *                 visual) e agrupa projetos e publicações por linha publicada,
+ *                 sem revelar linha em rascunho (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-16
- *  Atualizado em: 2026-09-24
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.4.0
  *
  *  Dependências : nenhuma
  *  Entradas     : arrays de entradas de coleção, na forma devolvida por
  *                 `getCollection` (`{ data: {...} }`), tipadas estruturalmente
  *                 — este módulo não importa `astro:content`
  *  Saídas       : arrays ordenados (cópias, sem mutar a entrada) e o
- *                 agrupamento `{ byLine, others }`
+ *                 agrupamentos `{ byLine, others }` (projetos) e `Map` (publicações)
  *  Uso          : const linhas = sortResearchLines(filterPublished(await getCollection('linhas-pesquisa')))
  *
  *  Notas        : funções puras, sem efeitos colaterais, testáveis sem a content layer do Astro
@@ -114,4 +114,34 @@ export function groupProjectsByLine<P extends ProjectLike>(
     byLine.set(lineId, [...(byLine.get(lineId) ?? []), project]);
   }
   return { byLine, others };
+}
+
+/** Entrada de `publicacoes` com os campos usados no agrupamento por linha. */
+type PublicationLike = {
+  data: { titulo: string; ano: number; linha_relacionada?: { id: string } };
+};
+
+/**
+ * Publicações ligadas a cada linha da página Pesquisa (sabatina "Pesquisa modelo C", Decisões 4 a
+ * 6): do ano mais recente ao mais antigo, empate por `titulo` (`localeCompare('pt-BR')`).
+ *
+ * @param lineIds Ids das linhas publicadas, presentes na página.
+ * @param publications Publicações já publicadas (`filterPublished`).
+ * @returns Id da linha → publicações. Sem linha, ou com linha fora de `lineIds`, a publicação não
+ *   entra; linha sem publicação não tem chave (a seção dela some).
+ */
+export function groupPublicationsByLine<P extends PublicationLike>(
+  lineIds: ReadonlySet<string>,
+  publications: P[],
+): Map<string, P[]> {
+  const sorted = [...publications].sort(
+    (a, b) => b.data.ano - a.data.ano || a.data.titulo.localeCompare(b.data.titulo, 'pt-BR'),
+  );
+  const byLine = new Map<string, P[]>();
+  for (const publication of sorted) {
+    const lineId = publication.data.linha_relacionada?.id;
+    if (lineId === undefined || !lineIds.has(lineId)) continue;
+    byLine.set(lineId, [...(byLine.get(lineId) ?? []), publication]);
+  }
+  return byLine;
 }

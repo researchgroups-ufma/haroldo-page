@@ -517,6 +517,18 @@ describe('coleção publicacoes', () => {
     expect(publicacoesSchema.safeParse(valido).success).toBe(true);
   });
 
+  // Sabatina "Pesquisa modelo C", Decisões 4 e 5: o mesmo formato de `projetos.linha_relacionada`.
+  it('aceita `linha_relacionada` com o id que o Tina grava e o normaliza', () => {
+    const resultado = publicacoesSchema.safeParse({
+      ...valido,
+      linha_relacionada: 'content/linhas-pesquisa/buracos-negros.md',
+    });
+    expect(resultado.success).toBe(true);
+    if (resultado.success) {
+      expect(resultado.data.linha_relacionada).toEqual({ id: 'buracos-negros', collection: 'linhas-pesquisa' });
+    }
+  });
+
   it.each([1899, 2101, 1000, 3000])('rejeita `ano` fora de 1900–2100 (F-09): %d', (ano) => {
     const resultado = publicacoesSchema.safeParse({ ...valido, ano });
     expect(resultado.success).toBe(false);
