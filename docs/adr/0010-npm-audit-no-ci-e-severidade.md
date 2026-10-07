@@ -146,6 +146,39 @@ precisa de segredo.
 (b) registrar exceção **datada** com justificativa escrita neste ADR, ou (c) trocar a
 dependência. Nunca afrouxar o nível para passar.
 
+## Exceções datadas (2026-10-07)
+
+Em 2026-10-07 o CI do commit `8c5ff4d` reprovou no audit, sem chegar aos testes: 6 avisos
+`high`/`critical` novos, publicados depois do último CI verde (2026-10-02). Medição do
+`npm audit` antes de qualquer mudança: `25 high, 1 critical`, em seis advisories. Decisão do
+stakeholder: corrigir o que tem correção compatível e registrar exceção datada só para o que
+não tem saída, sem mexer no que está em produção.
+
+**Corrigidos com `npm update <pacote>`, um por vez** (o lock mudou só a versão de cada um):
+
+| Advisory                      | Pacote                 | Antes → depois |
+| ----------------------------- | ---------------------- | -------------- |
+| GHSA-jqcg-44mw-7w3h (crítica) | `proxy-addr`           | 2.0.7 → 2.0.8  |
+| GHSA-ch52-4w7c-c8xp           | `http-cache-semantics` | 4.2.0 → 4.3.0  |
+| GHSA-68fv-2mgg-jv7q           | `source-map-js`        | 1.2.1 → 1.2.2  |
+
+**Exceções**, em `scripts/auditar-dependencias.mjs` (`EXCECOES`), que passou a ser o passo de
+audit do CI no lugar de `npm audit --audit-level=high`. O nível não muda: qualquer outro aviso
+`high`/`critical` reprova.
+
+| Advisory            | Pacote                 | Por que não há saída hoje                                                                                                                                                                                      | Alcance                                                                                |
+| ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| GHSA-7mx3-vvmw-hjmv | `@graphql-tools/utils` | Só via `@tinacms/cli`; a correção do npm é o downgrade para `@tinacms/cli@0.56.5`                                                                                                                              | Build do painel e servidor local do Tina                                               |
+| GHSA-vfj7-8cjw-p6xm | `braces`               | Só via `tinacms`/`@tinacms/cli`; a correção do npm é downgrade do Tina                                                                                                                                         | Ferramentas de build (glob de arquivos)                                                |
+| GHSA-wq5f-xc86-pv6w | `sharp`                | O `miniflare` do `wrangler` fixa `sharp@0.35.4` exato, e até o `wrangler@4.148.0` (o mais recente) continua assim; a corrigida é a `0.35.5`. Subir só a cópia do `astro` duplicaria o pacote sem tirar o aviso | Build e servidor local (`wrangler dev`); o Worker publicado serve HTML estático (D-01) |
+
+Nenhuma das três alcança o visitante: o site publicado é HTML estático, sem Node nem React em
+execução (D-01).
+
+**Retirada:** o script avisa no log do CI quando uma exceção não aparece mais no audit. Nesse
+momento ela sai do script e desta tabela. Gatilhos esperados: o Tina publicar versões sem os
+pacotes vulneráveis, e o `wrangler` passar a fixar `sharp@0.35.5` ou superior.
+
 ## Alternativas consideradas
 
 - **Reprovar em `moderate`.** Rejeitada: as 8 moderadas de hoje (5 sem correção nossa, 3
@@ -186,6 +219,8 @@ dependência. Nunca afrouxar o nível para passar.
   moderadas sem correção nossa deixam de existir e este ADR deve ser atualizado.
 - Surgir uma `high`/`critical` nova na árvore — o CI já reprova sozinho; a decisão aqui é qual
   das três respostas (atualizar, exceção datada, trocar dependência) se aplica.
+- O log do CI avisar que uma exceção datada não aparece mais — retirá-la do script e da seção
+  "Exceções datadas".
 - O site público passar a carregar React — hoje impossível por D-01. Se isso mudar, a decisão
   de reprovar só em `high` (e não em `moderate`, por causa do `react-router`) precisa ser
   reaberta como decisão arquitetural própria, porque o alcance do advisory deixaria de estar

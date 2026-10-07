@@ -303,9 +303,9 @@ npm run test
 npm run build
 ```
 
-O CI (`.github/workflows/ci.yml`) roda `npm ci` → `npm audit --audit-level=high` → `lint` →
+O CI (`.github/workflows/ci.yml`) roda `npm ci` → `node scripts/auditar-dependencias.mjs` → `lint` →
 `format:check` → `test:coverage` → `build:pipeline` → `test:dist` em todo push e pull request para `main`. O
-passo de audit reprova em `high`/`critical` e só relata `moderate`/`low` (`docs/adr/0010-npm-audit-no-ci-e-severidade.md`).
+passo de audit reprova em `high`/`critical`, salvo as exceções datadas por id GHSA no próprio script, e só relata `moderate`/`low` (`docs/adr/0010-npm-audit-no-ci-e-severidade.md`).
 O passo `build:pipeline` substitui `npm run build`
 porque o cloud check do TinaCloud não é sinal de defeito do pipeline
 em nenhum dos dois gatilhos: em push para `main` o commit já está lá por construção e o que
@@ -345,5 +345,6 @@ são **8 moderadas**, de duas origens por trás do TinaCMS — 5 via
 `tinacms@3.12.1 → react-router-dom → react-router` e 3 via
 `@tinacms/cli@2.6.1 → altair-express-middleware → express`/`body-parser → qs` —, alcançando só
 o painel `/admin` (React, autenticado, uma pessoa) — o site público não carrega React (D-01).
-O CI reprova a partir de `high`/`critical`; a política, os números medidos e as
+O CI reprova a partir de `high`/`critical`, com três exceções datadas desde 2026-10-07 (seção
+"Exceções datadas" do ADR); a política, os números medidos e as
 alternativas rejeitadas estão em `docs/adr/0010-npm-audit-no-ci-e-severidade.md`.

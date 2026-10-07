@@ -26,7 +26,8 @@ jobs:
       - run: npm ci
       # Reprova em high/critical, nao em moderate: as moderadas de hoje nao tem correcao nossa
       # disponivel (ADR-0010) e reprovar por elas deixaria o portao vermelho permanentemente.
-      - run: npm audit --audit-level=high
+      # Desde 2026-10-07, o mesmo portao com excecoes datadas por id GHSA (ADR-0010, "Excecoes datadas").
+      - run: node scripts/auditar-dependencias.mjs
       - run: npm run lint
       - run: npm run format:check
       # test:coverage em vez de test: roda os mesmos testes e ainda impoe o
