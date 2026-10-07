@@ -12,7 +12,7 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.74 |
+| **Versão do PRD** | v0.1.75 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase, na branch `design`, em 2026-10-07**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
@@ -56,6 +56,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.72 | 2026-10-02 | Desenvolvedor | Fecha a fase 4 (plano 073): M-07 verificada, §7.2 fixa `@astrojs/sitemap` 3.7.4, §12 em 9/9 |
 | v0.1.73 | 2026-10-02 | Desenvolvedor | Fase 4 fechada (`/fechar-fase`): 365 testes, 100% de cobertura, 4 exceções de cobertura e 5 dívidas da revisão de integração |
 | v0.1.74 | 2026-10-07 | Desenvolvedor | Sabatina "Extensão" (3 decisões, `docs/sabatinas/CHANGELOG_sabatina_extensao.md`): RF-15 passa de notícias a Extensão (SHOULD), coleção `extensao` no lugar de `noticias` (§7.3), rotas `/extensao` e `/en/outreach` (§6.1); sai a linha de notícias do §6.3. Imagens do site passam a coloridas |
+| v0.1.75 | 2026-10-07 | Desenvolvedor | F-07 emendada: a Home EN (`/en/`) também fica sem o aviso de idioma (mantém `lang="pt-BR"`), a pedido do dono do produto |
 
 ---
 
@@ -276,7 +277,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | F-04 | Link do Google Drive quebrado ou sem permissão pública | O site continua exibindo o link (não há como validar em build time sem chamada externa); o manual instrui o professor a conferir o compartilhamento como "qualquer pessoa com o link" | Instrução no manual e texto de ajuda sob o campo de link |
 | F-05 | Publicação sem DOI, sem arXiv e sem PDF | A entrada aparece apenas com metadados; nenhum botão de link vazio é renderizado | — |
 | F-06 | Disciplina sem nenhuma aula cadastrada | A página existe com ementa e bibliografia; a seção Aulas exibe estado vazio explícito | "Nenhuma aula publicada ainda." |
-| F-07 | Item (ou campo) sem versão em inglês na rota `/en` | Exibe o conteúdo em português, com `lang="pt-BR"` no elemento; a página mostra **um único** aviso se qualquer campo traduzível caiu no PT (sabatina fase 4, Decisão 4). Texto sem campo em inglês recebe `lang="pt-BR"` sem ligar o aviso (Decisão 13). A Sobre (`/en/about/`) não mostra o aviso, mas mantém o `lang="pt-BR"` (Decisão 16) | Aviso por página, do dicionário `en` (ex.: "Some content on this page is only available in Portuguese") |
+| F-07 | Item (ou campo) sem versão em inglês na rota `/en` | Exibe o conteúdo em português, com `lang="pt-BR"` no elemento; a página mostra **um único** aviso se qualquer campo traduzível caiu no PT (sabatina fase 4, Decisão 4). Texto sem campo em inglês recebe `lang="pt-BR"` sem ligar o aviso (Decisão 13). A Sobre (`/en/about/`) e a Home (`/en/`) não mostram o aviso, mas mantêm o `lang="pt-BR"` (Decisão 16; Home por pedido de 2026-10-07) | Aviso por página, do dicionário `en` (ex.: "Some content on this page is only available in Portuguese") |
 | F-08 | Imagem ausente (perfil sem foto, postagem de extensão sem foto) | Layout degrada sem quebrar; nenhum espaço reservado vazio ou ícone de imagem quebrada | — |
 | F-09 | Conteúdo salvo com formato inesperado que a validação Zod rejeita | O build falha de forma ruidosa e nomeia o arquivo e o campo problemático; cai em F-02 | Log de build: "content/publicacoes/x.md → campo `ano`: esperado número entre 1900 e 2100" |
 | F-10 | Dois itens gerando o mesmo nome de arquivo | O Tina impede a criação duplicada; o template de nome inclui discriminador suficiente (ano + slug do título) | "Já existe um item com este nome." |

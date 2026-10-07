@@ -258,8 +258,9 @@ describe('aviso de idioma (F-07, RF-28)', () => {
   };
   const notice = strings('en').fallback.notice;
 
-  it('em /en/ o aviso aparece no máximo uma vez no <main>', () => {
-    expect(noticeCount('en/index.html', notice)).toBeLessThanOrEqual(1);
+  // Pedido de 2026-10-07: a Home EN sai do aviso, como a Sobre; o `lang` continua.
+  it('em /en/ o aviso aparece exatamente 0 vezes no <main>', () => {
+    expect(noticeCount('en/index.html', notice)).toBe(0);
   });
 
   // Sabatina fase 4, Decisão 16: o aviso quebrava a Sobre EN a 1366x650; o `lang` continua.

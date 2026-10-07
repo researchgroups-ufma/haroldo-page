@@ -12,7 +12,7 @@
  *  Atualizado em: 2026-10-07
  *  Versão       : 0.2.0
  *
- *  Dependências : BaseLayout, ExternalLink, ProfileLists, FallbackNotice, LanguageLink, src/i18n/fallback.ts,
+ *  Dependências : BaseLayout, ExternalLink, ProfileLists, LanguageLink, src/i18n/fallback.ts,
  *                 src/lib/config.ts (siteConfig, `Locale`),
  *                 src/lib/profile.ts, src/lib/navigation.ts, src/i18n/index.ts (strings),
  *                 src/lib/published.ts (requireSingleton), astro:content (getCollection)
@@ -22,17 +22,17 @@
  *                 <HomeView lang="en" /> em `src/pages/en/index.astro`
  *
  *  Notas        : texto de interface só de `strings(lang)` (§10.4 do PRD);
- *                 campos do perfil com fallback por campo (RN-06) e aviso (F-07).
+ *                 campos do perfil com fallback por campo (RN-06) e `lang`, sem o
+ *                 aviso de idioma (F-07; pedido de 2026-10-07, como a Sobre).
  * ============================================================================
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import FallbackNotice from '../components/FallbackNotice.astro';
 import LanguageLink from '../components/LanguageLink.astro';
 import ProfileLists from '../components/ProfileLists.astro';
 import { strings } from '../i18n';
-import { hasFallback, localize, localizeOptional } from '../i18n/fallback';
+import { localize, localizeOptional } from '../i18n/fallback';
 import { siteConfig, type Locale } from '../lib/config';
 import { navItems as navItemsFor } from '../lib/navigation';
 import { profileLinks } from '../lib/profile';
@@ -60,15 +60,6 @@ const formacao = (perfil.formacao ?? []).map((item) => ({
   curso: localize(item.curso, item.en?.curso, lang),
 }));
 const areas = (perfil.areas ?? []).map((area) => localize(area.nome, area.en?.nome, lang));
-// F-07: um aviso por página quando algum texto caiu no português.
-const showNotice = hasFallback([
-  cargo,
-  departamento,
-  instituicao,
-  resumo,
-  ...formacao.flatMap((item) => [item.grau, item.curso]),
-  ...areas,
-]);
 // Mesmo contato da Sobre: e-mail e perfis acadêmicos na ordem fixa do schema, CV por último.
 const links = profileLinks(perfil.links, perfil.cv_url, t.about.links);
 // A Home não lista a si mesma no menu.
@@ -132,7 +123,6 @@ const navItems = navItemsFor(lang).filter((item) => item.key !== 'home');
     <div aria-hidden="true" class="regua-entrada bg-tinta mt-6 h-px"></div>
 
     <div class="text-pequeno grid gap-x-8 gap-y-6 pt-4 sm:grid-cols-2 lg:grid-cols-12">
-      <FallbackNotice show={showNotice} class="sm:col-span-2 lg:col-span-12" />
       <div class="space-y-3 sm:col-span-2 lg:col-span-6">
         <div class="text-secundario">
           <p lang={cargo.lang}>{cargo.text}</p>

@@ -192,11 +192,11 @@ nativa, fina, nas cores do site.
 
 Uma linha de `text-pequeno` em `--secundario`, com o texto de `t.fallback.notice` ("Some content on
 this page is only available in Portuguese."). Aparece **uma vez por página**, só nas rotas `/en`, e só
-quando algum texto traduzível (RN-06) caiu no português. **Exceção: a Sobre EN (`/en/about/`) não
-mostra o aviso** (sabatina fase 4, Decisão 16): ele fazia a área de conteúdo transbordar a
-1366×650, e o `lang="pt-BR"` dos trechos continua. Nas páginas internas que o mostram (as de pesquisa e ensino) é o primeiro filho do
-conteúdo, logo abaixo da régua do cabeçalho, com o mesmo recuo lateral e `pt-4`; na Home é a primeira
-linha sob a régua, na largura toda da grade. Em português nunca aparece. O `lang="pt-BR"` do elemento
+quando algum texto traduzível (RN-06) caiu no português. **Exceções: a Sobre EN (`/en/about/`) e a
+Home EN (`/en/`) não mostram o aviso** (a Sobre pela sabatina fase 4, Decisão 16, porque ele fazia a
+área de conteúdo transbordar a 1366×650; a Home por pedido de 2026-10-07), e o `lang="pt-BR"` dos
+trechos continua. Nas páginas internas que o mostram (as de pesquisa e ensino) é o primeiro filho do
+conteúdo, logo abaixo da régua do cabeçalho, com o mesmo recuo lateral e `pt-4`. Em português nunca aparece. O `lang="pt-BR"` do elemento
 é independente do aviso: campo em português sem versão em inglês (instituições, `periodo`) leva
 `lang="pt-BR"` e **não** liga o aviso (sabatina fase 4, Decisão 13).
 
