@@ -12,9 +12,9 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.77 |
+| **Versão do PRD** | v0.1.78 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase, na branch `design`, em 2026-10-07** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, na `design` em 2026-10-07, sem commit**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase em 2026-10-07 (`6fac810`)** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, em 2026-10-07 (`8d929e7`)** · **Página de disciplina (RF-24) refeita no modelo D na `main` em 2026-10-07, sem commit**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
@@ -59,6 +59,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.75 | 2026-10-07 | Desenvolvedor | F-07 emendada: a Home EN (`/en/`) também fica sem o aviso de idioma (mantém `lang="pt-BR"`), a pedido do dono do produto |
 | v0.1.76 | 2026-10-07 | Desenvolvedor | Sabatina "Pesquisa modelo C" (10 decisões, `docs/sabatinas/CHANGELOG_sabatina_pesquisa-modelo-c.md`): RF-22 redesenhado com a imagem fixa por linha; `publicacoes` ganha `linha_relacionada` (§7.3) |
 | v0.1.77 | 2026-10-07 | Desenvolvedor | Sabatina "Ensino modelo A" (12 decisões, `docs/sabatinas/CHANGELOG_sabatina_ensino-modelo-a.md`): disciplina perene, sem semestre na página nem na URL; RF-23 com "Em curso" em cartões e "Encerradas" em lista, ordem alfabética; RF-24 com datas só em disciplina em curso; RF-37/F-13 com todos os scripts numa aba Scripts e atalho na aula; RN-03 com rótulos novos; `disciplinas` ganha `imagem`, perde `codigo` e `semestre` vira opcional (§7.3) |
+| v0.1.78 | 2026-10-07 | Desenvolvedor | Sabatina "Disciplina modelo D" (3 decisões): capa, abas fixas e cartões; "Última aula" só em curso; RF-24 sem mudança |
 
 ---
 

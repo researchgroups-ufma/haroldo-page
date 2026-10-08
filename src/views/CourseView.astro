@@ -5,8 +5,10 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : View da página de disciplina (RF-24, F-06, RN-04, RF-37, F-13;
  *                 sabatina fase 4, Decisão 6): seta de volta para Ensino,
- *                 cabeçalho com status, descrição e ementa (sem semestre nem código:
- *                 a disciplina é perene, sabatina "Ensino modelo A"), e
+ *                 cabeçalho com status (sem semestre nem código: a disciplina é
+ *                 perene, sabatina "Ensino modelo A"), capa com imagem,
+ *                 descrição, ementa e atalhos (`CourseCover`, sabatina
+ *                 "Disciplina modelo D"), e
  *                 as seções da disciplina em abas — aulas na ordem do professor
  *                 (estado vazio explícito, scripts por aula), "Scripts da
  *                 disciplina" (sem aula correspondente), listas, materiais,
@@ -15,14 +17,14 @@
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
  *  Atualizado em: 2026-10-07
- *  Versão       : 0.2.0
+ *  Versão       : 0.3.0
  *
- *  Dependências : BaseLayout, PageHeader, CoursePanel, LessonList, ScriptPanel,
- *                 CourseResources, CourseTabs, FallbackNotice,
+ *  Dependências : BaseLayout, PageHeader, CourseCover, CoursePanel, LessonList,
+ *                 ScriptPanel, CourseResources, CourseTabs, FallbackNotice,
  *                 src/scripts/course-tabs.ts, src/i18n (`strings`),
  *                 src/i18n/fallback.ts (`localize`, `localizeOptional`, `hasFallback`),
  *                 src/lib/config.ts (`Locale`), src/lib/routes.ts (routePath),
- *                 src/lib/text.ts (toParagraphs), src/lib/courses.ts
+ *                 src/lib/courses.ts
  *                 (groupScriptsByLesson, presentSections), astro:content
  *                 (`CollectionEntry`)
  *  Entradas     : props `lang` e `course` (ambas obrigatórias)
@@ -43,6 +45,7 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
+import CourseCover from '../components/CourseCover.astro';
 import CoursePanel from '../components/CoursePanel.astro';
 import CourseTabs from '../components/CourseTabs.astro';
 import LessonList from '../components/LessonList.astro';
@@ -53,7 +56,6 @@ import { strings } from '../i18n';
 import { hasFallback, localize, localizeOptional } from '../i18n/fallback';
 import type { Locale } from '../lib/config';
 import { routePath } from '../lib/routes';
-import { toParagraphs } from '../lib/text';
 import { groupScriptsByLesson, presentSections, scriptAnchor, scriptsForTab } from '../lib/courses';
 
 export interface Props {
@@ -89,9 +91,10 @@ const nome = localize(data.nome, data.en?.nome, lang);
 const descricao = localizeOptional(data.descricao, data.en?.descricao, lang);
 const ementa = localizeOptional(data.ementa, data.en?.ementa, lang);
 const showNotice = hasFallback([nome, descricao, ementa]);
-const descriptionParagraphs = toParagraphs(descricao?.text);
-const syllabusParagraphs = toParagraphs(ementa?.text);
 const lessons = data.aulas ?? [];
+// Sabatina "Disciplina modelo D", Decisão 2: "Última aula" só em curso, e é a última da lista do
+// professor (RN-04) — a mesma regra do cartão da listagem de Ensino.
+const latest = showDates ? lessons.at(-1) : undefined;
 ---
 
 <BaseLayout title={nome.text}>
@@ -101,58 +104,52 @@ const lessons = data.aulas ?? [];
     titleLang={nome.lang}
     meta={meta}
     back={{ href: routePath('teaching', lang), label: t.course.back }}
-  >
-    <Fragment slot="aside">
-      {
-        descriptionParagraphs.map((paragraph) => (
-          <p class="text-corpo" lang={descricao?.lang}>
-            {paragraph}
-          </p>
-        ))
-      }
-      {
-        syllabusParagraphs.length > 0 && (
-          <div class="mt-4">
-            <p class="text-rotulo text-secundario">{t.course.syllabus}</p>
-            {syllabusParagraphs.map((paragraph) => (
-              <p class="text-pequeno text-secundario mt-1" lang={ementa?.lang}>
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        )
-      }
-    </Fragment>
-  </PageHeader>
+  />
 
   <FallbackNotice show={showNotice} class="px-margem pt-4" />
-  <div class="px-margem">
+  <div class="px-margem pb-16">
+    <CourseCover
+      nome={nome}
+      imagem={data.imagem}
+      descricao={descricao}
+      ementa={ementa}
+      latest={latest}
+      hasProblemSets={(data.listas ?? []).length > 0}
+    />
+
     <CourseTabs lang={lang} tabs={tabs} />
 
-    <CoursePanel id="aulas" title={t.course.lessons}>
+    <div class="paineis min-w-0">
+      <CoursePanel id="aulas" title={t.course.lessons}>
+        {
+          lessons.length === 0 ? (
+            // F-06: estado vazio explícito — a disciplina existe, mas nenhuma aula foi cadastrada.
+            <p class="text-corpo text-secundario">{t.course.noLessons}</p>
+          ) : (
+            <LessonList
+              lessons={lessons}
+              scripts={lessonScripts}
+              showDates={showDates}
+              highlightLatest={showDates}
+            />
+          )
+        }
+      </CoursePanel>
+
       {
-        lessons.length === 0 ? (
-          // F-06: estado vazio explícito — a disciplina existe, mas nenhuma aula foi cadastrada.
-          <p class="text-corpo text-secundario">{t.course.noLessons}</p>
-        ) : (
-          <LessonList lessons={lessons} scripts={lessonScripts} showDates={showDates} />
+        tabScripts.length > 0 && (
+          <CoursePanel id="scripts" title={t.course.courseScripts}>
+            <div class="flex flex-col gap-4">
+              {tabScripts.map(({ script, lesson, anchor }) => (
+                <ScriptPanel script={script} id={anchor} lesson={lesson} />
+              ))}
+            </div>
+          </CoursePanel>
         )
       }
-    </CoursePanel>
 
-    {
-      tabScripts.length > 0 && (
-        <CoursePanel id="scripts" title={t.course.courseScripts}>
-          <div class="flex flex-col gap-4">
-            {tabScripts.map(({ script, lesson, anchor }) => (
-              <ScriptPanel script={script} id={anchor} lesson={lesson} />
-            ))}
-          </div>
-        </CoursePanel>
-      )
-    }
-
-    <CourseResources data={data} />
+      <CourseResources data={data} />
+    </div>
   </div>
 </BaseLayout>
 

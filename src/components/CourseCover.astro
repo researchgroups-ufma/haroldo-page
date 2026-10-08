@@ -1,0 +1,159 @@
+---
+/**
+ * ============================================================================
+ *  Arquivo      : CourseCover.astro
+ *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
+ *  Descrição    : Capa da página de disciplina (RF-24; sabatina "Disciplina
+ *                 modelo D"): imagem da disciplina (ou o bloco `tinta` com a
+ *                 inicial do nome), descrição, ementa e os atalhos "Última aula"
+ *                 (só em disciplina em curso, Decisão 2) e "Listas de
+ *                 exercícios" (só com lista).
+ *  Autor        : Desenvolvedor
+ *  Criado em    : 2026-10-07
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.1.0
+ *
+ *  Dependências : src/components/ExternalLink.astro, src/components/LangText.astro,
+ *                 src/i18n (`strings`), src/i18n/fallback.ts (`portugueseOnly`,
+ *                 tipo `LocalizedText`), src/lib/routes.ts (`localeFromPath`),
+ *                 src/lib/text.ts (toParagraphs), astro:content (tipo
+ *                 `CollectionEntry<'disciplinas'>`)
+ *  Entradas     : props `nome`, `imagem`, `descricao`, `ementa`, `latest` e
+ *                 `hasProblemSets`
+ *  Saídas       : `<div class="capa">` com a imagem e o texto da disciplina
+ *  Uso          : <CourseCover nome={nome} descricao={descricao} … /> em `CourseView`
+ * ============================================================================
+ */
+import type { CollectionEntry } from 'astro:content';
+import ExternalLink from './ExternalLink.astro';
+import LangText from './LangText.astro';
+import { strings } from '../i18n';
+import { portugueseOnly, type LocalizedText } from '../i18n/fallback';
+import { localeFromPath } from '../lib/routes';
+import { toParagraphs } from '../lib/text';
+
+type Lesson = NonNullable<CollectionEntry<'disciplinas'>['data']['aulas']>[number];
+
+export interface Props {
+  /** Nome da disciplina, já resolvido por idioma (RN-06). Obrigatório: dá a inicial do bloco. */
+  nome: LocalizedText;
+  /** Caminho da imagem da disciplina. Ausente: bloco `tinta` com a inicial do nome. */
+  imagem?: string;
+  /** Descrição resolvida por idioma. Ausente: nenhum parágrafo. */
+  descricao?: LocalizedText;
+  /** Ementa resolvida por idioma. Ausente: o bloco da ementa some. */
+  ementa?: LocalizedText;
+  /** Aula do botão "Última aula". Ausente (disciplina encerrada ou sem aula): sem botão. */
+  latest?: Lesson;
+  /** Mostra o botão para a aba de listas. Obrigatória: quem chama sabe se há lista. */
+  hasProblemSets: boolean;
+}
+
+const { nome, imagem, descricao, ementa, latest, hasProblemSets } = Astro.props;
+
+// decisão 2 do fatiamento da fase 4: componentes compartilhados derivam o idioma do caminho.
+const lang = localeFromPath(Astro.url.pathname);
+const t = strings(lang);
+const descriptionParagraphs = toParagraphs(descricao?.text);
+const syllabusParagraphs = toParagraphs(ementa?.text);
+---
+
+<div
+  class="capa grid gap-6 pt-8 sm:grid-cols-[minmax(0,15rem)_1fr] lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-10"
+>
+  <div class="overflow-hidden rounded-xl">
+    {
+      imagem ? (
+        <img
+          src={imagem}
+          alt=""
+          decoding="async"
+          class="capa-img aspect-[16/9] h-full w-full object-cover sm:aspect-[4/5]"
+        />
+      ) : (
+        // Mesma regra do cartão da listagem (sabatina "Ensino modelo A", Decisões 7 e 11).
+        <div
+          aria-hidden="true"
+          class="bg-tinta text-papel flex aspect-[16/9] h-full items-end p-4 sm:aspect-[4/5]"
+        >
+          <span class="text-display-1">{nome.text.charAt(0)}</span>
+        </div>
+      )
+    }
+  </div>
+  <div class="flex min-w-0 flex-col">
+    {
+      descriptionParagraphs.map((paragraph) => (
+        <p class="text-titulo-item max-w-medida" lang={descricao?.lang}>
+          {paragraph}
+        </p>
+      ))
+    }
+    {
+      syllabusParagraphs.length > 0 && (
+        <div class="mt-5">
+          <p class="text-rotulo text-secundario">{t.course.syllabus}</p>
+          {syllabusParagraphs.map((paragraph) => (
+            <p class="text-pequeno text-secundario max-w-medida mt-1" lang={ementa?.lang}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      )
+    }
+    {
+      (latest || hasProblemSets) && (
+        <div class="mt-6 flex flex-wrap gap-3 sm:mt-auto sm:pt-6">
+          {latest && (
+            <ExternalLink href={latest.url} class="botao botao-cheio">
+              <span class="shrink-0 whitespace-nowrap opacity-70">{t.teaching.latestLesson}</span>
+              {/* Decisão 13 (sabatina fase 4): título de aula é "P". */}
+              <LangText value={portugueseOnly(latest.titulo, lang)} />
+            </ExternalLink>
+          )}
+          {hasProblemSets && (
+            <a href="#listas" class="botao botao-traco">
+              {t.course.problemSets}
+            </a>
+          )}
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .capa-img {
+    transition: transform 900ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .capa:hover .capa-img {
+    transform: scale(1.03);
+  }
+
+  /* `:global`: a classe passa para `ExternalLink`, que não recebe o escopo deste arquivo. */
+  :global(.botao) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-tinta);
+    font-size: 0.875rem;
+    transition:
+      background-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+  :global(.botao-cheio) {
+    background: var(--color-tinta);
+    color: var(--color-papel);
+  }
+  :global(.botao-cheio:hover) {
+    background: transparent;
+    color: var(--color-tinta);
+  }
+  :global(.botao-traco:hover) {
+    background: var(--color-tinta);
+    color: var(--color-papel);
+  }
+</style>

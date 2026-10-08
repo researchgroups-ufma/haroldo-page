@@ -285,25 +285,36 @@ Modelo A (sabatina "Ensino modelo A", 2026-10-07). A disciplina é perene: **nen
 
 ### 6.5 Disciplina `/ensino/[slug]` (RF-24, RF-37, F-06, F-13)
 
+Modelo D (sabatina "Disciplina modelo D", 2026-10-07): capa, faixa de abas fixa e cartões.
+
 - `PageHeader` com a seta de volta para `/ensino/`, o **nome** na mesma posição do título das outras
-  páginas e meta "Em curso" ou "Encerrada", sem semestre nem código; à direita **descricao** e **ementa**.
-  Sem trilha de navegação.
+  páginas e meta "Em curso" ou "Encerrada", sem semestre nem código. Sem trilha de navegação.
+- **Capa**: a **imagem** à esquerda a partir de `sm` (4:5; 16:9 em cima no celular), ou o bloco
+  `tinta` com a inicial do nome; à direita a **descricao** em `titulo-item`, a **ementa** e os
+  botões "Última aula · **titulo** ↗" (cheio, só em curso, a última aula da lista do professor) e
+  "Listas de exercícios" (contorno, só com lista, leva a `#listas`).
 - As seções viram **abas** (melhoria progressiva: sem JS ficam empilhadas com os títulos; o `#id`
   da URL escolhe a aba, também quando é o de um elemento dentro dela, e rola até ele): Aulas,
   Scripts, Listas de exercícios, Materiais
-  complementares, Bibliografia, Links — só as presentes, **sem contagem** no rótulo.
+  complementares, Bibliografia, Links — só as presentes, **sem contagem** no rótulo. A faixa fica
+  **presa ao topo** durante a rolagem, com régua fina e um sublinhado de 2 px que desliza até a aba
+  escolhida. Trocar de aba no meio da leitura põe o painel novo logo abaixo da faixa; os painéis
+  têm altura mínima de uma tela para isso. No celular a faixa rola para o lado e esmaece à direita
+  enquanto houver aba fora da tela.
 - **Datas de aula e de entrega só em disciplina em curso**: na encerrada não aparecem, mesmo
   preenchidas (sabatina "Ensino modelo A", Decisão 8).
-- **Aulas**, na ordem do professor (RN-04): linha pequena "**numero** · **data**" (o leitor de
-  tela ouve "Aula N"), **titulo** ↗, **descricao** e, para cada script cuja **aula** casa, um
-  atalho "Script · **titulo** →" para o painel dele na aba Scripts. Sem aulas: "Nenhuma aula
-  publicada ainda." (F-06).
+- **Aulas**, na ordem do professor (RN-04), em **cartões** (fundo `papel`, borda `tinta` no hover;
+  o cartão inteiro abre a aula): **numero** num quadrado `tinta` (o leitor de tela ouve "Aula N"),
+  **titulo** ↗, **descricao** e uma linha com a **data**, o selo "Última aula" e, para cada script
+  cuja **aula** casa, o atalho "Script · **titulo** →" para o painel dele na aba Scripts. Em curso, a
+  última aula tem fundo `bloco` e borda. Sem aulas: "Nenhuma aula publicada ainda." (F-06).
 - **Scripts** (sabatina "Ensino modelo A", Decisão 12): **todos** os scripts da disciplina, nos
   painéis da 5.4 — primeiro os ligados a uma aula, na ordem das aulas, com "Aula N ·" antes de
   "Script · linguagem"; depois os sem **aula** ou com aula inexistente (F-13). A aba aparece com
   qualquer script.
-- **Listas**: **titulo** ↗ e "Entrega dd/mm/aaaa"; **Materiais**: linha pequena com o **tipo**
-  ("Slides", "Notas", "Complementar") acima do **titulo** ↗; **Bibliografia**; **Links**.
+- **Listas**, **Materiais** e **Links** em cartões, numa grade de dois a partir de `sm`. Lista:
+  **titulo** ↗ inteiro e "Entrega dd/mm/aaaa" embaixo; material: rótulo com o **tipo** ("Slides",
+  "Notas", "Complementar") acima do **titulo** ↗ e da **descricao**. **Bibliografia** numerada.
 - Toda seção exceto Aulas some quando vazia.
 
 ### 6.6 Publicações `/publicacoes` (RF-25, RN-02, F-05)

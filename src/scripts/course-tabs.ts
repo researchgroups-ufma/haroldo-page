@@ -5,11 +5,15 @@
  *  Descrição    : Script das abas da página de disciplina (RF-24): alterna os
  *                 painéis, atualiza o `#id` da URL, escolhe a aba pelo `#id`
  *                 (do painel ou de um elemento dentro dele, rolando até ele) e
- *                 trata as setas, `Home` e `End` do teclado.
+ *                 trata as setas, `Home` e `End` do teclado. Desliza o
+ *                 sublinhado até a aba escolhida, esmaece a borda da faixa
+ *                 quando há abas fora dela e, na troca pelo usuário, põe o
+ *                 painel novo logo abaixo da faixa presa ao topo (sabatina
+ *                 "Disciplina modelo D", Decisão 1).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
  *  Atualizado em: 2026-10-07
- *  Versão       : 0.2.0
+ *  Versão       : 0.3.0
  *
  *  Dependências : nenhuma
  *  Entradas     : DOM de `CourseTabs` (`#curso-abas`) e dos painéis de `CourseView`
@@ -31,15 +35,47 @@ if (tablist && tabs.length > 1) {
     (tab) => document.getElementById(tab.getAttribute('aria-controls') ?? '') as HTMLElement,
   );
 
+  const strip = tablist.parentElement;
+  const marker = tablist.querySelector<HTMLElement>('.indicador');
+  let current = 0;
+
+  // O sublinhado cobre só o texto da aba (sem o padding); a faixa rola até deixá-la à vista.
+  const place = () => {
+    const tab = tabs[current];
+    if (marker) {
+      const { paddingLeft, paddingRight } = getComputedStyle(tab);
+      const left = parseFloat(paddingLeft);
+      marker.style.width = `${tab.offsetWidth - left - parseFloat(paddingRight)}px`;
+      marker.style.transform = `translateX(${tab.offsetLeft + left}px)`;
+    }
+    tablist.scrollLeft = Math.max(0, tab.offsetLeft - tablist.clientWidth / 3);
+  };
+  const fade = () =>
+    tablist.classList.toggle(
+      'corta',
+      tablist.scrollLeft + tablist.clientWidth < tablist.scrollWidth - 1,
+    );
+
   const select = (index: number, { focus = false, updateHash = false } = {}) => {
+    current = index;
     tabs.forEach((tab, i) => {
       const selected = i === index;
       tab.setAttribute('aria-selected', String(selected));
       tab.tabIndex = selected ? 0 : -1;
       panels[i].hidden = !selected;
     });
+    place();
     if (focus) tabs[index].focus();
     if (updateHash) history.replaceState(null, '', `#${panels[index].id}`);
+  };
+
+  // Só na troca pelo usuário (o `#id` rola até o próprio alvo): se a leitura já passou do início
+  // do painel — faixa presa no topo —, o novo painel começa logo abaixo dela.
+  const keepUnderStrip = () => {
+    const panel = panels[current];
+    if (strip && panel.getBoundingClientRect().top < strip.getBoundingClientRect().bottom) {
+      panel.scrollIntoView({ block: 'start' });
+    }
   };
 
   panels.forEach((panel, i) => {
@@ -48,7 +84,12 @@ if (tablist && tabs.length > 1) {
     panel.tabIndex = 0;
   });
   tablist.hidden = false;
-  tablist.parentElement?.setAttribute('data-abas', '');
+  strip?.setAttribute('data-abas', '');
+  tablist.addEventListener('scroll', fade, { passive: true });
+  window.addEventListener('resize', () => {
+    place();
+    fade();
+  });
 
   // O `#id` escolhe a aba quando é o do painel ou o de algo dentro dele — o atalho da aula aponta
   // para o script na aba Scripts (sabatina "Ensino modelo A", Decisão 12). Nesse caso, depois de
@@ -70,10 +111,14 @@ if (tablist && tabs.length > 1) {
     return true;
   };
   if (!reveal()) select(0);
+  fade();
   window.addEventListener('hashchange', reveal);
 
   tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => select(i, { updateHash: true }));
+    tab.addEventListener('click', () => {
+      select(i, { updateHash: true });
+      keepUnderStrip();
+    });
     tab.addEventListener('keydown', (event) => {
       const last = tabs.length - 1;
       const targets: Record<string, number> = {
@@ -86,6 +131,7 @@ if (tablist && tabs.length > 1) {
       if (next === undefined) return;
       event.preventDefault();
       select(next, { focus: true, updateHash: true });
+      keepUnderStrip();
     });
   });
 }

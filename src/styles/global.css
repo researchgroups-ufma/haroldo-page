@@ -220,6 +220,34 @@ a:is(:hover, :focus-visible) > .link-traco::after,
   transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
+/* Cartão da página de disciplina (aulas, listas, materiais, links — sabatina "Disciplina modelo
+   D"): fundo `papel` sobre o `bloco`, borda que aparece no hover e no foco. O título é o link, e o
+   `::after` dele estende o clique ao cartão; o que precisar de clique próprio dentro do cartão
+   (atalho do script) fica por cima com `relative z-10`. */
+.cartao {
+  position: relative;
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--color-papel);
+  border: 1px solid transparent;
+  transition: border-color 200ms ease-out;
+}
+.cartao:hover,
+.cartao:focus-within {
+  border-color: var(--color-tinta);
+}
+.cartao-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+}
+.cartao-link:focus-visible {
+  outline: none;
+}
+
 /* Transições entre páginas (View Transitions entre documentos, só CSS). O cartão fica parado, o
    nome e o menu migram entre a Home e o cabeçalho, e o conteúdo troca com um fade curto.
    Navegador sem suporte navega normalmente. */

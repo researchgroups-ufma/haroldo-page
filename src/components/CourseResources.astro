@@ -5,7 +5,9 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Listas de exercícios, materiais complementares,
  *                 bibliografia e links de uma disciplina (RF-24), cada um
- *                 num `CoursePanel` (painel de aba) em linhas enxutas. Cada
+ *                 num `CoursePanel` (painel de aba): listas, materiais e links
+ *                 em cartões numa grade de dois a partir de `sm` (sabatina
+ *                 "Disciplina modelo D"), bibliografia numerada. Cada
  *                 seção só aparece se o array correspondente tiver ao menos
  *                 um item (§6.5 da identidade: "Toda seção exceto Aulas some
  *                 quando vazia"). Extraído de `src/pages/ensino/[slug].astro`
@@ -13,7 +15,7 @@
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-18
  *  Atualizado em: 2026-10-07
- *  Versão       : 0.5.0
+ *  Versão       : 0.6.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/CoursePanel.astro,
  *                 src/components/LangText.astro, src/i18n (`strings`),
@@ -62,19 +64,17 @@ const pt = (text: string) => portugueseOnly(text, lang);
 {
   listas.length > 0 && (
     <CoursePanel id="listas" title={t.course.problemSets}>
-      <ul>
+      <ul class="grid gap-3 sm:grid-cols-2">
         {listas.map((lista) => (
-          <li class="recurso-linha grid grid-cols-[1fr_auto] items-baseline gap-4 py-3">
-            <ExternalLink
-              href={lista.url}
-              class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
-            >
+          <li class="cartao flex-col">
+            {/* Título inteiro (sabatina "Disciplina modelo D", Decisão 3). */}
+            <ExternalLink href={lista.url} class="cartao-link text-titulo-item">
               <LangText value={pt(lista.titulo)} />
             </ExternalLink>
             {showDates && lista.data_entrega && (
-              <span class="text-pequeno text-secundario">
+              <p class="text-pequeno mt-auto pt-4">
                 {t.course.dueDate(formatDate(lista.data_entrega, lang))}
-              </span>
+              </p>
             )}
           </li>
         ))}
@@ -85,23 +85,18 @@ const pt = (text: string) => portugueseOnly(text, lang);
 {
   materiais.length > 0 && (
     <CoursePanel id="materiais" title={t.course.materials}>
-      <ul>
+      <ul class="grid gap-3 sm:grid-cols-2">
         {materiais.map((material) => (
-          <li class="recurso-linha py-3">
-            <p class="text-pequeno text-secundario">{t.course.materialType[material.tipo]}</p>
-            <div>
-              <ExternalLink
-                href={material.url}
-                class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
-              >
-                <LangText value={pt(material.titulo)} />
-              </ExternalLink>
-              {material.descricao && (
-                <p class="text-pequeno text-secundario mt-1" lang={pt(material.descricao).lang}>
-                  {material.descricao}
-                </p>
-              )}
-            </div>
+          <li class="cartao flex-col gap-0">
+            <p class="text-rotulo text-secundario">{t.course.materialType[material.tipo]}</p>
+            <ExternalLink href={material.url} class="cartao-link text-titulo-item mt-2">
+              <LangText value={pt(material.titulo)} />
+            </ExternalLink>
+            {material.descricao && (
+              <p class="text-pequeno text-secundario mt-1" lang={pt(material.descricao).lang}>
+                {material.descricao}
+              </p>
+            )}
           </li>
         ))}
       </ul>
@@ -129,13 +124,10 @@ const pt = (text: string) => portugueseOnly(text, lang);
 {
   links.length > 0 && (
     <CoursePanel id="links" title={t.course.links}>
-      <ul>
+      <ul class="grid gap-3 sm:grid-cols-2">
         {links.map((link) => (
-          <li class="recurso-linha py-3">
-            <ExternalLink
-              href={link.url}
-              class="text-titulo-item decoration-1 underline-offset-[6px] hover:underline"
-            >
+          <li class="cartao">
+            <ExternalLink href={link.url} class="cartao-link text-titulo-item">
               <LangText value={pt(link.titulo)} />
             </ExternalLink>
           </li>
@@ -144,13 +136,3 @@ const pt = (text: string) => portugueseOnly(text, lang);
     </CoursePanel>
   )
 }
-
-<style>
-  /* Linhas com régua fina entre elas, régua forte na primeira — o padrão de lista do site. */
-  .recurso-linha {
-    border-top: 1px solid var(--color-regua);
-  }
-  .recurso-linha:first-child {
-    border-top-color: var(--color-tinta);
-  }
-</style>

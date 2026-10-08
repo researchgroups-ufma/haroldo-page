@@ -7,21 +7,26 @@
  *                 estilo. Melhoria progressiva (RNF-02) — sem JS, ou com uma
  *                 seção só, o `tablist` fica oculto e as seções ficam
  *                 empilhadas com os títulos; o `#id` da URL escolhe a aba inicial.
+ *                 Com as abas ativas, a faixa fica presa ao topo durante a
+ *                 rolagem, com um sublinhado que desliza até a aba escolhida
+ *                 (sabatina "Disciplina modelo D", Decisão 1).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-09-30
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-10-07
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/i18n (strings), src/lib/config.ts (`Locale`),
  *                 src/lib/courses.ts (`SectionKey`)
  *  Entradas     : props `lang` (obrigatória) e `tabs` (obrigatória: `{ id, key }[]`,
  *                 já sem `syllabus`)
- *  Saídas       : `#curso-abas` (oculto até o script rodar) e o estilo das abas
- *  Uso          : <CourseTabs lang={lang} tabs={tabs} /> acima dos painéis da disciplina
+ *  Saídas       : `div.faixa` com `#curso-abas` (oculto até o script rodar) e o
+ *                 estilo das abas e dos painéis irmãos (`.paineis`)
+ *  Uso          : <CourseTabs lang={lang} tabs={tabs} /> logo antes do `div.paineis`
  *
  *  Notas        : o script vive em `src/scripts/course-tabs.ts`, importado por
- *                 `CourseView` (aqui ele seria emitido antes dos painéis); os
- *                 painéis (`CoursePanel`, com o `id` de cada aba) ficam na view.
+ *                 `CourseView` (aqui ele seria emitido antes dos painéis); ele
+ *                 marca a faixa com `data-abas`, e os painéis (`CoursePanel`, com
+ *                 o `id` de cada aba) ficam no `div.paineis` irmão, na view.
  * ============================================================================
  */
 import { strings } from '../i18n';
@@ -39,50 +44,90 @@ const { lang, tabs } = Astro.props;
 const t = strings(lang);
 ---
 
-<div
-  id="curso-abas"
-  role="tablist"
-  aria-label={t.course.tabsLabel}
-  hidden
-  class="flex [scrollbar-width:none] gap-6 overflow-x-auto overflow-y-hidden pt-6"
->
-  {
-    tabs.map((tab) => (
-      <button
-        type="button"
-        role="tab"
-        id={`aba-${tab.id}`}
-        aria-controls={tab.id}
-        aria-selected="false"
-        tabindex="-1"
-        class="aba text-pequeno -mb-px shrink-0 border-b py-3 whitespace-nowrap"
-      >
-        {t.course[tab.key]}
-      </button>
-    ))
-  }
+<div class="faixa mt-12 min-w-0">
+  <div
+    id="curso-abas"
+    role="tablist"
+    aria-label={t.course.tabsLabel}
+    hidden
+    class="abas relative flex [scrollbar-width:none] gap-1 overflow-x-auto"
+  >
+    <span aria-hidden="true" class="indicador"></span>
+    {
+      tabs.map((tab) => (
+        <button
+          type="button"
+          role="tab"
+          id={`aba-${tab.id}`}
+          aria-controls={tab.id}
+          aria-selected="false"
+          tabindex="-1"
+          class="aba text-nav relative shrink-0 text-left whitespace-nowrap"
+        >
+          {t.course[tab.key]}
+        </button>
+      ))
+    }
+  </div>
 </div>
 
 <style>
+  /* A faixa acompanha a rolagem: a lista de aulas é longa e as abas não podem sumir. */
+  :global(.faixa[data-abas]) {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    margin-bottom: 2rem;
+    background: var(--color-bloco);
+  }
+  /* Régua por sombra interna, não borda: o sublinhado (absoluto, `bottom: 0`) passa por cima dela. */
+  .abas {
+    box-shadow: inset 0 -1px var(--color-regua);
+  }
+  /* No celular a faixa rola para o lado; o esmaecimento avisa que há abas além da borda. */
+  .abas:global(.corta) {
+    mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+  }
+
   .aba {
-    border-color: transparent;
+    padding: 0.875rem 0.75rem;
     color: var(--color-secundario);
+    transition: color 200ms ease-out;
+  }
+  .aba:first-of-type {
+    padding-left: 0;
   }
   .aba:hover,
   .aba[aria-selected='true'] {
     color: var(--color-tinta);
   }
-  .aba[aria-selected='true'] {
-    border-color: var(--color-tinta);
+  .indicador {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--color-tinta);
+    transition:
+      transform 420ms cubic-bezier(0.2, 0, 0, 1),
+      width 420ms cubic-bezier(0.2, 0, 0, 1);
   }
 
-  /* Com as abas ativas, a régua forte da primeira linha do painel é a base das abas. */
-  :global([data-abas] .curso-painel) {
+  /* Painel curto não encurta a página ao trocar de aba — senão o navegador recua a rolagem e a
+     faixa desce para o meio da tela. A margem de rolagem deixa o painel, e o alvo de um `#id`
+     dentro dele, começar sob a faixa. */
+  :global([data-abas] ~ .paineis) {
+    min-height: 100svh;
+  }
+  :global([data-abas] ~ .paineis .curso-painel),
+  :global([data-abas] ~ .paineis [id]) {
+    scroll-margin-top: 5.5rem;
+  }
+  :global([data-abas] ~ .paineis .curso-painel) {
     padding-top: 0;
   }
 
   /* Com as abas ativas, a aba mostra o título — o <h2> do painel fica só para leitor de tela. */
-  :global([data-abas] .painel-titulo) {
+  :global([data-abas] ~ .paineis .painel-titulo) {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -92,18 +137,26 @@ const t = strings(lang);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .aba {
-      transition:
-        color 150ms ease-out,
-        border-color 150ms ease-out;
+    :global([data-abas] ~ .paineis .curso-painel:not([hidden]) .cartao) {
+      animation: cartao-entra 420ms cubic-bezier(0.2, 0, 0, 1) both;
     }
-    :global([data-abas] .curso-painel:not([hidden])) {
-      animation: painel-entra 200ms ease-out;
+    /* Entrada em cascata: todo cartão é um `li.cartao`. */
+    :global(.curso-painel li.cartao:nth-child(2)) {
+      animation-delay: 50ms;
     }
-    @keyframes painel-entra {
+    :global(.curso-painel li.cartao:nth-child(3)) {
+      animation-delay: 100ms;
+    }
+    :global(.curso-painel li.cartao:nth-child(4)) {
+      animation-delay: 150ms;
+    }
+    :global(.curso-painel li.cartao:nth-child(n + 5)) {
+      animation-delay: 200ms;
+    }
+    @keyframes cartao-entra {
       from {
         opacity: 0;
-        transform: translateY(4px);
+        transform: translateY(12px);
       }
     }
   }
