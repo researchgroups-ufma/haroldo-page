@@ -1190,16 +1190,42 @@ All files          |     100 |    99.15 |     100 |     100 |
 
 `npm run lint` limpo, `format:check` limpo, `astro check`: `0 errors, 0 warnings, 0 hints`.
 
-**Tarefa 2** (`ffbe5ae`). Ensaio local:
+**Tarefa 2** (`ffbe5ae`). O ensaio local deu a mesma saída do run 37957835889 do workflow; abaixo, o passo "Busca publicacoes novas" desse run, colado sem cortes:
 
 ```
 ORCID 0000-0002-3702-7683: 28 trabalhos
-  sem DOI, ignorado: (4 registros)
-  + content/publicacoes/… (23 arquivos)
+  sem DOI, ignorado: Static boson stars in the Einstein-Friedberg-Lee-Sirlin theory and their astrophysical images
+  sem DOI, ignorado: Electrically charged regular black holes in nonlinear electrodynamics: light rings, shadows and gravitational lensing
+  sem DOI, ignorado: Scalar scattering by black holes and wormholes
+  sem DOI, ignorado: Tidal forces in dirty black hole spacetimes
+  + content/publicacoes/2026-inspirals-into-bosonic-dark-matter-stars-and-chirp-mimickers.md
+  + content/publicacoes/2026-two-shadows-of-a-single-black-hole-vacuum-birefringence-phenomena-within-einstein-nonlinear-electrodynamics.md
+  + content/publicacoes/2026-spherical-einstein-friedberg-lee-sirlin-boson-stars-self-interacting-solutions-and-their-astrophysical-appearance.md
+  + content/publicacoes/2025-on-the-resolution-of-space-time-singularities-in-spherically-symmetric-black-holes-geodesic-completeness-curvature-scalars-and-tidal-forces.md
+  + content/publicacoes/2025-good-tachyons-bad-bradyons-role-reversal-in-einstein-nonlinear-electrodynamics-models.md
+  + content/publicacoes/2024-spectral-lines-of-dirty-wormholes.md
+  + content/publicacoes/2024-static-boson-stars-in-the-einstein-friedberg-lee-sirlin-theory-and-their-astrophysical-images.md
+  + content/publicacoes/2024-singular-space-times-with-bounded-algebraic-curvature-scalars.md
+  + content/publicacoes/2023-electrically-charged-regular-black-holes-in-nonlinear-electrodynamics-light-rings-shadows-and-gravitational-lensing.md
+  + content/publicacoes/2023-quasinormal-modes-of-a-holonomy-corrected-schwarzschild-black-hole.md
+  + content/publicacoes/2023-shadows-of-black-holes-with-dark-matter-halo.md
+  + content/publicacoes/2022-einstein-maxwell-dilaton-neutral-black-holes-in-strong-magnetic-fields-topological-charge-shadows-and-lensing.md
+  + content/publicacoes/2022-scalar-scattering-by-black-holes-and-wormholes.md
+  + content/publicacoes/2022-tidal-forces-in-dirty-black-hole-spacetimes.md
+  + content/publicacoes/2021-can-different-black-holes-cast-the-same-shadow.md
+  + content/publicacoes/2021-equivalence-principle-in-reissner-nordstrom-geometry.md
+  + content/publicacoes/2021-shadows-and-lensing-of-black-holes-immersed-in-strong-magnetic-fields.md
+  + content/publicacoes/2020-4d-einstein-gauss-bonnet-gravity-massless-particles-and-absorption-of-planar-spin-0-waves.md
+  + content/publicacoes/2020-spinning-black-holes-with-a-separable-hamilton-jacobi-equation-from-a-modified-newman-janis-algorithm.md
+  + content/publicacoes/2020-comment-on-the-equivalence-principle-in-the-schwarzschild-geometry-am-j-phys-62-1037-1994.md
+  + content/publicacoes/2020-scalar-absorption-black-holes-versus-wormholes.md
+  + content/publicacoes/2020-tidal-forces-in-the-charged-hayward-black-hole-spacetime.md
+  + content/publicacoes/2020-on-axis-tidal-forces-in-kerr-spacetime.md
   DOI desconhecido na Crossref, marcado como visto: 10.1142/so21827182041014x (Tidal forces in the charged Hayward black hole spacetime)
 23 publicação(ões) nova(s); 1 DOI(s) só marcado(s) como visto(s).
-mudou=1 / novos=23 ; data/orcid-vistos.json com 24 DOIs
 ```
+
+`GITHUB_OUTPUT` do ensaio: `mudou=1`, `novos=23`; `data/orcid-vistos.json` com 24 DOIs.
 
 - `tests/content`: 145/145.
 - Professor presente nos 23 arquivos (`grep -L` vazio).
@@ -1228,6 +1254,16 @@ mudou=1 / novos=23 ; data/orcid-vistos.json com 24 DOIs
   rascunho real de `content/extensao/`.
 - No Vivaldi, `/pesquisa/`, `/en/research/`, `/` e `/en/`: nenhum `[EXEMPLO]` de publicação e
   nenhuma lista vazia.
+
+**Revisão final** (code-reviewer, Opus). Corrigidos:
+
+- **1:** DOI da DataCite (arXiv, Zenodo) virava "desconhecido". Agora o 404 consulta `/agency`
+  e o aviso diz a agência. Teste `unknownDoiWarning` RED→GREEN.
+- **2:** "0 < a < 1" era lido como tag. Teste RED→GREEN.
+- **6:** o README induzia o commit do `vistos`.
+- **8:** este bloco, que antes vinha resumido.
+
+Adiados, por serem Minor: 3, 4, 5 e 7 (lista no resumo da sessão).
 
 **Achado fora do escopo, para o stakeholder:** `PublicationItem.astro` junta os autores com `, `. No
 formato `Sobrenome, Prenome` (Decisão 4) a fronteira entre autores fica ambígua, como em "Furuta,

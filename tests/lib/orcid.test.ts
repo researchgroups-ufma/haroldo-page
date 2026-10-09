@@ -13,6 +13,7 @@ import {
   parseCrossref,
   parseOrcidWorks,
   selectNew,
+  unknownDoiWarning,
   type CrossrefAuthor,
   type OrcidWork,
 } from '../../src/lib/orcid';
@@ -323,6 +324,38 @@ describe('commitMessage', () => {
   it('só DOI marcado como visto: chore', () => {
     expect(commitMessage([], ['10.1142/so21827182041014x'])).toBe(
       'chore: DOIs do ORCID marcados como vistos\n\n- 10.1142/so21827182041014x\n',
+    );
+  });
+});
+
+describe('títulos com desigualdade (revisão final, achado 2)', () => {
+  const comTitulo = (value: string) =>
+    parseOrcidWorks({
+      group: [{ 'work-summary': [{ title: { title: { value } }, type: 'journal-article' }] }],
+    })[0].title;
+
+  it('"<" e ">" soltos não são marcação e ficam no título', () => {
+    expect(comTitulo('Bounds for 0 < a < 1 and b > 2')).toBe('Bounds for 0 < a < 1 and b > 2');
+  });
+
+  it('marcação de verdade sai, inclusive com prefixo de namespace', () => {
+    expect(comTitulo('Ce<sub>2</sub>(MoO<sub>4</sub>) and <mml:math>x</mml:math>')).toBe(
+      'Ce2(MoO4) and x',
+    );
+  });
+});
+
+describe('unknownDoiWarning (revisão final, achado 1)', () => {
+  it('DOI que nenhuma agência conhece: desconhecido', () => {
+    expect(unknownDoiWarning('10.1142/so21827182041014x', 'Tidal forces', null)).toBe(
+      'DOI desconhecido na Crossref, marcado como visto: 10.1142/so21827182041014x (Tidal forces)',
+    );
+  });
+
+  it('DOI de outra agência (arXiv/DataCite): diz qual e pede o cadastro pelo painel', () => {
+    expect(unknownDoiWarning('10.48550/arxiv.2101.00001', 'Um preprint', 'DataCite')).toBe(
+      'DOI registrado na DataCite, não na Crossref; marcado como visto, cadastre pelo painel: ' +
+        '10.48550/arxiv.2101.00001 (Um preprint)',
     );
   });
 });

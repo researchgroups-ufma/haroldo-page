@@ -119,10 +119,11 @@ const ENTITIES: Record<string, string> = {
 };
 
 // Tira a marcação JATS da Crossref (<i>, <sub>) e junta qualquer espaço, inclusive o fino
-// (U+2009) que ela põe entre iniciais: o site mostra texto puro.
+// (U+2009) que ela põe entre iniciais: o site mostra texto puro. Só conta como marcação o `<`
+// seguido de nome de tag: "0 < a < 1 and b > 2" é título de física, não tag.
 function cleanText(raw: string): string {
   return raw
-    .replace(/<[^>]+>/g, '')
+    .replace(/<\/?[A-Za-z][\w:-]*[^>]*>/g, '')
     .replace(/&(amp|lt|gt|quot|#39);/g, (entity) => ENTITIES[entity])
     .replace(/\s+/g, ' ')
     .trim();
@@ -298,6 +299,22 @@ export function buildPublication(
       doi: work.doi,
     },
   };
+}
+
+/**
+ * Aviso de log para um DOI que a Crossref não tem (404). Ele vira visto nos dois casos, mas a
+ * mensagem diz se o DOI não existe (corrigir no ORCID resolve) ou se é de outra agência, como os
+ * preprints do arXiv e o Zenodo na DataCite (cadastro pelo painel).
+ *
+ * @param doi DOI normalizado.
+ * @param title Título do ORCID, para achar o trabalho no log.
+ * @param agency Rótulo da agência dona do DOI (`/works/{doi}/agency`), ou `null` se nenhuma o conhece.
+ * @returns A linha de aviso.
+ */
+export function unknownDoiWarning(doi: string, title: string, agency: string | null): string {
+  return agency
+    ? `DOI registrado na ${agency}, não na Crossref; marcado como visto, cadastre pelo painel: ${doi} (${title})`
+    : `DOI desconhecido na Crossref, marcado como visto: ${doi} (${title})`;
 }
 
 /**

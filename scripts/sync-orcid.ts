@@ -44,6 +44,7 @@ import {
   parseCrossref,
   parseOrcidWorks,
   selectNew,
+  unknownDoiWarning,
   type CrossrefWork,
   type PublicationEntry,
 } from '../src/lib/orcid.ts';
@@ -59,7 +60,7 @@ const YAML = { language: 'yaml', lineWidth: -1 };
 
 type CrossrefResult =
   | { status: 'ok'; work: CrossrefWork }
-  | { status: 'ausente' }
+  | { status: 'ausente'; agencia: string | null }
   | { status: 'falha'; motivo: string };
 
 /** ORCID iD do professor, lido do perfil para que trocar no painel troque a fonte. */
@@ -104,9 +105,19 @@ async function buscarCrossref(doi: string, mailto: string): Promise<CrossrefResu
     const res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`, {
       headers: { 'User-Agent': mailto ? `${USER_AGENT} mailto:${mailto}` : USER_AGENT },
     });
-    if (res.status === 404) return { status: 'ausente' };
-    if (!res.ok) return { status: 'falha', motivo: `HTTP ${res.status}` };
-    return { status: 'ok', work: parseCrossref((await res.json()).message) };
+    if (!res.ok && res.status !== 404) return { status: 'falha', motivo: `HTTP ${res.status}` };
+    if (res.ok) return { status: 'ok', work: parseCrossref((await res.json()).message) };
+    // 404 não quer dizer DOI inexistente: preprints do arXiv e o Zenodo são da DataCite. A agência
+    // dona do DOI decide o aviso; se a consulta dela falhar, o DOI fica para a próxima execução.
+    const agencia = await fetch(
+      `https://api.crossref.org/works/${encodeURIComponent(doi)}/agency`,
+      {
+        headers: { 'User-Agent': mailto ? `${USER_AGENT} mailto:${mailto}` : USER_AGENT },
+      },
+    );
+    if (agencia.status === 404) return { status: 'ausente', agencia: null };
+    if (!agencia.ok) return { status: 'falha', motivo: `agency HTTP ${agencia.status}` };
+    return { status: 'ausente', agencia: String((await agencia.json()).message.agency.label) };
   } catch (erro) {
     return { status: 'falha', motivo: String(erro) };
   }
@@ -137,9 +148,7 @@ async function main(): Promise<void> {
       continue;
     }
     if (crossref.status === 'ausente') {
-      console.warn(
-        `  DOI desconhecido na Crossref, marcado como visto: ${work.doi} (${work.title})`,
-      );
+      console.warn(`  ${unknownDoiWarning(work.doi, work.title, crossref.agencia)}`);
       soMarcados.push(work.doi);
       continue;
     }

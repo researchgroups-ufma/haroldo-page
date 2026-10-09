@@ -268,15 +268,18 @@ Crossref. O trabalho está em `scripts/sync-orcid.ts`; as funções puras ficam 
 Decisões em `docs/sabatinas/CHANGELOG_sabatina_sync-orcid.md`.
 
 - **Rodar à mão:** aba Actions → ORCID → Run workflow, ou `gh workflow run orcid.yml`. Para ver o
-  que seria importado sem publicar, rode `npm run sync-orcid` localmente e descarte os arquivos
-  gerados.
+  que seria importado sem publicar, rode `npm run sync-orcid` localmente e desfaça tudo com
+  `git clean -f content/publicacoes` e `git checkout data/orcid-vistos.json`. O script também
+  reescreve o `vistos`, e um `vistos` commitado por engano marca DOIs como vistos sem importá-los.
 - **Só acrescenta.** Nunca altera nem apaga arquivo. `data/orcid-vistos.json` guarda os DOIs já
   vistos: publicação apagada ou despublicada no painel não volta. Para reimportar uma, tire o DOI
   desse arquivo.
 - **O que fica de fora, com aviso no log** (passo "Busca publicacoes novas"):
   - registro sem DOI;
-  - DOI que a Crossref não conhece (404), que vira visto (corrigir o DOI no ORCID faz o certo
-    entrar na semana seguinte);
+  - DOI que a Crossref não conhece (404), que vira visto. O aviso diz o caso: "desconhecido"
+    quando o DOI não existe (corrigir o DOI no ORCID faz o certo entrar na semana seguinte);
+    "registrado na DataCite" (ou outra agência) quando é de preprint do arXiv ou do Zenodo, que se
+    cadastra pelo painel;
   - DOI cuja consulta à Crossref falhou por rede ou 5xx, que fica para a próxima execução.
 - **Autores** saem como a Crossref os divide (`Sobrenome, Prenome`). O professor sai sempre como
   `LIMA JUNIOR, HAROLDO C. D.`: ele é reconhecido pelo ORCID ou, nos registros sem ORCID, pelo nome
