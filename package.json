@@ -18,7 +18,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:dist": "vitest run -c vitest.dist.config.ts",
-    "deploy": "vitest run tests/content && npm run build && wrangler deploy"
+    "deploy": "vitest run tests/content && npm run build && wrangler deploy",
+    "sync-orcid": "node scripts/sync-orcid.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",

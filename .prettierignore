@@ -21,3 +21,7 @@ content/
 # projeto. Sem esta linha, todo `tinacms dev` local deixaria o format:check
 # vermelho outra vez.
 tina/tina-lock.json
+
+# Lista de DOIs gravada pelo scripts/sync-orcid.ts (RF-17), num formato que é dele, não do
+# Prettier: sem esta linha, o commit do workflow do ORCID deixaria o format:check vermelho.
+data/orcid-vistos.json
