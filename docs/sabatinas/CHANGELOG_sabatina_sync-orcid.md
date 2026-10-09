@@ -87,6 +87,10 @@ para a próxima execução, como no lafim.
 no ORCID, o DOI corrigido é outro e entra normalmente. Descartados: tentar toda semana (o lafim) e
 falhar o workflow (bloquearia o resto da importação).
 **Impacto no PRD:** critério de aceite do RF-17.
+**Nota de 2026-10-09 (revisão final do plano):** 404 da Crossref também acontece com DOI válido de
+outra agência, como os preprints do arXiv e o Zenodo, que são da DataCite. A regra continua (vira
+visto), mas o sync consulta `/works/{doi}/agency` e o aviso diz qual é o caso: DOI inexistente
+(corrigir no ORCID) ou de outra agência (cadastrar pelo painel). Commit `bef594c`.
 
 ## Decisão 7 — As publicações de exemplo saem
 
