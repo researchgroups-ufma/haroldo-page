@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.78 |
+| **Versão do PRD** | v0.1.79 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase em 2026-10-07 (`6fac810`)** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, em 2026-10-07 (`8d929e7`)** · **Página de disciplina (RF-24) refeita no modelo D na `main` em 2026-10-07, sem commit**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/17 · **Extensão (RF-15) implementada fora de fase em 2026-10-07 (`6fac810`)** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, em 2026-10-07 (`8d929e7`)** · **Página de disciplina (RF-24) refeita no modelo D na `main` em 2026-10-07, sem commit** · **Sync do ORCID (RF-17) decidido em sabatina em 2026-10-09, sem plano**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-10-07 |
+| **Última atualização** | 2026-10-09 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav`; `docs/historico-de-implementacao.md` (histórico de implementação e versões antigas deste PRD) |
 
@@ -60,6 +60,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.76 | 2026-10-07 | Desenvolvedor | Sabatina "Pesquisa modelo C" (10 decisões, `docs/sabatinas/CHANGELOG_sabatina_pesquisa-modelo-c.md`): RF-22 redesenhado com a imagem fixa por linha; `publicacoes` ganha `linha_relacionada` (§7.3) |
 | v0.1.77 | 2026-10-07 | Desenvolvedor | Sabatina "Ensino modelo A" (12 decisões, `docs/sabatinas/CHANGELOG_sabatina_ensino-modelo-a.md`): disciplina perene, sem semestre na página nem na URL; RF-23 com "Em curso" em cartões e "Encerradas" em lista, ordem alfabética; RF-24 com datas só em disciplina em curso; RF-37/F-13 com todos os scripts numa aba Scripts e atalho na aula; RN-03 com rótulos novos; `disciplinas` ganha `imagem`, perde `codigo` e `semestre` vira opcional (§7.3) |
 | v0.1.78 | 2026-10-07 | Desenvolvedor | Sabatina "Disciplina modelo D" (3 decisões): capa, abas fixas e cartões; "Última aula" só em curso; RF-24 sem mudança |
+| v0.1.79 | 2026-10-09 | Desenvolvedor | Sabatina "Sync ORCID" (9 decisões, `docs/sabatinas/CHANGELOG_sabatina_sync-orcid.md`): RF-17 vira SHOULD; NG-03 e §6.3 |
 
 ---
 
@@ -125,7 +126,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 
 - **NG-01:** não haverá backend próprio, banco de dados, API própria ou sistema de login customizado.
 - **NG-02:** não haverá upload nem hospedagem de PDFs/slides pelo site — o professor hospeda onde preferir (Google Drive é a recomendação) e o site guarda apenas a URL (D-07).
-- **NG-03:** não haverá importação automática de publicações (ORCID, Crossref, OpenAlex, arXiv, BibTeX) no MVP.
+- **NG-03:** não haverá importação de publicações por OpenAlex, arXiv ou BibTeX no MVP. A importação semanal pelo ORCID, com a Crossref, entrou no escopo como RF-17 (sabatina "Sync ORCID", 2026-10-09).
 - **NG-04:** não haverá visual editing (editar clicando no texto da própria página) — decisão D-02, §7.2.
 - **NG-05:** não haverá área restrita, login de aluno, entrega de trabalhos, notas ou qualquer funcionalidade de ambiente virtual de aprendizagem.
 - **NG-06:** não haverá busca global, comentários, newsletter ou analytics no MVP.
@@ -210,7 +211,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-14 | SHOULD | Campos em inglês opcionais por item (grupo recolhível "Versão em inglês") | Dado um item com o grupo EN preenchido, quando o visitante acessa a rota `/en` correspondente, então vê o conteúdo em inglês; quando o grupo está vazio, vê o conteúdo em português (decisão D-03) | ⬜ |
 | RF-15 | SHOULD | Página Extensão: postagens com título, data, texto e até 5 fotos em carrossel (sabatina "Extensão", 2026-10-07) | Dado o professor em Extensão, quando cria uma postagem com título, data, texto e fotos (cada uma com descrição) e a publica, então ela aparece em `/extensao/` em ordem cronológica decrescente e ganha página própria em `/extensao/<slug>/` e `/en/outreach/<slug>/`; o painel escolhe a data num calendário em DD-MM-AAAA e não aceita a sexta foto nem foto sem imagem ou sem descrição | ⬜ |
 | RF-16 | WONT | Fluxo de aprovação por branch com preview antes de publicar | — (Editorial Workflow, plano pago do TinaCloud; ver NG-07 e R-05) | — |
-| RF-17 | WONT | Importação automática de publicações (ORCID/Crossref/OpenAlex/BibTeX) | — (ver NG-03) | — |
+| RF-17 | SHOULD | Importação semanal das publicações do ORCID do professor, com autores e veículo pela Crossref (sabatina "Sync ORCID", 2026-10-09) | Dado um trabalho com DOI no ORCID cujo DOI nenhum arquivo de `content/publicacoes/` nem `data/orcid-vistos.json` contém, quando o workflow `orcid` roda (segunda 08:00 de São Luís, ou sob demanda), então ele é gravado em `content/publicacoes/{ano}-{slug(titulo)}.md` com `publicado: true`, autores como `Sobrenome, Prenome` da Crossref e o professor na sua grafia de citação, e o site é publicado depois de testes e build verdes; trabalho sem DOI é ignorado; DOI que a Crossref não conhece vira visto com aviso; falha de rede adia para a próxima execução; arquivo existente nunca é alterado e publicação apagada no painel não volta. A primeira execução importa tudo o que já está no ORCID | ⬜ |
 | RF-37 | MUST | Gestão de scripts de código dentro da disciplina (lista `scripts[]`) | Dado o professor editando uma disciplina, quando acrescenta um script informando o título, colando o código no campo e escolhendo a linguagem (`python` por padrão), e salva, então o script aparece na página da disciplina com destaque de sintaxe e botão de copiar — numa aba Scripts com todos os scripts da disciplina: primeiro os da aula correspondente, na ordem das aulas e marcados "Aula N", quando o campo `aula` casa com uma aula existente — e a aula mostra um atalho para o script —, depois os gerais, quando `aula` está vazio ou não casa com nenhuma (F-13; sabatina "Ensino modelo A", Decisão 12) | ⬜ |
 
 #### Site público
@@ -325,7 +326,7 @@ Lista fechada:
 | Item | Versão-alvo |
 |---|---|
 | Página de CV completa | v1.1 |
-| Importação ORCID/Crossref/OpenAlex/BibTeX; exportação BibTeX | v2 |
+| Importação OpenAlex/arXiv/BibTeX; exportação BibTeX (a do ORCID virou RF-17) | v2 |
 | Filtros e busca em publicações | v1.2 |
 | Busca global no site | v2 |
 | Modo escuro | a avaliar |
@@ -493,6 +494,7 @@ Nome de arquivo: `{ano}-{slug(titulo)}.md`.
 | TinaCloud | Autenticação dos editores e API de conteúdo do painel | OAuth do TinaCloud; `clientId` público + token de leitura em variável de ambiente | Free: 2 usuários, 2 papéis, assets ≤ 100 MB, sem Editorial Workflow | Migrar para Decap CMS (gratuito, sem limite de usuários) mantendo o mesmo conteúdo em arquivos — o modelo de dados é agnóstico ao CMS (R-03) |
 | GitHub | Repositório e histórico do conteúdo | App do TinaCloud com acesso ao repositório | Gratuito — o repositório é público desde 2026-09-01 | Nenhum — é a fonte de verdade |
 | Cloudflare Workers Builds | Build e deploy automático | Integração GitHub ↔ Cloudflare | Free: 3.000 min de build/mês, 1 build simultâneo, teto de 20 min por build (verificado 2026-09-01) | Trocar por GitHub Actions + `wrangler deploy` (mesma conta, sem custo) |
+| ORCID (`pub.orcid.org/v3.0`) e Crossref (`api.crossref.org`) | Lista de trabalhos do professor; autores, veículo e ano por DOI (RF-17) | Nenhuma: APIs públicas; a Crossref recebe `mailto` | Gratuitas | Falha adia a importação para a semana seguinte; o professor cadastra pelo painel |
 | Hospedeiro de arquivos (Google Drive recomendado) | Armazenamento de PDFs, slides e listas | Do próprio hospedeiro; exige link público | Cota da conta usada pelo professor | Nenhum acoplamento a mitigar: o campo é uma URL livre (D-07), qualquer hospedeiro serve |
 
 ### 7.5 Estrutura de Diretórios do Projeto
