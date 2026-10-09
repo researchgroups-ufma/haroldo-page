@@ -15,7 +15,8 @@
  *  Entradas     : arrays de entradas de coleção, na forma devolvida por
  *                 `getCollection` (`{ data: {...} }`), tipadas estruturalmente
  *                 — este módulo não importa `astro:content`
- *  Saídas       : grupos por ano decrescente (`groupByYear`), booleano
+ *  Saídas       : grupos por ano decrescente (`groupByYear`), blocos da página com
+ *                 "2023 e anteriores" (`groupForPage`), booleano
  *                 (`isProfessorAuthor`) e URLs (`doiUrl`, `arxivUrl`)
  *  Uso          : const grupos = groupByYear(filterPublished(await getCollection('publicacoes')))
  *
@@ -63,6 +64,40 @@ export function groupByYear<T extends PublicationLike>(
     year,
     items: entries.filter((entry) => entry.data.ano === year).sort(compareWithinYear),
   }));
+}
+
+/**
+ * Ano do bloco "2023 e anteriores" da página (sabatina "Sanfona de Publicações", Decisão 2): ele e
+ * os anos antes dele ficam num bloco só, para os cabeçalhos caberem na sanfona. Fixo até alguém mudar.
+ */
+export const EARLIER_CUTOFF = 2023;
+
+/**
+ * Os blocos da página Publicações: um por ano depois de `cutoff`, em ordem decrescente, e um bloco
+ * só para `cutoff` e os anos anteriores, ordenado por ano decrescente e, no mesmo ano, por
+ * `compareWithinYear`.
+ *
+ * @param entries Publicações já publicadas (RN-01), na forma devolvida por `getCollection`.
+ * @param cutoff Ano do bloco que reúne os anteriores.
+ * @returns Os blocos; `andEarlier` só é verdadeiro no bloco que reúne algum ano anterior ao corte.
+ */
+export function groupForPage<T extends PublicationLike>(
+  entries: T[],
+  cutoff: number = EARLIER_CUTOFF,
+): { year: number; andEarlier: boolean; items: T[] }[] {
+  const groups = groupByYear(entries);
+  const recent = groups.filter((group) => group.year > cutoff);
+  const older = groups.filter((group) => group.year <= cutoff);
+  const blocks = recent.map((group) => ({ ...group, andEarlier: false }));
+  if (older.length === 0) return blocks;
+  return [
+    ...blocks,
+    {
+      year: cutoff,
+      andEarlier: older.some((group) => group.year < cutoff),
+      items: older.flatMap((group) => group.items),
+    },
+  ];
 }
 
 /**

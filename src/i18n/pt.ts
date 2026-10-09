@@ -181,6 +181,8 @@ export const pt = {
   },
   publications: {
     title: 'Publicações',
+    // Rótulo do bloco que reúne o ano de corte e os anteriores (sabatina "Sanfona de Publicações").
+    andEarlier: (year: number) => `${year} e anteriores`,
     type: {
       artigo: 'Artigo',
       preprint: 'Preprint',

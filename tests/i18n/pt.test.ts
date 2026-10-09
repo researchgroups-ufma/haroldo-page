@@ -111,3 +111,9 @@ describe('pt — chaves novas da fase 4 (decisão 4 do fatiamento da fase 4)', (
     expect('eyebrow' in pt.about).toBe(false);
   });
 });
+
+describe('publications.andEarlier (sabatina "Sanfona de Publicações", Decisão 2)', () => {
+  it('rótulo do bloco que reúne o corte e os anteriores', () => {
+    expect(pt.publications.andEarlier(2023)).toBe('2023 e anteriores');
+  });
+});

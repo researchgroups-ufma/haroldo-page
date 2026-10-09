@@ -35,6 +35,7 @@ const FUNCTION_SAMPLES: Record<string, unknown[]> = {
   'outreach.photoLabel': [2, 'Lentes de água'],
   'research.line': ['01'],
   'date.format': ['2026', '03', '15'],
+  'publications.andEarlier': [2023],
 };
 
 /**
@@ -175,5 +176,11 @@ describe('excecoes-m07 — lista coerente com os dicionários (reusada pelo plan
       const enValue = resolveValue(en, path);
       expect(enValue, `${path}: pt="${ptValue}" en="${enValue}"`).toBe(ptValue);
     }
+  });
+});
+
+describe('publications.andEarlier (sabatina "Sanfona de Publicações", Decisão 2)', () => {
+  it('rótulo do bloco que reúne o corte e os anteriores', () => {
+    expect(en.publications.andEarlier(2023)).toBe('2023 and earlier');
   });
 });

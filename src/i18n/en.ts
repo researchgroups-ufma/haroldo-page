@@ -168,6 +168,7 @@ export const en: UiStrings = {
   },
   publications: {
     title: 'Publications',
+    andEarlier: (year: number) => `${year} and earlier`,
     type: {
       artigo: 'Article',
       preprint: 'Preprint',

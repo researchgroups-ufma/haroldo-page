@@ -4,9 +4,11 @@ import matter from 'gray-matter';
 import { describe, expect, it } from 'vitest';
 import {
   arxivUrl,
+  EARLIER_CUTOFF,
   compareWithinYear,
   doiUrl,
   groupByYear,
+  groupForPage,
   isProfessorAuthor,
 } from '../../src/lib/publications';
 
@@ -41,6 +43,56 @@ describe('groupByYear', () => {
 
   it('lista vazia devolve lista vazia', () => {
     expect(groupByYear([])).toEqual([]);
+  });
+});
+
+describe('groupForPage (sabatina "Sanfona de Publicações", Decisão 2)', () => {
+  const pub = (ano: number, titulo: string) => ({ data: { ano, titulo } });
+
+  it('o corte é 2023', () => {
+    expect(EARLIER_CUTOFF).toBe(2023);
+  });
+
+  it('anos depois do corte têm bloco próprio; o corte e os anteriores viram um bloco só', () => {
+    const groups = groupForPage([
+      pub(2021, 'Antigo'),
+      pub(2026, 'Novo'),
+      pub(2023, 'Zebra'),
+      pub(2024, 'Meio'),
+      pub(2023, 'Abelha'),
+    ]);
+    expect(groups.map((g) => [g.year, g.andEarlier])).toEqual([
+      [2026, false],
+      [2024, false],
+      [2023, true],
+    ]);
+    // Dentro do bloco: ano decrescente e, no mesmo ano, a ordem de compareWithinYear.
+    expect(groups[2].items.map((e) => e.data.titulo)).toEqual(['Abelha', 'Zebra', 'Antigo']);
+  });
+
+  it('só anos anteriores ao corte: o bloco leva o ano do corte e é "e anteriores"', () => {
+    const groups = groupForPage([pub(2021, 'A'), pub(2020, 'B')]);
+    expect(groups.map((g) => [g.year, g.andEarlier])).toEqual([[2023, true]]);
+    expect(groups[0].items.map((e) => e.data.ano)).toEqual([2021, 2020]);
+  });
+
+  it('só o ano do corte: bloco comum, sem "e anteriores"', () => {
+    expect(groupForPage([pub(2023, 'A')]).map((g) => [g.year, g.andEarlier])).toEqual([
+      [2023, false],
+    ]);
+  });
+
+  it('nada no corte nem antes dele: igual ao groupByYear', () => {
+    const entries = [pub(2025, 'A'), pub(2024, 'B')];
+    expect(groupForPage(entries)).toEqual(
+      groupByYear(entries).map((g) => ({ ...g, andEarlier: false })),
+    );
+  });
+
+  it('corte por parâmetro', () => {
+    expect(groupForPage([pub(2024, 'A'), pub(2025, 'B')], 2024).map((g) => g.year)).toEqual([
+      2025, 2024,
+    ]);
   });
 });
 

@@ -15,7 +15,7 @@
  *
  *  Dependências : BaseLayout, PageHeader, PublicationItem, src/i18n (strings),
  *                 src/lib/config.ts (`Locale`), src/lib/published.ts
- *                 (filterPublished), src/lib/publications.ts (groupByYear),
+ *                 (filterPublished), src/lib/publications.ts (groupForPage),
  *                 src/scripts/publications-accordion.ts, astro:content
  *                 (getCollection)
  *  Entradas     : prop `lang` (obrigatória); coleção `publicacoes`
@@ -38,7 +38,7 @@ import PublicationItem from '../components/PublicationItem.astro';
 import { strings } from '../i18n';
 import type { Locale } from '../lib/config';
 import { filterPublished } from '../lib/published';
-import { groupByYear } from '../lib/publications';
+import { groupForPage } from '../lib/publications';
 
 export interface Props {
   /** Idioma da rota. Obrigatória. */
@@ -50,20 +50,22 @@ const t = strings(lang);
 
 // RN-01: rascunhos (`publicado: false`) nunca aparecem na página pública.
 const published = filterPublished(await getCollection('publicacoes'));
-// RN-02: `groupByYear` já aplica a ordem inteira (ano decrescente; dentro do ano,
+// RN-02: `groupForPage` (sobre `groupByYear`) já aplica a ordem inteira (ano decrescente; dentro do ano,
 // `compareWithinYear`, título alfabético pt-BR) — regra provisória que vale até existir um campo
 // de data de cadastro (Q-RN02, opção (c), decidida pelo stakeholder em 2026-09-14, README da
-// fase). Esta página não reordena nada por conta própria.
-const groups = groupByYear(published);
+// fase). Esta página não reordena nada por conta própria. 2023 e os anos anteriores ficam num bloco
+// só (sabatina "Sanfona de Publicações", Decisão 2), com o ano marcado em cada artigo.
+const groups = groupForPage(published);
 ---
 
 <BaseLayout title={t.nav.publications}>
   <PageHeader slot="cabecalho" title={t.publications.title} />
 
   {
-    /* Pai em bloco: o ScrollTrigger desliga o `pinSpacing` quando o pai do pin é flex (o `#conteudo`). */
+    /* Pai do bloco: com a sanfona, é o trilho do sticky, e o script dá a ele a altura da rolagem do timeline;
+       `shrink-0` porque o `#conteudo` é flex em coluna e encolheria essa altura até a do cartão. */
   }
-  <div>
+  <div class="shrink-0">
     <div id="pub-anos" class="px-margem">
       {
         groups.map((group) => {
@@ -71,10 +73,10 @@ const groups = groupByYear(published);
           const headingId = `${sectionId}-titulo`;
           return (
             <section id={sectionId} aria-labelledby={headingId} class="pub-ano">
-              <div class="py-4">
+              <div class="pub-ano-cabeca py-4">
                 <h2 id={headingId}>
                   <a href={`#${sectionId}`} class="pub-ano-link text-display-2">
-                    {group.year}
+                    {group.andEarlier ? t.publications.andEarlier(group.year) : group.year}
                   </a>
                 </h2>
               </div>
@@ -82,6 +84,9 @@ const groups = groupByYear(published);
                 <ol class="pub-ano-lista space-y-6 pb-8">
                   {group.items.map((item) => (
                     <li>
+                      {group.andEarlier && (
+                        <p class="text-pequeno text-secundario mb-1">{item.data.ano}</p>
+                      )}
                       <PublicationItem publication={item} />
                     </li>
                   ))}
@@ -103,6 +108,23 @@ const groups = groupByYear(published);
      não dobrar de espessura. */
   .pub-ano:first-child {
     border-top: 0;
+  }
+  /* Com a sanfona, os cabeçalhos ficam compactos (de ~80 para ~42 px) para todos caberem no cartão
+     junto com o ano aberto. A classe vem de `publications-accordion.ts` e sai quando ela recua
+     (sabatina "Sanfona de Publicações", Decisão 1). */
+  /* Com a sanfona, o bloco gruda no topo do cartão (sticky, resolvido pelo compositor junto com a
+     rolagem) e tem a altura dele, que o script grava em `--altura-cartao` a cada refresh do
+     ScrollTrigger. A rolagem que move o timeline vem da altura que o script dá ao pai. */
+  .sanfona-compacta {
+    position: sticky;
+    top: 0;
+    height: var(--altura-cartao);
+  }
+  .sanfona-compacta .pub-ano-cabeca {
+    padding-block: 0.375rem;
+  }
+  .sanfona-compacta .pub-ano-link {
+    font-size: 1.75rem;
   }
 </style>
 
