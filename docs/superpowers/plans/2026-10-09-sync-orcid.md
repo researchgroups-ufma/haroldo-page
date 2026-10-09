@@ -1174,3 +1174,61 @@ git push
 
 Check-runs verdes. Depois, atualizar a memória `haroldo-page-estado-atual`, substituindo o bloco de
 estado.
+
+## Evidência
+
+Execução inline em 2026-10-09, na `main`. Saídas desta sessão.
+
+**Tarefa 1** (`6bbc4ef`). RED: `Error: Cannot find module '../../src/lib/orcid'`. GREEN:
+
+```
+ Test Files  25 passed (25)
+      Tests  455 passed (455)
+All files          |     100 |    99.15 |     100 |     100 |
+  orcid.ts         |     100 |    96.72 |     100 |     100 | 146,148
+```
+
+`npm run lint` limpo, `format:check` limpo, `astro check`: `0 errors, 0 warnings, 0 hints`.
+
+**Tarefa 2** (`ffbe5ae`). Ensaio local:
+
+```
+ORCID 0000-0002-3702-7683: 28 trabalhos
+  sem DOI, ignorado: (4 registros)
+  + content/publicacoes/… (23 arquivos)
+  DOI desconhecido na Crossref, marcado como visto: 10.1142/so21827182041014x (Tidal forces in the charged Hayward black hole spacetime)
+23 publicação(ões) nova(s); 1 DOI(s) só marcado(s) como visto(s).
+mudou=1 / novos=23 ; data/orcid-vistos.json com 24 DOIs
+```
+
+- `tests/content`: 145/145.
+- Professor presente nos 23 arquivos (`grep -L` vazio).
+- Segunda execução: `0 publicação(ões) nova(s); 0 DOI(s) só marcado(s)`, `mudou=0`.
+- `npm run build` verde.
+- No Vivaldi, `/publicacoes/` e `/en/publications/` mostram 28 itens (23 reais e 5 exemplos),
+  anos de 2026 a 2020, e o professor em `<strong>` nos 28.
+- Desvio registrado: `lineWidth: -1` no `matter.stringify`. Sem ele, o ensaio dobrava títulos
+  longos em `>-`.
+
+**Tarefa 3** (`3928fd2`).
+
+- CI 37957476554 `success`. Check-runs: `qualidade: completed / success` e
+  `Workers Builds: haroldo-page: completed / success`.
+- Workflow ORCID 37957835889 `success`, com o log igual ao do ensaio.
+- O primeiro `gh workflow run` devolveu HTTP 500, mas criou o run. O run duplicado (37957875705)
+  foi cancelado antes de começar.
+- Commit do workflow: `fd85f47`, `docs: publicações novas do ORCID`, autor
+  `André Ferreira <160500693+abbadrava@users.noreply.github.com>`, 24 arquivos, sem trailer.
+  `Workers Builds: haroldo-page: completed / success`.
+- Produção, `/publicacoes/`: 26 DOIs únicos (23 reais e 3 de exemplo).
+
+**Tarefa 4** (`628db82`).
+
+- `test:coverage`: 455/455. `build` verde. `test:dist`: 54/54. A varredura RN-01 roda com o
+  rascunho real de `content/extensao/`.
+- No Vivaldi, `/pesquisa/`, `/en/research/`, `/` e `/en/`: nenhum `[EXEMPLO]` de publicação e
+  nenhuma lista vazia.
+
+**Achado fora do escopo, para o stakeholder:** `PublicationItem.astro` junta os autores com `, `. No
+formato `Sobrenome, Prenome` (Decisão 4) a fronteira entre autores fica ambígua, como em "Furuta,
+Leonardo K. S., Magalhães, Renan B., …". A view não foi alterada.

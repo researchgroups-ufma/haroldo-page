@@ -261,6 +261,31 @@ coerência deixou de ser só documentação: `tests/content/tina-lock-coerente.t
 árvore declarativa dos dois arquivos e reprova a suíte (no CI e no `build:pipeline`) se o lock
 ficar defasado — ver [Painel de edição](#painel-de-edição).
 
+**6. Publicações do ORCID (RF-17).** O workflow `.github/workflows/orcid.yml` roda toda segunda às
+08:00 de São Luís e cadastra em `content/publicacoes/` os trabalhos do ORCID do professor que o site
+ainda não viu. O ORCID iD vem de `links.orcid` em `content/perfil/index.md`. Autores e veículo vêm da
+Crossref. O trabalho está em `scripts/sync-orcid.ts`; as funções puras ficam em `src/lib/orcid.ts`.
+Decisões em `docs/sabatinas/CHANGELOG_sabatina_sync-orcid.md`.
+
+- **Rodar à mão:** aba Actions → ORCID → Run workflow, ou `gh workflow run orcid.yml`. Para ver o
+  que seria importado sem publicar, rode `npm run sync-orcid` localmente e descarte os arquivos
+  gerados.
+- **Só acrescenta.** Nunca altera nem apaga arquivo. `data/orcid-vistos.json` guarda os DOIs já
+  vistos: publicação apagada ou despublicada no painel não volta. Para reimportar uma, tire o DOI
+  desse arquivo.
+- **O que fica de fora, com aviso no log** (passo "Busca publicacoes novas"):
+  - registro sem DOI;
+  - DOI que a Crossref não conhece (404), que vira visto (corrigir o DOI no ORCID faz o certo
+    entrar na semana seguinte);
+  - DOI cuja consulta à Crossref falhou por rede ou 5xx, que fica para a próxima execução.
+- **Autores** saem como a Crossref os divide (`Sobrenome, Prenome`). O professor sai sempre como
+  `LIMA JUNIOR, HAROLDO C. D.`: ele é reconhecido pelo ORCID ou, nos registros sem ORCID, pelo nome
+  "Haroldo … Lima".
+- **Publica sozinho.** Push do `GITHUB_TOKEN` não dispara o `ci.yml`. Por isso o próprio workflow
+  roda `test:coverage`, `build:pipeline` e `test:dist` antes do commit, e só então o Workers Builds
+  publica. Falha manda e-mail a quem alterou o cron por último. O commit sai assinado com o noreply
+  do desenvolvedor.
+
 ## Deploy
 
 `npm run deploy` continua existindo, mas como **caminho manual de emergência** — não é o caminho
