@@ -5,12 +5,13 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-09-12
+Última atualização: 2026-10-12 — fatiadas as lacunas da auditoria de qualidade (planos 075–085).
 
-**A fase ainda não foi fatiada.** Os dois planos abaixo chegaram aqui **migrados da fase 2** em
-2026-09-12; os outros quinze itens do checklist (§12 do PRD) continuam sem plano escrito, e o
-`/fatiar` da fase só faz sentido depois que as fases 3 e 4 fecharem — é delas que sai o que o
-polimento tem de polir.
+**A fase está parcialmente fatiada.** Têm plano só os itens da auditoria de qualidade de 2026-10-12
+(075–085, sabatina
+[`CHANGELOG_sabatina_auditoria-qualidade.md`](../../docs/sabatinas/CHANGELOG_sabatina_auditoria-qualidade.md),
+9 decisões) e os dois planos **migrados da fase 2** em 2026-09-12 (027 e 029). Os demais itens dos 21
+do checklist (§12 do PRD) continuam sem plano escrito.
 
 **Critério de conclusão da fase** (§6.2 do PRD): *checklist §12 fechado; um usuário EDITOR edita no
 `/admin` em produção e a mudança aparece no site sem intervenção do ADMIN; M-01, M-02, M-04 e M-05
@@ -22,6 +23,17 @@ atingidas.*
 |---|---|---|---|---|---|
 | 027 | 🧑 Usuário EDITOR do professor e a matriz de permissões da §9 | ⬜ TODO | **stakeholder** (professor) | nenhum | — |
 | 029 | 🧑 Ciclo ponta a ponta cronometrado (M-02) e o critério do §6.2 | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
+| 075 | `/admin` fora da indexação por bloco próprio no `_headers` (RF-30, Decisão 8) | ⬜ TODO | agente (sonnet) | implementer | — |
+| 076 | Meta description das páginas fixas (RF-30, Decisões 2 e 9) | ⬜ TODO | agente (sonnet); textos revisados pelo stakeholder | implementer | — |
+| 077 | Meta description da disciplina e do item de Extensão (RF-30, Decisão 6) | ⬜ TODO | agente (sonnet) | implementer | — |
+| 078 | Open Graph, Twitter card e `public/og.png` (RF-30, Decisões 1 e 9) | ⬜ TODO | agente (sonnet) + orquestrador (imagem, produção) | implementer | — |
+| 079 | JSON-LD `Person` + `WebSite` na Home (RF-38, Decisão 7) | ⬜ TODO | agente (sonnet) + orquestrador (validador) | implementer | — |
+| 080 | Variantes WebP de `/uploads` com `sharp` e o retrato (Decisão 3) | ⬜ TODO | agente (sonnet) + orquestrador (navegador, §7.2) | implementer | — |
+| 081 | Variantes WebP nas demais `<img>` (Decisão 3) | ⬜ TODO | agente (sonnet) + orquestrador (navegador, Lighthouse) | implementer | — |
+| 082 | Cabeçalhos de segurança e cache no `_headers` (RNF-17, RNF-18) | ⬜ TODO | agente (sonnet) + orquestrador (`curl`) | implementer | — |
+| 083 | CSP do site público por `security.csp` (RNF-17) | ⬜ TODO | agente (sonnet) + orquestrador (medição que escolhe o ramo) | implementer | — |
+| 084 | `apple-touch-icon.png` e `favicon.ico` (Decisão 9) | ⬜ TODO | agente (sonnet) + orquestrador (`curl`) | implementer | — |
+| 085 | 🧑 Indexação no domínio próprio, HSTS e "Always Use HTTPS" — **BLOQUEADO pela Q-05** | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
 
 **Numeração é global e contínua e não é ordem de execução.** Os números 027 e 029 vieram da fase 2
 e **não foram renumerados** — a convenção do `plans/README.md` é que um "plano 027" identifique um
@@ -70,6 +82,47 @@ ADMIN em vez de passar despercebida.
 migração: o convite, a verificação da matriz de permissões, a medição do ciclo, o treinamento e a
 validação assistida (M-01) são a mesma conversa com a mesma pessoa.
 
+### Os planos da auditoria de qualidade (075–085)
+
+A numeração segue a **ordem de importância** dada pelo stakeholder (Decisão 5), e nenhuma
+dependência técnica obrigou trocá-la. Onde um item dependia de outro mais abaixo na lista, a
+verificação foi dividida em vez de a ordem mudar (ver "Armadilhas", item 3).
+
+```
+075 ──────────────────────────────┬──→ 082 ──→ 084
+076 ──→ 077 ──→ 078 ──────────────┘     │
+079                                     083
+080 ──→ 081
+075 (obrigatório) + 076..084 (recomendados) + Q-05 + migração do domínio ──→ 085
+```
+
+| Plano | Depende de | Por quê |
+|---|---|---|
+| 077 | 076 | usa os textos de Ensino e de Extensão como reserva |
+| 078 | — | sem dependência de código; depois do 077 para o `og:description` sair por página |
+| 081 | 080 | usa `src/lib/images.ts` e a integração |
+| 082 | 075, 078 | reaproveita `parseHeadersFile`; o `curl` do `og.png` precisa dele |
+| 083 | — | fecha o RNF-17 junto com o 082 |
+| 084 | 082 | as regras de cache dos ícones já estão no `_headers` |
+| 085 | 075, Q-05 | sem o `/admin/*`, tirar o `noindex` global expõe o painel |
+
+Ordem sugerida: **075 → 076 → 077 → 078 → 079 → 080 → 081 → 082 → 083 → 084**, e o 085 quando a Q-05
+e a sabatina da migração existirem. **Sem paralelismo:** a regra da casa é um plano por vez, com
+confirmação antes do próximo, e um build por vez no working tree. Quase todos tocam
+`tests/dist/site-gerado.test.ts`, e vários o `BaseLayout.astro`, a `HomeView.astro` ou o
+`astro.config.mjs`. Em tese, 075, 076, 079 e 080 não dependem um do outro.
+
+**Itens do §12 que estes planos fecham** (o último plano do grupo marca a caixa):
+
+| Item do §12 da fase 5 | Planos |
+|---|---|
+| SEO completo (RF-30) | 075, 076, 077, 078 |
+| Otimização de imagens | 080, 081 |
+| Dados estruturados JSON-LD (RF-38) | 079 |
+| Cabeçalhos de segurança e cache (RNF-17, RNF-18) | 082, 083, 084 |
+| Ícones | 084 |
+| Indexação no domínio próprio | 085 (bloqueado) |
+
 ## Por onde isto pode dar errado
 
 **1. A sessão do EDITOR não se substitui pela do ADMIN.** É literalmente o que o critério pede.
@@ -110,6 +163,54 @@ responsável e prazo "antes da fase 5". Ela decide URL canônica, sitemap e inde
 
    Decisões a sabatinar: `www` ou raiz como canônico, destino do `workers.dev`, e se o convite do
    plano 027 espera o domínio (o professor guardaria já o endereço definitivo do `/admin`).
+
+   Os passos 5 e 6, mais HSTS e "Always Use HTTPS", são o **plano 085**. Desde o 075 e o 082, o passo
+   5 tira **só a linha** `X-Robots-Tag` do `/*`: o bloco `/admin/*` e os cabeçalhos de segurança ficam.
+   Os valores do HSTS também entram na sabatina da migração: a Decisão 9 não os fixou.
+
+6. **Armadilhas dos planos da auditoria (075–085).**
+   1. **O `_headers` soma blocos.** Uma URL que casa `/*` e `/uploads/*` recebe os cabeçalhos dos dois,
+      e a documentação da Cloudflare diz que o mesmo nome em dois blocos sai com os valores unidos por
+      vírgula (não medido aqui). Por isso o `/*` não leva `Cache-Control` (082).
+   2. **O `/admin` fica fora da CSP de conteúdo por construção:** a `<meta>` é do Astro, e o painel é
+      `public/admin/`, copiado sem passar por ele. A proteção contra moldura vai por cabeçalho e vale
+      para o painel também (082).
+   3. **O RNF-18 se verifica em dois planos.** As regras de cache dos cinco caminhos entram no 082,
+      mas `favicon.ico` e `apple-touch-icon.png` só existem depois do 084, que faz o `curl` deles.
+      Assim os ícones, os menos importantes, continuam por último.
+   4. **A medição da CSP é do orquestrador e escolhe o ramo** (083): o executor entrega o ramo B e uma
+      cópia do `dist/` do ramo A. Na especificação, o atributo `style` do Shiki cai no ramo A.
+   5. **A prévia de compartilhamento só funciona depois do 085:** o robô do X/Twitter respeita o
+      `robots.txt`, e ele está em `Disallow: /`. O 078 confere as tags e a imagem servida.
+   6. **O `sharp` vira dependência direta só na 0.35.4** (080): o `miniflare` do `wrangler` fixa essa
+      versão, e a 0.35.5 duplicaria o pacote. Nada de `npm audit fix`.
+   7. **A M-07 lê `meta[content]`** (`tests/dist/i18n.test.ts`): description, `og:title` e
+      `og:description` das rotas EN não podem trazer valor do dicionário `pt`. A regra da Decisão 6
+      (EN nunca mostra o texto PT do item) e esse teste se reforçam.
+   8. **A pré-condição L-9 tem uma parte no código:** `src/views/ResearchView.astro:100` fixa
+      `/uploads/extensao-exemplo-4.jpg` como imagem de "Outros projetos". O professor não troca isso
+      pelo painel (085).
+   9. **GIF tem de continuar animado** (PRD v0.1.81, nota de 2026-10-19 na Decisão 3): imagem animada
+      não ganha variante WebP, porque o `sharp` sem `animated: true` gera só o primeiro quadro. O `.gif`
+      fica fora da lista de formatos e o `.webp` com `metadata().pages > 1` devolve só `{ src }` (080);
+      a asserção de `dist` do 081 pula as animadas.
+
+## Regras de código que todo plano desta fase herda
+
+As da fase 4 valem inteiras (`plans/fase-4-internacionalizacao/README.md`, seção de mesmo nome), com
+estes acréscimos:
+
+- **Identificadores do PRD desta fase:** SEO, description, Open Graph, favicon, sitemap e `/admin`
+  fora da indexação são **RF-30**; JSON-LD é **RF-38**; cabeçalhos de segurança e CSP são **RNF-17**;
+  cache de `/uploads/*` e dos ícones é **RNF-18**; fallback de idioma segue **RN-06**. Decisão da
+  sabatina se cita como "sabatina 'Lacunas da auditoria de qualidade', Decisão N", não como
+  identificador do PRD.
+- **`set:html`:** proibido com conteúdo do professor, com uma exceção, a confirmar pelo orquestrador
+  antes do despacho do 079: o JSON-LD da Home, só sobre a saída de `serializeJsonLd`, que escapa `<`,
+  `>`, `&`, U+2028 e U+2029. O 083 pode usá-lo, no ramo S2, com uma constante do código.
+- **Arquivo binário gerado uma vez** (`og.png`, ícones) entra no repositório; o script ou o HTML que o
+  gerou fica no scratchpad e vai **inteiro** para a Evidência, para a imagem poder ser refeita.
+- **Asserção de `_headers`** usa `parseHeadersFile` (075), nunca `includes` sobre o texto cru.
 
 ## Insumos que outras fases deixaram para cá
 
