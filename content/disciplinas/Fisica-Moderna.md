@@ -62,7 +62,7 @@ aulas:
     titulo: A gota fugídia de Wilson e o experimento de Millikan
     descricao: A gota fugídia de Wilson e o experimento de Millikan. Cálculo detalhado do experimento de Millikan e a determinação da carga do elétron.
     url: ' '
-  - numero: 11
+  - numero: 12
     titulo: A descoberta dos raios X
     descricao: A descoberta dos raios X. Os experimentos de Rontgen. Difração de raio-x e a lei de Bragg.
     url: ' '
