@@ -41,7 +41,10 @@ aulas:
     titulo: Dedução das transformações de Lorentz.
     descricao: 'Dedução das transformações de Lorentz. Transformada inversa. Consequências da transformação de Lorentz. Dilatação temporal, contração espacial. Sincronização de relógios. '
     url: 'https://exemplo.invalid/rg-2026-2/aula-06'
-  - {}
+  - numero: 7
+    titulo: Lei de adição de velocidades e efeito Doppler relativístico para a luz.
+    descricao: Lei de adição de velocidades. Efeito Doppler Relativístico para a luz. Resolução de problemas sobre cinemática relativística.
+    url: ' '
   - {}
   - {}
   - {}
