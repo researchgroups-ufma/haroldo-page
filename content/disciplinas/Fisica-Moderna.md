@@ -40,7 +40,7 @@ aulas:
   - numero: 9
     titulo: Dedução das transformações de Lorentz.
     descricao: 'Dedução das transformações de Lorentz. Transformada inversa. Consequências da transformação de Lorentz. Dilatação temporal, contração espacial. Sincronização de relógios. '
-    url: AAAA
+    url: 'https://exemplo.invalid/rg-2026-2/aula-06'
   - {}
   - {}
   - {}
