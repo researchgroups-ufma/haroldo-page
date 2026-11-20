@@ -15,7 +15,7 @@ aulas:
   - numero: 1
     titulo: 'Aula Inaugural. Panorama geral sobre a física do século XIX. O princípio de Galileu e as transformações de Galileu. '
     data: '2026-08-10'
-    descricao: 'Descrição do panorama da Física no inicio do século XIX. '
+    descricao: 'Descrição do panorama da Física no inicio do século XIX. A Mecânica Clássica, a termodinâmica e o eletromagnetismo.'
     url: 'https://exemplo.invalid/rg-2026-2/aula-01'
   - numero: 2
     titulo: Curvatura e as equações de campo de Einstein
