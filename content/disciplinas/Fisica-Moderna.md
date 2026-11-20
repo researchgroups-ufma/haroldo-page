@@ -13,9 +13,9 @@ bibliografia:
     url: 'https://archive.org/details/FsicaQunticaEisbergEResnick'
 aulas:
   - numero: 1
-    titulo: 'Variedades, tensores e a conexão de Levi-Civita'
+    titulo: 'Aula Inaugural. Panorama geral sobre a física do século XIX. O princípio de Galileu e as transformações de Galileu. '
     data: '2026-08-10'
-    descricao: 'Revisão de geometria diferencial: variedades, campos tensoriais, transporte paralelo e a conexão de Levi-Civita.'
+    descricao: 'Descrição do panorama da Física no inicio do século XIX. '
     url: 'https://exemplo.invalid/rg-2026-2/aula-01'
   - numero: 2
     titulo: Curvatura e as equações de campo de Einstein
