@@ -115,7 +115,10 @@ aulas:
     titulo: 'O átomo de Bohr: A ruptura com a física clássica. '
     descricao: 'O átomo de Bohr. Os postulados de Bohr. Quantização do raio, velocidade e energia. Explicação da fórmula empírica de Rydberg.'
     url: ' '
-  - {}
+  - numero: 24
+    titulo: 'A regra de quantização de Wilson-Sommerfeld. '
+    descricao: Regra de quantização de Wilson-Sommerfeld. Obtenção das regras de quantização de Planck e Bohr como caso particular.
+    url: ' '
   - {}
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
