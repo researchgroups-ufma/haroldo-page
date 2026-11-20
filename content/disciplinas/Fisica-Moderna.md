@@ -99,7 +99,10 @@ aulas:
       modelo de Thomson. Cálculo do espalhamento no modelo
       de Thomson.
     url: ' '
-  - {}
+  - numero: 20
+    titulo: 'O experimento de Rutherford-Geiger-Marsden e o modelo atômico de Rutherford. '
+    descricao: 'O experimento de Rutherford-Geiger-Marsden. Cálculo detalhado do espalhamento de partículas alpha pelo núcleo. '
+    url: ' '
   - {}
   - {}
   - {}
