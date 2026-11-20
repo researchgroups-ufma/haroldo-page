@@ -58,7 +58,10 @@ aulas:
     titulo: O tubo de Crookes e a descoberta dos catódicos.
     descricao: 'O tubo de Crookes e a descoberta dos catódicos. As experiências de Thomson com raios catódicos sob campo eletromagnéticos. Cálculo do ângulo de deflexão e determinação da razão carga-massa. '
     url: ' '
-  - {}
+  - numero: 10
+    titulo: A gota fugídia de Wilson e o experimento de Millikan
+    descricao: A gota fugídia de Wilson e o experimento de Millikan. Cálculo detalhado do experimento de Millikan e a determinação da carga do elétron.
+    url: ' '
   - {}
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
