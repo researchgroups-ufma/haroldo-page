@@ -1,11 +1,12 @@
 ---
 publicado: true
-titulo: Forças de maré em espaços-tempos de Kerr
+titulo: Fortalecimento da pesquisa em buracos negros na Universidade Federal do Maranhão
 periodo:
   inicio: '2023.1'
   fim: '2025.2'
 financiador: Sem financiamento externo
 status: concluído
 descricao: 'Investigação das forças de maré sentidas por corpos em queda em espaços-tempos de Kerr, incluindo o regime próximo ao horizonte. Editado pelo plano 021 para demonstrar o critério de conclusão da fase 1. [CONTEÚDO DE EXEMPLO]'
+linha_relacionada: ''
 ---
 
