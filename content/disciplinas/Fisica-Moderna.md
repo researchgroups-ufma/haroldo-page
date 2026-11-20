@@ -37,7 +37,7 @@ aulas:
     data: '2026-09-14'
     descricao: O princípio da Relatividade. Os postulados da Relatividade Especial. Consequências dos postulados. Relatividade da simultaneidade. Relatividade de intervalos de tempo e comprimentos.
     url: 'https://exemplo.invalid/rg-2026-2/aula-05'
-  - numero: 9
+  - numero: 6
     titulo: Dedução das transformações de Lorentz.
     descricao: 'Dedução das transformações de Lorentz. Transformada inversa. Consequências da transformação de Lorentz. Dilatação temporal, contração espacial. Sincronização de relógios. '
     url: 'https://exemplo.invalid/rg-2026-2/aula-06'
