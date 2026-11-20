@@ -2,9 +2,9 @@
 nome: Haroldo Cilas Duarte Lima Junior
 cargo: Professor Adjunto A
 instituicao: 'Universidade Federal do Maranhão (UFMA), Campus São Luís'
-departamento: Centro Tecnológico — Departamento de Física
+departamento: Centro de Ciências Exatas e Tecnologias — Departamento de Física
 foto: /uploads/profile.jpg
-bio: 'Professor Adjunto A no Departamento de Física do Centro Tecnológico da Universidade Federal do Maranhão (UFMA), Campus São Luís, e bolsista de Produtividade em Pesquisa do CNPq — Nível C. Doutor em Física pela UFPA (2023), com período sanduíche na Universidade de Aveiro. Pesquisa relatividade geral e teorias alternativas de gravitação, com ênfase em buracos negros de Kerr, forças de maré, campos escalares e sombras de buracos negros.'
+bio: 'Professor Adjunto A no Departamento de Física do Centro de Ciências Exatas e Tecnologias da Universidade Federal do Maranhão (UFMA), Campus São Luís, e bolsista de Produtividade em Pesquisa do CNPq — Nível C. Doutor em Física pela UFPA (2023), com período sanduíche na Universidade de Aveiro. Pesquisa na área de Relatividade Geral e teorias alternativas de gravitação, com ênfase sombras de buracos negros.'
 resumo_home: 'Pesquisa Relatividade Geral, teorias alternativas de gravitação e sombras de buracos negros.'
 formacao:
   - grau: Pós-doutorado
