@@ -1,0 +1,75 @@
+---
+publicado: true
+nome: Mecânica Clássica I
+semestre: '2026.2'
+status: atual
+descricao: 'Curso de nível de graduação voltado para a abordagem da Mecânica Clássica via Leis de Newton. Estudo das leis de conservação de energia, momento linear e momento angular para uma partícula e um sistema de partículas. Abordagem da mecânica em um referencial não-inercial. '
+imagem: /uploads/extensao-exemplo-1.jpg
+ementa: Mecânica newtoniana de uma partícula e de um sistema de partículas. Referenciais não inerciais. Oscilações. Gravitação. Problema de força central. Colisões. Cinemática e dinâmica de corpos rígidos.
+bibliografia:
+  - referencia: 'John Taylor. Mecânica Clássica. Bookman Editora, 2013.'
+    url: 'https://books.google.com.br/books/about/Mec%C3%A2nica_Cl%C3%A1ssica.html?id=A6Y5AgAAQBAJ&redir_esc=y'
+  - referencia: 'CARROLL, S. M. Spacetime and Geometry: An Introduction to General Relativity. Cambridge: Cambridge University Press, 2019.'
+    url: 'https://exemplo.invalid/bibliografia/carroll-spacetime-and-geometry'
+aulas:
+  - numero: 1
+    titulo: 'Variedades, tensores e a conexão de Levi-Civita'
+    data: '2026-08-10'
+    descricao: 'Revisão de geometria diferencial: variedades, campos tensoriais, transporte paralelo e a conexão de Levi-Civita.'
+    url: 'https://exemplo.invalid/rg-2026-2/aula-01'
+  - numero: 2
+    titulo: Curvatura e as equações de campo de Einstein
+    data: '2026-08-17'
+    descricao: 'Tensor de Riemann, identidades de Bianchi e a dedução das equações de campo.'
+    url: 'https://exemplo.invalid/rg-2026-2/aula-02'
+  - numero: 3
+    titulo: A solução de Schwarzschild e seus horizontes
+    data: '2026-08-24'
+    descricao: 'Solução estática e esfericamente simétrica, coordenadas de Eddington-Finkelstein e a estrutura causal.'
+    url: 'https://exemplo.invalid/rg-2026-2/aula-03'
+  - numero: 4
+    titulo: A métrica de Kerr e buracos negros em rotação
+    data: '2026-08-31'
+    descricao: 'Ergosfera, horizontes interno e externo, e o teorema de unicidade.'
+    url: 'https://exemplo.invalid/rg-2026-2/aula-04'
+  - numero: 5
+    titulo: Ondas gravitacionais no regime linearizado
+    data: '2026-09-14'
+    descricao: 'Perturbações da métrica de fundo, calibre TT e a fórmula de quadrupolo.'
+    url: 'https://exemplo.invalid/rg-2026-2/aula-05'
+listas:
+  - titulo: Lista 1 — Geometria diferencial e tensores
+    data_entrega: '2026-09-07'
+    url: 'https://exemplo.invalid/rg-2026-2/lista-01'
+  - titulo: Lista 2 — Soluções de vácuo e horizontes
+    url: 'https://exemplo.invalid/rg-2026-2/lista-02'
+materiais:
+  - titulo: 'Slides — Módulo 1: geometria diferencial'
+    tipo: slides
+    descricao: 'Slides das três primeiras aulas, em PDF.'
+    url: 'https://exemplo.invalid/rg-2026-2/slides-modulo-01'
+  - titulo: Notas de aula — a métrica de Kerr
+    tipo: notas
+    url: 'https://exemplo.invalid/rg-2026-2/notas-kerr'
+links:
+  - titulo: Simulador de órbitas em Schwarzschild
+    url: 'https://exemplo.invalid/rg-2026-2/simulador-orbitas'
+scripts:
+  - titulo: Raio do horizonte de Kerr
+    descricao: '[EXEMPLO] Script de demonstração usado para verificar o plano 022 — conteúdo inventado, substituir por material real.'
+    linguagem: python
+    codigo: |-
+      def raio_horizonte(massa, spin):
+          """Retorna r+ para Kerr, com G = c = 1."""
+          if abs(spin) > massa:
+              raise ValueError('spin excede o limite extremo')
+          return massa + (massa**2 - spin**2) ** 0.5
+
+      for m in [1.0, 2.5]:
+          r = raio_horizonte(m, 0.9 * m)
+          print(f"M={m}: r+ = {r:.4f} 'unidades geometricas'")
+    aula: 4
+    url: 'https://exemplo.invalid/rg-2026-2/script-horizonte-kerr.py'
+---
+
+
