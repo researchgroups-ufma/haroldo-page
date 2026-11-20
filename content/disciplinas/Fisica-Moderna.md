@@ -50,7 +50,10 @@ aulas:
     descricao: |
       Dinâmica relativística. O momento linear relativístico. A energia cinética relativística. 
     url: ' '
-  - {}
+  - numero: 9
+    titulo: Energia total e a dedução da célebre fórmula E=mc^2. Análise de uma colisão relativística.
+    descricao: Energia total e a dedução da célebre fórmula E=mc^2. Análise de uma colisão relativística.
+    url: ' '
   - {}
   - {}
   - {}
