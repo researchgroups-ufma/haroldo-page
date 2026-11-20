@@ -18,9 +18,9 @@ aulas:
     descricao: 'Descrição do panorama da Física no inicio do século XIX. A Mecânica Clássica, a termodinâmica e o eletromagnetismo.'
     url: 'https://exemplo.invalid/rg-2026-2/aula-01'
   - numero: 2
-    titulo: Curvatura e as equações de campo de Einstein
+    titulo: O debate sobre a natureza da luz. Teoria corpuscular vs ondulatória.
     data: '2026-08-17'
-    descricao: 'Tensor de Riemann, identidades de Bianchi e a dedução das equações de campo.'
+    descricao: 'Cálculo da reflexão e refração para as duas teorias.  A medida da velocidade da luz e a predileção pela teoria ondulatória.  A teoria moderna da luz:  O eletromagnetismo e as equações de Maxwell. Demonstração da equação de onda no vácuo a partir das equações de Maxwell.   '
     url: 'https://exemplo.invalid/rg-2026-2/aula-02'
   - numero: 3
     titulo: A solução de Schwarzschild e seus horizontes
