@@ -107,7 +107,10 @@ aulas:
     titulo: 'A instabilidade do modelo de Rutherford. '
     descricao: A instabilidade do modelo de Rutherford. O cálculo da potência irradiada no modelo. Instabilidade atômica. Tempo de instabilidade.
     url: ' '
-  - {}
+  - numero: 22
+    titulo: 'Linhas espectrais atômicas e as séries de Balmer, Lyman e Rydberg.'
+    descricao: 'Linhas espectrais atômicas e as séries de Balmer, Lyman e Rydberg.'
+    url: ' '
   - {}
   - {}
   - {}
