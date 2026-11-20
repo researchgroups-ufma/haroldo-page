@@ -66,6 +66,15 @@ aulas:
     titulo: A descoberta dos raios X
     descricao: A descoberta dos raios X. Os experimentos de Rontgen. Difração de raio-x e a lei de Bragg.
     url: ' '
+  - numero: 12
+    titulo: A descoberta da Radioatividade.
+    descricao: 'A descoberta da Radioatividade. Fluorescência, Fosforescência e os resultados de Becquerel. Os raios alpha, beta e gamma . Desvio dos raios em campos magnéticos. Natureza de cada raio.'
+    url: ' '
+  - {}
+  - {}
+  - {}
+  - {}
+  - {}
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
     data_entrega: '2026-09-07'
