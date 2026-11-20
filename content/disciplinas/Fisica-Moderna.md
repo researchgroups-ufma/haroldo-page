@@ -119,7 +119,10 @@ aulas:
     titulo: 'A regra de quantização de Wilson-Sommerfeld. '
     descricao: Regra de quantização de Wilson-Sommerfeld. Obtenção das regras de quantização de Planck e Bohr como caso particular.
     url: ' '
-  - {}
+  - numero: 25
+    titulo: 'O átomo de Sommerfeld. '
+    descricao: O átomo de Sommerfeld. Regras de quantização dos números quânticos do modelo de Sommerfeld. A constante de estrutura fina.
+    url: ' '
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
     data_entrega: '2026-09-07'
