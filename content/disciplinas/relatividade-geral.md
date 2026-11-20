@@ -7,7 +7,7 @@ descricao: 'Curso de nível de graduação voltado para a abordagem da Mecânica
 imagem: /uploads/extensao-exemplo-1.jpg
 ementa: Mecânica newtoniana de uma partícula e de um sistema de partículas. Referenciais não inerciais. Oscilações. Gravitação. Problema de força central. Colisões. Cinemática e dinâmica de corpos rígidos.
 bibliografia:
-  - referencia: 'John Taylo. Mecânica Clássica. Bookman, 2013.'
+  - referencia: 'John Taylo. Mecânica Clássica. Bookman Editora, 2013.'
     url: 'https://books.google.com.br/books/about/Mec%C3%A2nica_Cl%C3%A1ssica.html?id=A6Y5AgAAQBAJ&redir_esc=y'
   - referencia: 'CARROLL, S. M. Spacetime and Geometry: An Introduction to General Relativity. Cambridge: Cambridge University Press, 2019.'
     url: 'https://exemplo.invalid/bibliografia/carroll-spacetime-and-geometry'
