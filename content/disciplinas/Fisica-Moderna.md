@@ -1,14 +1,14 @@
 ---
 publicado: true
-nome: Mecânica Clássica I
+nome: Física Moderna I
 semestre: '2026.2'
 status: atual
-descricao: 'Curso de nível de graduação voltado para a abordagem da Mecânica Clássica via Leis de Newton. Estudo das leis de conservação de energia, momento linear e momento angular para uma partícula e um sistema de partículas. Abordagem da mecânica em um referencial não-inercial. '
+descricao: 'Curso de nível de graduação que descreve a quebra dos paradigmas da física clássica e o nascimento dos pilares da física moderna: A Teoria da Relatividade Especial e a Mecânica Quântica. '
 imagem: /uploads/extensao-exemplo-1.jpg
-ementa: Mecânica newtoniana de uma partícula e de um sistema de partículas. Referenciais não inerciais. Oscilações. Gravitação. Problema de força central. Colisões. Cinemática e dinâmica de corpos rígidos.
+ementa: 'Cenário Físico do final do século XIX. Cinemática e dinâmica relativística. Raios X e radioatividade. Problema do Corpo Negro. Efeito Fotoelétrico. A descoberta do elétron, próton e nêutron. Medida da carga elementar. Efeito Compton. Modelos atômicos. Teoria de de Broglie. Equação de Schrödinger. Função de onda e suas propriedades. Interpretação probabilística. Postulados da Mecânica Quântica. Soluções da equação de onda estacionária: partícula livre, barreira de potencial, poço de potencial. Princípio da incerteza.'
 bibliografia:
-  - referencia: 'John Taylor. Mecânica Clássica. Bookman Editora, 2013.'
-    url: 'https://books.google.com.br/books/about/Mec%C3%A2nica_Cl%C3%A1ssica.html?id=A6Y5AgAAQBAJ&redir_esc=y'
+  - referencia: 'Francisco Caruso e Vitor Oguri. Física Moderna: Origens Clássicas e Fundamentos Quânticos. Editora LTC, 2006/'
+    url: 'https://www.scribd.com/document/482651495/Fisica-Moderna-Caruso-e-Oguri-pdf'
   - referencia: 'CARROLL, S. M. Spacetime and Geometry: An Introduction to General Relativity. Cambridge: Cambridge University Press, 2019.'
     url: 'https://exemplo.invalid/bibliografia/carroll-spacetime-and-geometry'
 aulas:
@@ -71,5 +71,4 @@ scripts:
     aula: 4
     url: 'https://exemplo.invalid/rg-2026-2/script-horizonte-kerr.py'
 ---
-
 
