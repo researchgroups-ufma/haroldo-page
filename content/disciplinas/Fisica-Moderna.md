@@ -33,9 +33,9 @@ aulas:
     descricao: O experimento de Trountle-Noble e o experimento de Michelson-Morley. A hipótese do arrastamento do éter. A experiência de Fizeau-Fresnel. Tentativas de salvar a hipótese do éter. Teorias de emissão.
     url: 'https://exemplo.invalid/rg-2026-2/aula-04'
   - numero: 5
-    titulo: Ondas gravitacionais no regime linearizado
+    titulo: O princípio da Relatividade e os postulados da Teoria da Relatividade Especial.
     data: '2026-09-14'
-    descricao: 'Perturbações da métrica de fundo, calibre TT e a fórmula de quadrupolo.'
+    descricao: O princípio da Relatividade. Os postulados da Relatividade Especial. Consequências dos postulados. Relatividade da simultaneidade. Relatividade de intervalos de tempo e comprimentos.
     url: 'https://exemplo.invalid/rg-2026-2/aula-05'
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
