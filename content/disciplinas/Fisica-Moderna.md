@@ -75,7 +75,7 @@ aulas:
     descricao: A teoria da transmutação e a lei de decaimento radioativo. Cálculo de meia-vida e aplicações. Determinação do número de Avogadro por Rutherford.
     url: ' '
   - numero: 15
-    titulo: A radiação de corpo negro.
+    titulo: A radiação de corpo negro e a catástrofe do ultravioleta
     descricao: 'A radiação de corpo negro. Conceitos de radiação térmica. Radiância. Espectro de corpo negro. Lei de Stephan, Lei de Wien e aplicações.'
     url: ' '
   - {}
