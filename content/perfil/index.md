@@ -29,9 +29,9 @@ atuacao:
     periodo: atual
 areas:
   - nome: Teoria da Relatividade Geral e teorias alternativas de gravitação
+  - nome: Sombras de buracos negros
   - nome: Perturbações lineares em espaços-tempos curvos
   - nome: Forças de maré
-  - nome: Sombras de buracos negros
 email: haroldo.lima@ufma.br
 links:
   lattes: 'http://lattes.cnpq.br/8115459874963916'
