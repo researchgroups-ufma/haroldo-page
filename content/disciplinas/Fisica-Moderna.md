@@ -45,7 +45,11 @@ aulas:
     titulo: Lei de adição de velocidades e efeito Doppler relativístico para a luz.
     descricao: Lei de adição de velocidades. Efeito Doppler Relativístico para a luz. Resolução de problemas sobre cinemática relativística.
     url: ' '
-  - {}
+  - numero: 8
+    titulo: 'Dinâmica relativística. O momento linear relativístico. A energia cinética relativística. '
+    descricao: |
+      Dinâmica relativística. O momento linear relativístico. A energia cinética relativística. 
+    url: ' '
   - {}
   - {}
   - {}
