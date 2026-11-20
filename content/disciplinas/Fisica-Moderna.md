@@ -23,9 +23,9 @@ aulas:
     descricao: 'Cálculo da reflexão e refração para as duas teorias.  A medida da velocidade da luz e a predileção pela teoria ondulatória.  A teoria moderna da luz:  O eletromagnetismo e as equações de Maxwell. Demonstração da equação de onda no vácuo a partir das equações de Maxwell.   '
     url: 'https://exemplo.invalid/rg-2026-2/aula-02'
   - numero: 3
-    titulo: A solução de Schwarzschild e seus horizontes
+    titulo: 'O conflito entre as transformações de Galileu e a equação da onda eletromagnética. '
     data: '2026-08-24'
-    descricao: 'Solução estática e esfericamente simétrica, coordenadas de Eddington-Finkelstein e a estrutura causal.'
+    descricao: 'O conflito entre as transformações de Galileu e a equação da onda eletromagnética. A hipótese do Éter Luminífero. '
     url: 'https://exemplo.invalid/rg-2026-2/aula-03'
   - numero: 4
     titulo: A métrica de Kerr e buracos negros em rotação
