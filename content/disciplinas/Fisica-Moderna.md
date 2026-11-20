@@ -123,6 +123,12 @@ aulas:
     titulo: 'O átomo de Sommerfeld. '
     descricao: O átomo de Sommerfeld. Regras de quantização dos números quânticos do modelo de Sommerfeld. A constante de estrutura fina.
     url: ' '
+  - numero: 26
+    titulo: A hipótese de De Broglie.
+    descricao: |-
+      A hipótese de De Broglie. Ondas de matéria. Motivação
+      para equação de Schrodinger.
+    url: ' '
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
     data_entrega: '2026-09-07'
