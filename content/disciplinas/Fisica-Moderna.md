@@ -70,7 +70,7 @@ aulas:
     titulo: A descoberta da Radioatividade.
     descricao: 'A descoberta da Radioatividade. Fluorescência, Fosforescência e os resultados de Becquerel. Os raios alpha, beta e gamma . Desvio dos raios em campos magnéticos. Natureza de cada raio.'
     url: ' '
-  - numero: 13
+  - numero: 14
     titulo: A teoria da transmutação e a lei de decaimento radioativo
     descricao: A teoria da transmutação e a lei de decaimento radioativo. Cálculo de meia-vida e aplicações. Determinação do número de Avogadro por Rutherford.
     url: ' '
