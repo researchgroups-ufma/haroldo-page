@@ -2,7 +2,7 @@
 publicado: true
 titulo: Sombras de buracos negros
 ordem: 1
-resumo: 'Modelagem da sombra projetada por buracos negros e comparação com as imagens obtidas por interferometria de longa base. Editado pelo plano 021 para demonstrar o critério de conclusão da fase 1. [CONTEÚDO DE EXEMPLO] [verificação 026 — 2026-09-11]'
+resumo: Estudo analítico e modelagem computacional da sombra projetada por buracos negros e outros objetos compactos. As recentes imagens reais obtidas pela colaboração Event Horizon Telescope motivam o estudo teórico da aparência desses objetos misteriosos.
 imagem: /uploads/extensao-exemplo-1.jpg
 ---
 
