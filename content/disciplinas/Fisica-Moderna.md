@@ -92,6 +92,19 @@ aulas:
       O efeito Compton. Espalhamento de raio x por grafite. Derivação detalhada da fórmula do espalhamento
       Compton.
     url: ' '
+  - numero: 19
+    titulo: 'Modelos atômicos: O átomo de Thomson.'
+    descricao: |-
+      Modelos atômicos: O átomo de Thomson. Descrição do
+      modelo de Thomson. Cálculo do espalhamento no modelo
+      de Thomson.
+    url: ' '
+  - {}
+  - {}
+  - {}
+  - {}
+  - {}
+  - {}
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
     data_entrega: '2026-09-07'
