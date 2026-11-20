@@ -28,9 +28,9 @@ aulas:
     descricao: 'O conflito entre as transformações de Galileu e a equação da onda eletromagnética. A hipótese do Éter Luminífero. '
     url: 'https://exemplo.invalid/rg-2026-2/aula-03'
   - numero: 4
-    titulo: A métrica de Kerr e buracos negros em rotação
+    titulo: O experimento de Trountle-Noble e o experimento de Michelson-Morley.
     data: '2026-08-31'
-    descricao: 'Ergosfera, horizontes interno e externo, e o teorema de unicidade.'
+    descricao: O experimento de Trountle-Noble e o experimento de Michelson-Morley. A hipótese do arrastamento do éter. A experiência de Fizeau-Fresnel. Tentativas de salvar a hipótese do éter. Teorias de emissão.
     url: 'https://exemplo.invalid/rg-2026-2/aula-04'
   - numero: 5
     titulo: Ondas gravitacionais no regime linearizado
