@@ -9,8 +9,8 @@ ementa: 'Cenário Físico do final do século XIX. Cinemática e dinâmica relat
 bibliografia:
   - referencia: 'Francisco Caruso e Vitor Oguri. Física Moderna: Origens Clássicas e Fundamentos Quânticos. Editora LTC, 2006/'
     url: 'https://www.scribd.com/document/482651495/Fisica-Moderna-Caruso-e-Oguri-pdf'
-  - referencia: 'CARROLL, S. M. Spacetime and Geometry: An Introduction to General Relativity. Cambridge: Cambridge University Press, 2019.'
-    url: 'https://exemplo.invalid/bibliografia/carroll-spacetime-and-geometry'
+  - referencia: 'Robert Eisberg e Robert Resnick, Física Quântica: Átomos, Moléculas, Sólidos, Núcleos e Partículas. Editora LTC, 1979'
+    url: 'https://archive.org/details/FsicaQunticaEisbergEResnick'
 aulas:
   - numero: 1
     titulo: 'Variedades, tensores e a conexão de Levi-Civita'
