@@ -86,7 +86,12 @@ aulas:
     titulo: A natureza corpuscular da luz. O efeito fotoelétrico.
     descricao: A natureza corpuscular da luz. O efeito fotoelétrico. Postulados de Einstein para o efeito fotoelétrico.
     url: ' '
-  - {}
+  - numero: 18
+    titulo: O efeito Compton.
+    descricao: |-
+      O efeito Compton. Espalhamento de raio x por grafite. Derivação detalhada da fórmula do espalhamento
+      Compton.
+    url: ' '
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
     data_entrega: '2026-09-07'
