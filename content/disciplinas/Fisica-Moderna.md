@@ -137,7 +137,7 @@ listas:
   - titulo: Lista 1 — Relatividade Especial e Descoberta do Elétron e Raio-x
     data_entrega: '2026-09-07'
     url: 'https://exemplo.invalid/rg-2026-2/lista-01'
-  - titulo: Lista 2 — Soluções de vácuo e horizontes
+  - titulo: Lista 2 — A velha mecânica quântica.
     url: 'https://exemplo.invalid/rg-2026-2/lista-02'
 materiais:
   - titulo: 'Slides — Módulo 1: geometria diferencial'
