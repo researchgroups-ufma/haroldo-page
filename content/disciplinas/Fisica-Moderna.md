@@ -78,7 +78,10 @@ aulas:
     titulo: A radiação de corpo negro e a catástrofe do ultravioleta
     descricao: 'A radiação de corpo negro. Conceitos de radiação térmica. Radiância. Espectro de corpo negro. Lei de Stephan, Lei de Wien e aplicações. A catástrofe do ultravioleta.'
     url: ' '
-  - {}
+  - numero: 16
+    titulo: A solução de Max Planck em 1900 para a catástrofe do ultravioleta
+    descricao: A solução de Max Planck em 1900 para a catástrofe do ultravioleta. O quanta de energia. Fórmula de Planck.
+    url: ' '
   - {}
   - {}
 listas:
