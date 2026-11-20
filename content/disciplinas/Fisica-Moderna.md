@@ -82,7 +82,10 @@ aulas:
     titulo: A solução de Max Planck em 1900 para a catástrofe do ultravioleta
     descricao: A solução de Max Planck em 1900 para a catástrofe do ultravioleta. O quanta de energia. Fórmula de Planck.
     url: ' '
-  - {}
+  - numero: 17
+    titulo: A natureza corpuscular da luz. O efeito fotoelétrico.
+    descricao: A natureza corpuscular da luz. O efeito fotoelétrico. Postulados de Einstein para o efeito fotoelétrico.
+    url: ' '
   - {}
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
