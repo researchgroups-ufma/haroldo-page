@@ -103,7 +103,10 @@ aulas:
     titulo: 'O experimento de Rutherford-Geiger-Marsden e o modelo atômico de Rutherford. '
     descricao: 'O experimento de Rutherford-Geiger-Marsden. Cálculo detalhado do espalhamento de partículas alpha pelo núcleo. '
     url: ' '
-  - {}
+  - numero: 21
+    titulo: 'A instabilidade do modelo de Rutherford. '
+    descricao: A instabilidade do modelo de Rutherford. O cálculo da potência irradiada no modelo. Instabilidade atômica. Tempo de instabilidade.
+    url: ' '
   - {}
   - {}
   - {}
