@@ -111,7 +111,7 @@ aulas:
     titulo: 'Linhas espectrais atômicas e as séries de Balmer, Lyman e Rydberg.'
     descricao: 'Linhas espectrais atômicas e as séries de Balmer, Lyman e Rydberg.'
     url: ' '
-  - numero: 22
+  - numero: 23
     titulo: 'O átomo de Bohr: A ruptura com a física clássica. '
     descricao: 'O átomo de Bohr. Os postulados de Bohr. Quantização do raio, velocidade e energia. Explicação da fórmula empírica de Rydberg.'
     url: ' '
