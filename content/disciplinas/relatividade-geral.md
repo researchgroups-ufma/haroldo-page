@@ -1,13 +1,14 @@
 ---
 publicado: true
-nome: Relatividade Geral
+nome: Mecânica Clássica I
 semestre: '2026.2'
 status: atual
+descricao: 'Curso de nível de graduação voltado para a abordagem da Mecânica Clássica via Leis de Newton. Estudo das leis de conservação de energia, momento linear e momento angular para uma partícula e um sistema de partículas. Abordagem da mecânica em um referencial não-inercial. '
 imagem: /uploads/extensao-exemplo-1.jpg
-descricao: 'Curso de pós-graduação em relatividade geral, da geometria diferencial às soluções de buraco negro. [CONTEÚDO DE EXEMPLO]'
-ementa: Variedades e tensores; conexão e curvatura; equações de campo de Einstein; soluções de Schwarzschild e Kerr; ondas gravitacionais no regime linear.
+ementa: Mecânica newtoniana de uma partícula e de um sistema de partículas. Referenciais não inerciais. Oscilações. Gravitação. Problema de força central. Colisões. Cinemática e dinâmica de corpos rígidos.
 bibliografia:
-  - referencia: 'WALD, R. M. General Relativity. Chicago: University of Chicago Press, 1984.'
+  - referencia: 'John Taylo. Mecânica Clássica. Bookman, 2013.'
+    url: 'https://books.google.com.br/books/about/Mec%C3%A2nica_Cl%C3%A1ssica.html?id=A6Y5AgAAQBAJ&redir_esc=y'
   - referencia: 'CARROLL, S. M. Spacetime and Geometry: An Introduction to General Relativity. Cambridge: Cambridge University Press, 2019.'
     url: 'https://exemplo.invalid/bibliografia/carroll-spacetime-and-geometry'
 aulas:
