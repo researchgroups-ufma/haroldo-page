@@ -129,6 +129,10 @@ aulas:
       A hipótese de De Broglie. Ondas de matéria. Motivação
       para equação de Schrodinger.
     url: ' '
+  - numero: 27
+    titulo: 'O princípio da incerteza de Heisenberg. '
+    descricao: 'O princípio da incerteza de Heisenberg. Discussão sobre o problema da medida simultânea de posição e velocidade do elétron. '
+    url: ' '
 listas:
   - titulo: Lista 1 — Geometria diferencial e tensores
     data_entrega: '2026-09-07'
