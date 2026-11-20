@@ -54,7 +54,10 @@ aulas:
     titulo: Energia total e a dedução da célebre fórmula E=mc^2. Análise de uma colisão relativística.
     descricao: Energia total e a dedução da célebre fórmula E=mc^2. Análise de uma colisão relativística.
     url: ' '
-  - {}
+  - numero: 10
+    titulo: O tubo de Crookes e a descoberta dos catódicos.
+    descricao: 'O tubo de Crookes e a descoberta dos catódicos. As experiências de Thomson com raios catódicos sob campo eletromagnéticos. Cálculo do ângulo de deflexão e determinação da razão carga-massa. '
+    url: ' '
   - {}
   - {}
 listas:
