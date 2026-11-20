@@ -134,7 +134,7 @@ aulas:
     descricao: 'O princípio da incerteza de Heisenberg. Discussão sobre o problema da medida simultânea de posição e velocidade do elétron. '
     url: ' '
 listas:
-  - titulo: Lista 1 — Geometria diferencial e tensores
+  - titulo: Lista 1 — Relatividade Especial e Descoberta do Elétron e Raio-x
     data_entrega: '2026-09-07'
     url: 'https://exemplo.invalid/rg-2026-2/lista-01'
   - titulo: Lista 2 — Soluções de vácuo e horizontes
