@@ -29,7 +29,10 @@ aulas:
     data: ''
     descricao: 'Aplicações das leis de Newton em 1D. Forças que dependem do tempo, e da velocidade.'
     url: ' '
-  - {}
+  - numero: 5
+    titulo: Aplicações das leis de Newton em 3D. Disparo de projéteis e o problema de Larmor
+    descricao: Aplicações das leis de Newton em 3D. Disparo de projéteis e o problema de Larmor
+    url: ' '
   - {}
   - {}
   - {}
