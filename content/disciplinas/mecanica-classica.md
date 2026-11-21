@@ -151,6 +151,10 @@ aulas:
     titulo: 'Equação de Euler. '
     descricao: Equação de Euler. Demonstração da equação de Euler.
     url: ' '
+  - numero: 36
+    titulo: 'Movimento livre de um pião esférico e um pião simétrico. '
+    descricao: 'Movimento livre de um pião esférico e um pião simétrico. '
+    url: ' '
 listas:
   - {}
   - {}
