@@ -156,7 +156,7 @@ aulas:
     titulo: 'Os eixos principais de um sólido. '
     descricao: 'Os eixos principais de um sólido. Revisão de determinação de autovalor e autovetor. Os diferentes tipos de piões. Pião esférico, pião simétrico e pião assimétrico.'
     url: ' '
-  - numero: 34
+  - numero: 37
     titulo: 'Tensor de inércia em sistemas de coordenadas diferentes. '
     descricao: Tensor de inércia em sistemas de coordenadas diferentes. O teorema de Steiner ou teorema dos eixos paralelos.
     url: ' '
