@@ -29,6 +29,10 @@ aulas:
     data: ''
     descricao: 'Aplicações das leis de Newton em 1D. Forças que dependem do tempo, e da velocidade.'
     url: ' '
+  - numero: 4
+    titulo: 'Oscilador Harmônico Simples. '
+    descricao: 'Oscilador Harmônico Simples. Lei de Hooke. Solução exata do problema. '
+    url: ' '
   - numero: 5
     titulo: Aplicações das leis de Newton em 3D. Disparo de projéteis.
     descricao: Aplicações das leis de Newton em 3D. Disparo de projéteis e o problema de Larmor
@@ -154,10 +158,6 @@ aulas:
   - numero: 36
     titulo: 'Movimento livre de um pião esférico e um pião simétrico. '
     descricao: 'Movimento livre de um pião esférico e um pião simétrico. '
-    url: ' '
-  - numero: 4
-    titulo: 'Oscilador Harmônico Simples. '
-    descricao: 'Oscilador Harmônico Simples. Lei de Hooke. Solução exata do problema. '
     url: ' '
 listas:
   - {}
