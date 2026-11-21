@@ -152,7 +152,7 @@ aulas:
   - numero: 35
     titulo: Cálculo do tensor de inércia para algumas distribuições. O tensor de inércia de um cubo.
     url: ' '
-  - numero: 33
+  - numero: 36
     titulo: 'Os eixos principais de um sólido. '
     descricao: 'Os eixos principais de um sólido. Revisão de determinação de autovalor e autovetor. Os diferentes tipos de piões. Pião esférico, pião simétrico e pião assimétrico.'
     url: ' '
