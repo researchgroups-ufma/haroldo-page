@@ -80,7 +80,10 @@ aulas:
     titulo: Sistemas de massa variável. O movimento de foguetes.
     descricao: Sistemas de massa variável. O movimento de foguetes.
     url: ' '
-  - {}
+  - numero: 18
+    titulo: 'Movimento em um sistema de referência não inercial. Movimento relativo de translação. '
+    descricao: 'As limitações da Mecânica Newtoniana. Movimento em um sistema de referência não inercial. Movimento relativo de translação. '
+    url: ' '
   - {}
   - {}
   - {}
