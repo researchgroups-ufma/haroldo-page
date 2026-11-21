@@ -45,7 +45,7 @@ aulas:
     titulo: Trabalho e Energia em 1 dimensão. Parte I
     descricao: 'Trabalho e Energia em 1 dimensão. Fundamentos teóricos sobre energia cinética, trabalho realizado por uma força constante e forças variáveis.  '
     url: '  '
-  - numero: 5
+  - numero: 9
     titulo: Aplicações das leis de Newton em 3D. Disparo de projéteis.
     descricao: Aplicações das leis de Newton em 3D. Disparo de projéteis e o problema de Larmor
     url: ' '
