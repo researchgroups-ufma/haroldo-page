@@ -57,7 +57,7 @@ aulas:
     titulo: Trabalho e Energia em 1 dimensão. Parte II
     descricao: 'O Teorema Trabalho-Energia. A energia potencial e a definição de forças conservativas. Energia mecânica total e sua conservação. '
     url: ' '
-  - numero: 9
+  - numero: 12
     titulo: 'Interpretação do movimento a partir da função energia potencial. '
     descricao: 'Interpretação do movimento a partir da função energia potencial. Pontos de equilíbrio estável, instável e indiferente. '
     url: ' '
