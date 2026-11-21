@@ -145,7 +145,7 @@ aulas:
     titulo: 'O momento de Inércia. '
     descricao: O momento de Inércia. Cálculo do momento de inércia para diferentes distribuições. Solução do problema do pêndulo físico ou pêndulo composto.
     url: ' '
-  - numero: 31
+  - numero: 34
     titulo: 'O conceito do tensor de inércia '
     descricao: Movimento não-planar. O momento angular não está na mesma direção da velocidade angular! O conceito do tensor de inércia com o cálculo de L=I ɷ.
     url: ' '
