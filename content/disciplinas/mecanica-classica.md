@@ -124,6 +124,16 @@ aulas:
     titulo: 'O problema de Rutherford: seção de espalhamento Rutherford e a descoberta do núcleo.'
     descricao: 'O problema de Rutherford: seção de espalhamento Rutherford e a descoberta do núcleo.'
     url: ' '
+  - numero: 29
+    titulo: O que é um corpo rígido?
+    descricao: Corpo Rígido. O que é um corpo rígido? Definições iniciais. Contagem de graus de liberdade no movimento de um corpo rígido. Movimento planar simples de uma única partícula. Discussão sobre o conceito de momento angular.
+    url: ' '
+  - {}
+  - {}
+  - {}
+  - {}
+  - {}
+  - {}
 listas:
   - {}
   - {}
