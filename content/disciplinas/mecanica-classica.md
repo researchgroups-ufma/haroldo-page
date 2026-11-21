@@ -88,7 +88,10 @@ aulas:
     titulo: 'Referenciais acelerados. '
     descricao: O pêndulo simples em um vagão acelerado. A medida da normal em um vagão acelerado. Comentários sobre o princípio da equivalência de Einstein.
     url: ' '
-  - {}
+  - numero: 20
+    titulo: Movimento em um sistema de referência em rotação. Parte I.
+    descricao: 'Derivação da segunda lei de Newton em um referencial girante. As forças de inércia de Coriolis e centrífuga. '
+    url: ' '
   - {}
   - {}
   - {}
