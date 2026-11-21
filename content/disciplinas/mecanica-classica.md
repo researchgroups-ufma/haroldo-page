@@ -136,7 +136,9 @@ aulas:
     titulo: 'O conceito do tensor de inércia '
     descricao: Movimento não-planar. O momento angular não está na mesma direção da velocidade angular! O conceito do tensor de inércia com o cálculo de L=I ɷ.
     url: ' '
-  - {}
+  - numero: 33
+    titulo: Cálculo do tensor de inércia para algumas distribuições. O tensor de inércia de um cubo.
+    url: ' '
   - {}
   - {}
   - {}
