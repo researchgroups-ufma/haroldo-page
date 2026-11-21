@@ -174,6 +174,7 @@ listas:
     url: ' '
   - titulo: Gravitação e forças centrais
     url: ' '
-  - {}
+  - titulo: Rotações e corpo rígido
+    url: ' '
 ---
 
