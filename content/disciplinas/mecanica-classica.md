@@ -133,7 +133,7 @@ aulas:
     titulo: O teorema de Bertrand. Estabilidade de órbitas circulares em problemas de forças centrais.
     descricao: Órbitas em um campo de força central a partir do potencial efetivo. O teorema de Bertrand. Estabilidade de órbitas circulares em problemas de forças centrais.
     url: ' '
-  - numero: 28
+  - numero: 31
     titulo: 'O problema de Rutherford: seção de espalhamento Rutherford e a descoberta do núcleo.'
     descricao: 'O problema de Rutherford: seção de espalhamento Rutherford e a descoberta do núcleo.'
     url: ' '
