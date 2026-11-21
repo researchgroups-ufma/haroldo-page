@@ -96,7 +96,10 @@ aulas:
     titulo: Movimento em um sistema de referência em rotação. Parte II
     descricao: 'Aplicações da força centrífuga. Aplicações da força de Coriolis. '
     url: ' '
-  - {}
+  - numero: 22
+    titulo: A 2º Lei de Newton em diferentes sistemas de coordenadas.
+    descricao: 'A 2º Lei de Newton em diferentes sistemas de coordenadas. Coordenadas polares, cilíndricas e  esféricas. Solução elegante do pêndulo simples com o uso de coordenadas polares. (Coordenadas generalizadas serão vistas em Clássica II).'
+    url: ' '
   - {}
   - {}
   - {}
