@@ -69,7 +69,7 @@ aulas:
     titulo: Formulação diferencial da condição de uma força conservativa
     descricao: 'O Teorema de Stokes e a formulação diferencial da condição necessária e suficiente de uma força conservativa em 3D: rot F=0.'
     url: ' '
-  - numero: 12
+  - numero: 15
     titulo: Dinâmica de um sistema de partículas
     descricao: 'Conceitos iniciais. Determinação do centro de massa para sistemas discretos. O cálculo do centro de massa para distribuições contínuas 1D, 2D, e 3D. '
     url: ' '
