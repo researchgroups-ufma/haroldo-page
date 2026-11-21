@@ -141,7 +141,7 @@ aulas:
     titulo: O que é um corpo rígido?
     descricao: Corpo Rígido. O que é um corpo rígido? Definições iniciais. Contagem de graus de liberdade no movimento de um corpo rígido. Movimento planar simples de uma única partícula. Discussão sobre o conceito de momento angular.
     url: ' '
-  - numero: 30
+  - numero: 33
     titulo: 'O momento de Inércia. '
     descricao: O momento de Inércia. Cálculo do momento de inércia para diferentes distribuições. Solução do problema do pêndulo físico ou pêndulo composto.
     url: ' '
