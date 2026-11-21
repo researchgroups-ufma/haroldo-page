@@ -125,7 +125,7 @@ aulas:
     titulo: Solução do problema de dois corpos interagindo via força gravitacional
     descricao: 'Solução do problema de dois corpos interagindo via força gravitacional. Demonstração formal das leis empíricas de Kepler. '
     url: ' '
-  - numero: 26
+  - numero: 29
     titulo: 'A equação de Binet e suas aplicações. '
     descricao: 'A equação de Binet e suas aplicações. Como calcular a órbita dada a força central. Como calcular a força central dada a órbita. '
     url: ' '
