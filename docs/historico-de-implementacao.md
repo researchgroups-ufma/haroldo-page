@@ -261,3 +261,8 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
 - **2026-10-02 — 073 DONE** (`ead6056`): **fase 4 concluída, 9/9.** No navegador, as 8 rotas EN em 360/768/1440 sem rolagem
   horizontal (24/24), inspeção M-07 sem texto de interface em PT fora de `lang="pt-BR"`, fallback item a item (91 linhas, todo PT
   marcado) e seletor ida e volta nas 8 rotas. PRD v0.1.72; README da fase com o que a fase empurra para a 5. Dois ciclos de revisão.
+
+- **2026-11-21 — 086 DONE** (`19ece89`): aula e lista com link opcional (branco vale como ausente) e `beforeSubmit` na coleção
+  de disciplinas que descarta o item vazio e recusa o item pela metade e o link que não é endereço. O build de deploy reprovava
+  desde 2026-11-20 pelos `url: ' '`, `AAAA` e `- {}` salvos pelo painel; voltou a verde (versão `fa471ac9`) sem edição em
+  `content/`. Painel verificado no Edge. PRD v0.1.82. Quatro ciclos de revisão.

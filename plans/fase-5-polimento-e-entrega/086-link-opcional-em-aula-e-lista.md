@@ -1,6 +1,6 @@
 # Plano 086 — Link opcional em aula e lista, e item vazio descartado no painel (RF-07, RF-24, F-09)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RF-07** e **RF-24** (aula e lista sem link); **F-09** e **RNF-09** (o painel não grava o que o build recusa); Aviso 2 de `docs/avisos-do-painel-para-o-manual.md`, na coleção `disciplinas`. Plano transversal: não fecha item do §12.
 **Depende de:** nada. É urgente: o site está sem deploy desde 2026-11-20 16:32 UTC.
 **Modelo recomendado:** sonnet
@@ -271,7 +271,7 @@ arquivos tocados recebem o cabeçalho §10.1 (Descrição quando mudar, `Atualiz
 - [x] Canários A, B e C vermelhos e desfeitos
 - [x] PRD em v0.1.82 com §7.3, RF-07, RF-24 e §0.1; Aviso 2 atualizado
 - [x] `lint`, `format:check`, `test:coverage`, `build:pipeline`, `test:dist` verdes, com saída colada
-- [ ] Workers Builds `success` no SHA completo, vigia verde, e o CI vermelho só no passo de auditoria
+- [x] Workers Builds `success` no SHA completo, vigia verde, e o CI vermelho só no passo de auditoria (os passos seguintes ficaram pulados, não verdes: ver "Passo 12")
 
 ## Evidência
 
@@ -2430,3 +2430,42 @@ Arquivo gravado lido com `cat` depois de cada Save:
 - O do hover, pelo item 5.
 
 **Lock regravado pelo `tinacms dev`:** o `tina/tina-lock.json` foi regravado pelo `tinacms dev` do painel, com mtime posterior ao `triage2` (o revisor apontou no ciclo 3). O conteúdo segue com a mesma diferença do executor. `git diff --stat tina/tina-lock.json` dá `1 file changed, 1 insertion(+), 1 deletion(-)`. Depois da segunda sessão, `npx vitest run tests/content/tina-lock-coerente.test.ts tests/content/paridade-schema.test.ts tests/content/tina-disciplinas.test.ts` deu `Test Files  3 passed (3)` e `Tests  38 passed (38)`. Limpeza da segunda sessão: aba fechada, `astro dev stop`, processos encerrados, portas 9000, 4001 e 4321 livres, `teste-086.md` apagado e `git status --short -- content/ | wc -l` = `0`.
+
+### Passo 12 — push e produção (orquestrador, 2026-11-21)
+
+Push autorizado pelo dono do produto. Commit de trabalho `19ece899303e6d418a1953da0e427426f8d2a2cc` (`ec6025e..19ece89  main -> main`). O remoto não tinha andado (`git fetch`: 0 commits à frente).
+
+**Workers Builds**, check-run do SHA completo:
+```
+Workers Builds: haroldo-page | success | 2026-11-21T21:36:25Z
+
+Build ID: [04fc23b2-9fa1-4a82-a7b4-63fd0b848bea](https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production/builds/04fc23b2-9fa1-4a82-a7b4-63fd0b848bea)
+Script: [haroldo-page](https://dash.cloudflare.com/98e35087677f329c2adbf68711ecebbf/workers/services/view/haroldo-page/production)
+Version ID: fa471ac9-f1bc-45e4-9211-b379ed590ce2
+```
+É o primeiro build de deploy verde desde o `9128f6e` (2026-11-20 16:32 UTC).
+
+**Produção** (`https://haroldo-page.and-near.workers.dev`):
+```
+ensino/fisica-moderna/ -> 200 | li.aula=27 | cartao-link=11
+ensino/mecanica-classica/ -> 200 | li.aula=39 | cartao-link=1
+ensino/ -> 200 | li.aula=0 | cartao-link=0
+Lei de adição de velocidades e efeito Doppler relativístico para a
+ensino/fisica-moderna producao=fea5dc07b54be937 dist=fea5dc07b54be937 IGUAL
+ensino/mecanica-classica producao=44a5960067612166 dist=44a5960067612166 IGUAL
+```
+A aula 7 de Física Moderna, que estava presa desde 2026-11-20, está no ar. O HTML servido é igual, por SHA-256 (16 primeiros dígitos), ao `dist/` revisado no ciclo 2.
+
+**Vigia do deploy** (`gh workflow run vigia-do-deploy.yml`): `workflow_dispatch completed success 2026-11-21T21:37:09Z 44952472714`.
+
+**CI `qualidade`** (run `44952081005`), passos:
+```
+4 Run npm ci: success
+5 Run node scripts/auditar-dependencias.mjs: failure
+6 Run npm run lint: skipped
+7 Run npm run format:check: skipped
+8 Run npm run test:coverage: skipped
+9 Run npm run build:pipeline: skipped
+10 Run npm run test:dist: skipped
+```
+O único passo reprovado é o do audit (12 alertas publicados desde 2026-11-20, plano 087). Os passos 6 a 10 **não rodaram** no CI, ficaram pulados. A prova deles é a suíte autoritativa local (`triage2`), e o `build:pipeline` também rodou verde no Workers Builds acima. O CI volta a verde com o plano 087.
