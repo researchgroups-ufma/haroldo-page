@@ -24,7 +24,11 @@ aulas:
     titulo: As leis de Newton e suas aplicações
     descricao: 'As leis de Newton e suas aplicações. Forças Usuais (Atrito, Normal, Arrasto, Força Elástica). '
     url: '  '
-  - {}
+  - numero: 4
+    titulo: 'Aplicações das leis de Newton em 1D. Forças que dependem do tempo, e da velocidade.'
+    data: ''
+    descricao: 'Aplicações das leis de Newton em 1D. Forças que dependem do tempo, e da velocidade.'
+    url: ' '
   - {}
   - {}
   - {}
