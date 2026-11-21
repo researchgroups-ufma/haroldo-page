@@ -16,7 +16,10 @@ aulas:
     titulo: 'O que é Mecânica? '
     descricao: 'O que é Mecânica? Posição, tempo e velocidade. Cinemática Escalar.'
     url: ' '
-  - {}
+  - numero: 2
+    titulo: 'A cinemática vetorial. '
+    descricao: 'A cinemática vetorial. O conceito de posição como um vetor: o vetor posição. Movimento circular uniforme.'
+    url: ' '
   - {}
   - {}
   - {}
