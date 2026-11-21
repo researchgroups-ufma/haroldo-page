@@ -73,7 +73,7 @@ aulas:
     titulo: Dinâmica de um sistema de partículas
     descricao: 'Conceitos iniciais. Determinação do centro de massa para sistemas discretos. O cálculo do centro de massa para distribuições contínuas 1D, 2D, e 3D. '
     url: ' '
-  - numero: 13
+  - numero: 16
     titulo: Momento linear de um sistema de partículas. A Dinâmica de um sistema de partículas.
     descricao: Momento linear de um sistema de partículas. A Dinâmica de um sistema de partículas. F_ext= dP_cm/dt. A conservação do momento linear na ausência de forças externas.
     url: ' '
