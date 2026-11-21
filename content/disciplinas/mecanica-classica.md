@@ -33,12 +33,21 @@ aulas:
     titulo: 'Oscilador Harmônico Simples. '
     descricao: 'Oscilador Harmônico Simples. Lei de Hooke. Solução exata do problema. '
     url: ' '
+  - numero: 6
+    titulo: ' Oscilações Amortecidas. '
+    descricao: ' Oscilações Amortecidas. Os diferentes regimes de amortecimento.'
+    url: ' '
+  - numero: 7
+    titulo: Oscilações Forçadas e amortecidas
+    descricao: 'Oscilações Forçadas e amortecidas. O fenômeno da ressonância. '
+    url: ' '
+  - numero: 8
+    titulo: Trabalho e Energia em 1 dimensão. Parte I
+    descricao: 'Trabalho e Energia em 1 dimensão. Fundamentos teóricos sobre energia cinética, trabalho realizado por uma força constante e forças variáveis.  '
+    url: '  '
   - numero: 5
     titulo: Aplicações das leis de Newton em 3D. Disparo de projéteis.
     descricao: Aplicações das leis de Newton em 3D. Disparo de projéteis e o problema de Larmor
-    url: ' '
-  - numero: 6
-    titulo: 'Partícula carregada em campo eletromagnético. O Problema de Larmor. '
     url: ' '
   - numero: 7
     titulo: Trabalho e Energia em 1 dimensão. Parte I
@@ -158,14 +167,6 @@ aulas:
   - numero: 36
     titulo: 'Movimento livre de um pião esférico e um pião simétrico. '
     descricao: 'Movimento livre de um pião esférico e um pião simétrico. '
-    url: ' '
-  - numero: 6
-    titulo: ' Oscilações Amortecidas. '
-    descricao: ' Oscilações Amortecidas. Os diferentes regimes de amortecimento.'
-    url: ' '
-  - numero: 7
-    titulo: Oscilações Forçadas e amortecidas
-    descricao: 'Oscilações Forçadas e amortecidas. O fenômeno da ressonância. '
     url: ' '
 listas:
   - titulo: Leis de Newton e conservação de energia
