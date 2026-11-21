@@ -236,8 +236,13 @@ arquivos tocados recebem o cabeçalho §10.1 (Descrição quando mudar, `Atualiz
 
 ### Orquestrador, depois do executor
 
-11. **Painel, no Vivaldi**, com `npm run dev`, em `http://localhost:4321/admin`, numa disciplina de
-    teste e não nas do professor. Verifique:
+11. **Painel, no Vivaldi**, em `http://localhost:4321/admin`, numa disciplina de teste e não nas
+    do professor. **Não use `npm run dev`:** no Astro 7, ele deixa o servidor do Tina morto ("Failed
+    loading TinaCMS assets", README, seção "Painel de edição"). Suba os dois servidores
+    separadamente, com `npx astro dev --background --force` e `npx tinacms dev`. Ao fim, rode
+    `npx astro dev stop` e encerre os processos `node` do `tinacms dev`. O painel local grava
+    direto no disco, então descarte a disciplina de teste com `git status` e `git clean`/`git
+    checkout` só nos arquivos dela. Verifique:
     - um "+" em Aulas sem preencher e Save → salva, e o arquivo gravado não tem o item;
     - uma aula com título e sem número → aparece o alerta "Não salvo: Aulas, item N: falta Número."
       e o arquivo não muda;
@@ -245,7 +250,6 @@ arquivos tocados recebem o cabeçalho §10.1 (Descrição quando mudar, `Atualiz
     - um link `AAAA` → alerta.
 
     Abra o arquivo gravado depois de cada save, não só a tela (memória: verificar no painel).
-    Descarte a disciplina de teste ao fim.
 12. **Produção**, depois do push. O push depende de autorização do dono do produto. Verifique:
     - o check `Workers Builds: haroldo-page` do SHA **completo** do commit termina `success`;
     - a página de Física Moderna em produção mostra as aulas 7 em diante;
