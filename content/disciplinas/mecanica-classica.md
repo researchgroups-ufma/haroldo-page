@@ -84,7 +84,10 @@ aulas:
     titulo: 'Movimento em um sistema de referência não inercial. Movimento relativo de translação. '
     descricao: 'As limitações da Mecânica Newtoniana. Movimento em um sistema de referência não inercial. Movimento relativo de translação. '
     url: ' '
-  - {}
+  - numero: 19
+    titulo: 'Referenciais acelerados. '
+    descricao: O pêndulo simples em um vagão acelerado. A medida da normal em um vagão acelerado. Comentários sobre o princípio da equivalência de Einstein.
+    url: ' '
   - {}
   - {}
   - {}
