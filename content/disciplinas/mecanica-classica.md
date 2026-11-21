@@ -39,7 +39,7 @@ aulas:
   - numero: 7
     titulo: Trabalho e Energia em 1 dimensão. Parte I
     descricao: 'Trabalho e Energia em 1 dimensão. Fundamentos teóricos sobre energia cinética, trabalho realizado por uma força constante e forças variáveis.  '
-    url: ' '
+    url: '  '
   - {}
   - {}
   - {}
