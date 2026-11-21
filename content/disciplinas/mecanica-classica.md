@@ -163,7 +163,7 @@ aulas:
     titulo: ' Oscilações Amortecidas. '
     descricao: ' Oscilações Amortecidas. Os diferentes regimes de amortecimento.'
     url: ' '
-  - numero: 4
+  - numero: 7
     titulo: Oscilações Forçadas e amortecidas
     descricao: 'Oscilações Forçadas e amortecidas. O fenômeno da ressonância. '
     url: ' '
