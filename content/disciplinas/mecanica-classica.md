@@ -108,7 +108,10 @@ aulas:
     titulo: Forças centrais na Física. O problema de dois corpos
     descricao: Forças centrais na Física. Conceitos iniciais. O problema de dois corpos interagindo via força central. O referencial do centro de massa e a massa reduzida. Conservação da energia e momento angular.
     url: ' '
-  - {}
+  - numero: 25
+    titulo: Solução do problema de dois corpos interagindo via força gravitacional
+    descricao: 'Solução do problema de dois corpos interagindo via força gravitacional. Demonstração formal das leis empíricas de Kepler. '
+    url: ' '
   - {}
   - {}
   - {}
