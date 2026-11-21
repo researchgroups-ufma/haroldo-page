@@ -20,7 +20,10 @@ aulas:
     titulo: 'A cinemática vetorial. '
     descricao: 'A cinemática vetorial. O conceito de posição como um vetor: o vetor posição. Movimento circular uniforme.'
     url: ' '
-  - {}
+  - numero: 3
+    titulo: As leis de Newton e suas aplicações
+    descricao: 'As leis de Newton e suas aplicações. Forças Usuais (Atrito, Normal, Arrasto, Força Elástica). '
+    url: ' '
   - {}
   - {}
   - {}
