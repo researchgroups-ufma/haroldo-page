@@ -92,7 +92,10 @@ aulas:
     titulo: Movimento em um sistema de referência em rotação. Parte I.
     descricao: 'Derivação da segunda lei de Newton em um referencial girante. As forças de inércia de Coriolis e centrífuga. '
     url: ' '
-  - {}
+  - numero: 21
+    titulo: Movimento em um sistema de referência em rotação. Parte II
+    descricao: 'Aplicações da força centrífuga. Aplicações da força de Coriolis. '
+    url: ' '
   - {}
   - {}
   - {}
