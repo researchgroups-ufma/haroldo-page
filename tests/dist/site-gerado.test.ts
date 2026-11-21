@@ -12,11 +12,11 @@
  *                 e §8.3 (um `<h1>` por página, `lang` por árvore: pt-BR; en sob `dist/en/`). Lê arquivos de `dist/`, não sobe
  *                 servidor. Roda separado da suíte padrão (`vitest.dist.config.ts`, plano 052,
  *                 README da fase 3, decisão 9) porque depende de `npm run build:pipeline` já ter
- *                 rodado.
+ *                 rodado. RF-24 (aula e lista sem link, plano 086) também.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-23
- *  Atualizado em: 2026-10-02
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-11-21
+ *  Versão       : 0.5.0
  *
  *  Dependências : vitest, gray-matter, node:fs, node:path, node:zlib, src/lib/courses.ts,
  *                 src/i18n, src/lib/routes.ts
@@ -45,7 +45,7 @@ import matter from 'gray-matter';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { courseSlug } from '../../src/lib/courses';
 import { strings } from '../../src/i18n';
-import { HTML_LANG, counterpartPath, localeFromPath } from '../../src/lib/routes';
+import { HTML_LANG, counterpartPath, coursePath, localeFromPath } from '../../src/lib/routes';
 import { siteConfig } from '../../src/lib/config';
 
 const repoRoot = join(__dirname, '../..');
@@ -778,5 +778,112 @@ describe('sublinhado que segue o cursor (link-traco) no menu e no contato', () =
       expect(links.length, rota).toBeGreaterThan(1);
       for (const link of links) expect(link, rota).toContain('link-traco');
     }
+  });
+});
+
+describe('aula e lista sem link (plano 086, RF-24)', () => {
+  const locales = ['pt', 'en'] as const;
+  type Aula = { url?: string };
+  type Disciplina = { slug: string; status: string; aulas: Aula[]; listas: Aula[] };
+
+  /** Disciplinas publicadas, lidas de `content/` (nunca do `dist/`, que é o artefato testado). */
+  const disciplinas: Disciplina[] = listMarkdownFiles(join(contentDir, 'disciplinas'))
+    .map((file) => ({ file, data: matter.read(file).data }))
+    .filter(({ data }) => data.publicado === true)
+    .map(({ file, data }) => ({
+      slug: courseSlug(file),
+      status: String(data.status),
+      aulas: data.aulas ?? [],
+      listas: data.listas ?? [],
+    }));
+
+  // O `z.url()` do Zod 4 apara as pontas da URL; o esperado também usa `trim()` nas asserções 1 e 3.
+  /** `url` preenchida: texto com algo além de espaço (RF-24: em branco vale como ausente). */
+  const hasUrl = (item: Aula | undefined) => typeof item?.url === 'string' && item.url.trim() !== '';
+
+  /** Decodifica o atributo como o navegador: o Astro escapa `&` como `&amp;`. */
+  const decodeAttr = (value: string) =>
+    value
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+
+  const pageOf = (slug: string, locale: (typeof locales)[number]) =>
+    readFileSync(join(distDir, coursePath(slug, locale), 'index.html'), 'utf-8');
+
+  /** HTML do painel `id` (`aulas` ou `listas`), do `<section>` ao `</section>`. */
+  function panel(html: string, id: string): string {
+    const start = html.indexOf(`<section id="${id}"`);
+    if (start === -1) return '';
+    return html.slice(start, html.indexOf('</section>', start));
+  }
+
+  /**
+   * `href` de cada `<a>` com `class` começando em `cls`, decodificado, na ordem. Link sem `href`
+   * (o Astro omite o valor vazio: `<a href class=…>`) entra como `''`, para não passar despercebida.
+   */
+  const linksOf = (html: string, cls: string) =>
+    [...html.matchAll(/<a\s[^>]*>/g)]
+      .map((m) => m[0])
+      .filter((tag) => new RegExp(`\\sclass="${cls}[ "]`).test(tag))
+      .map((tag) => decodeAttr(tag.match(/\shref="([^"]*)"/)?.[1] ?? ''));
+
+  it('o conteúdo tem disciplina publicada (o laço não é vazio)', () => {
+    expect(disciplinas.length).toBeGreaterThan(0);
+  });
+
+  it.each([
+    ['aulas', 'aulas', 'cartao aula'],
+    ['listas', 'listas', 'cartao flex-col'],
+  ] as const)('%s: um <li> por item e um link só nos que têm url, na mesma ordem', (id, key, cls) => {
+    let checked = 0;
+    for (const course of disciplinas) {
+      const items = course[key];
+      if (items.length === 0) continue;
+      for (const locale of locales) {
+        const section = panel(pageOf(course.slug, locale), id);
+        const itemCount = section.split(`<li class="${cls}`).length - 1;
+        expect(itemCount, `${locale}/${course.slug} ${id}: <li>`).toBe(items.length);
+        expect(linksOf(section, 'cartao-link'), `${locale}/${course.slug} ${id}: links`).toEqual(
+          items.filter(hasUrl).map((item) => item.url?.trim()),
+        );
+        checked += 1;
+      }
+    }
+    expect(checked, `nenhuma disciplina com ${id}`).toBeGreaterThan(0);
+  });
+
+  it('capa: o botão "Última aula" existe se e só se a última aula tem url', () => {
+    let checked = 0;
+    for (const course of disciplinas.filter((c) => c.status === 'atual')) {
+      const latest = course.aulas.at(-1);
+      for (const locale of locales) {
+        const buttons = linksOf(pageOf(course.slug, locale), 'botao botao-cheio');
+        expect(buttons, `${locale}/${course.slug}: botão`).toEqual(hasUrl(latest) ? [latest?.url?.trim()] : []);
+        checked += 1;
+      }
+    }
+    expect(checked, 'nenhuma disciplina em curso').toBeGreaterThan(0);
+  });
+
+  it('Ensino: o atalho da última aula tem <a> se e só se ela tem url', () => {
+    let checked = 0;
+    for (const locale of locales) {
+      const html = readFileSync(
+        join(distDir, locale === 'pt' ? 'ensino' : 'en/teaching', 'index.html'),
+        'utf-8',
+      );
+      const cards = html.split('<article ').slice(1);
+      for (const course of disciplinas.filter((c) => c.status === 'atual' && c.aulas.length > 0)) {
+        const card = cards.find((c) => c.includes(`href="${coursePath(course.slug, locale)}"`));
+        expect(card, `${locale}/${course.slug}: cartão em Ensino`).toBeDefined();
+        const shortcut = card?.match(/·<\/span>\s*<(a|span)\b/)?.[1];
+        expect(shortcut, `${locale}/${course.slug}: atalho`).toBe(hasUrl(course.aulas.at(-1)) ? 'a' : 'span');
+        checked += 1;
+      }
+    }
+    expect(checked, 'nenhuma disciplina em curso com aula').toBeGreaterThan(0);
   });
 });

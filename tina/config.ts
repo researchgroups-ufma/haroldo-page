@@ -12,12 +12,13 @@
  *                 (`src/content.config.ts`, D-06).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-10-07
- *  Versão       : 0.5.0
+ *  Atualizado em: 2026-11-21
+ *  Versão       : 0.6.0
  *
  *  Dependências : tinacms (defineConfig), src/lib/slug.ts (slugify, reusado
  *                 nos templates de nome de arquivo — ver nota abaixo),
- *                 src/lib/outreach.ts (toCalendarDate, data da Extensão)
+ *                 src/lib/outreach.ts (toCalendarDate, data da Extensão),
+ *                 src/lib/course-items.ts (prepareCourseItems, salvamento de disciplinas)
  *  Entradas     : TINA_CLIENT_ID, TINA_TOKEN, TINA_BRANCH — variáveis de
  *                 ambiente lidas do `.env` local pelo `@tinacms/cli`
  *  Saídas       : configuração consumida por `tinacms dev` / `tinacms build`,
@@ -92,6 +93,7 @@
 import { defineConfig } from 'tinacms';
 import { slugify } from '../src/lib/slug';
 import { toCalendarDate } from '../src/lib/outreach';
+import { prepareCourseItems } from '../src/lib/course-items';
 
 export default defineConfig({
   branch: process.env.TINA_BRANCH || 'main',
@@ -534,6 +536,22 @@ export default defineConfig({
             slugify: (values) => slugify(String(values?.nome ?? '')),
             description: 'Gerado automaticamente a partir do nome — não é digitado.',
           },
+          // F-09 e Aviso 2 de `docs/avisos-do-painel-para-o-manual.md`: o `required` de um campo de
+          // item não bloqueia o "+" clicado à toa, e o Tina aceita qualquer texto como "Link" — foi
+          // assim que `' '` e `AAAA` chegaram ao arquivo e quebraram o build. Um `validate` na lista
+          // trava o formulário antes de o professor conseguir preenchê-la (mesmo motivo da `extensao`
+          // abaixo), então a checagem fica no salvamento: item vazio sai em silêncio, item pela metade
+          // e link que não é endereço recusam com alerta (`src/lib/course-items.ts`, plano 086).
+          beforeSubmit: async ({ values, cms }) => {
+            const prepared = prepareCourseItems(values);
+            if (prepared.problems.length > 0) {
+              // O erro lançado só impede o salvamento; quem avisa o professor é o alerta.
+              const message = `Não salvo: ${prepared.problems.join(' ')}`;
+              cms.alerts.error(message);
+              throw new Error(message);
+            }
+            return prepared.values;
+          },
         },
         fields: [
           {
@@ -632,7 +650,6 @@ export default defineConfig({
                 type: 'string',
                 name: 'url',
                 label: 'Link',
-                required: true,
                 description:
                   'Link do material da aula — Drive, repositório institucional, arXiv, YouTube etc.',
               },
@@ -653,7 +670,6 @@ export default defineConfig({
                 type: 'string',
                 name: 'url',
                 label: 'Link',
-                required: true,
                 description: 'Link da lista de exercícios — qualquer hospedeiro serve.',
               },
             ],

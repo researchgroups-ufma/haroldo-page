@@ -10,11 +10,12 @@
  *                 entrada — quem decide o que é um dado válido é este arquivo.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-10-07
- *  Versão       : 0.4.0
+ *  Atualizado em: 2026-11-21
+ *  Versão       : 0.5.0
  *
  *  Dependências : astro:content (defineCollection, reference), astro/loaders
- *                 (glob), astro/zod (z), src/lib/outreach.ts (toCalendarDate)
+ *                 (glob), astro/zod (z), src/lib/outreach.ts (toCalendarDate),
+ *                 src/lib/course-items.ts (blankToUndefined)
  *  Entradas     : arquivos Markdown com frontmatter em `content/perfil/`,
  *                 `content/linhas-pesquisa/`, `content/projetos/`,
  *                 `content/disciplinas/`, `content/publicacoes/`,
@@ -85,6 +86,7 @@
 import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { toCalendarDate } from './lib/outreach';
+import { blankToUndefined } from './lib/course-items';
 import { z } from 'astro/zod';
 
 /**
@@ -339,10 +341,10 @@ const projetos = defineCollection({
   schema: projetosSchema,
 });
 
-/** Referência bibliográfica dentro de uma disciplina. */
+/** Referência bibliográfica dentro de uma disciplina. Link em branco vale como ausente (plano 086). */
 const bibliografiaSchema = z.object({
   referencia: z.string(),
-  url: z.url().optional(),
+  url: z.preprocess(blankToUndefined, z.url().optional()),
 });
 
 /**
@@ -350,20 +352,25 @@ const bibliografiaSchema = z.object({
  *
  * `url` é URL livre, agnóstica ao hospedeiro (D-07) — validada apenas como
  * URL, nunca por domínio (ex.: não se exige que seja um link do Google Drive).
+ * RF-07, RF-24 (plano 086, decisão 1): o link é opcional, e o em branco vale como ausente — o
+ * professor monta o cronograma antes de ter o material. `AAAA` continua reprovando.
  */
 const aulaSchema = z.object({
   numero: z.number(),
   titulo: z.string(),
   data: z.string().optional(),
   descricao: z.string().optional(),
-  url: z.url(),
+  url: z.preprocess(blankToUndefined, z.url().optional()),
 });
 
-/** Lista de exercícios dentro de uma disciplina (D-05). URL livre (D-07). */
+/**
+ * Lista de exercícios dentro de uma disciplina (D-05). URL livre (D-07). RF-24 (plano 086,
+ * decisão 1): o link é opcional, e o em branco vale como ausente.
+ */
 const listaSchema = z.object({
   titulo: z.string(),
   data_entrega: z.string().optional(),
-  url: z.url(),
+  url: z.preprocess(blankToUndefined, z.url().optional()),
 });
 
 /** Material complementar dentro de uma disciplina (D-05). URL livre (D-07). */
@@ -400,7 +407,7 @@ const scriptSchema = z.object({
   linguagem: z.enum(['python', 'r', 'matlab', 'bash', 'outro']),
   codigo: z.string(),
   aula: z.number().optional(),
-  url: z.url().optional(),
+  url: z.preprocess(blankToUndefined, z.url().optional()),
 });
 
 /** Grupo `en` da coleção `disciplinas` (§7.3, RN-06, RN-09, plano 018). */

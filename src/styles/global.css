@@ -234,7 +234,8 @@ a:is(:hover, :focus-visible) > .link-traco::after,
   border: 1px solid transparent;
   transition: border-color 200ms ease-out;
 }
-.cartao:hover,
+/* Sem link o cartão não parece clicável (RF-24, plano 086); o foco continua marcando. */
+.cartao:has(.cartao-link):hover,
 .cartao:focus-within {
   border-color: var(--color-tinta);
 }

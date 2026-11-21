@@ -73,23 +73,32 @@ conhecidas: `aulas[]`, `listas[]`, `materiais[]`, `bibliografia[]`, `scripts[].t
 `scripts[].codigo` (plano 022) e — desde o plano 021 — `publicacoes.autores[]`, a primeira
 instância em lista de **string simples**, não de objetos.
 
+**Atualização de 2026-11-21 (plano 086).** A coleção `disciplinas` passou a ter um `beforeSubmit`
+no salvamento (`prepareCourseItems`, `src/lib/course-items.ts`): o item vazio (o "+" clicado à
+toa) é descartado em silêncio, e o item pela metade e o link que não é endereço recusam o
+salvamento com o alerta "Não salvo: …", que diz qual item completar. Vale para as seis listas
+embutidas (`aulas[]`, `listas[]`, `bibliografia[]`, `scripts[]`, `materiais[]`, `links[]`). A
+instância que sobra, sem essa proteção, é `publicacoes.autores[]`. O descrito abaixo vale, portanto,
+só para ela. Motivo da mudança: o "Link" de aula era obrigatório no painel, e o professor gravou
+`' '` e `AAAA` para passar; o build do site reprova desde 2026-11-20.
+
 **Isto contradiz o F-01 do PRD** ("O Tina bloqueia o salvamento e destaca o campo") para o caso de
 lista embutida: o manual não pode prometer ao professor o que o painel não faz nesse caso
 específico.
 
-**Como reproduzir.** Adicionar um item a qualquer uma das listas acima deixando o subcampo
-obrigatório em branco (ex.: uma aula sem `numero`/`titulo`/`url`, um autor vazio em
-`publicacoes.autores[]`) e salvar o documento — o botão `Save` habilita e o arquivo grava o item
-incompleto (ex.: `aulas: [ {} ]`); o erro só aparece no `npm run build` seguinte, no `astro check`.
+**Como reproduzir.** Na instância que sobra, adicionar um autor em `publicacoes.autores[]` e
+deixá-lo em branco, depois salvar o documento — o botão `Save` habilita e o arquivo grava o item
+incompleto; o erro só aparece no `npm run build` seguinte, no `astro check`. (Antes do plano 086, o
+mesmo valia para qualquer lista de `disciplinas`, ex.: `aulas: [ {} ]`.)
 
 **Contorno.** Nenhum no painel: preencher todos os subcampos obrigatórios de cada item antes de
 adicionar o próximo, e conferir o frontmatter gravado depois de salvar, não só a tela.
 
-**O que o manual tem de dizer ao professor.** _"Ao adicionar um item numa lista (aula, material,
-script, autor), preencha todos os campos antes de sair dele — o painel às vezes deixa salvar um
-item incompleto, e o problema só aparece minutos depois, no site."_
+**O que o manual tem de dizer ao professor.** _"Ao adicionar um autor numa publicação, preencha-o
+antes de sair — o painel às vezes deixa salvar um autor vazio, e o problema só aparece minutos
+depois, no site. Nas disciplinas, se aparecer o alerta 'Não salvo: …', ele diz qual item completar."_
 
-**Quando revisar.** Observado no TinaCMS 3.12.1. Perde objeto se uma versão futura do
+**Quando revisar.** Observado no TinaCMS 3.12.1; atualizado em 2026-11-21 (plano 086). Perde objeto se uma versão futura do
 `@tinacms/schema-tools` passar a tipar (e o Tina passar a executar) `validate` para a variante de
 lista de objetos — o que também tornaria o F-01 do PRD verdadeiro para este caso.
 

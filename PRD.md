@@ -12,13 +12,13 @@
 |---|---|
 | **Nome do projeto** | Site Pessoal Acadêmico — Prof. Haroldo C. D. Lima Junior (UFMA) |
 | **Codinome / sigla** | `haroldo-page` |
-| **Versão do PRD** | v0.1.81 |
+| **Versão do PRD** | v0.1.82 |
 | **Status** | 🟢 Aprovado |
 | **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/21 · **Extensão (RF-15) implementada fora de fase em 2026-10-07 (`6fac810`)** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, em 2026-10-07 (`8d929e7`)** · **Página de disciplina (RF-24) refeita no modelo D na `main` em 2026-10-07, sem commit** · **Sync do ORCID (RF-17) implementado fora de fase em 2026-10-09 (`3928fd2`; primeira carga `fd85f47`)**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-10-19 |
+| **Última atualização** | 2026-11-21 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav`; `docs/historico-de-implementacao.md` (histórico de implementação e versões antigas deste PRD) |
 
@@ -63,6 +63,7 @@ Só as versões que mudaram o produto: texto de §1–§11, §13–§17 ou dos a
 | v0.1.79 | 2026-10-09 | Desenvolvedor | Sabatina "Sync ORCID" (9 decisões, `docs/sabatinas/CHANGELOG_sabatina_sync-orcid.md`): RF-17 vira SHOULD; NG-03 e §6.3 |
 | v0.1.80 | 2026-10-12 | Desenvolvedor | Sabatina "Lacunas da auditoria de qualidade" (9 decisões, `docs/sabatinas/CHANGELOG_sabatina_auditoria-qualidade.md`): RF-30 emendado com description por página, `og:image` fixa 1200×630 com Open Graph e Twitter card, e `/admin` fora da indexação só por `noindex`; RF-38 (JSON-LD `Person` + `WebSite` na Home, SHOULD), RNF-17 (cabeçalhos de segurança) e RNF-18 (cache de `/uploads/*` e ícones) criados, com os valores técnicos da Decisão 9; Q-05 bloqueia também HSTS e "Always Use HTTPS"; Q-10 e Q-11 abertas e resolvidas; fase 5 do §12 passa a 21 itens |
 | v0.1.81 | 2026-10-19 | Desenvolvedor | §12 da fase 5, "Otimização de imagens": imagem animada (GIF, WebP com mais de um quadro) fica sem variante WebP e é servida original, para o GIF enviado pelo painel continuar animado (decisão do dono do produto; nota na Decisão 3 da sabatina "Lacunas da auditoria de qualidade") |
+| v0.1.82 | 2026-11-21 | Desenvolvedor | §7.3, RF-07, RF-24: link de aula e de lista opcional; em branco vale como ausente (plano 086) |
 
 ---
 
@@ -203,7 +204,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-04 | MUST | Editar o perfil | Dado o professor no item Perfil, quando altera a biografia e salva, então a mudança é commitada e aparece no site após o deploy | ⬜ |
 | RF-05 | MUST | CRUD de publicações | Dado o professor em Publicações, quando cria uma entrada com título, autores, ano, veículo e DOI e salva, então ela aparece na página pública agrupada sob o ano informado | ⬜ |
 | RF-06 | MUST | CRUD de disciplinas | Dado o professor em Disciplinas, quando cria "Mecânica Clássica / 2026.2 / atual" e salva, então a disciplina aparece na listagem de disciplinas atuais | ⬜ |
-| RF-07 | MUST | Gestão de aulas dentro da disciplina | Dado o professor editando uma disciplina, quando acrescenta uma aula com número, título, data e link do Drive, então a aula aparece na página da disciplina na ordem definida por ele (decisão D-05) | ⬜ |
+| RF-07 | MUST | Gestão de aulas dentro da disciplina | Dado o professor editando uma disciplina, quando acrescenta uma aula com número, título, data e, quando houver, o link do material, então a aula aparece na página da disciplina na ordem definida por ele (decisão D-05) | ⬜ |
 | RF-08 | MUST | Gestão de listas de exercícios e materiais complementares dentro da disciplina | Idem RF-07, para as listas `listas[]` e `materiais[]` | ⬜ |
 | RF-09 | MUST | CRUD de linhas de pesquisa | Dado o professor em Linhas de pesquisa, quando cria uma linha com título e descrição e salva, então ela aparece na página Pesquisa na ordem definida pelo campo `ordem` | ⬜ |
 | RF-10 | MUST | Interruptor Rascunho/Publicado em todo conteúdo de listagem | Dado um item com `publicado = false`, quando o site é construído, então o item não aparece em nenhuma página pública nem no sitemap | ⬜ |
@@ -224,7 +225,7 @@ A stack alvo amadureceu: o TinaCMS passou a oferecer integração oficial com As
 | RF-21 | MUST | Página Sobre com biografia, formação, atuação profissional, contato e links acadêmicos (as áreas de atuação ficam na Home desde o redesenho de 2026-09-23) | Dado o perfil preenchido, quando o visitante abre Sobre, então vê todos os campos preenchidos e apenas eles — campos vazios não deixam rótulo órfão na página | ⬜ |
 | RF-22 | MUST | Página Pesquisa listando linhas de pesquisa (e projetos, se houver). Desde a sabatina "Pesquisa modelo C" (2026-10-07): a partir de `lg`, a imagem da linha fica parada à esquerda e troca enquanto o texto rola; linha sem imagem mostra um bloco neutro com o número; cada linha lista os seus projetos e as publicações ligadas a ela; projetos sem linha ficam em "Outros projetos", último bloco do ensaio, com imagem fixa e o próximo número | Dado duas linhas publicadas, quando o visitante abre Pesquisa, então vê as duas na ordem definida; dado uma linha sem projeto ou sem publicação ligada, então a seção correspondente não aparece | ⬜ |
 | RF-23 | MUST | Página Ensino separando disciplinas em curso e encerradas, sem semestre (sabatina "Ensino modelo A") | Dado disciplinas com status distintos, quando o visitante abre Ensino, então vê primeiro "Em curso", em cartões com imagem (ou bloco `tinta` com a inicial do nome), e depois "Encerradas", em lista; cada disciplina num grupo só, ordem alfabética pelo nome; grupo vazio some, e sem nenhuma disciplina publicada a página mostra uma frase só; nenhum semestre aparece | ⬜ |
-| RF-24 | MUST | Página de disciplina com ementa, bibliografia, aulas, listas e materiais | Dada uma disciplina com 3 aulas e 2 listas, quando o visitante abre a página, então vê as 5 entradas com título, data (quando houver e a disciplina estiver em curso — sabatina "Ensino modelo A", Decisão 8) e link que abre o arquivo no Drive em nova aba | ⬜ |
+| RF-24 | MUST | Página de disciplina com ementa, bibliografia, aulas, listas e materiais | Dada uma disciplina com 3 aulas e 2 listas, quando o visitante abre a página, então vê as 5 entradas com título, data (quando houver e a disciplina estiver em curso — sabatina "Ensino modelo A", Decisão 8) e o link, quando houver, que abre o arquivo em nova aba; sem link, o item aparece sem link | ⬜ |
 | RF-25 | MUST | Página Publicações agrupada por ano, decrescente | Dadas publicações de 2024 e 2026, quando o visitante abre a página, então vê 2026 antes de 2024, cada uma com autores, veículo e os links disponíveis (DOI, arXiv, PDF) | ⬜ |
 | RF-26 | MUST | Site responsivo | Dado qualquer rota, quando aberta em 360 px de largura, então não há rolagem horizontal nem elemento cortado | ⬜ |
 | RF-27 | MUST | Página 404 no idioma da rota, com caminho de volta | Dada uma URL inexistente, quando acessada, então a resposta é uma página 404 com navegação; sob `/en`, a 404 em inglês (`dist/en/404.html`, servida pelo modo `404-page` do Worker — premissa a provar por artefato; sabatina fase 4, Decisão 9) | ⬜ |
@@ -457,8 +458,8 @@ Conteúdo em arquivos Markdown com frontmatter, em `content/` na raiz do projeto
 | `descricao` | string | | resumo curto para a listagem |
 | `ementa` | rich-text | | |
 | `bibliografia[]` | lista de objetos | | `{ referencia, url? }` |
-| `aulas[]` | lista de objetos | | `{ numero, titulo, data?, descricao?, url }` |
-| `listas[]` | lista de objetos | | `{ titulo, data_entrega?, url }` |
+| `aulas[]` | lista de objetos | | `{ numero, titulo, data?, descricao?, url? }` — link em branco vale como ausente (plano 086) |
+| `listas[]` | lista de objetos | | `{ titulo, data_entrega?, url? }` — link em branco vale como ausente (plano 086) |
 | `materiais[]` | lista de objetos | | `{ titulo, tipo (slides/notas/complementar), descricao?, url }` |
 | `links[]` | lista de objetos | | `{ titulo, url }` — simulações, vídeos, páginas externas |
 | `scripts[]` | lista de objetos | | `{ titulo, descricao?, linguagem (python/r/matlab/bash/outro), codigo, aula?, url? }` — `codigo` é o código-fonte colado no próprio conteúdo (RN-05, RF-37); `linguagem` tem `python` como padrão; `aula` é o número da aula correspondente, sem integridade referencial (F-13); `url` aponta o arquivo original, se houver |

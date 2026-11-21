@@ -14,8 +14,8 @@
  *                 narrowing.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-02
- *  Atualizado em: 2026-09-28
- *  Versão       : 0.3.0
+ *  Atualizado em: 2026-11-21
+ *  Versão       : 0.4.0
  *
  *  Dependências : vitest, src/content.config.ts
  *  Entradas     : nenhuma (objetos sintéticos construídos no próprio teste)
@@ -396,6 +396,97 @@ describe('coleção disciplinas', () => {
       aulas: [{ numero: 1, titulo: 'Aula sem link', url: 'não-é-uma-url' }],
     });
     expect(resultado.success).toBe(false);
+  });
+
+  describe('link opcional em aula e lista (plano 086, RF-07, RF-24)', () => {
+    const urlValida = 'https://x.test/a';
+    // chave ausente, vazio, espaço e a URL válida passam; texto que não é endereço reprova
+    const brancos: [string, Record<string, unknown>][] = [
+      ['ausente', {}],
+      ['vazio', { url: '' }],
+      ['um espaço', { url: ' ' }],
+      ['dois espaços', { url: '  ' }],
+      ['URL válida', { url: urlValida }],
+    ];
+
+    it.each(brancos)('aula com `url` %s passa', (_rotulo, extra) => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        aulas: [{ numero: 1, titulo: 'Aula', ...extra }],
+      });
+      expect(resultado.success).toBe(true);
+    });
+
+    it.each(brancos)('lista com `url` %s passa', (_rotulo, extra) => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        listas: [{ titulo: 'Lista', ...extra }],
+      });
+      expect(resultado.success).toBe(true);
+    });
+
+    it('`url` em branco sai do item parseado como `undefined` (vale como ausente)', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        aulas: [{ numero: 1, titulo: 'Aula', url: ' ' }],
+      });
+      expect(resultado.success).toBe(true);
+      expect(resultado.success && resultado.data.aulas?.[0]?.url).toBeUndefined();
+    });
+
+    it('URL válida com espaço nas pontas passa e sai aparada (o `test:dist` espera `trim()`)', () => {
+      const resultado = disciplinasSchema.safeParse({
+        ...valido,
+        aulas: [{ numero: 1, titulo: 'Aula', url: `  ${urlValida} ` }],
+      });
+      expect(resultado.success).toBe(true);
+      expect(resultado.success && resultado.data.aulas?.[0]?.url).toBe(urlValida);
+    });
+
+    it('rejeita `AAAA` como `url` de aula e de lista', () => {
+      expect(
+        disciplinasSchema.safeParse({
+          ...valido,
+          aulas: [{ numero: 1, titulo: 'Aula', url: 'AAAA' }],
+        }).success,
+      ).toBe(false);
+      expect(
+        disciplinasSchema.safeParse({ ...valido, listas: [{ titulo: 'Lista', url: 'AAAA' }] })
+          .success,
+      ).toBe(false);
+    });
+
+    it('bibliografia e script com `url` em branco passam; `AAAA` reprova', () => {
+      const script = { titulo: 'S', linguagem: 'python', codigo: 'x = 1' };
+      for (const url of ['', ' ', '  ']) {
+        expect(
+          disciplinasSchema.safeParse({ ...valido, bibliografia: [{ referencia: 'R', url }] })
+            .success,
+        ).toBe(true);
+        expect(
+          disciplinasSchema.safeParse({ ...valido, scripts: [{ ...script, url }] }).success,
+        ).toBe(true);
+      }
+      expect(
+        disciplinasSchema.safeParse({ ...valido, bibliografia: [{ referencia: 'R', url: 'AAAA' }] })
+          .success,
+      ).toBe(false);
+      expect(
+        disciplinasSchema.safeParse({ ...valido, scripts: [{ ...script, url: 'AAAA' }] }).success,
+      ).toBe(false);
+    });
+
+    it('material e link externo continuam com `url` obrigatória', () => {
+      expect(
+        disciplinasSchema.safeParse({
+          ...valido,
+          materiais: [{ titulo: 'M', tipo: 'slides', url: ' ' }],
+        }).success,
+      ).toBe(false);
+      expect(
+        disciplinasSchema.safeParse({ ...valido, links: [{ titulo: 'L', url: '' }] }).success,
+      ).toBe(false);
+    });
   });
 
   it('aceita item sem o grupo `en` (RN-09 — português é canônico)', () => {

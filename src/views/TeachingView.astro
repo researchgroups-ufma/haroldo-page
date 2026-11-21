@@ -14,8 +14,8 @@
  *                 frase só (RN-01).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-09-30
- *  Atualizado em: 2026-10-07
- *  Versão       : 0.2.0
+ *  Atualizado em: 2026-11-21
+ *  Versão       : 0.3.0
  *
  *  Dependências : BaseLayout, PageHeader, ExternalLink, FallbackNotice, LangText,
  *                 src/i18n (`strings`), src/i18n/fallback.ts (`localize`, `localizeOptional`,
@@ -147,10 +147,17 @@ const showNotice = hasFallback(
                   {latest && (
                     <p class="text-pequeno relative z-10 mt-auto pt-4">
                       <span class="text-secundario">{t.teaching.latestLesson} ·</span>{' '}
-                      <ExternalLink href={latest.url} class="underline">
-                        {/* Decisão 13: título de aula é campo "P" — `lang` sem ligar o aviso. */}
-                        {latest.numero}. <LangText value={portugueseOnly(latest.titulo, lang)} />
-                      </ExternalLink>
+                      {/* RN-04, RF-24: a última aula sem link sai como texto (plano 086). */}
+                      {latest.url ? (
+                        <ExternalLink href={latest.url} class="underline">
+                          {/* Decisão 13: título de aula é campo "P" — `lang` sem ligar o aviso. */}
+                          {latest.numero}. <LangText value={portugueseOnly(latest.titulo, lang)} />
+                        </ExternalLink>
+                      ) : (
+                        <span>
+                          {latest.numero}. <LangText value={portugueseOnly(latest.titulo, lang)} />
+                        </span>
+                      )}
                       {/* Decisão 8 da sabatina "Ensino modelo A": data só em disciplina em curso, que é este bloco. */}
                       {latest.data && (
                         <span class="text-secundario"> · {formatDate(latest.data, lang)}</span>

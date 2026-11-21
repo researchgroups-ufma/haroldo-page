@@ -6,12 +6,13 @@
  *  Descrição    : Capa da página de disciplina (RF-24; sabatina "Disciplina
  *                 modelo D"): imagem da disciplina (ou o bloco `tinta` com a
  *                 inicial do nome), descrição, ementa e os atalhos "Última aula"
- *                 (só em disciplina em curso, Decisão 2) e "Listas de
- *                 exercícios" (só com lista).
+ *                 (só em disciplina em curso, Decisão 2, e só se a última aula
+ *                 tem link, RF-24, plano 086) e "Listas de exercícios" (só com
+ *                 lista).
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-10-07
- *  Atualizado em: 2026-10-07
- *  Versão       : 0.1.0
+ *  Atualizado em: 2026-11-21
+ *  Versão       : 0.2.0
  *
  *  Dependências : src/components/ExternalLink.astro, src/components/LangText.astro,
  *                 src/i18n (`strings`), src/i18n/fallback.ts (`portugueseOnly`,
@@ -43,7 +44,10 @@ export interface Props {
   descricao?: LocalizedText;
   /** Ementa resolvida por idioma. Ausente: o bloco da ementa some. */
   ementa?: LocalizedText;
-  /** Aula do botão "Última aula". Ausente (disciplina encerrada ou sem aula): sem botão. */
+  /**
+   * Aula do botão "Última aula". Ausente (disciplina encerrada ou sem aula), ou sem `url`
+   * (RF-24, plano 086): sem botão.
+   */
   latest?: Lesson;
   /** Mostra o botão para a aba de listas. Obrigatória: quem chama sabe se há lista. */
   hasProblemSets: boolean;
@@ -102,9 +106,10 @@ const syllabusParagraphs = toParagraphs(ementa?.text);
       )
     }
     {
-      (latest || hasProblemSets) && (
+      (latest?.url || hasProblemSets) && (
         <div class="mt-6 flex flex-wrap gap-3 sm:mt-auto sm:pt-6">
-          {latest && (
+          {/* RN-04, RF-24: a última aula sem link não tem botão (plano 086). */}
+          {latest?.url && (
             <ExternalLink href={latest.url} class="botao botao-cheio">
               <span class="shrink-0 whitespace-nowrap opacity-70">{t.teaching.latestLesson}</span>
               {/* Decisão 13 (sabatina fase 4): título de aula é "P". */}
