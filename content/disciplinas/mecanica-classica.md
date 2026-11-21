@@ -117,7 +117,7 @@ aulas:
     titulo: Leis de Kepler. Apresentação e discussão do conteúdo físico. O problema da gravitação.
     descricao: Leis de Kepler. Apresentação e discussão do conteúdo físico. O problema da gravitação.
     url: ' '
-  - numero: 24
+  - numero: 27
     titulo: Forças centrais na Física. O problema de dois corpos
     descricao: Forças centrais na Física. Conceitos iniciais. O problema de dois corpos interagindo via força central. O referencial do centro de massa e a massa reduzida. Conservação da energia e momento angular.
     url: ' '
