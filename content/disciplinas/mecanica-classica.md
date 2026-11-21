@@ -81,7 +81,7 @@ aulas:
     titulo: 'Trabalho e energia para um sistema de partículas e aplicações. '
     descricao: Trabalho e energia para um sistema de partículas e aplicações. A energia mecânica total no referencial do CM.
     url: ' '
-  - numero: 15
+  - numero: 18
     titulo: Momento angular de um sistema de partículas e aplicações.
     descricao: Definição do momento angular para um sistema de partículas e aplicações. A conservação do momento angular total na ausência de torques externos.
     url: ' '
