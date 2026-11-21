@@ -89,7 +89,7 @@ aulas:
     titulo: Colisões elásticas e inelásticas.
     descricao: Colisões elásticas e inelásticas em 1 dimensão. Resultado geral. Colisões elásticas em 2 dimensões.
     url: ' '
-  - numero: 17
+  - numero: 20
     titulo: Sistemas de massa variável. O movimento de foguetes.
     descricao: Sistemas de massa variável. O movimento de foguetes.
     url: ' '
