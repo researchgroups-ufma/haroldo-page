@@ -147,7 +147,10 @@ aulas:
     titulo: 'Tensor de inércia em sistemas de coordenadas diferentes. '
     descricao: Tensor de inércia em sistemas de coordenadas diferentes. O teorema de Steiner ou teorema dos eixos paralelos.
     url: ' '
-  - {}
+  - numero: 35
+    titulo: 'Equação de Euler. '
+    descricao: Equação de Euler. Demonstração da equação de Euler.
+    url: ' '
 listas:
   - {}
   - {}
