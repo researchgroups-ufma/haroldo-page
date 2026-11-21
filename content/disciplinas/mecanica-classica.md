@@ -129,7 +129,7 @@ aulas:
     titulo: 'A equação de Binet e suas aplicações. '
     descricao: 'A equação de Binet e suas aplicações. Como calcular a órbita dada a força central. Como calcular a força central dada a órbita. '
     url: ' '
-  - numero: 27
+  - numero: 30
     titulo: O teorema de Bertrand. Estabilidade de órbitas circulares em problemas de forças centrais.
     descricao: Órbitas em um campo de força central a partir do potencial efetivo. O teorema de Bertrand. Estabilidade de órbitas circulares em problemas de forças centrais.
     url: ' '
