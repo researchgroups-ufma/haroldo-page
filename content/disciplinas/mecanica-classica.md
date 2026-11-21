@@ -65,7 +65,7 @@ aulas:
     titulo: 'Trabalho e Energia em 2 dimensões. A integral de linha como trabalho realizado por uma força. '
     descricao: 'Trabalho e Energia em 2 dimensões. Revisão de integral de linha. O trabalho como uma integral de linha ao longo de uma curva C. '
     url: ' '
-  - numero: 11
+  - numero: 14
     titulo: Formulação diferencial da condição de uma força conservativa
     descricao: 'O Teorema de Stokes e a formulação diferencial da condição necessária e suficiente de uma força conservativa em 3D: rot F=0.'
     url: ' '
