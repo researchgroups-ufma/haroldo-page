@@ -159,6 +159,11 @@ aulas:
     titulo: 'Movimento livre de um pião esférico e um pião simétrico. '
     descricao: 'Movimento livre de um pião esférico e um pião simétrico. '
     url: ' '
+  - numero: 4
+    titulo: ' Oscilações Amortecidas. '
+    descricao: ' Oscilações Amortecidas. Os diferentes regimes de amortecimento.'
+    url: ' '
+  - {}
 listas:
   - {}
   - {}
