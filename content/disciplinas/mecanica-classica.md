@@ -72,7 +72,10 @@ aulas:
     titulo: Momento angular de um sistema de partículas e aplicações.
     descricao: Definição do momento angular para um sistema de partículas e aplicações. A conservação do momento angular total na ausência de torques externos.
     url: ' '
-  - {}
+  - numero: 16
+    titulo: Colisões elásticas e inelásticas.
+    descricao: Colisões elásticas e inelásticas em 1 dimensão. Resultado geral. Colisões elásticas em 2 dimensões.
+    url: ' '
   - {}
   - {}
   - {}
