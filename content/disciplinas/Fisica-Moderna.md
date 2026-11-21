@@ -147,9 +147,7 @@ materiais:
   - titulo: Notas de aula — a métrica de Kerr
     tipo: notas
     url: 'https://exemplo.invalid/rg-2026-2/notas-kerr'
-links:
-  - titulo: Simulador de órbitas em Schwarzschild
-    url: 'https://exemplo.invalid/rg-2026-2/simulador-orbitas'
+links: []
 scripts:
   - titulo: Raio do horizonte de Kerr
     descricao: '[EXEMPLO] Script de demonstração usado para verificar o plano 022 — conteúdo inventado, substituir por material real.'
