@@ -61,7 +61,7 @@ aulas:
     titulo: 'Interpretação do movimento a partir da função energia potencial. '
     descricao: 'Interpretação do movimento a partir da função energia potencial. Pontos de equilíbrio estável, instável e indiferente. '
     url: ' '
-  - numero: 10
+  - numero: 13
     titulo: 'Trabalho e Energia em 2 dimensões. A integral de linha como trabalho realizado por uma força. '
     descricao: 'Trabalho e Energia em 2 dimensões. Revisão de integral de linha. O trabalho como uma integral de linha ao longo de uma curva C. '
     url: ' '
