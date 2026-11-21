@@ -33,7 +33,9 @@ aulas:
     titulo: Aplicações das leis de Newton em 3D. Disparo de projéteis e o problema de Larmor
     descricao: Aplicações das leis de Newton em 3D. Disparo de projéteis e o problema de Larmor
     url: ' '
-  - {}
+  - numero: 6
+    titulo: 'Partícula carregada em campo eletromagnético. O Problema de Larmor. '
+    url: ' '
   - {}
   - {}
   - {}
