@@ -53,7 +53,7 @@ aulas:
     titulo: Trabalho e Energia em 1 dimensão. Parte I
     descricao: 'Trabalho e Energia em 1 dimensão. Fundamentos teóricos sobre energia cinética, trabalho realizado por uma força constante e forças variáveis.  '
     url: '  '
-  - numero: 8
+  - numero: 11
     titulo: Trabalho e Energia em 1 dimensão. Parte II
     descricao: 'O Teorema Trabalho-Energia. A energia potencial e a definição de forças conservativas. Energia mecânica total e sua conservação. '
     url: ' '
