@@ -77,7 +77,7 @@ aulas:
     titulo: Momento linear de um sistema de partículas. A Dinâmica de um sistema de partículas.
     descricao: Momento linear de um sistema de partículas. A Dinâmica de um sistema de partículas. F_ext= dP_cm/dt. A conservação do momento linear na ausência de forças externas.
     url: ' '
-  - numero: 14
+  - numero: 17
     titulo: 'Trabalho e energia para um sistema de partículas e aplicações. '
     descricao: Trabalho e energia para um sistema de partículas e aplicações. A energia mecânica total no referencial do CM.
     url: ' '
