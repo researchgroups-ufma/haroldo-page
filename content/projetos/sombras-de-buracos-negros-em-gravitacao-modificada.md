@@ -4,8 +4,9 @@ titulo: 'Apoio a Jovens Pesquisadores: Gravitação e Buracos Begros na Universi
 periodo:
   inicio: '2026.1'
   fim: ''
+financiador: Universidade Federal do Maranhão
 status: em andamento
-descricao: 'Construção e análise de sombras de buracos negros em teorias alternativas de gravitação, com foco nos desvios mensuráveis em relação à solução de Kerr. [CONTEÚDO DE EXEMPLO]'
+descricao: 'A pesquisa teórica em Relatividade Geral e em teorias alternativas de gravitação é de suma importância para o progresso da Física Teórica no Brasil, e em particular no estado do Maranhão. Este projeto visa expandir a linha de pesquisa em Relatividade Geral e buracos negros na Universidade Federal do Maranhão (UFMA), visando futuramente a consolidação de um grupo de pesquisa nesta área. '
 linha_relacionada: content/linhas-pesquisa/sombras-de-buracos-negros.md
 ---
 
