@@ -5,7 +5,7 @@
 **Depende de:** plano **086** DONE e verificado em produção. O 086 mexe em `tina/config.ts` e no `tina/tina-lock.json`, que este plano regenera; a branch tem de nascer depois dele.
 **Modelo recomendado:** sonnet
 **Agente recomendado:** implementer
-**Executável por:** agente (degraus 1 a 4, na branch) + orquestrador (branch, painel local no Vivaldi, push, PR, merge, produção e reversão)
+**Executável por:** agente (degraus 1 a 4, na branch) + orquestrador (branch, painel local no Edge, push, PR, merge, produção e reversão)
 **PRD:** `S:\Projetos\academic_page\haroldo\PRD.md`
 **Projeto:** `S:\Projetos\academic_page\haroldo`
 
@@ -82,7 +82,7 @@ repositório `tinacms/tinacms`, e o pacote 4.0.5 baixado e lido, nunca executado
 **Prévia da branch na Cloudflare.** O gatilho "Deploy non-production branches" (todo branch menos a
 `main`) roda `npm run build:pipeline` e `npx wrangler versions upload`. Isso gera uma versão sem
 publicar, e a prévia usa o `wrangler` novo. **Perigo:** o `/admin` da prévia usa `TINA_BRANCH`,
-que cai em `'main'` (`tina/config.ts:97`). Salvar nele grava no conteúdo real do professor.
+que cai em `'main'` (`branch: process.env.TINA_BRANCH || 'main'`, em `tina/config.ts`). Salvar nele grava no conteúdo real do professor.
 **Ninguém salva no `/admin` de prévia.**
 
 ## Regras invioláveis
@@ -200,19 +200,32 @@ Depois, o commit `chore: sobe tinacms, vite e wrangler para as versões corrigid
 
 **PARADA A.** Reporte ao orquestrador e espere o passo O2 antes do degrau 3.
 
-### O2 — Orquestrador: painel local no Vivaldi (depois do degrau 2, e de novo depois do 3)
+### O2 — Orquestrador: painel local no Edge (depois do degrau 2, e de novo depois do 3)
 
 Não use `npm run dev`: no Astro 7 ele deixa o servidor do Tina morto (README, seção "Painel de
 edição"). Suba os dois servidores com `npx astro dev --background --force` e `npx tinacms dev`, e
 abra `http://localhost:4321/admin`. O painel local grava no disco: tudo o que for salvo se desfaz
 com `git checkout -- content/` e `git clean` só nos arquivos criados, conferidos um a um no `git
-status`. Verifique:
+status`. Faça os testes de escrita numa **disciplina de teste** criada como rascunho
+(`content/disciplinas/teste-087.md`, com `publicado: false`, `nome` e `status`), nunca nas do
+professor, e apague-a no fim.
+
+**Navegador desde 2026-11-21: Edge.** No Vivaldi a extensão parou de agir: a aba sai do grupo da
+extensão. Com a janela sem foco, a captura de tela pode dar timeout de CDP. Leia o estado pelo DOM
+(`javascript_tool`, `find`, `read_page`). Antes e depois de cada Save, grave o `cat` e o mtime do
+arquivo de teste num `.txt` do scratchpad: a Evidência cola esses arquivos, não a lembrança.
+Verifique:
 
 1. as seis coleções listam os documentos: perfil, linhas de pesquisa, projetos, disciplinas,
    publicações e extensão;
-2. editar um campo de uma disciplina e salvar → o arquivo muda no disco com o valor;
-3. os alertas do `beforeSubmit` do 086 (aula pela metade) e da Extensão (foto pela metade)
-   aparecem;
+2. editar um campo da disciplina de teste e salvar → o arquivo muda no disco com o valor;
+3. os alertas do `beforeSubmit` aparecem e o arquivo não muda:
+   - 086, aula com Número `1` e Título `" "` (só espaço): o Tina aceita, sem "Required", e o hook
+     tem de responder "Não salvo: Aulas, item 1: falta Título.". **Campo vazio não serve para este
+     teste:** o `required` do próprio Tina já barra, e o hook nem é chamado (o ciclo 3 do 086
+     reprovou por isso);
+   - 086, link `AAAA`;
+   - Extensão, foto pela metade;
 4. o gerenciador de mídia abre e lista `public/uploads`;
 5. **Avisos 1, 2 (instância `publicacoes.autores[]`) e 3** de
    `docs/avisos-do-painel-para-o-manual.md`: repita o "Como reproduzir" de cada um e anote se o
@@ -344,7 +357,7 @@ reporte com a saída do erro.
 2. `Workers Builds: haroldo-page` `success` no mesmo SHA, e `gh workflow run vigia-do-deploy.yml`
    verde.
 3. Abra a Home e uma disciplina em `https://haroldo-page.and-near.workers.dev`.
-4. `/admin` de produção, no Vivaldi, logado como ADMIN:
+4. `/admin` de produção, no Edge, logado como ADMIN:
    - o TinaCloud mostra a `main` indexada depois do merge;
    - as seis coleções listam;
    - uma disciplina abre.
