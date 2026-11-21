@@ -155,6 +155,10 @@ aulas:
     titulo: 'Movimento livre de um pião esférico e um pião simétrico. '
     descricao: 'Movimento livre de um pião esférico e um pião simétrico. '
     url: ' '
+  - numero: 4
+    titulo: 'Oscilador Harmônico Simples. '
+    descricao: 'Oscilador Harmônico Simples. Lei de Hooke. Solução exata do problema. '
+    url: ' '
 listas:
   - {}
   - {}
