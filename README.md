@@ -160,11 +160,11 @@ fora do versionamento (ver `.gitignore`) — `npm run build` os regenera antes d
 Diferente dos dois acima, ele precisa estar em `main` para o TinaCloud indexar a branch; sem
 ele, o painel de administração do TinaCloud mostra "No Tina config was found on main" mesmo
 com o `tina/config.ts` presente e legível no repositório — foi exatamente o que travou este
-projeto até o arquivo ser versionado. Ele também não é gerado por `tinacms build` (que roda
-no `npm run build`) — só por `tinacms dev`. Na prática: quem mudar o schema em
-`tina/config.ts` precisa subir `npx tinacms dev` uma vez (mesmo que só para deixá-lo indexar e
-derrubar em seguida) e commitar o `tina/tina-lock.json` atualizado junto com a mudança de
-schema. A coerência entre os dois arquivos é verificada automaticamente por
+projeto até o arquivo ser versionado. Desde o `@tinacms/cli` 4.0.2 o `tinacms build` (que roda
+no `npm run build`) também o regenera, além do `tinacms dev`; mas o build do CI não commita o
+resultado. Na prática: quem mudar o schema em `tina/config.ts` precisa rodar `npx tinacms dev`
+uma vez (mesmo que só para deixá-lo indexar e derrubar em seguida) ou um build local, e commitar
+o `tina/tina-lock.json` atualizado junto com a mudança de schema. A coerência entre os dois arquivos é verificada automaticamente por
 `tests/content/tina-lock-coerente.test.ts`, que reprova a suíte se o lock ficar defasado.
 
 ## Pipeline de publicação
@@ -369,10 +369,10 @@ três (`vite`, `sharp`, `esbuild`), removidos no upgrade do Astro: o 7 exige `vi
 já pede nativamente as versões corrigidas de `sharp` e `esbuild`. A história completa, com o
 que motivou cada pin e por que cada um caiu, está em
 `docs/adr/0002-pin-do-vite-via-overrides.md`. `npm audit` **não** está em zero vulnerabilidades:
-são **8 moderadas**, de duas origens por trás do TinaCMS — 5 via
-`tinacms@3.12.1 → react-router-dom → react-router` e 3 via
-`@tinacms/cli@2.6.1 → altair-express-middleware → express`/`body-parser → qs` —, alcançando só
-o painel `/admin` (React, autenticado, uma pessoa) — o site público não carrega React (D-01).
-O CI reprova a partir de `high`/`critical`, com três exceções datadas desde 2026-10-07 (seção
-"Exceções datadas" do ADR); a política, os números medidos e as
+medidas em 2026-11-22, são **20 moderadas** e 3 baixas, de origens variadas (ferramentas de lint e
+teste, `astro`, `altair-*` do Tina), deixadas de fora do portão de propósito (ADR-0010); nenhuma
+alcança o site público, que não carrega React nem Node (D-01).
+O CI reprova a partir de `high`/`critical`, com três exceções datadas (seção "Exceções datadas
+(2026-11-22)" do ADR): `GHSA-c4qx` e `GHSA-7mx3` (`@graphql-tools/utils@11.2.2` sob o
+`@tinacms/cli`) e `GHSA-mrhx` (as cópias `zod@3.25.76` do Tina); a política, os números medidos e as
 alternativas rejeitadas estão em `docs/adr/0010-npm-audit-no-ci-e-severidade.md`.

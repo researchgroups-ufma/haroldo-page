@@ -4,9 +4,10 @@
  *  Projeto      : Site Pessoal Acadêmico — Prof. Haroldo
  *  Descrição    : Verifica que `tina/tina-lock.json` (o único artefato do Tina
  *                 versionado, ver README §"Painel de edição") está em dia com
- *                 `tina/config.ts`. O lock só é regenerado por `npx tinacms
- *                 dev`, manualmente; sem este teste, quem muda o schema e
- *                 esquece de subir o dev server produz um lock defasado que
+ *                 `tina/config.ts`. O lock é regenerado por `npx tinacms dev` e,
+ *                 desde o CLI 4.0.2, por `tinacms build`, mas o build do CI não
+ *                 commita; sem este teste, quem muda o schema e esquece de
+ *                 commitar o lock produz um lock defasado que
  *                 segue para `main` em silêncio e só aparece dias depois,
  *                 como "No Tina config was found on main" no painel do
  *                 TinaCloud (RNF-09, dívida 2 da fase 1).

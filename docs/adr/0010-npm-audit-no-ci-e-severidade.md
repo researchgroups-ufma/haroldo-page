@@ -166,11 +166,11 @@ não tem saída, sem mexer no que está em produção.
 audit do CI no lugar de `npm audit --audit-level=high`. O nível não muda: qualquer outro aviso
 `high`/`critical` reprova.
 
-| Advisory            | Pacote                 | Por que não há saída hoje                                                                                                                                                                                      | Alcance                                                                                |
-| ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| GHSA-7mx3-vvmw-hjmv | `@graphql-tools/utils` | Só via `@tinacms/cli`; a correção do npm é o downgrade para `@tinacms/cli@0.56.5`                                                                                                                              | Build do painel e servidor local do Tina                                               |
-| GHSA-vfj7-8cjw-p6xm | `braces`               | Só via `tinacms`/`@tinacms/cli`; a correção do npm é downgrade do Tina                                                                                                                                         | Ferramentas de build (glob de arquivos)                                                |
-| GHSA-wq5f-xc86-pv6w | `sharp`                | O `miniflare` do `wrangler` fixa `sharp@0.35.4` exato, e até o `wrangler@4.148.0` (o mais recente) continua assim; a corrigida é a `0.35.5`. Subir só a cópia do `astro` duplicaria o pacote sem tirar o aviso | Build e servidor local (`wrangler dev`); o Worker publicado serve HTML estático (D-01) |
+| Advisory                                     | Pacote                 | Por que não há saída hoje                                                                                                                                                                                      | Alcance                                                                                |
+| -------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| GHSA-7mx3-vvmw-hjmv                          | `@graphql-tools/utils` | Só via `@tinacms/cli`; a correção do npm é o downgrade para `@tinacms/cli@0.56.5` (motivo reescrito em 2026-11-22, ver abaixo)                                                                                 | Build do painel e servidor local do Tina                                               |
+| GHSA-vfj7-8cjw-p6xm (retirada em 2026-11-22) | `braces`               | Só via `tinacms`/`@tinacms/cli`; a correção do npm é downgrade do Tina                                                                                                                                         | Ferramentas de build (glob de arquivos)                                                |
+| GHSA-wq5f-xc86-pv6w (retirada em 2026-11-22) | `sharp`                | O `miniflare` do `wrangler` fixa `sharp@0.35.4` exato, e até o `wrangler@4.148.0` (o mais recente) continua assim; a corrigida é a `0.35.5`. Subir só a cópia do `astro` duplicaria o pacote sem tirar o aviso | Build e servidor local (`wrangler dev`); o Worker publicado serve HTML estático (D-01) |
 
 Nenhuma das três alcança o visitante: o site publicado é HTML estático, sem Node nem React em
 execução (D-01).
@@ -178,6 +178,53 @@ execução (D-01).
 **Retirada:** o script avisa no log do CI quando uma exceção não aparece mais no audit. Nesse
 momento ela sai do script e desta tabela. Gatilhos esperados: o Tina publicar versões sem os
 pacotes vulneráveis, e o `wrangler` passar a fixar `sharp@0.35.5` ou superior.
+
+## Exceções datadas (2026-11-22)
+
+O CI `qualidade` ficou vermelho desde 2026-11-20 no portão deste ADR, por 12 alertas
+`high`/`critical` publicados depois do último verde. Plano 087, em branch, com o painel `/admin`
+verificado local depois dos degraus 2 e 3. Decisões do dono do produto (2026-11-21): o `wrangler`
+fixado sobe de 4.145.0 para 4.166.0; e, se o `@tinacms/cli` 4 quebrasse o painel, o degrau seria
+desfeito e o GHSA-pwhx viraria exceção (não foi preciso: o degrau 3 ficou).
+
+**Retrato do `npm audit`** (`info, low, moderate, high, critical, total`):
+
+| Momento                      | Contagem                                       |
+| ---------------------------- | ---------------------------------------------- |
+| Antes (`main`, `71e1c24`)    | `0, 3, 23, 22, 2, 50`                          |
+| Depois (degrau 4, `48139bc`) | `0, 3, 20, 13, 0, 36`; o portão sai `aprovado` |
+
+**Corrigido por atualização** (sem `overrides`, sem `npm audit fix`):
+
+| Advisory                 | Pacote                                | Antes → depois                                                 | Degrau |
+| ------------------------ | ------------------------------------- | -------------------------------------------------------------- | ------ |
+| GHSA-27r3-jxmh-p828      | `body-parser`                         | 1.20.6 → 1.20.9                                                | 1      |
+| GHSA-r7fv, GHSA-gfr2     | `markdown-it`                         | 14.3.1 → 14.3.3                                                | 1      |
+| 4 advisories do `undici` | `undici` (via `astro`)                | 8.11.2 → 8.13.1                                                | 1      |
+| 4 advisories do `undici` | `undici` (via `miniflare`)            | 7.29.1 → 7.30.2 (`wrangler` 4.166.0)                           | 2      |
+| GHSA-mrhx (`zod`)        | `zod` (via `astro`, `sitemap`)        | 4.5.4 → 4.6.7                                                  | 1      |
+| GHSA-x34j (crítica)      | `tinacms`, `@tinacms/app`             | 3.12.1 → 3.15.2, 2.5.12 → 2.6.0                                | 2      |
+| GHSA-587h                | `vite`                                | 8.2.2 → 8.3.8 (e a cópia 6.4.3 do CLI some com o CLI 4: 7.3.8) | 2 e 3  |
+| GHSA-pwhx                | `@tinacms/cli`                        | 2.6.1 → 4.0.5                                                  | 3      |
+| GHSA-c4qx                | `@graphql-tools/utils` (cópia 12.0.0) | 12.0.0 → 12.1.0                                                | 4      |
+| GHSA-wq5f (exceção)      | `sharp`                               | 0.35.4 → 0.35.5                                                | 2      |
+
+**Exceções**, em `scripts/auditar-dependencias.mjs` (`EXCECOES`):
+
+| Advisory            | Pacote                 | Por que não há saída hoje                                                                                                                                                                                                  | Alcance                                  | Gatilho de retirada                                                 |
+| ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------- |
+| GHSA-c4qx-w738-7hr3 | `@graphql-tools/utils` | Só a cópia 11.2.2 sob `@tinacms/cli@4.0.5` (`npm explain`: todos os dependentes chegam ao CLI). É a última 11.x e os `@graphql-codegen/*` do CLI pedem `^11.2.0`. A cópia 12.0.0 foi atualizada para 12.1.0                | Build do painel e servidor local do Tina | O `@tinacms/cli` passar a pedir `@graphql-tools/utils` 12.1 ou mais |
+| GHSA-7mx3-vvmw-hjmv | `@graphql-tools/utils` | A mesma cópia 11.2.2. Motivo reescrito: o "downgrade para `@tinacms/cli@0.56.5`" de 2026-10-07 não descreve mais a medição                                                                                                 | Idem                                     | Idem                                                                |
+| GHSA-mrhx-c7xc-m3w5 | `zod`                  | Só as 4 cópias `zod@3.25.76` sob `tinacms`/`@tinacms/*` (`npm ls zod`); a 3.25.76 é a última 3.x e o Tina pede `^3.24.2`. O `fixAvailable` do npm é `tinacms@1.2.1`, um downgrade. As cópias do Astro (4.6.7) estão limpas | Painel `/admin` e build                  | O Tina passar a aceitar `zod` 4                                     |
+
+A exceção do `zod` vale por id do alerta e esconderia também uma cópia do Astro: por isso a prova
+do `npm ls zod` (só as cópias do Tina abaixo de 4.6.6) está na Evidência do plano 087.
+
+Alcance de todas: o painel `/admin`, autenticado e usado por uma pessoa, e o build. O site
+publicado é HTML estático, sem React nem Node em execução (D-01).
+
+**Retiradas nesta data:** `braces` (já não aparecia) e `sharp` (o `miniflare` do `wrangler@4.166.0`
+fixa `sharp@0.35.5`). O histórico de 2026-09-12 e de 2026-10-07 não foi reescrito.
 
 ## Alternativas consideradas
 

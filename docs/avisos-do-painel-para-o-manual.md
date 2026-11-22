@@ -9,7 +9,7 @@
 - **Criado em:** 2026-09-12, pelo plano 033 (`plans/fase-2-pipeline-de-publicacao/033-avisos-do-painel-para-o-manual-da-fase-5.md`).
 - **Destino:** fase 5 — `docs/manual-do-professor.md` e a sessão de treinamento de 30 min de
   RNF-05.
-- **Versão do TinaCMS observada:** 3.12.1 (`package.json`; confirmada também no contexto do plano 022) — vale para os Avisos 1 a 3, que são comportamento do painel. Os Avisos 4 e 5 **não** são
+- **Versão do TinaCMS observada:** 3.15.2, em 2026-11-22 (plano 087; antes, 3.12.1 — `package.json`, confirmada também no contexto do plano 022) — vale para os Avisos 1 a 3, que são comportamento do painel. Os Avisos 4 e 5 **não** são
   defeito do TinaCMS (são o pipeline de build e a decisão de arquitetura D-04, respectivamente); a
   linha "Quando revisar" de cada um já deixa isso explícito.
 
@@ -50,7 +50,9 @@ save — a tela nunca é prova.
 antes de abrir qualquer outra seção do formulário — se você abrir 'Versão em inglês' ou outra seção
 parecida e voltar, o que você acabou de mudar pode não ser salvo, mesmo que a tela pareça certa."_
 
-**Quando revisar.** Observado no TinaCMS 3.12.1. Perde objeto se uma versão futura do Tina parar de
+**Reobservado em 2026-11-22 (plano 087, TinaCMS 3.15.2).** O caminho do plano 021 (editar `nome` de uma disciplina, abrir "Versão em inglês", voltar pelo breadcrumb e salvar no pai) **não reproduziu** em 3.15.2: a edição foi gravada. No 3.12.1, o mesmo caminho reverteu a edição na tela e desabilitou o `Save`. O caminho do plano 020 (interruptor "Publicado") **não foi reverificado** em 3.15.2. O aviso fica: um caminho só deixou de reproduzir.
+
+**Quando revisar.** Observado no TinaCMS 3.12.1; em 3.15.2 o caminho do 021 não reproduz e o do 020 não foi reverificado (ver acima). Perde objeto se uma versão futura do Tina parar de
 re-inicializar o formulário a partir do documento carregado ao sair de um subpainel de grupo
 `object` — ou seja, se o estado do formulário passar a sobreviver à navegação entre subpainéis sem
 salvar.
@@ -98,7 +100,7 @@ adicionar o próximo, e conferir o frontmatter gravado depois de salvar, não s�
 antes de sair — o painel às vezes deixa salvar um autor vazio, e o problema só aparece minutos
 depois, no site. Nas disciplinas, se aparecer o alerta 'Não salvo: …', ele diz qual item completar."_
 
-**Quando revisar.** Observado no TinaCMS 3.12.1; atualizado em 2026-11-21 (plano 086). Perde objeto se uma versão futura do
+**Quando revisar.** Observado no TinaCMS 3.12.1; atualizado em 2026-11-21 (plano 086). Reobservado em 3.15.2 em 2026-11-22 (plano 087): continua; o "+" em `publicacoes.autores[]` deixando o item vazio gravou `- ''`. Perde objeto se uma versão futura do
 `@tinacms/schema-tools` passar a tipar (e o Tina passar a executar) `validate` para a variante de
 lista de objetos — o que também tornaria o F-01 do PRD verdadeiro para este caso.
 
@@ -137,7 +139,7 @@ texto da saída do `npm run build`/`astro check`, não confiar no exit code.
 relacionada, edite-o com atenção redobrada — e avise o responsável técnico depois de qualquer
 alteração nele, mesmo que pareça não ter mexido nesse campo."_
 
-**Quando revisar.** Observado no TinaCMS 3.12.1. Perde objeto se uma versão futura passar a omitir
+**Quando revisar.** Observado no TinaCMS 3.12.1; reobservado em 3.15.2 em 2026-11-22 (plano 087): continua, o projeto ganhou `linha_relacionada: ''`, e o mesmo apareceu ao salvar uma **publicação**, coleção que este aviso não lista. Perde objeto se uma versão futura passar a omitir
 `reference` vazio do frontmatter (como já faz hoje para campos de string simples como `codigo`), em
 vez de gravar string vazia.
 

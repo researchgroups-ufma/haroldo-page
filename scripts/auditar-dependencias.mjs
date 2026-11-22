@@ -8,7 +8,7 @@
  *                 exceção deixou de ser necessária, para ser retirada.
  *  Autor        : Desenvolvedor
  *  Criado em    : 2026-10-07
- *  Atualizado em: 2026-10-07
+ *  Atualizado em: 2026-11-22
  *  Versão       : 0.1.0
  *
  *  Dependências : node:child_process, node:process, node:url, node:console
@@ -36,17 +36,20 @@ export const EXCECOES = {
   'GHSA-7mx3-vvmw-hjmv': {
     desde: '2026-10-07',
     pacote: '@graphql-tools/utils',
-    motivo: 'só via @tinacms/cli; a única correção do npm é o downgrade para @tinacms/cli@0.56.5',
+    motivo:
+      'só a cópia 11.2.2 sob @tinacms/cli@4.0.5; é a última 11.x e os @graphql-codegen/* do CLI pedem ^11.2.0',
   },
-  'GHSA-vfj7-8cjw-p6xm': {
-    desde: '2026-10-07',
-    pacote: 'braces',
-    motivo: 'só via tinacms/@tinacms/cli; a única correção do npm é downgrade do Tina',
+  'GHSA-c4qx-w738-7hr3': {
+    desde: '2026-11-22',
+    pacote: '@graphql-tools/utils',
+    motivo:
+      'só a cópia 11.2.2 sob @tinacms/cli@4.0.5; é a última 11.x e os @graphql-codegen/* do CLI pedem ^11.2.0',
   },
-  'GHSA-wq5f-xc86-pv6w': {
-    desde: '2026-10-07',
-    pacote: 'sharp',
-    motivo: 'miniflare (wrangler, até o 4.148.0) fixa sharp@0.35.4 exato; a corrigida é a 0.35.5',
+  'GHSA-mrhx-c7xc-m3w5': {
+    desde: '2026-11-22',
+    pacote: 'zod',
+    motivo:
+      'só as cópias zod@3.25.76 de tinacms/@tinacms/*; a linha 3 não tem correção (3.25.76 é a última 3.x) e o Tina pede ^3.24.2 até o CLI 4.0.5',
   },
 };
 
