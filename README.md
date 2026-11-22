@@ -370,7 +370,7 @@ já pede nativamente as versões corrigidas de `sharp` e `esbuild`. A história 
 que motivou cada pin e por que cada um caiu, está em
 `docs/adr/0002-pin-do-vite-via-overrides.md`. `npm audit` **não** está em zero vulnerabilidades:
 medidas em 2026-11-22, são **3 baixas, 20 moderadas e 8 altas**. As 8 altas são o `zod` 3.x do Tina
-e os pacotes `@tinacms/*` que dependem dele, cobertas pela exceção abaixo. As baixas (`dompurify`,
+e os pacotes do Tina que dependem dele, cobertas pela exceção abaixo. As baixas (`dompurify`,
 `katex`, `mermaid`) vêm do `tinacms`; entre as moderadas estão `qs` e `@tailwindcss/typography`
 (via `@tinacms/cli`), `fast-uri` (`@astrojs/check`), `smol-toml` (via `astro`) e o próprio `astro`,
 além de lint e teste. As moderadas ficam fora do escopo do portão (ADR-0010); a do

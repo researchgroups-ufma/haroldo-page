@@ -195,7 +195,7 @@ desfeito e o GHSA-pwhx viraria exceção (não foi preciso: o degrau 3 ficou).
 | Depois: contagem do lock em `17364aa` | `0, 3, 20, 8, 0, 31`  |
 
 O portão sai `aprovado` no commit de docs do degrau 4 que retira as exceções do
-`@graphql-tools/utils`; as 8 `high` restantes são as do `zod` 3.x do Tina e os pacotes `@tinacms/*`
+`@graphql-tools/utils`; as 8 `high` restantes são as do `zod` 3.x do Tina e os pacotes do Tina
 que dependem dele, todas cobertas pela exceção do `zod`.
 
 **Corrigido por atualização** (sem `overrides`, sem `npm audit fix`):
@@ -222,11 +222,12 @@ que dependem dele, todas cobertas pela exceção do `zod`.
 A exceção do `zod` vale por id do alerta e esconderia também uma cópia do Astro: por isso a prova
 do `npm ls zod` (só as cópias do Tina abaixo de 4.6.6) está na Evidência do plano 087.
 
-Alcance de todas: o painel `/admin`, autenticado e usado por uma pessoa, e o build. O site
+Alcance da exceção: o painel `/admin`, autenticado e usado por uma pessoa, e o build. O site
 publicado é HTML estático, sem React nem Node em execução (D-01).
 
 **Retiradas nesta data:** `braces` (já não aparecia) e `sharp` (o `miniflare` do `wrangler@4.166.0`
-fixa `sharp@0.35.5`). O histórico de 2026-09-12 e de 2026-10-07 não foi reescrito.
+fixa `sharp@0.35.5`) e `GHSA-7mx3` (`@graphql-tools/utils`, que saiu com a atualização dos
+`@graphql-codegen/*` em `17364aa`). O histórico de 2026-09-12 e de 2026-10-07 não foi reescrito.
 
 ## Alternativas consideradas
 
