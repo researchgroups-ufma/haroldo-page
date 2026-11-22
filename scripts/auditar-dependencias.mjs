@@ -33,18 +33,6 @@ import console from 'node:console';
  * entrada lá também.
  */
 export const EXCECOES = {
-  'GHSA-7mx3-vvmw-hjmv': {
-    desde: '2026-10-07',
-    pacote: '@graphql-tools/utils',
-    motivo:
-      'só a cópia 11.2.2 sob @tinacms/cli@4.0.5; é a última 11.x e os @graphql-codegen/* do CLI pedem ^11.2.0',
-  },
-  'GHSA-c4qx-w738-7hr3': {
-    desde: '2026-11-22',
-    pacote: '@graphql-tools/utils',
-    motivo:
-      'só a cópia 11.2.2 sob @tinacms/cli@4.0.5; é a última 11.x e os @graphql-codegen/* do CLI pedem ^11.2.0',
-  },
   'GHSA-mrhx-c7xc-m3w5': {
     desde: '2026-11-22',
     pacote: 'zod',

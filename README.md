@@ -369,10 +369,13 @@ três (`vite`, `sharp`, `esbuild`), removidos no upgrade do Astro: o 7 exige `vi
 já pede nativamente as versões corrigidas de `sharp` e `esbuild`. A história completa, com o
 que motivou cada pin e por que cada um caiu, está em
 `docs/adr/0002-pin-do-vite-via-overrides.md`. `npm audit` **não** está em zero vulnerabilidades:
-medidas em 2026-11-22, são **20 moderadas** e 3 baixas, de origens variadas (ferramentas de lint e
-teste, `astro`, `altair-*` do Tina), deixadas de fora do portão de propósito (ADR-0010); nenhuma
-alcança o site público, que não carrega React nem Node (D-01).
-O CI reprova a partir de `high`/`critical`, com três exceções datadas (seção "Exceções datadas
-(2026-11-22)" do ADR): `GHSA-c4qx` e `GHSA-7mx3` (`@graphql-tools/utils@11.2.2` sob o
-`@tinacms/cli`) e `GHSA-mrhx` (as cópias `zod@3.25.76` do Tina); a política, os números medidos e as
+medidas em 2026-11-22, são **3 baixas, 20 moderadas e 8 altas**. As 8 altas são o `zod` 3.x do Tina
+e os pacotes `@tinacms/*` que dependem dele, cobertas pela exceção abaixo. As baixas (`dompurify`,
+`katex`, `mermaid`) vêm do `tinacms`; entre as moderadas estão `qs` e `@tailwindcss/typography`
+(via `@tinacms/cli`), `fast-uri` (`@astrojs/check`), `smol-toml` (via `astro`) e o próprio `astro`,
+além de lint e teste. As moderadas ficam fora do escopo do portão (ADR-0010); a do
+`astro` (GHSA-98hj, XSS com `<script>`/`<style>` sem escape, `<7.3.2`, e outras três) é pendência
+nomeada: o `astro` não foi atualizado no plano 087.
+O CI reprova a partir de `high`/`critical`, com uma exceção datada (seção "Exceções datadas
+(2026-11-22)" do ADR): `GHSA-mrhx` (as cópias `zod@3.25.76` do Tina); a política, os números medidos e as
 alternativas rejeitadas estão em `docs/adr/0010-npm-audit-no-ci-e-severidade.md`.

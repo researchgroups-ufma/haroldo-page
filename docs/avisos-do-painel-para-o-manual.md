@@ -50,9 +50,9 @@ save — a tela nunca é prova.
 antes de abrir qualquer outra seção do formulário — se você abrir 'Versão em inglês' ou outra seção
 parecida e voltar, o que você acabou de mudar pode não ser salvo, mesmo que a tela pareça certa."_
 
-**Reobservado em 2026-11-22 (plano 087, TinaCMS 3.15.2).** O caminho do plano 021 (editar `nome` de uma disciplina, abrir "Versão em inglês", voltar pelo breadcrumb e salvar no pai) **não reproduziu** em 3.15.2: a edição foi gravada. No 3.12.1, o mesmo caminho reverteu a edição na tela e desabilitou o `Save`. O caminho do plano 020 (interruptor "Publicado") **não foi reverificado** em 3.15.2. O aviso fica: um caminho só deixou de reproduzir.
+**Reobservado em 2026-11-22 (plano 087, TinaCMS 3.15.2).** O caminho testado (editar `nome` de uma disciplina, abrir "Versão em inglês", voltar pelo breadcrumb e salvar no pai) produzia no 3.12.1 a manifestação do plano 021 (a edição revertia na tela e o `Save` desabilitava) e **não reproduziu** em 3.15.2: a edição foi gravada. Os caminhos registrados pelo plano 020 (interruptor "Publicado") e pelo 021 (`resumo`/`corpo` de linha de pesquisa) **não foram reverificados** em 3.15.2. O aviso fica.
 
-**Quando revisar.** Observado no TinaCMS 3.12.1; em 3.15.2 o caminho do 021 não reproduz e o do 020 não foi reverificado (ver acima). Perde objeto se uma versão futura do Tina parar de
+**Quando revisar.** Observado no TinaCMS 3.12.1; em 3.15.2 o caminho testado em 2026-11-22 não reproduz e os do 020 e do 021 não foram reverificados (ver acima). Perde objeto se uma versão futura do Tina parar de
 re-inicializar o formulário a partir do documento carregado ao sair de um subpainel de grupo
 `object` — ou seja, se o estado do formulário passar a sobreviver à navegação entre subpainéis sem
 salvar.

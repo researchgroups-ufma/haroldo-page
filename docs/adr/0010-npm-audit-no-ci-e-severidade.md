@@ -168,7 +168,7 @@ audit do CI no lugar de `npm audit --audit-level=high`. O nível não muda: qual
 
 | Advisory                                     | Pacote                 | Por que não há saída hoje                                                                                                                                                                                      | Alcance                                                                                |
 | -------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| GHSA-7mx3-vvmw-hjmv                          | `@graphql-tools/utils` | Só via `@tinacms/cli`; a correção do npm é o downgrade para `@tinacms/cli@0.56.5` (motivo reescrito em 2026-11-22, ver abaixo)                                                                                 | Build do painel e servidor local do Tina                                               |
+| GHSA-7mx3-vvmw-hjmv (retirada em 2026-11-22) | `@graphql-tools/utils` | Só via `@tinacms/cli`; a correção do npm é o downgrade para `@tinacms/cli@0.56.5` (saiu com a atualização do `@graphql-codegen/*`, ver 2026-11-22)                                                             | Build do painel e servidor local do Tina                                               |
 | GHSA-vfj7-8cjw-p6xm (retirada em 2026-11-22) | `braces`               | Só via `tinacms`/`@tinacms/cli`; a correção do npm é downgrade do Tina                                                                                                                                         | Ferramentas de build (glob de arquivos)                                                |
 | GHSA-wq5f-xc86-pv6w (retirada em 2026-11-22) | `sharp`                | O `miniflare` do `wrangler` fixa `sharp@0.35.4` exato, e até o `wrangler@4.148.0` (o mais recente) continua assim; a corrigida é a `0.35.5`. Subir só a cópia do `astro` duplicaria o pacote sem tirar o aviso | Build e servidor local (`wrangler dev`); o Worker publicado serve HTML estático (D-01) |
 
@@ -189,33 +189,35 @@ desfeito e o GHSA-pwhx viraria exceção (não foi preciso: o degrau 3 ficou).
 
 **Retrato do `npm audit`** (`info, low, moderate, high, critical, total`):
 
-| Momento                      | Contagem                                       |
-| ---------------------------- | ---------------------------------------------- |
-| Antes (`main`, `71e1c24`)    | `0, 3, 23, 22, 2, 50`                          |
-| Depois (degrau 4, `48139bc`) | `0, 3, 20, 13, 0, 36`; o portão sai `aprovado` |
+| Momento                               | Contagem              |
+| ------------------------------------- | --------------------- |
+| Antes (`main`, `71e1c24`)             | `0, 3, 23, 22, 2, 50` |
+| Depois: contagem do lock em `17364aa` | `0, 3, 20, 8, 0, 31`  |
+
+O portão sai `aprovado` no commit de docs do degrau 4 que retira as exceções do
+`@graphql-tools/utils`; as 8 `high` restantes são as do `zod` 3.x do Tina e os pacotes `@tinacms/*`
+que dependem dele, todas cobertas pela exceção do `zod`.
 
 **Corrigido por atualização** (sem `overrides`, sem `npm audit fix`):
 
-| Advisory                 | Pacote                                | Antes → depois                                                 | Degrau |
-| ------------------------ | ------------------------------------- | -------------------------------------------------------------- | ------ |
-| GHSA-27r3-jxmh-p828      | `body-parser`                         | 1.20.6 → 1.20.9                                                | 1      |
-| GHSA-r7fv, GHSA-gfr2     | `markdown-it`                         | 14.3.1 → 14.3.3                                                | 1      |
-| 4 advisories do `undici` | `undici` (via `astro`)                | 8.11.2 → 8.13.1                                                | 1      |
-| 4 advisories do `undici` | `undici` (via `miniflare`)            | 7.29.1 → 7.30.2 (`wrangler` 4.166.0)                           | 2      |
-| GHSA-mrhx (`zod`)        | `zod` (via `astro`, `sitemap`)        | 4.5.4 → 4.6.7                                                  | 1      |
-| GHSA-x34j (crítica)      | `tinacms`, `@tinacms/app`             | 3.12.1 → 3.15.2, 2.5.12 → 2.6.0                                | 2      |
-| GHSA-587h                | `vite`                                | 8.2.2 → 8.3.8 (e a cópia 6.4.3 do CLI some com o CLI 4: 7.3.8) | 2 e 3  |
-| GHSA-pwhx                | `@tinacms/cli`                        | 2.6.1 → 4.0.5                                                  | 3      |
-| GHSA-c4qx                | `@graphql-tools/utils` (cópia 12.0.0) | 12.0.0 → 12.1.0                                                | 4      |
-| GHSA-wq5f (exceção)      | `sharp`                               | 0.35.4 → 0.35.5                                                | 2      |
+| Advisory                 | Pacote                         | Antes → depois                                                                                                                                                                                                                | Degrau |
+| ------------------------ | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| GHSA-27r3-jxmh-p828      | `body-parser`                  | 1.20.6 → 1.20.9                                                                                                                                                                                                               | 1      |
+| GHSA-r7fv, GHSA-gfr2     | `markdown-it`                  | 14.3.1 → 14.3.3                                                                                                                                                                                                               | 1      |
+| 4 advisories do `undici` | `undici` (via `astro`)         | 8.11.2 → 8.13.1                                                                                                                                                                                                               | 1      |
+| 4 advisories do `undici` | `undici` (via `miniflare`)     | 7.29.1 → 7.30.2 (`wrangler` 4.166.0)                                                                                                                                                                                          | 2      |
+| GHSA-mrhx (`zod`)        | `zod` (via `astro`, `sitemap`) | 4.5.4 → 4.6.7                                                                                                                                                                                                                 | 1      |
+| GHSA-x34j (crítica)      | `tinacms`, `@tinacms/app`      | 3.12.1 → 3.15.2, 2.5.12 → 2.6.0                                                                                                                                                                                               | 2      |
+| GHSA-587h                | `vite`                         | 8.2.2 → 8.3.8 (e a cópia 6.4.3 do CLI some com o CLI 4: 7.3.8)                                                                                                                                                                | 2 e 3  |
+| GHSA-pwhx                | `@tinacms/cli`                 | 2.6.1 → 4.0.5                                                                                                                                                                                                                 | 3      |
+| GHSA-c4qx, GHSA-7mx3     | `@graphql-tools/utils`         | 12.0.0 → 12.1.0 (cópias sob `merge`/`schema`, degrau 3; sob `relay-operation-optimizer`, degrau 4); 11.2.2 → 12.1.0 com `@graphql-codegen/*` 6.2.2, 7.4.2, 7.5.0, 6.1.2, 6.2.0 e `schema-ast` 6.1.1, dentro das faixas do CLI | 3 e 4  |
+| GHSA-wq5f (exceção)      | `sharp`                        | 0.35.4 → 0.35.5                                                                                                                                                                                                               | 2      |
 
 **Exceções**, em `scripts/auditar-dependencias.mjs` (`EXCECOES`):
 
-| Advisory            | Pacote                 | Por que não há saída hoje                                                                                                                                                                                                  | Alcance                                  | Gatilho de retirada                                                 |
-| ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------- |
-| GHSA-c4qx-w738-7hr3 | `@graphql-tools/utils` | Só a cópia 11.2.2 sob `@tinacms/cli@4.0.5` (`npm explain`: todos os dependentes chegam ao CLI). É a última 11.x e os `@graphql-codegen/*` do CLI pedem `^11.2.0`. A cópia 12.0.0 foi atualizada para 12.1.0                | Build do painel e servidor local do Tina | O `@tinacms/cli` passar a pedir `@graphql-tools/utils` 12.1 ou mais |
-| GHSA-7mx3-vvmw-hjmv | `@graphql-tools/utils` | A mesma cópia 11.2.2. Motivo reescrito: o "downgrade para `@tinacms/cli@0.56.5`" de 2026-10-07 não descreve mais a medição                                                                                                 | Idem                                     | Idem                                                                |
-| GHSA-mrhx-c7xc-m3w5 | `zod`                  | Só as 4 cópias `zod@3.25.76` sob `tinacms`/`@tinacms/*` (`npm ls zod`); a 3.25.76 é a última 3.x e o Tina pede `^3.24.2`. O `fixAvailable` do npm é `tinacms@1.2.1`, um downgrade. As cópias do Astro (4.6.7) estão limpas | Painel `/admin` e build                  | O Tina passar a aceitar `zod` 4                                     |
+| Advisory            | Pacote | Por que não há saída hoje                                                                                                                                                                                                                                                        | Alcance                 | Gatilho de retirada             |
+| ------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ------------------------------- |
+| GHSA-mrhx-c7xc-m3w5 | `zod`  | Só as 4 cópias `zod@3.25.76` sob `tinacms`/`@tinacms/*` (`npm ls zod`); a 3.25.76 é a última 3.x e o Tina pede `^3.24.2`. O `fixAvailable` do npm foi `tinacms@1.2.1` no degrau 3 e `@tinacms/cli@1.0.4` no degrau 4, os dois downgrade. As cópias do Astro (4.6.7) estão limpas | Painel `/admin` e build | O Tina passar a aceitar `zod` 4 |
 
 A exceção do `zod` vale por id do alerta e esconderia também uma cópia do Astro: por isso a prova
 do `npm ls zod` (só as cópias do Tina abaixo de 4.6.6) está na Evidência do plano 087.
