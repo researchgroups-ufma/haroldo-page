@@ -10,6 +10,11 @@ on:
   schedule:
     - cron: '17 12 * * *'
   workflow_dispatch:
+    inputs:
+      testar_telegram:
+        description: 'Enviar uma mensagem de teste ao Telegram mesmo com o build verde'
+        type: boolean
+        default: false
 
 permissions:
   checks: read
@@ -20,12 +25,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Conferir o Workers Builds do commit mais recente da main
+        id: vigia
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           CHECK: 'Workers Builds: haroldo-page'
         run: |
           set -euo pipefail
+          # o motivo vai para o output antes do exit, para o passo do Telegram citar
+          falha() { echo "::error::$1"; echo "motivo=$1" >> "$GITHUB_OUTPUT"; exit 1; }
           sha=$(gh api "repos/$REPO/commits/main" --jq .sha)
           data=$(gh api "repos/$REPO/commits/$sha" --jq .commit.committer.date)
           idade=$(( $(date +%s) - $(date -d "$data" +%s) ))
@@ -39,8 +47,7 @@ jobs:
           # desconectado (plano 025).
           if [ -z "$check" ]; then
             if [ "$idade" -gt 1800 ]; then
-              echo "::error::Nenhum '$CHECK' em $sha, $(( idade / 60 )) min depois do commit."
-              exit 1
+              falha "Nenhum '$CHECK' em $sha, $(( idade / 60 )) min depois do commit."
             fi
             echo "Sem '$CHECK' ainda, commit com $(( idade / 60 )) min: build em andamento."
             exit 0
@@ -56,8 +63,7 @@ jobs:
           # esperar mais e nulo.
           if [ "$status" != "completed" ]; then
             if [ "$idade" -gt 3600 ]; then
-              echo "::error::Check '$CHECK' de $sha preso em '$status' ha $(( idade / 60 )) min. Log: $url"
-              exit 1
+              falha "Check '$CHECK' de $sha preso em '$status' ha $(( idade / 60 )) min. Log: $url"
             fi
             echo "Build ainda em andamento."
             exit 0
@@ -65,7 +71,40 @@ jobs:
           case "$conclusao" in
             success | neutral | skipped) echo "Build de deploy verde." ;;
             *)
-              echo "::error::Build de deploy de $sha terminou '$conclusao'. O site segue na versao anterior. Log: $url"
-              exit 1
+              falha "Build de deploy de $sha terminou '$conclusao'. O site segue na versao anterior. Log: $url"
               ;;
           esac
+
+      # Canal extra ao e-mail do F-02. Sem os secrets o passo so avisa e nao reprova: o e-mail
+      # continua sendo o aviso garantido.
+      - name: Avisar no Telegram
+        if: failure() || inputs.testar_telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MOTIVO: ${{ steps.vigia.outputs.motivo }}
+          TESTE: ${{ inputs.testar_telegram }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::warning::TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID ausente; aviso nao enviado."
+            exit 0
+          fi
+          if [ "$TESTE" = "true" ] && [ -z "$MOTIVO" ]; then
+            titulo="[teste] Vigia do deploy do site do Haroldo"
+            MOTIVO="Mensagem de teste disparada manualmente. Nenhuma falha real."
+          else
+            titulo="Falha no deploy do site do Haroldo"
+            MOTIVO="${MOTIVO:-O vigia falhou antes de concluir a conferencia (ver o log do run).}"
+          fi
+          texto=$(printf '%s\n\n%s\n\nRun: %s' "$titulo" "$MOTIVO" "$RUN_URL")
+          if ! resposta=$(curl -sS --fail-with-body \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=${texto}" \
+            --data-urlencode "disable_web_page_preview=true"); then
+            echo "::error::Telegram recusou o envio: $resposta"
+            exit 1
+          fi
+          echo "Aviso enviado ao Telegram."
