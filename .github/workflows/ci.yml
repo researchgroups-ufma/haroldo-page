@@ -55,3 +55,14 @@ jobs:
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
       # tests/dist/**: le o dist/ recem-gerado pelo build:pipeline acima (plano 052, §11)
       - run: npm run test:dist
+      # So no push para a main: num save do professor quem empurra e o TinaCloud, e o e-mail de
+      # falha iria para ele, nao para o ADMIN. Falha em PR ja aparece na propria PR.
+      - name: Avisar falha no Telegram
+        if: failure() && github.event_name == 'push'
+        uses: ./.github/actions/telegram
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          titulo: CI vermelho na main do site do Haroldo
+          texto: >-
+            O CI (qualidade) falhou no commit ${{ github.sha }}: ${{ github.event.head_commit.message }}

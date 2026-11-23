@@ -3,12 +3,19 @@ name: Vigia do deploy
 # A Cloudflare nao notifica falha do Workers Builds (plano 028). Este workflow le o resultado do
 # build de deploy no check run do commit mais recente da `main` e reprova se ele falhou — a
 # reprovacao e o que gera o e-mail do GitHub ao ADMIN (F-02, RNF-04). Decisao em ADR-0011.
+# Desde 2026-11-23 tambem avisa no Telegram, e o aviso imediato vem do gatilho `check_run`.
 on:
   # `schedule`, e nao `push`: o e-mail de um workflow agendado vai para quem alterou o cron por
   # ultimo (o ADMIN); o de `push` iria para quem empurrou, que num save do professor e o TinaCloud.
   # 12:17 UTC (09:17 em Brasilia), fora da hora cheia, quando o GitHub atrasa agendamentos.
+  # A execucao diaria pega o que o `check_run` nao ve (build ausente ou preso) e mantem o repo
+  # ativo (passo "Manter os agendamentos ativos").
   schedule:
     - cron: '17 12 * * *'
+  # Fim do build da Cloudflare: aviso no Telegram na hora, uma vez por build. Um cron de hora em
+  # hora repetiria o aviso a cada hora enquanto a `main` seguisse quebrada.
+  check_run:
+    types: [completed]
   workflow_dispatch:
     inputs:
       testar_telegram:
@@ -18,12 +25,18 @@ on:
 
 permissions:
   checks: read
-  contents: read
+  # write: o passo que mantem os agendamentos ativos faz um commit vazio
+  contents: write
 
 jobs:
   build-de-deploy:
+    # `check_run` dispara para qualquer check de app externo; so o build de deploy interessa
+    if: "github.event_name != 'check_run' || github.event.check_run.name == 'Workers Builds: haroldo-page'"
     runs-on: ubuntu-latest
     steps:
+      # traz a action local do Telegram e o historico usado para medir a inatividade
+      - uses: actions/checkout@v7
+
       - name: Conferir o Workers Builds do commit mais recente da main
         id: vigia
         env:
@@ -75,36 +88,50 @@ jobs:
               ;;
           esac
 
-      # Canal extra ao e-mail do F-02. Sem os secrets o passo so avisa e nao reprova: o e-mail
-      # continua sendo o aviso garantido.
-      - name: Avisar no Telegram
-        if: failure() || inputs.testar_telegram
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          MOTIVO: ${{ steps.vigia.outputs.motivo }}
-          TESTE: ${{ inputs.testar_telegram }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Avisar falha no Telegram
+        if: failure()
+        uses: ./.github/actions/telegram
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          titulo: Falha no deploy do site do Haroldo
+          texto: ${{ steps.vigia.outputs.motivo || 'O vigia falhou antes de concluir a conferencia (ver o log do run).' }}
+
+      - name: Mensagem de teste no Telegram
+        if: inputs.testar_telegram
+        uses: ./.github/actions/telegram
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          titulo: '[teste] Vigia do deploy do site do Haroldo'
+          texto: Mensagem de teste disparada manualmente. Nenhuma falha real.
+
+      # Num repositorio publico o GitHub desliga os workflows agendados apos 60 dias sem atividade,
+      # e um workflow desligado nao consegue avisar nada (ADR-0011, "Risco nomeado"). Um commit na
+      # `main` e o que zera essa contagem. Aos 45 dias sem commit sobra margem de 15 execucoes
+      # diarias. Nao dispara o CI (push com GITHUB_TOKEN nao dispara workflows); o Workers Builds
+      # publica de novo o mesmo conteudo.
+      - name: Manter os agendamentos ativos
+        id: keepalive
+        if: always() && github.event_name != 'check_run'
         run: |
           set -euo pipefail
-          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-            echo "::warning::TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID ausente; aviso nao enviado."
-            exit 0
-          fi
-          if [ "$TESTE" = "true" ] && [ -z "$MOTIVO" ]; then
-            titulo="[teste] Vigia do deploy do site do Haroldo"
-            MOTIVO="Mensagem de teste disparada manualmente. Nenhuma falha real."
-          else
-            titulo="Falha no deploy do site do Haroldo"
-            MOTIVO="${MOTIVO:-O vigia falhou antes de concluir a conferencia (ver o log do run).}"
-          fi
-          texto=$(printf '%s\n\n%s\n\nRun: %s' "$titulo" "$MOTIVO" "$RUN_URL")
-          if ! resposta=$(curl -sS --fail-with-body \
-            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=${texto}" \
-            --data-urlencode "disable_web_page_preview=true"); then
-            echo "::error::Telegram recusou o envio: $resposta"
-            exit 1
-          fi
-          echo "Aviso enviado ao Telegram."
+          dias=$(( ( $(date +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          echo "ultimo commit na main ha $dias dias"
+          if [ "$dias" -lt 45 ]; then exit 0; fi
+          git config user.name "André Ferreira"
+          git config user.email "160500693+abbadrava@users.noreply.github.com"
+          git commit --allow-empty -m "chore: mantém os workflows agendados ativos ($dias dias sem commit)"
+          git push
+          echo "dias=$dias" >> "$GITHUB_OUTPUT"
+
+      - name: Avisar o commit de manutencao no Telegram
+        if: always() && steps.keepalive.outputs.dias
+        uses: ./.github/actions/telegram
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          titulo: Site do Haroldo sem edicoes ha ${{ steps.keepalive.outputs.dias }} dias
+          texto: >-
+            Fiz um commit vazio na main para o GitHub nao desligar o vigia e o ORCID (regra dos 60
+            dias). Nada a fazer; e so para voce saber que o site esta parado.

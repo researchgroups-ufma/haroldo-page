@@ -1,0 +1,46 @@
+name: Avisar no Telegram
+description: >-
+  Manda uma mensagem de texto ao chat do bot. Usada pelo vigia do deploy, pelo CI e pelo ORCID.
+  Sem token ou chat o passo so deixa um aviso no log e nao reprova: o e-mail do GitHub continua
+  sendo o aviso garantido. Action composta nao le `secrets`, por isso eles chegam como inputs.
+
+inputs:
+  token:
+    description: TELEGRAM_BOT_TOKEN
+    required: false
+  chat_id:
+    description: TELEGRAM_CHAT_ID
+    required: false
+  titulo:
+    description: Primeira linha da mensagem
+    required: true
+  texto:
+    description: Corpo da mensagem
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ inputs.token }}
+        TELEGRAM_CHAT_ID: ${{ inputs.chat_id }}
+        TITULO: ${{ inputs.titulo }}
+        TEXTO: ${{ inputs.texto }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        set -euo pipefail
+        if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+          echo "::warning::TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID ausente; aviso nao enviado."
+          exit 0
+        fi
+        mensagem=$(printf '%s\n\n%s\n\nRun: %s' "$TITULO" "$TEXTO" "$RUN_URL")
+        if ! resposta=$(curl -sS --fail-with-body \
+          "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+          --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+          --data-urlencode "text=${mensagem}" \
+          --data-urlencode "disable_web_page_preview=true"); then
+          echo "::error::Telegram recusou o envio: $resposta"
+          exit 1
+        fi
+        echo "Aviso enviado ao Telegram."

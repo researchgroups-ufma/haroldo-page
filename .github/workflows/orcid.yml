@@ -54,3 +54,13 @@ jobs:
           git add content/publicacoes data/orcid-vistos.json
           git commit -F "$RUNNER_TEMP/orcid-commit.txt"
           git push
+      - name: Avisar falha no Telegram
+        if: failure()
+        uses: ./.github/actions/telegram
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          titulo: Falha na sincronizacao do ORCID do site do Haroldo
+          texto: >-
+            O workflow semanal do ORCID falhou; nenhuma publicacao nova foi publicada nesta rodada.
+            Veja o log do run para o passo que quebrou.
