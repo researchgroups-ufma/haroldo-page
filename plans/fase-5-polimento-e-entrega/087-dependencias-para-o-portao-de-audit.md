@@ -1,6 +1,6 @@
 # Plano 087 — Dependências atualizadas para o portão de auditoria voltar a verde (RNF-07, RNF-08, ADR-0010)
 
-**Status:** TODO
+**Status:** DONE
 **RFs cobertos:** **RNF-07** e **RNF-08** (portão de `npm audit` do CI, ADR-0010). Plano transversal: não fecha item do §12.
 **Depende de:** plano **086** DONE e verificado em produção. O 086 mexe em `tina/config.ts` e no `tina/tina-lock.json`, que este plano regenera; a branch tem de nascer depois dele.
 **Modelo recomendado:** sonnet
@@ -386,8 +386,8 @@ reporte com a saída do erro.
 - [x] Canário do portão vermelho e desfeito
 - [x] ADR-0010, README, cabeçalho do teste do lock e avisos do painel atualizados
 - [x] Portão final em árvore limpa (`npm ci` + a sequência do `ci.yml`), tudo verde e colado
-- [ ] Prévia da branch `success`; CI do PR inteiro verde
-- [ ] Depois do merge: CI `qualidade` verde na `main`, Workers Builds `success`, vigia verde, `/admin` de produção funcionando, tudo pelo SHA completo
+- [x] Prévia da branch `success`; CI do PR inteiro verde
+- [x] Depois do merge: CI `qualidade` verde na `main`, Workers Builds `success`, vigia verde, `/admin` de produção funcionando, tudo pelo SHA completo
 
 ## Evidência
 
@@ -2772,4 +2772,95 @@ ADR-0010: `GHSA-7mx3` entra em "Retiradas nesta data"; "Alcance de todas" vira "
 Checking formatting...
 All matched files use Prettier code style!
 EXIT=0
+```
+
+
+## O3 a O5 (orquestrador)
+
+Feito pelo orquestrador, com push e merge autorizados pelo dono do produto. O fallback do degrau 3 e a reversão (O6) não foram necessários: o degrau 3 ficou e a produção passou.
+
+### o3.txt
+
+```
+O3 — orquestrador, 2026-11-22
+Revisão: code-reviewer APROVADO no ciclo 2 (reprovações: ciclo 0 com 4 obrigatórios, ciclo 1 com 1 obrigatório).
+Push autorizado pelo dono do produto: git push -u origin atualiza-dependencias → * [new branch], HEAD bed5038a2a93a2f7a325a33dc73f2b9c2289438f
+PR: https://github.com/researchgroups-ufma/haroldo-page/pull/1
+Check-runs do SHA completo bed5038a2a93a2f7a325a33dc73f2b9c2289438f: "Workers Builds: haroldo-page: completed success;qualidade: completed success;"
+CI qualidade (run 45047447944, pull_request): npm ci, auditar-dependencias, lint, format:check, test:coverage, build:pipeline, test:dist — todos success.
+Workers Builds (build bcef1966-c2ea-43eb-bbe4-a93f846a957f), log pela API /builds/builds/{uuid}/logs:
+  "Installing project dependencies: npm clean-install --progress=false" / "added 1543 packages, and audited 1544 packages in 1m"
+  "Tests  166 passed (166)" / "- 0 errors" / "[build] Complete!" / "Success: Build command completed"
+  "Executing user deploy command: npx wrangler versions upload" / " ⛅️ wrangler 4.166.0" / "Worker Version ID: 9393f43f-1d24-4646-a6e3-55de75d7b75e" / "✨ Success! Build completed."
+Prévia (alias https://atualiza-dependencias-haroldo-page.and-near.workers.dev), SHA-256 (16 hex) do corpo servido = dist/ local:
+  / 15a13014d348ae43 = 15a13014d348ae43 "Prof. Haroldo C. D. Lima Junior"
+  /ensino/fisica-moderna/ fea5dc07b54be937 = fea5dc07b54be937 "Física Moderna I — Haroldo Lima Junior"
+  /extensao/ufma-bacabal/ 5bba0a591312d4f1 = 5bba0a591312d4f1
+  /admin/ HTTP 200 "TinaCMS" (não aberto para edição; nada salvo na prévia)
+```
+
+### o4.txt
+
+```
+O4 — orquestrador, 2026-11-22 23:39:54 -0300 (pergunta feita às 14:09; merge autorizado pelo dono do produto na resposta, recebida perto das 23:39)
+origin/main antes: 71e1c24373288cf3774839664fb6e7f3653bbfad
+commits do plano (main..HEAD):
+bed5038 docs: evidência dos degraus 1 a 4 e dos O2 do plano 087
+a018b50 docs: lista a retirada do GHSA-7mx3 no ADR-0010 (plano 087, degrau 4)
+ad857f4 docs: corrige exceções e textos apontados na revisão (plano 087, degrau 4)
+17364aa chore: atualiza @graphql-codegen dentro da faixa (plano 087, degrau 4)
+e3aef7f docs: exceções datadas e ADR-0010 depois da atualização (plano 087, degrau 4)
+48139bc chore: atualiza @graphql-tools/utils dentro da faixa (plano 087, degrau 4)
+f7ec0c6 chore: sobe @tinacms/cli para 4.0.5 (plano 087, degrau 3)
+9685036 chore: sobe tinacms, vite e wrangler para as versões corrigidas (plano 087, degrau 2)
+7ea9400 chore: atualiza dependências compatíveis do audit (plano 087, degrau 1)
+Reversão (O6), do mais novo ao mais antigo:
+git revert --no-edit bed5038 a018b50 ad857f4 17364aa e3aef7f 48139bc f7ec0c6 9685036 7ea9400 && git push origin main
+Linha de base da produção antes do push:
+/ prod=15a13014d348ae43 dist-branch=15a13014d348ae43
+/ensino/fisica-moderna/ prod=fea5dc07b54be937 dist-branch=fea5dc07b54be937
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+ tina/tina-lock.json                                |    2 +-
+ 9 files changed, 4745 insertions(+), 2944 deletions(-)
+To https://github.com/researchgroups-ufma/haroldo-page.git
+   71e1c24..bed5038  main -> main
+main local=bed5038a2a93a2f7a325a33dc73f2b9c2289438f remota=bed5038a2a93a2f7a325a33dc73f2b9c2289438f
+```
+
+### o4-npm-test.txt
+
+```
+
+ Test Files  27 passed (27)
+      Tests  529 passed (529)
+   Start at  23:40:26
+   Duration  2.16s (transform 7.57s, setup 0ms, import 13.99s, tests 653ms, environment 5ms)
+
+EXIT=0
+```
+
+### o5.txt
+
+```
+O5 — orquestrador, 2026-11-22 (noite) / 2026-11-23 UTC
+main = bed5038a2a93a2f7a325a33dc73f2b9c2289438f (push 71e1c24..bed5038)
+Check-runs novos do SHA completo na main: "Workers Builds: haroldo-page: completed success;qualidade: completed success;"
+  → CI qualidade verde na main, o primeiro desde 2026-11-20.
+Workers Builds de produção: build 2124c1ef-1d70-4ebe-85e6-0a45c24c966e, log pela API:
+  "Installing project dependencies: npm clean-install --progress=false" / "added 1543 packages, and audited 1544 packages in 2m"
+  "Tests  166 passed (166)" / "- 0 errors" / "02:43:36 [build] Complete!"
+  "Executing user deploy command: npx wrangler deploy" / " ⛅️ wrangler 4.166.0" / "Current Version ID: dd2ddc11-ca67-49e5-b9b5-04e46fcf1853" / "✨ Success! Build completed."
+Deployment ativo (API /workers/scripts/haroldo-page/deployments): created_on 2026-11-23T02:43:41Z, versions [{"version_id":"dd2ddc11-ca67-49e5-b9b5-04e46fcf1853","percentage":100}]
+Vigia do deploy: gh workflow run vigia-do-deploy.yml → run 45101888556, "success bed5038a2a93a2f7a325a33dc73f2b9c2289438f workflow_dispatch"
+Produção x dist/ (SHA-256, 16 hex):
+  / 15a13014d348ae43 = 15a13014d348ae43 (HTTP 200, 6891 bytes; uma primeira leitura veio vazia por falha momentânea de rede, repetida 3x com HTTP 200)
+  /ensino/fisica-moderna/ fea5dc07b54be937 = fea5dc07b54be937
+  /extensao/ufma-bacabal/ 5bba0a591312d4f1 = 5bba0a591312d4f1
+  /admin/ HTTP 200
+/admin de produção no Edge, 2026-11-23 00:04:10 -0300, logado no TinaCloud pelo dono do produto:
+  coleções (#/collections/<c>/~): {"perfil":{"n":1},"linhas_pesquisa":{"n":2},"projetos":{"n":2},"disciplinas":{"n":2},"publicacoes":{"n":23},"extensao":{"n":3}} (= main), nenhuma tela de erro
+  disciplinas/Fisica-Moderna abre: {"nome":"Física Moderna I","aulas":34}; Save desabilitado; nada salvo
+  console do painel (rastreio desde a abertura): "No console errors or exceptions found for this tab."
+  TinaCloud, projeto haroldo-page, Configuration → Branches: "atualiza-dependencias | 10 hours ago | design | 2 months ago | main | 23 minutes ago" (main reindexada depois do merge, push às 23:41)
 ```

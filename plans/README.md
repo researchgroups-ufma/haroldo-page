@@ -4,7 +4,7 @@ Um diretório por fase do roadmap (§6.2 do PRD). **Cada fase tem seu próprio `
 estado dos planos, a ordem de execução, o grafo de dependências e as armadilhas aprendidas ali.
 Este arquivo é só o mapa.
 
-Última atualização: 2026-11-21 — **086 DONE** (`19ece89`): link opcional em aula e lista e item vazio descartado no painel; o deploy voltou a verde (versão `fa471ac9`). O CI segue vermelho só no audit, que é o 087, o próximo. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../docs/historico-de-implementacao.md), §4.1.
+Última atualização: 2026-11-23 — **087 DONE** (`7ea9400`…`a018b50`, evidência em `bed5038`): dependências atualizadas e o CI `qualidade` voltou a verde na `main`, o primeiro desde 2026-11-20; produção na versão `dd2ddc11`. Os eventos anteriores estão em [`docs/historico-de-implementacao.md`](../docs/historico-de-implementacao.md), §4.1.
 
 ## Fases
 
@@ -15,7 +15,7 @@ Este arquivo é só o mapa.
 | [`fase-2-pipeline-de-publicacao/`](fase-2-pipeline-de-publicacao/README.md) | 2 — Pipeline de publicação ponta a ponta | 🟢 **Concluída (5/5)** | 023–035, todos DONE (o 027 e o 029 migraram para a fase 5) |
 | [`fase-3-site-publico/`](fase-3-site-publico/README.md) | 3 — Site público em português | 🟢 **Concluída (12/12)** | 036–054, todos DONE |
 | [`fase-4-internacionalizacao/`](fase-4-internacionalizacao/README.md) | 4 — Internacionalização | 🟢 **Concluída (9/9 no §12)** — critério do §6.2 demonstrado em 2026-10-02 (plano 073, `ead6056`); sabatinada e fatiada em 2026-09-24 ([`CHANGELOG_sabatina_fase-4-i18n.md`](../docs/sabatinas/CHANGELOG_sabatina_fase-4-i18n.md)) | 055–074; todos DONE; o 073 fechou a fase |
-| [`fase-5-polimento-e-entrega/`](fase-5-polimento-e-entrega/README.md) | 5 — Polimento e entrega | ⬜ Não iniciada (0/21 no §12) — parcialmente fatiada em 2026-10-12 | **027** e **029** (migrados da fase 2 em 2026-09-12), **075–085** (auditoria de qualidade) e **087** (dependências do audit), TODO; **086** DONE (`19ece89`); o 085 bloqueado pela Q-05; próximo, o 087 |
+| [`fase-5-polimento-e-entrega/`](fase-5-polimento-e-entrega/README.md) | 5 — Polimento e entrega | ⬜ Não iniciada (0/21 no §12) — parcialmente fatiada em 2026-10-12 | **027** e **029** (migrados da fase 2 em 2026-09-12), **075–085** (auditoria de qualidade), TODO; **086** DONE (`19ece89`) e **087** DONE (`7ea9400`…`a018b50`); o 085 bloqueado pela Q-05 |
 
 A ordem do roadmap **não** é 0→1→2→3→4→5 linear: a fase 2 vem antes do site público de
 propósito. O PRD explica por quê — o maior risco do projeto é o ciclo de publicação, não o

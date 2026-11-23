@@ -14,11 +14,11 @@
 | **Codinome / sigla** | `haroldo-page` |
 | **Versão do PRD** | v0.1.82 |
 | **Status** | 🟢 Aprovado |
-| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/21 · **Extensão (RF-15) implementada fora de fase em 2026-10-07 (`6fac810`)** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, em 2026-10-07 (`8d929e7`)** · **Página de disciplina (RF-24) refeita no modelo D na `main` em 2026-10-07, sem commit** · **Sync do ORCID (RF-17) implementado fora de fase em 2026-10-09 (`3928fd2`; primeira carga `fd85f47`)** · **Link opcional em aula e lista (RF-07, RF-24; plano 086, `19ece89`) em 2026-11-21**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
+| **Estado da implementação** | Fase 0 🟢 10/10, concluída em 2026-09-01 · Fase 1 🟢 10/10, em 2026-09-10 · Fase 2 🟢 5/5, em 2026-09-12 · Fase 3 🟢 12/12, em 2026-09-23 · **Fase 4 🟢 9/9, concluída em 2026-10-02 (plano 073, `ead6056`) — próximo: fase 5** · Fase 5 ⬜ 0/21 · **Extensão (RF-15) implementada fora de fase em 2026-10-07 (`6fac810`)** · **Ensino (RF-23/RF-24) refeito no modelo A, com disciplinas perenes, em 2026-10-07 (`8d929e7`)** · **Página de disciplina (RF-24) refeita no modelo D na `main` em 2026-10-07, sem commit** · **Sync do ORCID (RF-17) implementado fora de fase em 2026-10-09 (`3928fd2`; primeira carga `fd85f47`)** · **Link opcional em aula e lista (RF-07, RF-24; plano 086, `19ece89`) em 2026-11-21** · **Dependências do portão de audit (RNF-07, RNF-08; plano 087, `7ea9400`…`a018b50`, evidência em `bed5038`) em 2026-11-23: CI `qualidade` verde na `main`**. Detalhe por item no §12; execução em `plans/README.md`; histórico em `docs/historico-de-implementacao.md` |
 | **Autor(es)** | Desenvolvedor (`and.near@hotmail.com`) |
 | **Revisores / aprovadores** | Desenvolvedor (dono do produto); Professor (usuário-chave, valida a fase 5) |
 | **Data de criação** | 2026-09-01 |
-| **Última atualização** | 2026-11-21 |
+| **Última atualização** | 2026-11-23 |
 | **Repositório** | <https://github.com/researchgroups-ufma/haroldo-page> — **público**, na organização `researchgroups-ufma`. Criado privado no plano 010; tornado público em 2026-09-01 por necessidade do projeto |
 | **Documentos relacionados** | `briefing.md` (este diretório); `../docs/plano-i18n.md` (padrão de i18n do LaFiM, reaproveitado); projeto irmão `../grav`; `docs/historico-de-implementacao.md` (histórico de implementação e versões antigas deste PRD) |
 

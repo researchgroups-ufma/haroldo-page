@@ -5,7 +5,7 @@
 > é o campo `Status:` de cada um. Este arquivo existe para o que não cabe em nenhum dos dois: a
 > ordem, o paralelismo e as armadilhas.
 
-Última atualização: 2026-11-21 — 086 DONE (`19ece89`): o deploy voltou a verde; o próximo é o 087.
+Última atualização: 2026-11-23 — 087 DONE (`7ea9400`…`a018b50`, evidência em `bed5038`): o CI `qualidade` voltou a verde na `main`.
 
 **A fase está parcialmente fatiada.** Têm plano só os itens da auditoria de qualidade de 2026-10-12
 (075–085, sabatina
@@ -35,7 +35,7 @@ atingidas.*
 | 084 | `apple-touch-icon.png` e `favicon.ico` (Decisão 9) | ⬜ TODO | agente (sonnet) + orquestrador (`curl`) | implementer | — |
 | 085 | 🧑 Indexação no domínio próprio, HSTS e "Always Use HTTPS" — **BLOQUEADO pela Q-05** | ⬜ TODO | orquestrador + **stakeholder** | nenhum | — |
 | 086 | Link opcional em aula e lista; item vazio descartado no painel (RF-07, RF-24, F-09) | ✅ DONE | agente (sonnet) + orquestrador (painel, produção) | implementer | `19ece89` |
-| 087 | Dependências atualizadas para o portão de audit voltar a verde, na branch `atualiza-dependencias` (RNF-07, RNF-08, ADR-0010) — **depois do 086** | ⬜ TODO | agente (sonnet) + orquestrador (painel, PR, merge, produção) | implementer | — |
+| 087 | Dependências atualizadas para o portão de audit voltar a verde, na branch `atualiza-dependencias` (RNF-07, RNF-08, ADR-0010) | ✅ DONE | agente (sonnet) + orquestrador (painel, PR, merge, produção) | implementer | `7ea9400`…`a018b50` |
 
 **Numeração é global e contínua e não é ordem de execução.** Os números 027 e 029 vieram da fase 2
 e **não foram renumerados** — a convenção do `plans/README.md` é que um "plano 027" identifique um

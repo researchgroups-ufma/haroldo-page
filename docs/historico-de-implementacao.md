@@ -266,3 +266,8 @@ Uma entrada por plano promovido a DONE, a partir do 074, sempre no fim desta se�
   de disciplinas que descarta o item vazio e recusa o item pela metade e o link que não é endereço. O build de deploy reprovava
   desde 2026-11-20 pelos `url: ' '`, `AAAA` e `- {}` salvos pelo painel; voltou a verde (versão `fa471ac9`) sem edição em
   `content/`. Painel verificado no Edge. PRD v0.1.82. Quatro ciclos de revisão.
+
+- **2026-11-23 — 087 DONE** (`7ea9400`…`a018b50`, evidência em `bed5038`; hash de trabalho: o primeiro e o último dos oito commits de trabalho da
+  branch `atualiza-dependencias`): dependências atualizadas, entre elas o CLI do Tina 4.0.5, e o CI `qualidade` voltou a verde na
+  `main` em `bed5038`, o primeiro desde 2026-11-20; produção na versão `dd2ddc11`. `npm audit` de 50 para 31 alertas, com
+  `critical` de 2 para 0; exceção única, GHSA-mrhx (`zod` 3.x do Tina). Não fecha item do §12. Três ciclos de revisão.
